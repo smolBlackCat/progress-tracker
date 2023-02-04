@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio Code Settings
+.vscode/
+
+# Ignore build
+build/
