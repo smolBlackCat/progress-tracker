@@ -40,3 +40,10 @@ an empty window like this.
     <img src="docs/empty_window.png">
     <caption>Cool Window just for you :)</caption>
 </figure>
+
+<br>
+
+<figure>
+    <img src="docs/about_window.png">
+    <caption>About Dialog</caption>
+</figure>
