@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 configure_file(app_info.h.in app_info.h)
 
-add_executable(progress-tracker main.cpp)
+add_executable(progress-tracker main.cpp
+app_window.cpp app_window.h)
 target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
 
 # Setup CMake to use GTK+, tell the compiler where to look for headers
