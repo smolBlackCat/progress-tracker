@@ -4,6 +4,7 @@
 #include <gtkmm/aboutdialog.h>
 #include <giomm/menu.h>
 #include <giomm/simpleactiongroup.h>
+#include <gtk/gtkaboutdialog.h>
 #include <iostream>
 
 ApplicationWindow::ApplicationWindow() :
@@ -37,16 +38,13 @@ ApplicationWindow::~ApplicationWindow() {
 }
 
 void ApplicationWindow::show_about_dialog() {
-    auto about_dialog = Gtk::make_managed<Gtk::AboutDialog>();
-    about_dialog->set_program_name("Progress Tracker");
-    about_dialog->set_comments("App for storing Kanban-style todo lists.");
-    about_dialog->set_copyright("De Moura © All rights reserved.");
-    about_dialog->set_license("MIT License\n\nCopyright (c) 2023 de Moura");
-    std::string version_str = "";
-    version_str.append(std::to_string(MAJOR_VERSION));
-    version_str.append(".");
-    version_str.append(std::to_string(MINOR_VERSION));
-    about_dialog->set_version(version_str);
-
-    about_dialog->set_visible();
+    gtk_show_about_dialog(
+        this->gobj(),
+        "program_name", "Progress",
+        "version", "1.0.0",
+        "comments", "Simple app for storing kanban-style todo lists.",
+        "license_type", GtkLicense::GTK_LICENSE_MIT_X11,
+        "logo_icon_name", "com.moura.ProgressTracker",
+        nullptr
+    );
 }
