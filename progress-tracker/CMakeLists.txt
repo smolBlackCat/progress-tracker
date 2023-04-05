@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(ProgressTracker VERSION 1.0)
 
+option(TESTS_ENABLED True)
+if (TESTS_ENABLED)
+    enable_testing()
+endif()
+
 # GTK setup
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
@@ -10,10 +15,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 configure_file(app_info.h.in app_info.h)
 
-# Set Libraries
+# Set Libraries and include directories
 add_subdirectory(ui)
+add_subdirectory(core)
 list(APPEND APP_LIBS ui)
+list(APPEND APP_LIBS core)
 list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/ui")
+list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
 add_executable(progress-tracker main.cpp)
 
@@ -24,7 +32,7 @@ target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIRS})
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
+# Link the application's libraries and headers
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
 target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR} ${APP_INCLUDES})
-
 target_include_directories(progress-tracker PUBLIC ${PROJECT_BINARY_DIR})
