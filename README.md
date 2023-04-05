@@ -9,22 +9,24 @@ the Linux version is made.
 
 To build on Linux:
 
-1. Install the required dependencies. For now the only dependency being used here
-is the gui toolkit gtkmm. This can be done by issuing this command (Debian/Ubuntu systems).
+1. Install the required dependencies. For now the only dependency being used
+here is the gui toolkit gtkmm and the test framework catch2 (optional if you
+don't want to create tests binaries.)
 
-    `sudo apt install libgtkmm-4.0-dev`
+    `sudo apt install libgtkmm-4.0-dev catch2`
 
 2. You also have to have cmake installed.
 
     `sudo apt install cmake`
 
-3. Create a build directory, navigate into it and issue the command (assuming
-that you're in the project's directory).
+3. Configure and build the project using cmake.
 
     ```sh
-    mkdir build
-    cd build
-    cmake ../progress-tracker
+    mkdir build/
+    cd build/
+    # set DTESTS_ENABLED=True if you want to run the tests
+    # (ps. they have all passed ;))
+    cmake ../progress-tracker/ -DTESTS_ENABLED=False
     cmake --build .
     ```
 
@@ -45,5 +47,5 @@ an empty window like this.
 
 <figure>
     <img src="docs/about_window.png">
-    <caption>About Dialog</caption>
+    <caption>About Dialog (the icon won't appear)</caption>
 </figure>
