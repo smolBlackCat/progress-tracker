@@ -11,12 +11,6 @@ Board::Board(std::string name, std::string background) :
     }
 }
 
-Board::Board(std::string name, std::string background, unsigned long long id) :
-        Item{name, id}, background{background}, cardlist_vector{} {
-    if (!is_background(background)) {
-        throw std::domain_error{"given background is not of background type."};
-    }
-}
 
 bool Board::set_background(std::string other) {
     if (is_background(other)) {
@@ -28,18 +22,6 @@ bool Board::set_background(std::string other) {
 
 std::string Board::get_background() const { 
     return background;
-}
-
-std::string Board::fetch_xml() const {
-    std::string xml_code = "<xml version=\"1.0\">\n"
-        "<board name=\"" + name + "\" background=\"" + background + "\">\n";
-    
-    for (size_t i = 0; i < cardlist_vector.size(); i++) {
-        xml_code += cardlist_vector.at(i).fetch_xml() + "\n";
-    }
-    xml_code += "</board>";
-    
-    return xml_code;
 }
 
 bool Board::add_cardlist(CardList& cardlist) {

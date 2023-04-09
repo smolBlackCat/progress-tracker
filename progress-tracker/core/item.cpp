@@ -9,19 +9,12 @@ Item::Item(std::string name) : name{name} {
     id = distribution(gen);
 }
 
-Item::Item(std::string name, unsigned long long id) : name{name}, id{id} {
-}
-
 void Item::set_name(std::string other) {
     name = other;
 }
 
 std::string Item::get_name() const {
     return name;
-}
-
-std::string Item::fetch_xml() const {
-    return "\t\t<item name=\"" + name + "\">";
 }
 
 bool Item::operator==(const Item& item) const {

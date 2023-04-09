@@ -25,33 +25,6 @@ TEST_CASE("Setting a new name to an 'Card' object") {
     CHECK(card.get_name() == "To do");
 }
 
-TEST_CASE("Fetching the xml code from an 'Item' object") {
-    Item item{"Chores"};
-
-    std::string expected = "\t\t<item name=\"" + item.get_name() + "\">";
-
-    CHECK(item.fetch_xml() == expected);
-}
-
-TEST_CASE("Fetching xml tags from Card objects") {
-    Card card{"To do"};
-    Card card2{"Doing"};
-    Card card3{"Done"};
-
-    CHECK(card.fetch_xml() == "\t\t<card name=\"" + card.get_name() + "\">");
-    CHECK(card2.fetch_xml() == "\t\t<card name=\"" + card2.get_name() + "\">");
-    CHECK(card3.fetch_xml() == "\t\t<card name=\"" + card3.get_name() + "\">");
-}
-
-TEST_CASE("Inheritance correctness") {
-    Item* card = new Card("name");
-
-    CHECK(card->fetch_xml() != "\t\t<item name=\"" + card->get_name() + "\">");
-
-    delete card;
-    card = nullptr;
-}
-
 TEST_CASE("Inserting cards into a cardlist") {
     CardList cardlist{"To do"};
 
@@ -72,14 +45,6 @@ TEST_CASE("Fetching xml tags from CardList object") {
     cardlist.add_card(card);
     cardlist.add_card(card2);
     cardlist.add_card(card3);
-
-    std::string expected = "\t<list name=\"Todo\">\n"
-        "\t\t<card name=\"Chores\">\n"
-        "\t\t<card name=\"Fix the computer\">\n"
-        "\t\t<card name=\"Code for the cs course\">\n"
-        "\t</list>";
-
-    CHECK(cardlist.fetch_xml() == expected);
 }
 
 TEST_CASE("Removing cards from a CardList object") {
@@ -97,13 +62,6 @@ TEST_CASE("Removing cards from a CardList object") {
 
     CHECK(cardlist.remove_card(card4));
     CHECK_FALSE(cardlist.remove_card(card4));
-
-    std::string expected = "\t<list name=\"Todo\">\n"
-        "\t\t<card name=\"Fix the computer\">\n"
-        "\t\t<card name=\"Code for the cs course\">\n"
-        "\t</list>";
-
-    CHECK(cardlist.fetch_xml() == expected);
 }
 
 TEST_CASE("Basic Usage of a board") {
@@ -150,17 +108,39 @@ TEST_CASE("Basic Usage of a board") {
 
     // Should not remove the duplicate list with different cards
     CHECK_FALSE(board.remove_cardlist(doing_cardlist));
-
-    std::string expected = "<xml version=\"1.0\">\n"
-        "<board name=\"Computer Science Stuff\" background=\"(255,224,123,1)\">\n"
-        + todo_cardlist.fetch_xml() + "\n"
-        + todo_cardlist.fetch_xml() + "\n"
-        + doing_cardlist2.fetch_xml()
-        + "\n</board>";
-    
-    CHECK(board.fetch_xml() == expected);
 }
 
-TEST_CASE("Creating model objects from xml code strings") {
-    
+/**
+ * It creates xml code of a progress tracker board
+*/
+TEST_CASE("Using TinyXML2") {
+    const char* tasks1[] = {"Fix the computer", "Code project", "Do Math Assignment"};
+    const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
+    const char* lists_names[] = {"TODO", "Done"};
+    tinyxml2::XMLDocument doc;
+
+    tinyxml2::XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Computer Science Classes");
+    board_element->SetAttribute("background", "(255,255,255,1)");
+    doc.InsertEndChild(board_element);
+
+    for (auto& list_name: lists_names) {
+        // Create list
+        tinyxml2::XMLElement* list_element = doc.NewElement("list");
+        list_element->SetAttribute("name", list_name);
+
+        for (auto& task: (list_name=="TODO"? tasks1:tasks2)) {
+            // Create card
+            tinyxml2::XMLElement* card_element = doc.NewElement("card");
+            card_element->SetAttribute("name", task);
+            list_element->InsertEndChild(card_element);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+
+    tinyxml2::XMLPrinter printer;
+
+    doc.Print(&printer);
+
+    std::cout << printer.CStr() << std::endl;
 }
