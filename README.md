@@ -13,7 +13,7 @@ To build on Linux:
 here is the gui toolkit gtkmm and the test framework catch2 (optional if you
 don't want to create tests binaries.)
 
-    `sudo apt install libgtkmm-4.0-dev catch2`
+    `sudo apt install libgtkmm-4.0-dev libtinyxml2-dev catch2`
 
 2. You also have to have cmake installed.
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(ProgressTracker VERSION 1.0)
 
-option(TESTS_ENABLED True)
+option(TESTS_ENABLED true)
 if (TESTS_ENABLED)
     enable_testing()
 endif()
@@ -9,6 +9,9 @@ endif()
 # GTK setup
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
+
+# Tiny XML setup
+find_library(TINYXML2_LIB libtinyxml2 tinyxml2 REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
