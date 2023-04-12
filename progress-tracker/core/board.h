@@ -12,6 +12,7 @@ public:
 
     bool set_background(std::string other);
     std::string get_background() const;
+    std::string xml_structure() const;
     bool add_cardlist(CardList& cardlist);
     bool remove_cardlist(CardList& cardlist);
 
@@ -21,3 +22,5 @@ private:
 
     bool is_background(std::string& background) const;
 };
+
+Board* board_from_xml(std::string xml_filename);

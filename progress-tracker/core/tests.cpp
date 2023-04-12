@@ -1,9 +1,39 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
+#include <fstream>
+#include <filesystem>
 #include "item.h"
 #include "card.h"
 #include "cardlist.h"
 #include "board.h"
+
+void create_dummy_file() {
+    const char* tasks1[] = {"Fix the computer", "Code project", "Do Math Assignment"};
+    const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
+    const char* lists_names[] = {"TODO", "Done"};
+    tinyxml2::XMLDocument doc;
+
+    tinyxml2::XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Computer Science Classes");
+    board_element->SetAttribute("background", "(255,255,255,1)");
+    doc.InsertEndChild(board_element);
+
+    for (auto& list_name: lists_names) {
+        // Create list
+        tinyxml2::XMLElement* list_element = doc.NewElement("list");
+        list_element->SetAttribute("name", list_name);
+
+        for (auto& task: (list_name=="TODO"? tasks1:tasks2)) {
+            // Create card
+            tinyxml2::XMLElement* card_element = doc.NewElement("card");
+            card_element->SetAttribute("name", task);
+            list_element->InsertEndChild(card_element);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+
+    doc.SaveFile("board_progress.xml")
+}
 
 TEST_CASE("ID generation") {
     Item item{"name"};
@@ -50,14 +80,15 @@ TEST_CASE("Fetching xml tags from CardList object") {
 TEST_CASE("Removing cards from a CardList object") {
     CardList cardlist{"Todo"};
 
-    Card card{"Chores"}, card2{"Fix the computer"}, card3{"Code for the cs course"}, card4{"Fix the computer"};
+    Card card{"Chores"}, card2{"Fix the computer"},
+         card3{"Code for the cs course"}, card4{"Fix the computer"};
 
     cardlist.add_card(card);
     cardlist.add_card(card2);
     cardlist.add_card(card3);
     cardlist.add_card(card4);
 
-    CHECK(cardlist.remove_card(card));  // Remove the first card; should return true;
+    CHECK(cardlist.remove_card(card));        // Remove the first card; should return true;
     CHECK_FALSE(cardlist.remove_card(card));  // try to remove the first card; return false;
 
     CHECK(cardlist.remove_card(card4));
@@ -110,37 +141,28 @@ TEST_CASE("Basic Usage of a board") {
     CHECK_FALSE(board.remove_cardlist(doing_cardlist));
 }
 
-/**
- * It creates xml code of a progress tracker board
-*/
-TEST_CASE("Using TinyXML2") {
-    const char* tasks1[] = {"Fix the computer", "Code project", "Do Math Assignment"};
-    const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
-    const char* lists_names[] = {"TODO", "Done"};
-    tinyxml2::XMLDocument doc;
+TEST_CASE("Creating boards from XML files") {
+    if (!std::filesystem::exists("board_progress.xml")) {
+        create_dummy_file();
+    }
+    REQUIRE(board_from_xml("non_existent_file.xml") == nullptr);
 
-    tinyxml2::XMLElement* board_element = doc.NewElement("board");
-    board_element->SetAttribute("name", "Computer Science Classes");
-    board_element->SetAttribute("background", "(255,255,255,1)");
-    doc.InsertEndChild(board_element);
+    Board* board = board_from_xml("board_progress.xml");
 
-    for (auto& list_name: lists_names) {
-        // Create list
-        tinyxml2::XMLElement* list_element = doc.NewElement("list");
-        list_element->SetAttribute("name", list_name);
+    REQUIRE(board != nullptr);
 
-        for (auto& task: (list_name=="TODO"? tasks1:tasks2)) {
-            // Create card
-            tinyxml2::XMLElement* card_element = doc.NewElement("card");
-            card_element->SetAttribute("name", task);
-            list_element->InsertEndChild(card_element);
+    std::string file_content = "";
+    std::fstream xml_file{"board_progress.xml"};
+    if (xml_file.is_open()) {
+        std::string line;
+
+        while (std::getline(xml_file, line)) {
+            file_content += line + "\n";
         }
-        board_element->InsertEndChild(list_element);
+        xml_file.close();
+    } else {
+        std::cerr << "\033[;32ERROR READING THE FILE.\033[m" << std::endl;
     }
 
-    tinyxml2::XMLPrinter printer;
-
-    doc.Print(&printer);
-
-    std::cout << printer.CStr() << std::endl;
+    CHECK(board->xml_structure() == file_content);
 }

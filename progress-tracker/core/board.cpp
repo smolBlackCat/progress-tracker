@@ -9,8 +9,9 @@ Board::Board(std::string name, std::string background) :
     if (!is_background(background)) {
         throw std::domain_error{"given background is not of background type."};
     }
-}
 
+    this->background = background;
+}
 
 bool Board::set_background(std::string other) {
     if (is_background(other)) {
@@ -22,6 +23,37 @@ bool Board::set_background(std::string other) {
 
 std::string Board::get_background() const { 
     return background;
+}
+
+std::string Board::xml_structure() const {
+    std::string xml_struct;
+    tinyxml2::XMLDocument doc;
+
+    tinyxml2::XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", name.c_str());
+    board_element->SetAttribute("background", background.c_str());
+    doc.InsertEndChild(board_element);
+
+    for (auto& cardlist: cardlist_vector) {
+        // Create list
+        tinyxml2::XMLElement* list_element = doc.NewElement("list");
+        list_element->SetAttribute("name", cardlist.get_name().c_str());
+
+        for (auto& card: *cardlist.get_card_vector()) {
+            // Create card
+            tinyxml2::XMLElement* card_element = doc.NewElement("card");
+            card_element->SetAttribute("name", card.get_name().c_str());
+            list_element->InsertEndChild(card_element);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+
+    tinyxml2::XMLPrinter printer;
+
+    doc.Print(&printer);
+
+    xml_struct = printer.CStr();
+    return xml_struct;
 }
 
 bool Board::add_cardlist(CardList& cardlist) {
@@ -48,4 +80,42 @@ bool Board::is_background(std::string& background) const {
 
     return std::regex_match(background, rgba_r)
         || std::filesystem::exists(background);
+}
+
+Board* board_from_xml(std::string filename) {
+
+    if (!std::filesystem::exists(filename)) return nullptr;
+
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile(filename.c_str());
+
+    // Set basic Item attributes: name
+    std::string board_name;
+    std::string board_background;
+
+    const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
+    board_name = board_element->FindAttribute("name")->Value();
+    board_background = board_element->FindAttribute("background")->Value();
+
+    // Set Board specific attributes: cardlist_vector
+    Board* board = new Board(board_name, board_background);
+
+    const tinyxml2::XMLElement* list_element = board_element->FirstChildElement("list");
+    
+    while (list_element) {
+        CardList cur_cardlist{list_element->Attribute("name")};
+
+        const tinyxml2::XMLElement* card_element = list_element->FirstChildElement("card");
+        while(card_element) {
+            Card cur_card{card_element->Attribute("name")};
+            cur_cardlist.add_card(cur_card);
+
+            card_element = card_element->NextSiblingElement("card");
+        }
+        board->add_cardlist(cur_cardlist);
+
+        list_element = list_element->NextSiblingElement("list");
+    }
+
+    return board;
 }

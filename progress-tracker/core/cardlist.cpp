@@ -22,3 +22,9 @@ bool CardList::remove_card(Card& card) {
     }
     return false;
 }
+
+const std::vector<Card>* CardList::get_card_vector() const {
+    const std::vector<Card>* pcard_vector = &card_vector;
+
+    return pcard_vector;
+}

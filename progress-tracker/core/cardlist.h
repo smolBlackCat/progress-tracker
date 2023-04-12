@@ -12,6 +12,8 @@ public:
     bool add_card(Card& card);
     bool remove_card(Card& card);
 
+    const std::vector<Card>* get_card_vector() const;
+
 private:
     std::vector<Card> card_vector;
 };
