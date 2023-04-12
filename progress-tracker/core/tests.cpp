@@ -7,15 +7,16 @@
 #include "cardlist.h"
 #include "board.h"
 
-void create_dummy_file() {
+void create_dummy_file(const char* board_name, const char* board_background,
+                       const char* filename) {
     const char* tasks1[] = {"Fix the computer", "Code project", "Do Math Assignment"};
     const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
     const char* lists_names[] = {"TODO", "Done"};
     tinyxml2::XMLDocument doc;
 
     tinyxml2::XMLElement* board_element = doc.NewElement("board");
-    board_element->SetAttribute("name", "Computer Science Classes");
-    board_element->SetAttribute("background", "(255,255,255,1)");
+    board_element->SetAttribute("name", board_name);
+    board_element->SetAttribute("background", board_background);
     doc.InsertEndChild(board_element);
 
     for (auto& list_name: lists_names) {
@@ -32,7 +33,26 @@ void create_dummy_file() {
         board_element->InsertEndChild(list_element);
     }
 
-    doc.SaveFile("board_progress.xml")
+    doc.SaveFile(filename);
+}
+
+std::string* get_xml_from_file(const char* filename) {
+    if (!std::filesystem::exists(filename)) return nullptr;
+
+    std::string* file_content = new std::string{};
+    std::fstream xml_file{filename};
+    if (xml_file.is_open()) {
+        std::string line;
+
+        while (std::getline(xml_file, line)) {
+            *file_content += line + "\n";
+        }
+        xml_file.close();
+    } else {
+        return nullptr;
+    }
+
+    return file_content;
 }
 
 TEST_CASE("ID generation") {
@@ -143,26 +163,18 @@ TEST_CASE("Basic Usage of a board") {
 
 TEST_CASE("Creating boards from XML files") {
     if (!std::filesystem::exists("board_progress.xml")) {
-        create_dummy_file();
+        create_dummy_file("Computer Science Classes", "(255,255,255,1)", "board_progress.xml");
     }
     REQUIRE(board_from_xml("non_existent_file.xml") == nullptr);
 
     Board* board = board_from_xml("board_progress.xml");
-
     REQUIRE(board != nullptr);
 
-    std::string file_content = "";
-    std::fstream xml_file{"board_progress.xml"};
-    if (xml_file.is_open()) {
-        std::string line;
+    std::string* file_content = get_xml_from_file("board_progress.xml");
+    CHECK(board->xml_structure() == *file_content);
 
-        while (std::getline(xml_file, line)) {
-            file_content += line + "\n";
-        }
-        xml_file.close();
-    } else {
-        std::cerr << "\033[;32ERROR READING THE FILE.\033[m" << std::endl;
+    if (!std::filesystem::exists("expected_to_fail.xml")) {
+        create_dummy_file("Test went wrong", "not a background string", "expected_to_fail.xml");
     }
-
-    CHECK(board->xml_structure() == file_content);
+    CHECK_THROWS_AS(board_from_xml("expected_to_fail.xml"), std::domain_error);
 }
