@@ -98,7 +98,13 @@ Board* board_from_xml(std::string filename) {
     board_background = board_element->FindAttribute("background")->Value();
 
     // Set Board specific attributes: cardlist_vector
-    Board* board = new Board(board_name, board_background);
+    Board* board;
+    try {
+        board = new Board{board_name, board_background};
+    } catch (std::domain_error e) {
+        delete board;
+        return nullptr;
+    }
 
     const tinyxml2::XMLElement* list_element = board_element->FirstChildElement("list");
     

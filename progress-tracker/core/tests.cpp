@@ -176,5 +176,5 @@ TEST_CASE("Creating boards from XML files") {
     if (!std::filesystem::exists("expected_to_fail.xml")) {
         create_dummy_file("Test went wrong", "not a background string", "expected_to_fail.xml");
     }
-    CHECK_THROWS_AS(board_from_xml("expected_to_fail.xml"), std::domain_error);
+    CHECK(board_from_xml("expected_to_fail.xml") == nullptr);
 }

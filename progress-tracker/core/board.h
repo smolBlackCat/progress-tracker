@@ -82,6 +82,9 @@ private:
  * @param xml_filename The file name. It can be relative or absolute.
  * 
  * @returns Board pointer to the new Board object. The caller should deallocate
- *          the object after its use to avoid memory leaks.
+ *          the object after its use to avoid memory leaks. Note that a nullptr
+ *          is returned if the object creation was not successful, either
+ *          because the filename doesn't exist or the filename wasn't a proper
+ *          Progress XML.
 */
 Board* board_from_xml(std::string xml_filename);
