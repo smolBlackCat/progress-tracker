@@ -28,6 +28,11 @@ list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
 add_executable(progress-tracker main.cpp)
 
+if (TESTS_ENABLED)
+    add_test(NAME CoreTest COMMAND core/core_test)
+endif()
+
+
 # Setup CMake to use GTK+, tell the compiler where to look for headers
 # and to the linker where to look for libraries
 target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})

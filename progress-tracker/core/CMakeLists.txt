@@ -9,7 +9,4 @@ if (TESTS_ENABLED)
     target_link_libraries(core_test PRIVATE ${TINYXML2_LIB})
     target_include_directories(core_test PRIVATE ${PROJECT_SOURCE_DIR}/core)
     target_include_directories(core_test PRIVATE /usr/include/catch2/)
-
-    # Tests
-    add_test(NAME CoreTest COMMAND core_test)
 endif()
