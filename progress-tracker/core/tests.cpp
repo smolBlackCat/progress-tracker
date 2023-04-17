@@ -1,15 +1,17 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
-#include <fstream>
 #include <filesystem>
-#include "item.h"
+#include <fstream>
+
+#include "board.h"
 #include "card.h"
 #include "cardlist.h"
-#include "board.h"
+#include "item.h"
 
 void create_dummy_file(const char* board_name, const char* board_background,
                        const char* filename) {
-    const char* tasks1[] = {"Fix the computer", "Code project", "Do Math Assignment"};
+    const char* tasks1[] = {"Fix the computer", "Code project",
+                            "Do Math Assignment"};
     const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
     const char* lists_names[] = {"TODO", "Done"};
     tinyxml2::XMLDocument doc;
@@ -19,12 +21,12 @@ void create_dummy_file(const char* board_name, const char* board_background,
     board_element->SetAttribute("background", board_background);
     doc.InsertEndChild(board_element);
 
-    for (auto& list_name: lists_names) {
+    for (auto& list_name : lists_names) {
         // Create list
         tinyxml2::XMLElement* list_element = doc.NewElement("list");
         list_element->SetAttribute("name", list_name);
 
-        for (auto& task: (list_name=="TODO"? tasks1:tasks2)) {
+        for (auto& task : (list_name == "TODO" ? tasks1 : tasks2)) {
             // Create card
             tinyxml2::XMLElement* card_element = doc.NewElement("card");
             card_element->SetAttribute("name", task);
@@ -90,7 +92,8 @@ TEST_CASE("Inserting cards into a cardlist") {
 TEST_CASE("Fetching xml tags from CardList object") {
     CardList cardlist{"Todo"};
 
-    Card card{"Chores"}, card2{"Fix the computer"}, card3{"Code for the cs course"};
+    Card card{"Chores"}, card2{"Fix the computer"},
+        card3{"Code for the cs course"};
 
     cardlist.add_card(card);
     cardlist.add_card(card2);
@@ -101,25 +104,28 @@ TEST_CASE("Removing cards from a CardList object") {
     CardList cardlist{"Todo"};
 
     Card card{"Chores"}, card2{"Fix the computer"},
-         card3{"Code for the cs course"}, card4{"Fix the computer"};
+        card3{"Code for the cs course"}, card4{"Fix the computer"};
 
     cardlist.add_card(card);
     cardlist.add_card(card2);
     cardlist.add_card(card3);
     cardlist.add_card(card4);
 
-    CHECK(cardlist.remove_card(card));        // Remove the first card; should return true;
-    CHECK_FALSE(cardlist.remove_card(card));  // try to remove the first card; return false;
+    CHECK(cardlist.remove_card(
+        card));  // Remove the first card; should return true;
+    CHECK_FALSE(cardlist.remove_card(
+        card));  // try to remove the first card; return false;
 
     CHECK(cardlist.remove_card(card4));
     CHECK_FALSE(cardlist.remove_card(card4));
 }
 
 TEST_CASE("Basic Usage of a board") {
-    // A domain_error exception is thrown when the background is not of background type
+    // A domain_error exception is thrown when the background is not of
+    // background type
     CHECK_THROWS(Board("Gabriel's Board", "not a background"));
 
-    Board board{"Computer Science Stuff", "(255,255,255,1)"};  //valid;
+    Board board{"Computer Science Stuff", "(255,255,255,1)"};  // valid;
 
     CHECK_FALSE(board.set_background("not a background"));
     CHECK(board.set_background("/home/moura/Pictures/cat.jpeg"));
@@ -127,25 +133,26 @@ TEST_CASE("Basic Usage of a board") {
 
     CardList todo_cardlist{"TODO"};
     std::string card_names1[] = {"OS assignment", "C++ Application"};
-    for (auto& name: card_names1) {
+    for (auto& name : card_names1) {
         Card card{name};
         todo_cardlist.add_card(card);
     }
     CardList doing_cardlist{"DOING"};
-    std::string card_names2[] = {"Progress-Tracker App", "Advanced Algebra Assignment"};
-    for (auto& name: card_names2) {
+    std::string card_names2[] = {"Progress-Tracker App",
+                                 "Advanced Algebra Assignment"};
+    for (auto& name : card_names2) {
         Card card{name};
         doing_cardlist.add_card(card);
     }
 
     CardList doing_cardlist2{"DOING"};
     std::string card_names3[] = {"Fixing", "Chores", "Homeschooling"};
-    for (auto& name: card_names3) {
+    for (auto& name : card_names3) {
         Card card{name};
         doing_cardlist2.add_card(card);
     }
 
-    // Adding 
+    // Adding
     CHECK(board.add_cardlist(todo_cardlist));
     CHECK(board.add_cardlist(todo_cardlist));
 
@@ -163,7 +170,8 @@ TEST_CASE("Basic Usage of a board") {
 
 TEST_CASE("Creating boards from XML files") {
     if (!std::filesystem::exists("board_progress.xml")) {
-        create_dummy_file("Computer Science Classes", "(255,255,255,1)", "board_progress.xml");
+        create_dummy_file("Computer Science Classes", "(255,255,255,1)",
+                          "board_progress.xml");
     }
     REQUIRE(board_from_xml("non_existent_file.xml") == nullptr);
 
@@ -174,7 +182,8 @@ TEST_CASE("Creating boards from XML files") {
     CHECK(board->xml_structure() == *file_content);
 
     if (!std::filesystem::exists("expected_to_fail.xml")) {
-        create_dummy_file("Test went wrong", "not a background string", "expected_to_fail.xml");
+        create_dummy_file("Test went wrong", "not a background string",
+                          "expected_to_fail.xml");
     }
     CHECK(board_from_xml("expected_to_fail.xml") == nullptr);
 }
