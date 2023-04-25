@@ -30,6 +30,7 @@ add_executable(progress-tracker main.cpp)
 
 if (TESTS_ENABLED)
     add_test(NAME CoreTest COMMAND core/core_test)
+    add_test(NAME DialogTest COMMAND ui/dialog_test)
 endif()
 
 
