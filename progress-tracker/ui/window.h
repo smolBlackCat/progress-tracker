@@ -7,6 +7,8 @@
 #include <gtkmm/menubutton.h>
 #include <gtkmm/window.h>
 
+#include "create_board_dialog.h"
+
 namespace ui {
 /**
  * Progress app about dialog.
@@ -31,9 +33,11 @@ private:
     Gtk::MenuButton menu_button;
     Gtk::Label label;
 
-    ui::ProgressAboutDialog dialog;
+    ui::ProgressAboutDialog about_dialog;
+    ui::CreateBoardDialog create_board_dialog;
 
     void setup_menu_button();
     void show_about();
+    void show_create_board();
 };
 }  // namespace ui

@@ -3,7 +3,8 @@
 #include <iostream>
 #include <string>
 
-ui::CreateBoardDialog::CreateBoardDialog()
+namespace ui {
+CreateBoardDialog::CreateBoardDialog(Gtk::Window& parent)
     : header_bar(),
       root(Gtk::Orientation::VERTICAL),
       checkbuttons_box(Gtk::Orientation::VERTICAL),
@@ -17,21 +18,26 @@ ui::CreateBoardDialog::CreateBoardDialog()
       board_name_entry(),
       dialog_colour_button(),
       dialog_data{{"title", ""}, {"background", ""}} {
+    set_transient_for(parent);
+    set_modal();
     set_default_size(300, 400);
     set_size_request(300, 400);
+
     colour_dialog = Gtk::ColorDialog::create();
     alert_dialog = Gtk::AlertDialog::create("Board setting incomplete");
+
     this->setup_dialog_titlebar();
     this->setup_dialog_root();
+
     set_child(root);
 }
 
-std::map<std::string, std::string> ui::CreateBoardDialog::get_entry()
+std::map<std::string, std::string> CreateBoardDialog::get_entry()
     const noexcept {
     return dialog_data;
 }
 
-void ui::CreateBoardDialog::on_bg_button_click() {
+void CreateBoardDialog::on_bg_button_click() {
     /**
      * TODO: Code is not filtering the files properly, probably due to wrong
      * mime types.
@@ -52,7 +58,7 @@ void ui::CreateBoardDialog::on_bg_button_click() {
         dialog));
 }
 
-void ui::CreateBoardDialog::on_solid_radiobutton_toggle() {
+void CreateBoardDialog::on_solid_radiobutton_toggle() {
     if (!solid_colour_cbttn.get_active()) return;
 
     selected_bg_label.set_visible(false);
@@ -61,7 +67,7 @@ void ui::CreateBoardDialog::on_solid_radiobutton_toggle() {
     dialog_colour_button.set_visible();
 }
 
-void ui::CreateBoardDialog::on_image_radiobutton_toggle() {
+void CreateBoardDialog::on_image_radiobutton_toggle() {
     if (!image_cbttn.get_active()) return;
 
     dialog_colour_button.set_visible(false);
@@ -75,7 +81,7 @@ void ui::CreateBoardDialog::on_image_radiobutton_toggle() {
     }
 }
 
-void ui::CreateBoardDialog::close_window() {
+void CreateBoardDialog::close_window() {
     set_visible(false);
 
     // Cleanup any inserted data
@@ -84,7 +90,7 @@ void ui::CreateBoardDialog::close_window() {
     board_name_entry.set_text("");
 }
 
-void ui::CreateBoardDialog::save_entry() {
+void CreateBoardDialog::save_entry() {
     if (board_name_entry.get_text_length() == 0) {
         alert_dialog->set_detail("Board name should not be empty");
         alert_dialog->show(*this);
@@ -112,7 +118,7 @@ void ui::CreateBoardDialog::save_entry() {
     close_window();
 }
 
-void ui::CreateBoardDialog::setup_dialog_root() {
+void CreateBoardDialog::setup_dialog_root() {
     board_name_entry.set_placeholder_text("Board Name");
     board_name_entry.set_margin(4);
     root.append(board_name_entry);
@@ -145,7 +151,7 @@ void ui::CreateBoardDialog::setup_dialog_root() {
     root.append(checkbuttons_box);
 }
 
-void ui::CreateBoardDialog::setup_dialog_titlebar() {
+void CreateBoardDialog::setup_dialog_titlebar() {
     create_button.signal_clicked().connect(
         sigc::mem_fun(*this, &ui::CreateBoardDialog::save_entry));
     cancel_button.signal_clicked().connect(
@@ -161,7 +167,7 @@ void ui::CreateBoardDialog::setup_dialog_titlebar() {
     set_titlebar(header_bar);
 }
 
-void ui::CreateBoardDialog::on_colourdialog_finish(
+void CreateBoardDialog::on_colourdialog_finish(
     const Glib::RefPtr<Gio::AsyncResult>& result) {
     try {
         auto colour = colour_dialog->choose_rgba_finish(result);
@@ -173,7 +179,7 @@ void ui::CreateBoardDialog::on_colourdialog_finish(
     }
 }
 
-void ui::CreateBoardDialog::on_filedialog_finish(
+void CreateBoardDialog::on_filedialog_finish(
     const Glib::RefPtr<Gio::AsyncResult>& result,
     const Glib::RefPtr<Gtk::FileDialog>& dialog) {
     try {
@@ -186,3 +192,4 @@ void ui::CreateBoardDialog::on_filedialog_finish(
         err.what();
     }
 }
+}  // namespace ui

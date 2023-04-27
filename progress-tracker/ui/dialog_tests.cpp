@@ -10,7 +10,7 @@ class Dummy : public Gtk::Window {
    public:
     Dummy() :
     open_dialog_btt{"Insert progress-tracker as the board name\n"
-    "Choose any option"}, dialog{} {
+    "Choose any option"}, dialog{*this} {
         set_default_size(600, 400);
         dialog.set_transient_for(*this);
         dialog.set_modal();

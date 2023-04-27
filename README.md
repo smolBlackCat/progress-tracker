@@ -35,17 +35,33 @@ to do now is to just execute it.
 
     `./progress-tracker`
 
+## Project current state
 At this point, you should get a console message displaying the app's version and
 an empty window like this.
 
 <figure>
+    <caption>Main View of the appplication</caption>
     <img src="docs/empty_window.png">
-    <caption>Cool Window just for you :)</caption>
 </figure>
 
 <br>
 
 <figure>
+    <caption>About Dialog (icon won't be present)</caption>
     <img src="docs/about_window.png">
-    <caption>About Dialog (the icon won't appear)</caption>
+</figure>
+
+<br>
+
+<figure>
+    <caption>Create Board Dialog</caption>
+    <img src="docs/create_board_dialog.png">
+</figure>
+
+<figure>
+    <img src="docs/create_board_dialog1.png">
+</figure>
+
+<figure>
+    <img src="docs/create_board_dialog2.png">
 </figure>

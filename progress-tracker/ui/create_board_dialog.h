@@ -32,7 +32,7 @@ public:
     /**
      * @brief Dialog Window constructor
      */
-    CreateBoardDialog();
+    CreateBoardDialog(Gtk::Window& parent);
     std::map<std::string, std::string> get_entry() const noexcept;
 
 private:

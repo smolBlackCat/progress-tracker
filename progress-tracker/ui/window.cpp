@@ -19,6 +19,7 @@ ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) {
     set_authors(authors);
 
     set_hide_on_close();
+    set_modal();
     set_transient_for(parent);
 }
 
@@ -29,7 +30,8 @@ ProgressWindow::ProgressWindow()
       add_board_button(),
       menu_button(),
       label("Add new board"),
-      dialog(*this) {
+      about_dialog(*this),
+      create_board_dialog(*this) {
     set_title("Progress");
     set_default_size(600, 600);
     set_size_request(600, 600);
@@ -40,6 +42,9 @@ ProgressWindow::ProgressWindow()
     header_bar.pack_start(add_board_button);
 
     add_board_button.set_icon_name("gtk-add");
+    add_board_button.signal_clicked().connect(
+        sigc::mem_fun(*this, &ui::ProgressWindow::show_create_board)
+    );
 
     setup_menu_button();
 
@@ -61,7 +66,11 @@ void ProgressWindow::setup_menu_button() {
 }
 
 void ProgressWindow::show_about() {
-    dialog.set_visible();
-    dialog.present();
+    about_dialog.set_visible();
+    about_dialog.present();
+}
+
+void ProgressWindow::show_create_board() {
+    create_board_dialog.set_visible();
 }
 }  // namespace ui
