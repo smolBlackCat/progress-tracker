@@ -11,7 +11,7 @@
  * @brief A class representing a single list of cards inside a board.
  */
 class CardList : public Item {
-   public:
+public:
     /**
      * @brief CardList constructor;
      */
@@ -44,6 +44,6 @@ class CardList : public Item {
      */
     const std::vector<Card>* get_card_vector() const;
 
-   private:
+private:
     std::vector<Card> card_vector;
 };

@@ -8,7 +8,7 @@
  * @brief A class representing a single card within a \ref CardList object.
  */
 class Card : public Item {
-   public:
+public:
     /**
      * @brief Card constructor.
      *

@@ -11,13 +11,13 @@
 #include "gtkmm/button.h"
 #include "gtkmm/checkbutton.h"
 #include "gtkmm/colordialog.h"
+#include "gtkmm/colordialogbutton.h"
 #include "gtkmm/entry.h"
 #include "gtkmm/error.h"
 #include "gtkmm/filedialog.h"
 #include "gtkmm/headerbar.h"
 #include "gtkmm/label.h"
 #include "gtkmm/window.h"
-#include "gtkmm/colordialogbutton.h"
 
 namespace ui {
 

@@ -10,7 +10,7 @@
  * @brief Base class for representing items of a Kanban-style todo list.
  */
 class Item {
-   public:
+public:
     /**
      * @brief Base class Constructor.
      *
@@ -40,7 +40,7 @@ class Item {
      */
     unsigned long long get_id() const;
 
-   protected:
+protected:
     std::string name;
     unsigned long long id;
 };

@@ -11,7 +11,7 @@
  * @brief A class representing the kanban-style board of the application,
  */
 class Board : public Item {
-   public:
+public:
     /**
      * @brief Board constructor.
      *
@@ -62,7 +62,7 @@ class Board : public Item {
      */
     bool remove_cardlist(CardList& cardlist);
 
-   private:
+private:
     std::string background;
     std::vector<CardList> cardlist_vector;
 

@@ -1,4 +1,5 @@
 BasedOnStyle: Google
+AccessModifierOffset: -4
 IndentWidth: 4
 AlignTrailingComments: true
 AllowShortIfStatementsOnASingleLine: true

@@ -1,5 +1,4 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/button.h>
@@ -13,7 +12,7 @@ namespace ui {
  * Progress app about dialog.
  */
 class ProgressAboutDialog : public Gtk::AboutDialog {
-   public:
+public:
     ProgressAboutDialog(Gtk::Window& parent);
     ~ProgressAboutDialog() override;
 };
@@ -22,11 +21,11 @@ class ProgressAboutDialog : public Gtk::AboutDialog {
  * Progress application window.
  */
 class ProgressWindow : public Gtk::Window {
-   public:
+public:
     ProgressWindow();
     ~ProgressWindow() override;
 
-   private:
+private:
     Gtk::HeaderBar header_bar;
     Gtk::Button add_board_button;
     Gtk::MenuButton menu_button;
@@ -38,5 +37,3 @@ class ProgressWindow : public Gtk::Window {
     void show_about();
 };
 }  // namespace ui
-
-#endif  // WINDOW_h
