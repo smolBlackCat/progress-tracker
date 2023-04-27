@@ -6,6 +6,7 @@
 #include "giomm/asyncresult.h"
 #include "giomm/liststore.h"
 #include "glibmm/refptr.h"
+#include "gtkmm/alertdialog.h"
 #include "gtkmm/box.h"
 #include "gtkmm/button.h"
 #include "gtkmm/checkbutton.h"
@@ -16,6 +17,7 @@
 #include "gtkmm/headerbar.h"
 #include "gtkmm/label.h"
 #include "gtkmm/window.h"
+#include "gtkmm/colordialogbutton.h"
 
 namespace ui {
 
@@ -26,14 +28,14 @@ namespace ui {
  * and the board's background.
  */
 class CreateBoardDialog : public Gtk::Window {
-   public:
+public:
     /**
      * @brief Dialog Window constructor
      */
     CreateBoardDialog();
     std::map<std::string, std::string> get_entry() const noexcept;
 
-   private:
+private:
     /**
      * @brief Reorders selected_bg_label and select_bg_button below the the
      * solid colour option radiobutton.
@@ -69,12 +71,12 @@ class CreateBoardDialog : public Gtk::Window {
     /**
      * @brief Stores the entry into a map so the user is able to request it by
      * using the get_entry() method.
-    */
+     */
     void save_entry();
 
     /**
      * @brief Closes the dialog window.
-    */
+     */
     void close_window();
 
     // Helpers
@@ -84,12 +86,12 @@ class CreateBoardDialog : public Gtk::Window {
     // Dialog helpers
     /**
      * @brief Callback that stores the selected colour into selected_colour;
-    */
+     */
     void on_colourdialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result);
 
     /**
      * @brief Callback that stores the selected file into selected_file;
-    */
+     */
     void on_filedialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
                               const Glib::RefPtr<Gtk::FileDialog>& dialog);
 
@@ -100,9 +102,10 @@ class CreateBoardDialog : public Gtk::Window {
     Gtk::CheckButton solid_colour_cbttn, image_cbttn;
     Gtk::Button select_bg_button, create_button, cancel_button;
     Gtk::Entry board_name_entry;
+    Glib::RefPtr<Gtk::AlertDialog> alert_dialog;
 
     // Colour Dialog attributes helpers
-    Gdk::RGBA selected_colour;
+    Gtk::ColorDialogButton dialog_colour_button;
     Glib::RefPtr<Gtk::ColorDialog> colour_dialog;
 
     // File Dialog attributes helpers
