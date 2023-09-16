@@ -3,38 +3,19 @@
 #include <iostream>
 #include <string>
 
+#include "window.h"
+
 namespace ui {
-CreateBoardDialog::CreateBoardDialog(Gtk::Window& parent)
-    : header_bar(),
-      root(Gtk::Orientation::VERTICAL),
-      checkbuttons_box(Gtk::Orientation::VERTICAL),
-      bg_label(),
-      solid_colour_cbttn("Solid Colour"),
-      image_cbttn("Image"),
-      selected_bg_label("No colour selected"),
-      select_bg_button("Select File"),
-      create_button("Create"),
-      cancel_button("Cancel"),
-      board_name_entry(),
-      dialog_colour_button(),
-      dialog_data{{"title", ""}, {"background", ""}} {
-    set_transient_for(parent);
-    set_modal();
-    set_default_size(300, 400);
-    set_size_request(300, 400);
+CreateBoardDialog::CreateBoardDialog(
+    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder)
+    : Gtk::Window(cobject), builder(ref_builder),
+    p_colour_button(builder->get_widget<Gtk::ColorDialogButton>("colour-button")),
+    p_file_image(builder->get_widget<Gtk::Image>("file-image")),
+    p_select_file_label(builder->get_widget<Gtk::Label>("select-file-label")),
+    p_board_name_entry(builder->get_widget<Gtk::Entry>("board-name-entry")),
+    p_background_selector_stack(builder->get_widget<Gtk::Stack>("background-selector-stack")) {
 
-    colour_dialog = Gtk::ColorDialog::create();
-    alert_dialog = Gtk::AlertDialog::create("Board setting incomplete");
-
-    this->setup_dialog_titlebar();
-    this->setup_dialog_root();
-
-    set_child(root);
-}
-
-std::map<std::string, std::string> CreateBoardDialog::get_entry()
-    const noexcept {
-    return dialog_data;
+    this->setup_dialog_buttons();
 }
 
 void CreateBoardDialog::on_bg_button_click() {
@@ -43,6 +24,9 @@ void CreateBoardDialog::on_bg_button_click() {
      * mime types.
      */
     auto dialog = Gtk::FileDialog::create();
+
+    dialog->set_title("Select a file");
+    dialog->set_modal();
 
     auto filters = Gio::ListStore<Gtk::FileFilter>::create();
     auto image_filter = Gtk::FileFilter::create();
@@ -53,130 +37,50 @@ void CreateBoardDialog::on_bg_button_click() {
     filters->append(image_filter);
     dialog->set_filters(filters);
 
-    dialog->open(sigc::bind(
+    dialog->open(*this, sigc::bind(
         sigc::mem_fun(*this, &ui::CreateBoardDialog::on_filedialog_finish),
         dialog));
 }
 
-void CreateBoardDialog::on_solid_radiobutton_toggle() {
-    if (!solid_colour_cbttn.get_active()) return;
-
-    selected_bg_label.set_visible(false);
-    select_bg_button.set_visible(false);
-
-    dialog_colour_button.set_visible();
-}
-
-void CreateBoardDialog::on_image_radiobutton_toggle() {
-    if (!image_cbttn.get_active()) return;
-
-    dialog_colour_button.set_visible(false);
-
-    select_bg_button.set_visible();
-    selected_bg_label.set_visible();
-    if (selected_file) {
-        selected_bg_label.set_text(selected_file->get_basename());
-    } else {
-        selected_bg_label.set_text("No file selected");
-    }
-}
-
+// TODO: Implement cleanup code for whenever the dialog is closed
 void CreateBoardDialog::close_window() {
     set_visible(false);
 
     // Cleanup any inserted data
-    dialog_colour_button.set_rgba(Gdk::RGBA());
-    selected_bg_label.set_label("");
-    board_name_entry.set_text("");
+    p_board_name_entry->set_text("");
+    p_select_file_label->set_text("No file selected");
+    p_file_image->property_file().set_value("");
+    p_colour_button->set_rgba(Gdk::RGBA("#FFFFFF"));
 }
 
-void CreateBoardDialog::save_entry() {
-    if (board_name_entry.get_text_length() == 0) {
-        alert_dialog->set_detail("Board name should not be empty");
-        alert_dialog->show(*this);
-        return;
+void CreateBoardDialog::create_board() {
+    std::string selected_file = p_background_selector_stack->get_visible_child_name();
+    if (selected_file == "as-file") {
+        std::cout << "Board (file) added" << std::endl;
     } else {
-        dialog_data["title"] = board_name_entry.get_text();
+        std::cout << "Board (colour) added" << std::endl;
     }
-
-    if (solid_colour_cbttn.get_active()) {
-        if (dialog_colour_button.get_rgba().is_clear()) {
-            alert_dialog->set_detail("No colour was selected");
-            alert_dialog->show(*this);
-            return;
-        }
-        dialog_data["background"] = dialog_colour_button.get_rgba().to_string();
-    } else if (image_cbttn.get_active()) {
-        if (!selected_file) {
-            alert_dialog->set_detail("No file was selected");
-            alert_dialog->show(*this);
-            return;
-        }
-        dialog_data["background"] = selected_file->get_path();
-    }
-
     close_window();
 }
 
-void CreateBoardDialog::setup_dialog_root() {
-    board_name_entry.set_placeholder_text("Board Name");
-    board_name_entry.set_margin(4);
-    root.append(board_name_entry);
+void CreateBoardDialog::setup_dialog_buttons() {
+    // Header Bar buttons
+    builder->get_widget<Gtk::Button>("create-button")
+        ->signal_clicked()
+        .connect(sigc::mem_fun(*this, &ui::CreateBoardDialog::create_board));
+    builder->get_widget<Gtk::Button>("cancel-button")
+        ->signal_clicked()
+        .connect(sigc::mem_fun(*this, &ui::CreateBoardDialog::close_window));
 
-    bg_label.set_markup("<span size=\"large\"><b>Background</b></span>");
-    bg_label.set_halign(Gtk::Align::START);
-    bg_label.set_margin_start(4);
-    bg_label.set_margin_top(20);
-    bg_label.set_margin_bottom(8);
-    root.append(bg_label);
-
-    solid_colour_cbttn.signal_toggled().connect(sigc::mem_fun(
-        *this, &ui::CreateBoardDialog::on_solid_radiobutton_toggle));
-    image_cbttn.signal_toggled().connect(sigc::mem_fun(
-        *this, &ui::CreateBoardDialog::on_image_radiobutton_toggle));
-    select_bg_button.signal_clicked().connect(
-        sigc::mem_fun(*this, &ui::CreateBoardDialog::on_bg_button_click));
-
-    solid_colour_cbttn.set_active();
-    image_cbttn.set_group(solid_colour_cbttn);
-
-    dialog_colour_button.set_dialog(colour_dialog);
-
-    checkbuttons_box.set_margin(10);
-    checkbuttons_box.append(solid_colour_cbttn);
-    checkbuttons_box.append(dialog_colour_button);
-    checkbuttons_box.append(image_cbttn);
-    checkbuttons_box.append(select_bg_button);
-    checkbuttons_box.append(selected_bg_label);
-    root.append(checkbuttons_box);
-}
-
-void CreateBoardDialog::setup_dialog_titlebar() {
-    create_button.signal_clicked().connect(
-        sigc::mem_fun(*this, &ui::CreateBoardDialog::save_entry));
-    cancel_button.signal_clicked().connect(
-        sigc::mem_fun(*this, &ui::CreateBoardDialog::close_window));
-
-    header_bar.pack_start(cancel_button);
-    header_bar.pack_end(create_button);
-    header_bar.set_show_title_buttons(false);
-    auto dialog_title = Gtk::make_managed<Gtk::Label>();
-    dialog_title->set_markup("<b>Create Board</b>");
-    header_bar.set_title_widget(*dialog_title);
-
-    set_titlebar(header_bar);
-}
-
-void CreateBoardDialog::on_colourdialog_finish(
-    const Glib::RefPtr<Gio::AsyncResult>& result) {
-    try {
-        auto colour = colour_dialog->choose_rgba_finish(result);
-        dialog_colour_button.set_rgba(colour);
-    } catch (const Gtk::DialogError& err) {
-        err.what();
-    } catch (const Glib::Error& err) {
-        err.what();
-    }
+    // Stack Buttons
+    builder->get_widget<Gtk::Button>("select-file-button")
+        ->signal_clicked()
+        .connect(
+            sigc::mem_fun(*this, &ui::CreateBoardDialog::on_bg_button_click));
+    builder->get_widget<Gtk::ColorDialogButton>("colour-button")
+        ->property_rgba()
+        .signal_changed()
+        .connect(sigc::mem_fun(*this, &CreateBoardDialog::on_colourbutton_set));
 }
 
 void CreateBoardDialog::on_filedialog_finish(
@@ -184,12 +88,17 @@ void CreateBoardDialog::on_filedialog_finish(
     const Glib::RefPtr<Gtk::FileDialog>& dialog) {
     try {
         selected_file = dialog->open_finish(result);
-
-        selected_bg_label.set_label(selected_file->get_basename());
+        p_file_image->property_paintable().set_value(
+            Gdk::Texture::create_from_file(selected_file));
+        p_select_file_label->set_text(selected_file->get_basename());
     } catch (Gtk::DialogError& err) {
         err.what();
     } catch (Glib::Error& err) {
         err.what();
     }
+}
+
+void CreateBoardDialog::on_colourbutton_set() {
+    selected_colour = p_colour_button->get_rgba();
 }
 }  // namespace ui

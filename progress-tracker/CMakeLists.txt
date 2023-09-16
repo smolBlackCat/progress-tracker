@@ -26,11 +26,10 @@ list(APPEND APP_LIBS core)
 list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/ui")
 list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
-add_executable(progress-tracker main.cpp)
+add_executable(progress-tracker main.cpp ui/resources.cpp)
 
 if (TESTS_ENABLED)
     add_test(NAME CoreTest COMMAND core/core_test)
-    add_test(NAME DialogTest COMMAND ui/dialog_test)
 endif()
 
 

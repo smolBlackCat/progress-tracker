@@ -34,7 +34,7 @@ private:
     Gtk::Label label;
 
     ui::ProgressAboutDialog about_dialog;
-    ui::CreateBoardDialog create_board_dialog;
+    ui::CreateBoardDialog* create_board_dialog;
 
     void setup_menu_button();
     void show_about();
