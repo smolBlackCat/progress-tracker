@@ -27,15 +27,27 @@ don't want to create tests binaries.)
     # set DTESTS_ENABLED=True if you want to run the tests
     # (ps. they have all passed ;))
     cmake ../progress-tracker/ -DTESTS_ENABLED=False
-    cmake --build .
     ```
 
-4. After all that you should find a binary called progress-tracker. All you have
-to do now is to just execute it.
+4. Because the app now use embedded resources, before building the program it's
+important to compile those resources so the app can use them. After issuing this
+command, you should be able to see a file called "resources.cpp" within the "ui"
+directory.
 
-    `./progress-tracker`
+    ```sh
+    cd progress-tracker/ui
+    glib-compile-resources --target=resources.cpp --generate-source resources.xml
+    ```
+
+5. After that, you can build and run the project.
+
+    ```sh
+    cmake --build build-dir
+    build-dir/progress-tracker
+    ```
 
 ## Project current state
+
 At this point, you should get a console message displaying the app's version and
 an empty window like this.
 
@@ -54,14 +66,6 @@ an empty window like this.
 <br>
 
 <figure>
-    <caption>Create Board Dialog</caption>
+    <caption><b>Improved CreateBoardDialog UI</b></caption>
     <img src="docs/create_board_dialog.png">
-</figure>
-
-<figure>
-    <img src="docs/create_board_dialog1.png">
-</figure>
-
-<figure>
-    <img src="docs/create_board_dialog2.png">
 </figure>
