@@ -7,6 +7,7 @@ if (TESTS_ENABLED)
 endif()
 
 # GTK setup
+find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
@@ -26,7 +27,7 @@ list(APPEND APP_LIBS core)
 list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/ui")
 list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
-add_executable(progress-tracker main.cpp ui/resources.cpp)
+add_executable(progress-tracker main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
 if (TESTS_ENABLED)
     add_test(NAME CoreTest COMMAND core/core_test)
@@ -44,3 +45,20 @@ target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
 target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR} ${APP_INCLUDES})
 target_include_directories(progress-tracker PUBLIC ${PROJECT_BINARY_DIR})
+
+# Resources Settings
+set(GLIB_FLAGS --target=resources.cpp)
+set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
+set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${PROJECT_SOURCE_DIR}/ui)
+
+list(APPEND RESOURCES ui/com.moura.Progress.svg)
+list(APPEND RESOURCES ui/create-board-dialog.ui)
+
+add_custom_command(
+    OUTPUT resources.cpp
+    COMMAND glib-compile-resources ${PROJECT_SOURCE_DIR}/ui/resources.xml ${GLIB_FLAGS}
+    DEPENDS ${PROJECT_SOURCE_DIR}/ui/resources.xml
+    ${RESOURCES}
+)
+add_custom_target(generate_resources DEPENDS resources.cpp)
+add_dependencies(progress-tracker generate_resources)
