@@ -179,6 +179,7 @@ TEST_CASE("Creating boards from XML files") {
     REQUIRE(board != nullptr);
 
     std::string* file_content = get_xml_from_file("board_progress.xml");
+    std::cout << file_content << std::endl;
     CHECK(board->xml_structure() == *file_content);
 
     if (!std::filesystem::exists("expected_to_fail.xml")) {
