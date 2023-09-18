@@ -32,8 +32,8 @@ don't want to create tests binaries.)
 4. After that, you can build and run the project.
 
     ```sh
-    cmake --build build-dir
-    build-dir/progress-tracker
+    make
+    src/progress-tracker
     ```
 
 ## Project current state
