@@ -74,10 +74,12 @@ bool Board::remove_cardlist(CardList& cardlist) {
 }
 
 bool Board::is_background(std::string& background) const {
-    std::regex rgba_r{"\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
+    std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
+    std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 
-    return std::regex_match(background, rgba_r) ||
-           std::filesystem::exists(background);
+    return std::regex_match(background, rgba_r) 
+        || std::regex_match(background, rgba1_r)
+        || std::filesystem::exists(background);
 }
 
 Board* board_from_xml(std::string filename) {

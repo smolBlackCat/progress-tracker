@@ -54,12 +54,11 @@ void CreateBoardDialog::close_window() {
 }
 
 void CreateBoardDialog::create_board() {
-    std::string selected_file = p_background_selector_stack->get_visible_child_name();
-    if (selected_file == "as-file") {
-        std::cout << "Board (file) added" << std::endl;
-    } else {
-        std::cout << "Board (colour) added" << std::endl;
-    }
+    std::string background_type = p_background_selector_stack->get_visible_child_name();
+    std::string background = background_type == "as-file"?
+        p_select_file_label->get_text():selected_colour.to_string();
+    Board board{p_board_name_entry->get_text(), background};
+    ((ui::ProgressWindow*) get_transient_for())->add_board(board);
     close_window();
 }
 
@@ -90,7 +89,7 @@ void CreateBoardDialog::on_filedialog_finish(
         selected_file = dialog->open_finish(result);
         p_file_image->property_paintable().set_value(
             Gdk::Texture::create_from_file(selected_file));
-        p_select_file_label->set_text(selected_file->get_basename());
+        p_select_file_label->set_text(selected_file->get_path());
     } catch (Gtk::DialogError& err) {
         err.what();
     } catch (Glib::Error& err) {

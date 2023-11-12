@@ -7,6 +7,7 @@
 #include <gtkmm/menubutton.h>
 #include <gtkmm/window.h>
 
+#include "../core/board.h"
 #include "create_board_dialog.h"
 
 namespace ui {
@@ -27,11 +28,24 @@ public:
     ProgressWindow();
     ~ProgressWindow() override;
 
+    void add_board(Board& board);
+
 private:
     Gtk::HeaderBar header_bar;
     Gtk::Button add_board_button;
     Gtk::MenuButton menu_button;
-    Gtk::Label label;
+    Gtk::FlowBox board_grid;
+    Gtk::Box board_root;
+    Gtk::Stack stack;
+
+    /**
+     * There are two kinds of pages:
+     * 
+     * board_grid: Shows a view of various boards to be worked on by the user
+     * 
+     * board_main: Shows the kanban todo list
+    */
+    std::string current_page;
 
     ui::ProgressAboutDialog about_dialog;
     ui::CreateBoardDialog* create_board_dialog;
@@ -39,5 +53,6 @@ private:
     void setup_menu_button();
     void show_about();
     void show_create_board();
+    void go_to_main_board();
 };
 }  // namespace ui

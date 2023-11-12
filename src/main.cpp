@@ -1,16 +1,15 @@
-#include <gtkmm/application.h>
 #include <app_info.h>
 #include <iostream>
-#include "ui/window.h"
+
+#include "ui/application.h"
 
 /**
  * Progress app main entry.
 */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
 
-	auto app = Gtk::Application::create("com.moura.Progress");
+	auto app = ui::Application::create();
 
-	return app->make_window_and_run<ui::ProgressWindow>(argc, argv);
+	return app->run(argc, argv);
 }
