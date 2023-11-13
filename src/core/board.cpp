@@ -101,7 +101,6 @@ Board* board_from_xml(std::string filename) {
     try {
         board = new Board{board_name, board_background};
     } catch (std::domain_error e) {
-        delete board;
         return nullptr;
     }
 

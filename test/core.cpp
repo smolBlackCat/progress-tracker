@@ -26,7 +26,7 @@ void create_dummy_file(const char* board_name, const char* board_background,
         tinyxml2::XMLElement* list_element = doc.NewElement("list");
         list_element->SetAttribute("name", list_name);
 
-        for (auto& task : (list_name == "TODO" ? tasks1 : tasks2)) {
+        for (auto& task : (std::string{list_name} == std::string{"TODO"} ? tasks1 : tasks2)) {
             // Create card
             tinyxml2::XMLElement* card_element = doc.NewElement("card");
             card_element->SetAttribute("name", task);
@@ -125,11 +125,11 @@ TEST_CASE("Basic Usage of a board") {
     // background type
     CHECK_THROWS(Board("Gabriel's Board", "not a background"));
 
-    Board board{"Computer Science Stuff", "(255,255,255,1)"};  // valid;
+    Board board{"Computer Science Stuff", "rgba(255,255,255,1)"};  // valid;
 
     CHECK_FALSE(board.set_background("not a background"));
     CHECK(board.set_background("/home/moura/Pictures/cat.jpeg"));
-    CHECK(board.set_background("(255,224,123,1)"));
+    CHECK(board.set_background("rgba(255,224,123,1)"));
 
     CardList todo_cardlist{"TODO"};
     std::string card_names1[] = {"OS assignment", "C++ Application"};
@@ -168,23 +168,25 @@ TEST_CASE("Basic Usage of a board") {
     CHECK_FALSE(board.remove_cardlist(doing_cardlist));
 }
 
-TEST_CASE("Creating boards from XML files") {
+TEST_CASE("Creating Boards from XML files: Creating board from inexistent files") {
+    REQUIRE_FALSE(board_from_xml("non_existent_file.xml"));
+}
+
+TEST_CASE("Creating boards from XML files: Creating a board from an existing file") {
+
     if (!std::filesystem::exists("board_progress.xml")) {
-        create_dummy_file("Computer Science Classes", "(255,255,255,1)",
+        create_dummy_file("Computer Science Classes", "rgba(255,255,255,1)",
                           "board_progress.xml");
     }
-    REQUIRE(board_from_xml("non_existent_file.xml") == nullptr);
-
     Board* board = board_from_xml("board_progress.xml");
-    REQUIRE(board != nullptr);
+    REQUIRE(board);
 
     std::string* file_content = get_xml_from_file("board_progress.xml");
-    std::cout << file_content << std::endl;
     CHECK(board->xml_structure() == *file_content);
 
     if (!std::filesystem::exists("expected_to_fail.xml")) {
         create_dummy_file("Test went wrong", "not a background string",
                           "expected_to_fail.xml");
     }
-    CHECK(board_from_xml("expected_to_fail.xml") == nullptr);
+    CHECK_FALSE(board_from_xml("expected_to_fail.xml"));
 }
