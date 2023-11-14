@@ -42,7 +42,7 @@ private:
      */
     void on_filedialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
                               const Glib::RefPtr<Gtk::FileDialog>& dialog);
-    
+
     /**
      * @brief Callback that stores the selected file into selected_colour;
      */

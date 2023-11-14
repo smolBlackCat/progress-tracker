@@ -1,15 +1,18 @@
 #include "board.h"
 
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
 #include <filesystem>
 #include <regex>
 #include <stdexcept>
-#include <cstdlib>
-#include <cctype>
-#include <algorithm>
 
 Board::Board(std::string name, std::string background)
-    : Item{name}, background{}, cardlist_vector{},
-      boards_dir{std::string{std::getenv("HOME")} + "/.config/progress/boards/"} {
+    : Item{name},
+      background{},
+      cardlist_vector{},
+      boards_dir{std::string{std::getenv("HOME")} +
+                 "/.config/progress/boards/"} {
     if (!is_background(background)) {
         throw std::domain_error{"given background is not of background type."};
     }
@@ -58,7 +61,7 @@ bool Board::remove_cardlist(CardList& cardlist) {
 
 std::string lower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
-                    [](unsigned char c) {return std::tolower(c);});
+                   [](unsigned char c) { return std::tolower(c); });
     return s;
 }
 
@@ -68,12 +71,12 @@ bool Board::save_as_xml() const {
     std::string filename = lower(name);
     int id{};
 
-    while (std::filesystem::exists(boards_dir+filename+".xml")) {
+    while (std::filesystem::exists(boards_dir + filename + ".xml")) {
         filename = filename + std::to_string(id);
         id++;
     }
 
-    auto result = doc->SaveFile((boards_dir+filename+".xml").c_str());
+    auto result = doc->SaveFile((boards_dir + filename + ".xml").c_str());
     delete doc;
     if (!(result == tinyxml2::XML_SUCCESS)) {
         return false;
@@ -85,9 +88,9 @@ bool Board::is_background(std::string& background) const {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 
-    return std::regex_match(background, rgba_r) 
-        || std::regex_match(background, rgba1_r)
-        || std::filesystem::exists(background);
+    return std::regex_match(background, rgba_r) ||
+           std::regex_match(background, rgba1_r) ||
+           std::filesystem::exists(background);
 }
 
 tinyxml2::XMLDocument* Board::xml_doc() const {

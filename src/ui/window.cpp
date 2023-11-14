@@ -3,11 +3,11 @@
 #include <giomm/menu.h>
 #include <giomm/simpleactiongroup.h>
 
-#include "board-card-button.h"
 #include <iostream>
 
-namespace ui {
+#include "board-card-button.h"
 
+namespace ui {
 
 // TODO: Remove hardcoded text. Add support for other languages
 ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) {
@@ -36,7 +36,7 @@ ProgressWindow::ProgressWindow()
       current_page{"board_grid"},
       board_grid{},
       board_root{Gtk::Orientation::HORIZONTAL},
-      stack{}{
+      stack{} {
     set_title("Progress");
     set_default_size(600, 600);
     set_size_request(600, 600);
@@ -78,7 +78,8 @@ ProgressWindow::~ProgressWindow() { delete create_board_dialog; }
 
 void ProgressWindow::add_board(Board& board) {
     auto new_board_card = Gtk::make_managed<BoardCardButton>(board);
-    new_board_card->signal_clicked().connect(sigc::mem_fun(*this, &ProgressWindow::go_to_main_board));
+    new_board_card->signal_clicked().connect(
+        sigc::mem_fun(*this, &ProgressWindow::go_to_main_board));
     board_grid.append(*new_board_card);
 }
 
@@ -95,9 +96,7 @@ void ProgressWindow::setup_menu_button() {
     menu_button.set_menu_model(menu);
 }
 
-void ProgressWindow::show_about() {
-    about_dialog.set_visible();
-}
+void ProgressWindow::show_about() { about_dialog.set_visible(); }
 
 void ProgressWindow::show_create_board() { create_board_dialog->set_visible(); }
 
@@ -105,4 +104,4 @@ void ProgressWindow::go_to_main_board() {
     stack.set_visible_child("main_board");
     std::cout << "Fatal" << std::endl;
 }
-} // namespace ui
+}  // namespace ui

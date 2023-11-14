@@ -40,11 +40,11 @@ private:
 
     /**
      * There are two kinds of pages:
-     * 
+     *
      * board_grid: Shows a view of various boards to be worked on by the user
-     * 
+     *
      * board_main: Shows the kanban todo list
-    */
+     */
     std::string current_page;
 
     ui::ProgressAboutDialog about_dialog;

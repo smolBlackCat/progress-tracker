@@ -1,11 +1,12 @@
 #pragma once
 
-#include <vector>
 #include <glibmm.h>
 #include <gtkmm/application.h>
 
-#include "window.h"
+#include <vector>
+
 #include "../core/board.h"
+#include "window.h"
 
 namespace ui {
 
@@ -22,10 +23,10 @@ public:
 
 protected:
     Application();
-    
+
     /**
      * @brief Load boards into the application
-    */
+     */
     void on_startup() override;
     void on_activate() override;
 

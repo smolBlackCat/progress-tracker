@@ -11,10 +11,11 @@ class TestWindow : public Gtk::Window {
 public:
     TestWindow() : Gtk::Window{}, root{}, colour{"fatal"} {
         // Load boards
-        std::string board_path = std::string{std::getenv("HOME")}
-                                    + "/.config/progress/boards/";
+        std::string board_path =
+            std::string{std::getenv("HOME")} + "/.config/progress/boards/";
         int col = 0;
-        for (const auto &dir_entry: std::filesystem::directory_iterator(board_path)) {
+        for (const auto& dir_entry :
+             std::filesystem::directory_iterator(board_path)) {
             Board* p_board = board_from_xml(dir_entry.path());
             boards.push_back(p_board);
             auto board = Gtk::make_managed<ui::BoardCardButton>(*p_board);
@@ -30,14 +31,12 @@ public:
     }
 
     ~TestWindow() {
-        for (auto &board: boards) {
+        for (auto& board : boards) {
             delete board;
         }
     }
 
-    void fatal() {
-        std::cout << "Fatal" <<  colour.to_string() << std::endl;
-    }
+    void fatal() { std::cout << "Fatal" << colour.to_string() << std::endl; }
 
 private:
     Gtk::Box root;

@@ -15,7 +15,10 @@ uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
 
 // TODO: Code for loading the image and name of the board
 ui::BoardCardButton::BoardCardButton(Board& board)
-    : Button{}, root_box{Gtk::Orientation::VERTICAL}, board_thumbnail{}, board_name{} {
+    : Button{},
+      root_box{Gtk::Orientation::VERTICAL},
+      board_thumbnail{},
+      board_name{} {
     std::string m_text = "<b>";
     m_text += board.get_name();
     m_text += "</b>";

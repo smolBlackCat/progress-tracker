@@ -9,14 +9,14 @@ namespace ui {
 /**
  * @brief Class for representing a widget for selecting a
  * kanban board.
-*/
+ */
 class BoardCardButton : public Gtk::Button {
 public:
     /**
      * @brief BoardCardButton constructor
      * @param board Board object reference from which basic information will be
      *              gathered from
-    */
+     */
     BoardCardButton(Board& board);
 
 private:
@@ -24,4 +24,4 @@ private:
     Gtk::Image board_thumbnail;
     Gtk::Label board_name;
 };
-}
+}  // namespace ui

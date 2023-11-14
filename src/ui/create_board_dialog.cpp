@@ -8,13 +8,15 @@
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
     BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder)
-    : Gtk::Window(cobject), builder(ref_builder),
-    p_colour_button(builder->get_widget<Gtk::ColorDialogButton>("colour-button")),
-    p_file_image(builder->get_widget<Gtk::Image>("file-image")),
-    p_select_file_label(builder->get_widget<Gtk::Label>("select-file-label")),
-    p_board_name_entry(builder->get_widget<Gtk::Entry>("board-name-entry")),
-    p_background_selector_stack(builder->get_widget<Gtk::Stack>("background-selector-stack")) {
-
+    : Gtk::Window(cobject),
+      builder(ref_builder),
+      p_colour_button(
+          builder->get_widget<Gtk::ColorDialogButton>("colour-button")),
+      p_file_image(builder->get_widget<Gtk::Image>("file-image")),
+      p_select_file_label(builder->get_widget<Gtk::Label>("select-file-label")),
+      p_board_name_entry(builder->get_widget<Gtk::Entry>("board-name-entry")),
+      p_background_selector_stack(
+          builder->get_widget<Gtk::Stack>("background-selector-stack")) {
     this->setup_dialog_buttons();
 }
 
@@ -37,9 +39,11 @@ void CreateBoardDialog::on_bg_button_click() {
     filters->append(image_filter);
     dialog->set_filters(filters);
 
-    dialog->open(*this, sigc::bind(
-        sigc::mem_fun(*this, &ui::CreateBoardDialog::on_filedialog_finish),
-        dialog));
+    dialog->open(
+        *this,
+        sigc::bind(
+            sigc::mem_fun(*this, &ui::CreateBoardDialog::on_filedialog_finish),
+            dialog));
 }
 
 // TODO: Implement cleanup code for whenever the dialog is closed
@@ -54,11 +58,14 @@ void CreateBoardDialog::close_window() {
 }
 
 void CreateBoardDialog::create_board() {
-    std::string background_type = p_background_selector_stack->get_visible_child_name();
-    std::string background = background_type == "as-file"?
-        p_select_file_label->get_text():selected_colour.to_string();
+    std::string background_type =
+        p_background_selector_stack->get_visible_child_name();
+    std::string background = background_type == "as-file"
+                                 ? p_select_file_label->get_text()
+                                 : selected_colour.to_string();
     Board board{p_board_name_entry->get_text(), background};
-    ((ui::ProgressWindow*) get_transient_for())->add_board(board);
+    board.save_as_xml();
+    ((ui::ProgressWindow*)get_transient_for())->add_board(board);
     close_window();
 }
 

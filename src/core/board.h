@@ -1,10 +1,11 @@
 #pragma once
 
+#include <tinyxml2.h>
+
 #include <vector>
 
 #include "cardlist.h"
 #include "item.h"
-#include <tinyxml2.h>
 
 /**
  * @class Board
@@ -65,14 +66,14 @@ public:
 
     /**
      * @brief Saves the board information as a file.
-     * 
+     *
      * @details This method will create a new file based on the board's name. It
      *          will start numbering the files in case there are boards with the
      *          same name.
-     * 
+     *
      * @returns True if the file is created sucessfully. False is returned when
      *          the files already exists or there was a OS error.
-    */
+     */
     bool save_as_xml() const;
 
 private:

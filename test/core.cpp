@@ -26,7 +26,9 @@ void create_dummy_file(const char* board_name, const char* board_background,
         tinyxml2::XMLElement* list_element = doc.NewElement("list");
         list_element->SetAttribute("name", list_name);
 
-        for (auto& task : (std::string{list_name} == std::string{"TODO"} ? tasks1 : tasks2)) {
+        for (auto& task :
+             (std::string{list_name} == std::string{"TODO"} ? tasks1
+                                                            : tasks2)) {
             // Create card
             tinyxml2::XMLElement* card_element = doc.NewElement("card");
             card_element->SetAttribute("name", task);
@@ -168,12 +170,13 @@ TEST_CASE("Basic Usage of a board") {
     CHECK_FALSE(board.remove_cardlist(doing_cardlist));
 }
 
-TEST_CASE("Creating Boards from XML files: Creating board from inexistent files") {
+TEST_CASE(
+    "Creating Boards from XML files: Creating board from inexistent files") {
     REQUIRE_FALSE(board_from_xml("non_existent_file.xml"));
 }
 
-TEST_CASE("Creating boards from XML files: Creating a board from an existing file") {
-
+TEST_CASE(
+    "Creating boards from XML files: Creating a board from an existing file") {
     if (!std::filesystem::exists("board_progress.xml")) {
         create_dummy_file("Computer Science Classes", "rgba(255,255,255,1)",
                           "board_progress.xml");
@@ -195,5 +198,5 @@ TEST_CASE("Saving boards: Successful attempt") {
     Board board{"Progress-tracker", "rgba(0,0,170,1)"};
 
     CHECK(board.save_as_xml());  // progress-tracker.xml should be created
-    CHECK(board.save_as_xml()); // progress-tracker1.xml should be created
+    CHECK(board.save_as_xml());  // progress-tracker1.xml should be created
 }
