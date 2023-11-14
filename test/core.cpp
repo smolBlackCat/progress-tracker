@@ -190,3 +190,10 @@ TEST_CASE("Creating boards from XML files: Creating a board from an existing fil
     }
     CHECK_FALSE(board_from_xml("expected_to_fail.xml"));
 }
+
+TEST_CASE("Saving boards: Successful attempt") {
+    Board board{"Progress-tracker", "rgba(0,0,170,1)"};
+
+    CHECK(board.save_as_xml());  // progress-tracker.xml should be created
+    CHECK(board.save_as_xml()); // progress-tracker1.xml should be created
+}

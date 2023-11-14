@@ -4,6 +4,7 @@
 
 #include "cardlist.h"
 #include "item.h"
+#include <tinyxml2.h>
 
 /**
  * @class Board
@@ -62,8 +63,21 @@ public:
      */
     bool remove_cardlist(CardList& cardlist);
 
+    /**
+     * @brief Saves the board information as a file.
+     * 
+     * @details This method will create a new file based on the board's name. It
+     *          will start numbering the files in case there are boards with the
+     *          same name.
+     * 
+     * @returns True if the file is created sucessfully. False is returned when
+     *          the files already exists or there was a OS error.
+    */
+    bool save_as_xml() const;
+
 private:
     std::string background;
+    const std::string boards_dir;
     std::vector<CardList> cardlist_vector;
 
     /**
@@ -76,6 +90,8 @@ private:
      * @returns True if the background is of background type, otherwise False.
      */
     bool is_background(std::string& background) const;
+
+    tinyxml2::XMLDocument* xml_doc() const;
 };
 
 /**

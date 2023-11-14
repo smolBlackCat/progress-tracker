@@ -3,9 +3,13 @@
 #include <filesystem>
 #include <regex>
 #include <stdexcept>
+#include <cstdlib>
+#include <cctype>
+#include <algorithm>
 
 Board::Board(std::string name, std::string background)
-    : Item{name}, background{}, cardlist_vector{} {
+    : Item{name}, background{}, cardlist_vector{},
+      boards_dir{std::string{std::getenv("HOME")} + "/.config/progress/boards/"} {
     if (!is_background(background)) {
         throw std::domain_error{"given background is not of background type."};
     }
@@ -25,32 +29,11 @@ std::string Board::get_background() const { return background; }
 
 std::string Board::xml_structure() const {
     std::string xml_struct;
-    tinyxml2::XMLDocument doc;
-
-    tinyxml2::XMLElement* board_element = doc.NewElement("board");
-    board_element->SetAttribute("name", name.c_str());
-    board_element->SetAttribute("background", background.c_str());
-    doc.InsertEndChild(board_element);
-
-    for (auto& cardlist : cardlist_vector) {
-        // Create list
-        tinyxml2::XMLElement* list_element = doc.NewElement("list");
-        list_element->SetAttribute("name", cardlist.get_name().c_str());
-
-        for (auto& card : *cardlist.get_card_vector()) {
-            // Create card
-            tinyxml2::XMLElement* card_element = doc.NewElement("card");
-            card_element->SetAttribute("name", card.get_name().c_str());
-            list_element->InsertEndChild(card_element);
-        }
-        board_element->InsertEndChild(list_element);
-    }
-
     tinyxml2::XMLPrinter printer;
-
-    doc.Print(&printer);
-
+    auto doc = xml_doc();
+    doc->Print(&printer);
     xml_struct = printer.CStr();
+    delete doc;
     return xml_struct;
 }
 
@@ -73,6 +56,31 @@ bool Board::remove_cardlist(CardList& cardlist) {
     return false;
 }
 
+std::string lower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                    [](unsigned char c) {return std::tolower(c);});
+    return s;
+}
+
+bool Board::save_as_xml() const {
+    tinyxml2::XMLDocument* doc = xml_doc();
+
+    std::string filename = lower(name);
+    int id{};
+
+    while (std::filesystem::exists(boards_dir+filename+".xml")) {
+        filename = filename + std::to_string(id);
+        id++;
+    }
+
+    auto result = doc->SaveFile((boards_dir+filename+".xml").c_str());
+    delete doc;
+    if (!(result == tinyxml2::XML_SUCCESS)) {
+        return false;
+    }
+    return true;
+}
+
 bool Board::is_background(std::string& background) const {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
@@ -80,6 +88,31 @@ bool Board::is_background(std::string& background) const {
     return std::regex_match(background, rgba_r) 
         || std::regex_match(background, rgba1_r)
         || std::filesystem::exists(background);
+}
+
+tinyxml2::XMLDocument* Board::xml_doc() const {
+    auto doc = new tinyxml2::XMLDocument{};
+
+    tinyxml2::XMLElement* board_element = doc->NewElement("board");
+    board_element->SetAttribute("name", name.c_str());
+    board_element->SetAttribute("background", background.c_str());
+    doc->InsertEndChild(board_element);
+
+    for (auto& cardlist : cardlist_vector) {
+        // Create list
+        tinyxml2::XMLElement* list_element = doc->NewElement("list");
+        list_element->SetAttribute("name", cardlist.get_name().c_str());
+
+        for (auto& card : *cardlist.get_card_vector()) {
+            // Create card
+            tinyxml2::XMLElement* card_element = doc->NewElement("card");
+            card_element->SetAttribute("name", card.get_name().c_str());
+            list_element->InsertEndChild(card_element);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+
+    return doc;
 }
 
 Board* board_from_xml(std::string filename) {
