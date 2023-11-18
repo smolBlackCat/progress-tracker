@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # GTK setup
 find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
 find_package(PkgConfig REQUIRED)
+find_package(Catch2 3 REQUIRED)
+
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
 # Tiny XML setup
