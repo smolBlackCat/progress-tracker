@@ -7,6 +7,8 @@
 #include "cardlist.h"
 #include "item.h"
 
+
+// TODO: Add real saving functionality
 /**
  * @class Board
  *
@@ -24,6 +26,18 @@ public:
     Board(std::string name, std::string background);
 
     /**
+     * @brief Constructs a Board object from a filepath
+     * 
+     * @param board_file_path valid path name pointing to a valid board xml file
+     * 
+     * @details It's completely necessary for the filepath given to be valid,
+     * that is, the file exists and the syntax of Progress Boards checks out.
+     * 
+     * @throws std::domain_error if the board_file_path is not valid at all
+    */
+    Board(std::string board_file_path);
+
+    /**
      * @brief Changes the background information of the board.
      *
      * @param other The new background.
@@ -39,6 +53,13 @@ public:
      * @returns The background value
      */
     std::string get_background() const;
+
+    /**
+     * @brief Sets a file path to where the board will be saved.
+     * 
+     * @returns true if the path was set successfully, otherwise false.
+    */
+    bool set_filepath(const std::string& file_path);
 
     /**
      * @brief Returns the xml structure of this board object.
@@ -77,8 +98,7 @@ public:
     bool save_as_xml() const;
 
 private:
-    std::string background;
-    const std::string boards_dir;
+    std::string background, file_path;
     std::vector<CardList> cardlist_vector;
 
     /**
@@ -94,16 +114,3 @@ private:
 
     tinyxml2::XMLDocument* xml_doc() const;
 };
-
-/**
- * @brief Creates a pointer to a new Board object created from a xml file.
- *
- * @param xml_filename The file name. It can be relative or absolute.
- *
- * @returns Board pointer to the new Board object. The caller should deallocate
- *          the object after its use to avoid memory leaks. Note that a nullptr
- *          is returned if the object creation was not successful, either
- *          because the filename doesn't exist or the filename wasn't a proper
- *          Progress XML.
- */
-Board* board_from_xml(std::string xml_filename);

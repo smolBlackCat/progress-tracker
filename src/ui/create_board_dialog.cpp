@@ -1,7 +1,9 @@
 #include "create_board_dialog.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
+#include <format>
 
 #include "window.h"
 
@@ -57,6 +59,14 @@ void CreateBoardDialog::close_window() {
     p_colour_button->set_rgba(Gdk::RGBA("#FFFFFF"));
 }
 
+std::string lower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return s;
+}
+
+// TODO: The current behaviour of this function is to not allow the creation of
+// boards with the same name. Implement better code that allows boards with the same name.
 void CreateBoardDialog::create_board() {
     std::string background_type =
         p_background_selector_stack->get_visible_child_name();
@@ -64,9 +74,18 @@ void CreateBoardDialog::create_board() {
                                  ? p_select_file_label->get_text()
                                  : selected_colour.to_string();
     Board board{p_board_name_entry->get_text(), background};
-    board.save_as_xml();
-    ((ui::ProgressWindow*)get_transient_for())->add_board(board);
-    close_window();
+    std::string new_file_path = std::string{std::getenv("HOME")} + "/.config/progress/boards/"
+        + lower(board.get_name()) + ".xml";
+    if (!board.set_filepath(new_file_path)) {
+        auto message_dialog = Gtk::AlertDialog::create(
+            std::format("It was not possible to create a Board with the name {}",
+                board.get_name()));
+        message_dialog->show(*this);
+    } else {
+        board.save_as_xml();
+        ((ui::ProgressWindow*)get_transient_for())->add_board(board);
+        close_window();
+    }
 }
 
 void CreateBoardDialog::setup_dialog_buttons() {

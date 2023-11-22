@@ -130,7 +130,10 @@ TEST_CASE("Basic Usage of a board") {
     Board board{"Computer Science Stuff", "rgba(255,255,255,1)"};  // valid;
 
     CHECK_FALSE(board.set_background("not a background"));
+
+    // FIXME: Don't rely on absolute path. You won't hand you laptop to anyone
     CHECK(board.set_background("/home/moura/Pictures/cat.jpeg"));
+
     CHECK(board.set_background("rgba(255,224,123,1)"));
 
     CardList todo_cardlist{"TODO"};
@@ -165,14 +168,11 @@ TEST_CASE("Basic Usage of a board") {
 
     // 'doing_cardlist' was already removed. must return false
     CHECK_FALSE(board.remove_cardlist(doing_cardlist));
-
-    // Should not remove the duplicate list with different cards
-    CHECK_FALSE(board.remove_cardlist(doing_cardlist));
 }
 
 TEST_CASE(
     "Creating Boards from XML files: Creating board from inexistent files") {
-    REQUIRE_FALSE(board_from_xml("non_existent_file.xml"));
+    REQUIRE_THROWS(Board("non-existent-file.xml"));
 }
 
 TEST_CASE(
@@ -181,22 +181,35 @@ TEST_CASE(
         create_dummy_file("Computer Science Classes", "rgba(255,255,255,1)",
                           "board_progress.xml");
     }
-    Board* board = board_from_xml("board_progress.xml");
-    REQUIRE(board);
+    REQUIRE_NOTHROW(Board{"board_progress.xml"});
+
+    Board board{"board_progress.xml"};
 
     std::string* file_content = get_xml_from_file("board_progress.xml");
-    CHECK(board->xml_structure() == *file_content);
+    CHECK(board.xml_structure() == *file_content);
 
     if (!std::filesystem::exists("expected_to_fail.xml")) {
         create_dummy_file("Test went wrong", "not a background string",
                           "expected_to_fail.xml");
     }
-    CHECK_FALSE(board_from_xml("expected_to_fail.xml"));
+    REQUIRE_THROWS(Board("expected_to_fail.xml"));
 }
 
 TEST_CASE("Saving boards: Successful attempt") {
     Board board{"Progress-tracker", "rgba(0,0,170,1)"};
 
-    CHECK(board.save_as_xml());  // progress-tracker.xml should be created
-    CHECK(board.save_as_xml());  // progress-tracker1.xml should be created
+    board.set_filepath("./progress-tracker-board.xml");
+    CHECK(board.save_as_xml());
+
+    std::string xml_structure1 = board.xml_structure();
+
+    auto cardlist = CardList{"Fatal"};
+    board.add_cardlist(cardlist);
+    CHECK(board.save_as_xml());
+
+    std::string xml_structure2 = board.xml_structure();
+
+    CHECK_FALSE(xml_structure1 == xml_structure2);
+
+    std::filesystem::remove("./progress-tracker-board.xml");
 }

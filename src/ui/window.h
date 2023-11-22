@@ -32,8 +32,8 @@ public:
 
 private:
     Gtk::HeaderBar header_bar;
-    Gtk::Button add_board_button;
-    Gtk::MenuButton menu_button;
+    Gtk::Button add_board_button, home_button;
+    Gtk::MenuButton menu_button, board_menu_button;
     Gtk::FlowBox board_grid;
     Gtk::Box board_root;
     Gtk::Stack stack;

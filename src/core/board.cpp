@@ -6,18 +6,87 @@
 #include <filesystem>
 #include <regex>
 #include <stdexcept>
+#include <format>
 
 Board::Board(std::string name, std::string background)
     : Item{name},
       background{},
       cardlist_vector{},
-      boards_dir{std::string{std::getenv("HOME")} +
-                 "/.config/progress/boards/"} {
+      file_path{} {
     if (!is_background(background)) {
         throw std::domain_error{"given background is not of background type."};
     }
 
     this->background = background;
+}
+
+Board::Board(std::string board_file_path) :
+    Item{"none"},
+    background{},
+    cardlist_vector{},
+    file_path{board_file_path} {
+
+    if (!std::filesystem::exists(file_path))
+        throw std::domain_error{std::format("filename {} does not exist.", file_path)};
+
+    tinyxml2::XMLDocument doc;
+
+    auto error_code = doc.LoadFile(file_path.c_str());
+    if (error_code != 0) {
+        throw std::domain_error{std::format("It was not possible to load the file on {}", file_path)};
+    }
+
+    // Set basic Item attributes: name
+
+    const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
+
+    if (!board_element) {
+        throw std::domain_error{std::format("{} is not a progress xml file.", file_path)};
+    }
+
+    auto board_element_name = board_element->FindAttribute("name");
+    auto board_element_background = board_element->FindAttribute("background");
+
+    if (!(board_element_name && board_element_background)) {
+        throw std::domain_error{std::format("{} is not a progress xml file.", file_path)};
+    }
+
+    name = board_element_name->Value();
+    background = board_element_background->Value();
+
+    if (name.empty() || !is_background(background)) {
+        throw std::domain_error{std::format("{} is not a well formed progress xml file.", file_path)};
+    }
+
+    const tinyxml2::XMLElement* list_element =
+        board_element->FirstChildElement("list");
+
+    while (list_element) {
+        auto cur_cardlist_name = list_element->Attribute("name");
+        if (!cur_cardlist_name) {
+            throw std::domain_error{std::format("{} is not a valid progress xml file.", file_path)};
+        }
+
+        CardList cur_cardlist{cur_cardlist_name};
+
+        const tinyxml2::XMLElement* card_element =
+            list_element->FirstChildElement("card");
+        while (card_element) {
+            auto cur_card_name = card_element->Attribute("name");
+
+            if (!cur_card_name) {
+                throw std::domain_error{std::format("{} is not a valid progress xml file.", file_path)};
+            }
+            Card cur_card{cur_card_name};
+
+            cur_cardlist.add_card(cur_card);
+
+            card_element = card_element->NextSiblingElement("card");
+        }
+        this->add_cardlist(cur_cardlist);
+
+        list_element = list_element->NextSiblingElement("list");
+    }
 }
 
 bool Board::set_background(std::string other) {
@@ -29,6 +98,17 @@ bool Board::set_background(std::string other) {
 }
 
 std::string Board::get_background() const { return background; }
+
+bool Board::set_filepath(const std::string& file_path) {
+    std::filesystem::path p{file_path};
+
+    if (std::filesystem::exists(file_path)
+        or (!std::filesystem::exists(p.parent_path())))
+        return false;
+    
+    this->file_path = file_path;
+    return true;
+}
 
 std::string Board::xml_structure() const {
     std::string xml_struct;
@@ -59,26 +139,12 @@ bool Board::remove_cardlist(CardList& cardlist) {
     return false;
 }
 
-std::string lower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    return s;
-}
-
 bool Board::save_as_xml() const {
     tinyxml2::XMLDocument* doc = xml_doc();
 
-    std::string filename = lower(name);
-    int id{};
-
-    while (std::filesystem::exists(boards_dir + filename + ".xml")) {
-        filename = filename + std::to_string(id);
-        id++;
-    }
-
-    auto result = doc->SaveFile((boards_dir + filename + ".xml").c_str());
+    auto result = doc->SaveFile((file_path).c_str());
     delete doc;
-    if (!(result == tinyxml2::XML_SUCCESS)) {
+    if (result != tinyxml2::XML_SUCCESS) {
         return false;
     }
     return true;
@@ -116,48 +182,4 @@ tinyxml2::XMLDocument* Board::xml_doc() const {
     }
 
     return doc;
-}
-
-Board* board_from_xml(std::string filename) {
-    if (!std::filesystem::exists(filename)) return nullptr;
-
-    tinyxml2::XMLDocument doc;
-    doc.LoadFile(filename.c_str());
-
-    // Set basic Item attributes: name
-    std::string board_name;
-    std::string board_background;
-
-    const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
-    board_name = board_element->FindAttribute("name")->Value();
-    board_background = board_element->FindAttribute("background")->Value();
-
-    // Set Board specific attributes: cardlist_vector
-    Board* board;
-    try {
-        board = new Board{board_name, board_background};
-    } catch (std::domain_error e) {
-        return nullptr;
-    }
-
-    const tinyxml2::XMLElement* list_element =
-        board_element->FirstChildElement("list");
-
-    while (list_element) {
-        CardList cur_cardlist{list_element->Attribute("name")};
-
-        const tinyxml2::XMLElement* card_element =
-            list_element->FirstChildElement("card");
-        while (card_element) {
-            Card cur_card{card_element->Attribute("name")};
-            cur_cardlist.add_card(cur_card);
-
-            card_element = card_element->NextSiblingElement("card");
-        }
-        board->add_cardlist(cur_cardlist);
-
-        list_element = list_element->NextSiblingElement("list");
-    }
-
-    return board;
 }

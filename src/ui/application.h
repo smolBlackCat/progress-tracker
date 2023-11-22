@@ -32,6 +32,6 @@ protected:
 
 private:
     ProgressWindow main_window;
-    std::vector<Board*> boards;
+    std::vector<Board> boards;
 };
 }  // namespace ui
