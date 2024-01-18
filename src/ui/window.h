@@ -9,6 +9,7 @@
 
 #include "../core/board.h"
 #include "create_board_dialog.h"
+#include "board-widget.h"
 
 namespace ui {
 /**
@@ -28,14 +29,14 @@ public:
     ProgressWindow();
     ~ProgressWindow() override;
 
-    void add_board(Board& board);
+    void add_board(Board* board);
 
 private:
     Gtk::HeaderBar header_bar;
     Gtk::Button add_board_button, home_button;
     Gtk::MenuButton menu_button, board_menu_button;
     Gtk::FlowBox board_grid;
-    Gtk::Box board_root;
+    ui::BoardWidget board_widget;
     Gtk::Stack stack;
 
     /**
@@ -54,5 +55,6 @@ private:
     void show_about();
     void show_create_board();
     void go_to_main_board();
+    void go_to_main_menu();
 };
 }  // namespace ui

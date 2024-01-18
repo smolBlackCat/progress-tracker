@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "card.h"
 #include "item.h"
@@ -18,16 +19,25 @@ public:
     CardList(std::string name);
 
     /**
-     * @brief Adds a \ref Card object to the cardlist.
+     * @brief Adds a Card object to the cardlist by moving the Card object
+     * into a newly allocated space.
      *
-     * @returns True if the card was added successfully, otherwise false.
+     * @returns A pointer to the allocated object. It may be nullptr
      */
-    bool add_card(Card& card);
+    std::shared_ptr<Card> add_card(Card& card);
 
     /**
-     * @brief Removes a \ref Card object from the cardlist.
+     * @brief Adds a Card object to the cardlist by moving the Card object
+     * into a newly allocated space.
      *
-     * @param card \ref Card instance.
+     * @returns A pointer to the allocated object. It may be nullptr
+     */
+    std::shared_ptr<Card> add_card(Card&& card);
+
+    /**
+     * @brief Removes a Card object from the cardlist.
+     *
+     * @param card Card instance.
      *
      * @returns True if the card was successfully removed from the cardlist.
      *          False may be returned when the requested Card to be removed is
@@ -42,8 +52,10 @@ public:
      *
      * @returns the pointer pointing to a constant vector object.
      */
-    const std::vector<Card>* get_card_vector() const;
+    std::vector<std::shared_ptr<Card>>& get_card_vector();
+
+    void reorder_card(std::shared_ptr<Card> next, std::shared_ptr<Card> sibling);
 
 private:
-    std::vector<Card> card_vector;
+    std::vector<std::shared_ptr<Card>> card_vector;
 };

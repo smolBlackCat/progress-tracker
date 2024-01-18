@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <format>
 
+Board::Board() : Item{""} { }
+
 Board::Board(std::string name, std::string background)
     : Item{name},
       background{},
@@ -78,12 +80,11 @@ Board::Board(std::string board_file_path) :
                 throw std::domain_error{std::format("{} is not a valid progress xml file.", file_path)};
             }
             Card cur_card{cur_card_name};
-
-            cur_cardlist.add_card(cur_card);
+            cur_cardlist.add_card(std::move(cur_card));
 
             card_element = card_element->NextSiblingElement("card");
         }
-        this->add_cardlist(cur_cardlist);
+        this->add_cardlist(std::move(cur_cardlist));
 
         list_element = list_element->NextSiblingElement("list");
     }
@@ -110,7 +111,7 @@ bool Board::set_filepath(const std::string& file_path) {
     return true;
 }
 
-std::string Board::xml_structure() const {
+std::string Board::xml_structure() {
     std::string xml_struct;
     tinyxml2::XMLPrinter printer;
     auto doc = xml_doc();
@@ -120,18 +121,19 @@ std::string Board::xml_structure() const {
     return xml_struct;
 }
 
-bool Board::add_cardlist(CardList& cardlist) {
-    try {
-        cardlist_vector.push_back(cardlist);
-        return true;
-    } catch (std::bad_alloc e) {
-        return false;
-    }
+std::shared_ptr<CardList> Board::add_cardlist(CardList& cardlist) {
+    return add_cardlist(std::move(cardlist));
+}
+
+std::shared_ptr<CardList> Board::add_cardlist(CardList&& cardlist) {
+    std::shared_ptr<CardList> new_cardlist{new CardList{cardlist}};
+    if (new_cardlist) { cardlist_vector.push_back(new_cardlist); }
+    return new_cardlist;
 }
 
 bool Board::remove_cardlist(CardList& cardlist) {
     for (size_t i = 0; i < cardlist_vector.size(); i++) {
-        if (cardlist == cardlist_vector.at(i)) {
+        if (cardlist == (*cardlist_vector.at(i))) {
             cardlist_vector.erase(cardlist_vector.begin() + i);
             return true;
         }
@@ -139,15 +141,59 @@ bool Board::remove_cardlist(CardList& cardlist) {
     return false;
 }
 
-bool Board::save_as_xml() const {
-    tinyxml2::XMLDocument* doc = xml_doc();
+void Board::reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<CardList> sibling) {
+    size_t next_i = -1;
+    size_t sibling_i = -1;
 
+    for (size_t i = 0; i < cardlist_vector.size(); i++) {
+        if (*cardlist_vector[i] == *next) {
+            next_i = i;
+        }
+        if (*cardlist_vector[i] == *sibling) {
+            sibling_i = i;
+        }
+    }
+
+    if (next_i == -1 || sibling_i == -1) {
+        throw std::invalid_argument{"Either next or sibling are not children of this cardlist"};
+    }
+
+    auto next_it = std::next(cardlist_vector.begin(), next_i);
+    std::shared_ptr<CardList> temp_v = cardlist_vector[next_i];
+    cardlist_vector.erase(next_it);
+
+    sibling_i -= 1;
+
+    if (sibling_i == cardlist_vector.size()-1) {
+        cardlist_vector.push_back(temp_v);
+    } else {
+        auto sibling_it = std::next(cardlist_vector.begin(), sibling_i+1);
+        cardlist_vector.insert(sibling_it, temp_v);
+    }
+}
+
+bool Board::save_as_xml() {
+    tinyxml2::XMLDocument* doc = xml_doc();
     auto result = doc->SaveFile((file_path).c_str());
     delete doc;
-    if (result != tinyxml2::XML_SUCCESS) {
-        return false;
+    return result == tinyxml2::XML_SUCCESS;
+}
+
+std::string Board::get_background_type() const {
+    std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
+    std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
+
+    if (std::regex_match(background, rgba1_r) || std::regex_match(background, rgba1_r)) {
+        return "colour";
+    } else if (std::filesystem::exists(background)) {
+        return "file";
     }
-    return true;
+
+    return "invalid";
+}
+
+std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
+    return cardlist_vector;
 }
 
 bool Board::is_background(std::string& background) const {
@@ -159,7 +205,7 @@ bool Board::is_background(std::string& background) const {
            std::filesystem::exists(background);
 }
 
-tinyxml2::XMLDocument* Board::xml_doc() const {
+tinyxml2::XMLDocument* Board::xml_doc() {
     auto doc = new tinyxml2::XMLDocument{};
 
     tinyxml2::XMLElement* board_element = doc->NewElement("board");
@@ -167,15 +213,15 @@ tinyxml2::XMLDocument* Board::xml_doc() const {
     board_element->SetAttribute("background", background.c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto& cardlist : cardlist_vector) {
+    for (auto cardlist : cardlist_vector) {
         // Create list
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
-        list_element->SetAttribute("name", cardlist.get_name().c_str());
+        list_element->SetAttribute("name", cardlist->get_name().c_str());
 
-        for (auto& card : *cardlist.get_card_vector()) {
+        for (auto card : cardlist->get_card_vector()) {
             // Create card
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
-            card_element->SetAttribute("name", card.get_name().c_str());
+            card_element->SetAttribute("name", card->get_name().c_str());
             list_element->InsertEndChild(card_element);
         }
         board_element->InsertEndChild(list_element);

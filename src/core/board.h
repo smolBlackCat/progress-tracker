@@ -7,7 +7,6 @@
 #include "cardlist.h"
 #include "item.h"
 
-
 // TODO: Add real saving functionality
 /**
  * @class Board
@@ -16,6 +15,8 @@
  */
 class Board : public Item {
 public:
+    Board();
+
     /**
      * @brief Board constructor.
      *
@@ -66,24 +67,42 @@ public:
      *
      * @returns A string of xml structure of this object.
      */
-    std::string xml_structure() const;
+    std::string xml_structure();
 
     /**
-     * @brief Adds a \ref CardList object to the board
+     * @brief Adds a CardList object to the board by moving the contents to a
+     * dynamic allocated space.
+     * 
+     * @param cardlist CardList rvalue
      *
-     * @returns True if the \ref CardList object was added successfully,
-     * otherwise False.
+     * @returns a CardList pointer to the newly allocated object.
      */
-    bool add_cardlist(CardList& cardlist);
+    std::shared_ptr<CardList> add_cardlist(CardList& cardlist);
 
     /**
-     * @brief Removes a \ref CardList object from the board.
+     * @brief Adds a CardList object to the board by moving the contents to a
+     * dynamic allocated space.
+     * 
+     * @param cardlist CardList rvalue
      *
-     * @returns True if the \ref CardList object is removed from the board.
-     *          False is returned if the \ref CardList object requested to be
+     * @returns a CardList pointer to the newly allocated object.
+     */
+    std::shared_ptr<CardList> add_cardlist(CardList&& cardlist);
+
+    /**
+     * @brief Removes a CardList object from the board and free the allocated
+     * space linked to the cardlist object.
+     *
+     * @returns True if the CardList object is removed from the board.
+     *          False is returned if the CardList object requested to be
      *          removed isn't in the board.
      */
     bool remove_cardlist(CardList& cardlist);
+
+    /**
+     * @brief Reorders the next card after sibling
+    */
+    void reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<CardList> sibling);
 
     /**
      * @brief Saves the board information as a file.
@@ -95,11 +114,17 @@ public:
      * @returns True if the file is created sucessfully. False is returned when
      *          the files already exists or there was a OS error.
      */
-    bool save_as_xml() const;
+    bool save_as_xml();
+
+    std::string get_background_type() const;
+
+    std::vector<std::shared_ptr<CardList>>& get_cardlists();
 
 private:
     std::string background, file_path;
-    std::vector<CardList> cardlist_vector;
+
+    // All CardLists pointers points to a dynamic object.
+    std::vector<std::shared_ptr<CardList>> cardlist_vector;
 
     /**
      * @brief Checks whether a given string is of background type.
@@ -112,5 +137,5 @@ private:
      */
     bool is_background(std::string& background) const;
 
-    tinyxml2::XMLDocument* xml_doc() const;
+    tinyxml2::XMLDocument* xml_doc();
 };

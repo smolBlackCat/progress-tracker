@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
 	std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION << std::endl;
 
 	auto app = ui::Application::create();
+	int return_code = app->run(argc, argv);
+	std::cout << "Return Code: " << return_code << std::endl;
 
-	return app->run(argc, argv);
+	return return_code;
 }

@@ -13,14 +13,16 @@ uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
     return (r << 24) + (g << 16) + (b << 8) + a;
 }
 
-// TODO: Code for loading the image and name of the board
-ui::BoardCardButton::BoardCardButton(Board& board)
+ui::BoardCardButton::BoardCardButton(Board* board)
     : Button{},
       root_box{Gtk::Orientation::VERTICAL},
       board_thumbnail{},
-      board_name{} {
+      board_name{},
+      board{board} {
+    
+    if (!board) throw std::domain_error{"Fatal"};
     std::string m_text = "<b>";
-    m_text += board.get_name();
+    m_text += board->get_name();
     m_text += "</b>";
 
     set_valign(Gtk::Align::CENTER);
@@ -33,14 +35,14 @@ ui::BoardCardButton::BoardCardButton(Board& board)
     board_name.set_valign(Gtk::Align::CENTER);
     board_name.set_vexpand(false);
 
-    if (std::filesystem::exists(board.get_background())) {
+    if (std::filesystem::exists(board->get_background())) {
         auto board_bg_image = Gdk::Pixbuf::create_from_file(
-            board.get_background(), 256, 256, false);
+            board->get_background(), 256, 256, false);
         board_thumbnail.set(board_bg_image);
     } else {
         auto solid_colour =
             Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-        Gdk::RGBA colour{board.get_background()};
+        Gdk::RGBA colour{board->get_background()};
         solid_colour->fill(rgb_to_hex(colour));
         board_thumbnail.set(solid_colour);
     }

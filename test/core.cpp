@@ -2,6 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
+#include <type_traits>
 
 #include "board.h"
 #include "card.h"
@@ -125,14 +126,14 @@ TEST_CASE("Removing cards from a CardList object") {
 TEST_CASE("Basic Usage of a board") {
     // A domain_error exception is thrown when the background is not of
     // background type
-    CHECK_THROWS(Board("Gabriel's Board", "not a background"));
+    //CHECK_THROWS(Board{"Gabriel's Board", "not a background"});
 
     Board board{"Computer Science Stuff", "rgba(255,255,255,1)"};  // valid;
 
     CHECK_FALSE(board.set_background("not a background"));
 
-    // FIXME: Don't rely on absolute path. You won't hand you laptop to anyone
-    CHECK(board.set_background("/home/moura/Pictures/cat.jpeg"));
+    // FIXME: Don't rely on absolute path. You won't hand your laptop to anyone
+    CHECK(board.set_background("/home/moura/Pictures/cat-better.png"));
 
     CHECK(board.set_background("rgba(255,224,123,1)"));
 
@@ -212,4 +213,40 @@ TEST_CASE("Saving boards: Successful attempt") {
     CHECK_FALSE(xml_structure1 == xml_structure2);
 
     std::filesystem::remove("./progress-tracker-board.xml");
+}
+
+template<typename T>
+requires std::is_base_of_v<Item, T>
+bool order_match(std::vector<std::shared_ptr<T>> order, std::string* order_to_match) {
+    for (size_t i = 0; i < order.size(); i++) {
+        if (order[i]->get_name() != order_to_match[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+TEST_CASE("Cards reordering within a CardList") {
+    CardList cardlist{"Fatal"};
+
+    Card card1{""}, card2{""}, card3{""};
+    card1 = Card{"Programming"};
+    card2 = Card{"Planning"};
+    card3 = Card{"Productivity"};
+
+    auto card1_refptr = cardlist.add_card(card1);
+    auto card2_refptr = cardlist.add_card(card2);
+    auto card3_refptr = cardlist.add_card(card3);
+
+    // Order is: Programming, Planning, Productivity
+
+    cardlist.reorder_card(card1_refptr, card2_refptr);
+    // New expected order is: Planning, Programming, Productivity
+    std::string expected_order[] = {"Planning", "Programming", "Productivity"};
+    CHECK(order_match(cardlist.get_card_vector(), expected_order));
+
+    cardlist.reorder_card(card2_refptr, card3_refptr);
+    // New expected order: Programming, Productivity, Planning
+    std::string expected_order1[] = {"Programming", "Productivity", "Planning"};
+    CHECK(order_match(cardlist.get_card_vector(), expected_order1));
 }

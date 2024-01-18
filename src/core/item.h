@@ -18,6 +18,8 @@ public:
      */
     Item(std::string name);
 
+    virtual ~Item() = default;
+
     /**
      * @brief Changes the object's name.
      *

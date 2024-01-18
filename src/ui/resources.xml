@@ -2,5 +2,6 @@
     <gresource prefix="ui">
         <file>com.moura.Progress.svg</file>
         <file>create-board-dialog.ui</file>
+        <file>stylesheet.css</file>
     </gresource>
 </gresources>

@@ -17,7 +17,9 @@ public:
      * @param board Board object reference from which basic information will be
      *              gathered from
      */
-    BoardCardButton(Board& board);
+    BoardCardButton(Board* board);
+
+    Board* board;
 
 private:
     Gtk::Box root_box;
