@@ -5,8 +5,8 @@
 #include <memory>
 
 #include "../core/card.h"
-#include "editable-label-header.h"
 #include "cardlist.h"
+#include "editable-label-header.h"
 
 namespace ui {
 
@@ -20,11 +20,7 @@ public:
 
     void set_cardlist(ui::Cardlist* cardlist_p);
 
-    ui::Cardlist const* get_cardlist();
-
     std::shared_ptr<Card> get_card();
-
-    bool equal(ui::CardWidget& other);
 
 protected:
     void on_confirm_changes();

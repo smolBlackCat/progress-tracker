@@ -1,7 +1,8 @@
 #include "cardlist.h"
-#include <stdexcept>
-#include <iterator>
+
 #include <iostream>
+#include <iterator>
+#include <stdexcept>
 
 CardList::CardList(std::string name) : Item{name}, card_vector{} {}
 
@@ -11,7 +12,9 @@ std::shared_ptr<Card> CardList::add_card(Card& card) {
 
 std::shared_ptr<Card> CardList::add_card(Card&& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
-    if (new_card) { card_vector.push_back(new_card); }
+    if (new_card) {
+        card_vector.push_back(new_card);
+    }
     return new_card;
 }
 
@@ -29,7 +32,8 @@ std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
     return card_vector;
 }
 
-void CardList::reorder_card(std::shared_ptr<Card> next, std::shared_ptr<Card> sibling) {
+void CardList::reorder_card(std::shared_ptr<Card> next,
+                            std::shared_ptr<Card> sibling) {
     size_t next_i = -1;
     size_t sibling_i = -1;
 
@@ -43,7 +47,8 @@ void CardList::reorder_card(std::shared_ptr<Card> next, std::shared_ptr<Card> si
     }
 
     if (next_i == -1 || sibling_i == -1) {
-        throw std::invalid_argument{"Either next or sibling are not children of this cardlist"};
+        throw std::invalid_argument{
+            "Either next or sibling are not children of this cardlist"};
     }
 
     auto next_it = std::next(card_vector.begin(), next_i);
@@ -52,10 +57,10 @@ void CardList::reorder_card(std::shared_ptr<Card> next, std::shared_ptr<Card> si
 
     sibling_i -= 1;
 
-    if (sibling_i == card_vector.size()-1) {
+    if (sibling_i == card_vector.size() - 1) {
         card_vector.push_back(temp_v);
     } else {
-        auto sibling_it = std::next(card_vector.begin(), sibling_i+1);
+        auto sibling_it = std::next(card_vector.begin(), sibling_i + 1);
         card_vector.insert(sibling_it, temp_v);
     }
 }

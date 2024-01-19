@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "card.h"
 #include "item.h"
@@ -54,7 +54,8 @@ public:
      */
     std::vector<std::shared_ptr<Card>>& get_card_vector();
 
-    void reorder_card(std::shared_ptr<Card> next, std::shared_ptr<Card> sibling);
+    void reorder_card(std::shared_ptr<Card> next,
+                      std::shared_ptr<Card> sibling);
 
 private:
     std::vector<std::shared_ptr<Card>> card_vector;

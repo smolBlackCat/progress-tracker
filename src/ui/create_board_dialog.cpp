@@ -1,12 +1,12 @@
 #include "create_board_dialog.h"
 
 #include <cstdlib>
+#include <format>
 #include <iostream>
 #include <string>
-#include <format>
 
-#include "window.h"
 #include "application.h"
+#include "window.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
@@ -67,7 +67,8 @@ std::string lower(std::string s) {
 }
 
 // TODO: The current behaviour of this function is to not allow the creation of
-// boards with the same name. Implement better code that allows boards with the same name.
+// boards with the same name. Implement better code that allows boards with the
+// same name.
 void CreateBoardDialog::create_board() {
     std::string background_type =
         p_background_selector_stack->get_visible_child_name();
@@ -75,19 +76,24 @@ void CreateBoardDialog::create_board() {
                                  ? p_select_file_label->get_text()
                                  : selected_colour.to_string();
     Board* board = new Board{p_board_name_entry->get_text(), background};
-    std::string new_file_path = std::string{std::getenv("HOME")} + "/.config/progress/boards/"
-        + lower(board->get_name()) + ".xml";
+    std::string new_file_path = std::string{std::getenv("HOME")} +
+                                "/.config/progress/boards/" +
+                                lower(board->get_name()) + ".xml";
     if (!board->set_filepath(new_file_path)) {
-        auto message_dialog = Gtk::AlertDialog::create(
-            std::format("It was not possible to create a Board with the name {}",
-                board->get_name()));
+        auto message_dialog = Gtk::AlertDialog::create(std::format(
+            "It was not possible to create a Board with the name {}",
+            board->get_name()));
         delete board;
         message_dialog->show(*this);
     } else {
         board->save_as_xml();
         // FIXME: This is definitely a backbone for spaghetti code.
-        // I'll have to consider if having a separate application class is really useful
-        ((ui::Application*) ((ui::ProgressWindow*)get_transient_for())->get_application().get())->add_board(board);
+        // I'll have to consider if having a separate application class is
+        // really useful
+        ((ui::Application*)((ui::ProgressWindow*)get_transient_for())
+             ->get_application()
+             .get())
+            ->add_board(board);
         ((ui::ProgressWindow*)get_transient_for())->add_board(board);
         close_window();
     }

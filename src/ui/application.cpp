@@ -12,15 +12,13 @@ ui::Application::Application()
     : Gtk::Application{"com.moura.Progress"}, main_window{}, boards{} {}
 
 ui::Application::~Application() {
-    for (Board* board: boards) {
+    for (Board* board : boards) {
         delete board;
         board = nullptr;
     }
 }
 
-void ui::Application::add_board(Board* board) {
-    boards.push_back(board);
-}
+void ui::Application::add_board(Board* board) { boards.push_back(board); }
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
@@ -35,7 +33,7 @@ void ui::Application::on_startup() {
         }
     } else {
         // Load all boards information onto memory
-        for (const auto &dir_entry :
+        for (const auto& dir_entry :
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();
             if (board_filename.ends_with(".xml")) {

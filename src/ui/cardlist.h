@@ -6,8 +6,8 @@
 
 #include "../core/card.h"
 #include "../core/cardlist.h"
-#include "editable-label-header.h"
 #include "card.h"
+#include "editable-label-header.h"
 
 namespace ui {
 
@@ -39,10 +39,6 @@ public:
 
     ui::CardWidget* add_card();
 
-    void reorder_card(ui::CardWidget& next, ui::CardWidget& sibling);
-
-    void append_card(ui::CardWidget* card);
-
     void remove_card(ui::CardWidget* card);
 
     std::shared_ptr<CardList>& get_cardlist_refptr();
@@ -52,14 +48,18 @@ public:
     CardListHeader& get_header();
 
 private:
+    // Widgets
     CardListHeader cardlist_header;
     Gtk::Button add_card_button;
     Gtk::Box root;
-    std::vector<ui::CardWidget*> cards_tracker;
+
+    // Data
     BoardWidget& board;
     std::shared_ptr<CardList> cardlist_refptr;
-    int n_rows = 1; // We're counting with add_card_button
+    std::vector<ui::CardWidget*> cards_tracker;
 
-    void remove();
+    void reorder_card(ui::CardWidget& next, ui::CardWidget& sibling);
+
+    void setup_drag_and_drop(ui::CardWidget* card);
 };
 }  // namespace ui

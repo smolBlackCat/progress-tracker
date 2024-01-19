@@ -33,7 +33,6 @@ public:
      * @returns String as the name of the object.
      */
     std::string get_name() const;
-    bool operator==(const Item& Item) const;
 
     /**
      * @brief Gets the object's ID.
@@ -41,6 +40,8 @@ public:
      * @returns The integer as the object's ID.
      */
     unsigned long long get_id() const;
+
+    bool operator==(const Item& Item) const;
 
 protected:
     std::string name;

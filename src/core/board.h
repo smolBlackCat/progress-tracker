@@ -7,7 +7,6 @@
 #include "cardlist.h"
 #include "item.h"
 
-// TODO: Add real saving functionality
 /**
  * @class Board
  *
@@ -28,14 +27,14 @@ public:
 
     /**
      * @brief Constructs a Board object from a filepath
-     * 
+     *
      * @param board_file_path valid path name pointing to a valid board xml file
-     * 
+     *
      * @details It's completely necessary for the filepath given to be valid,
      * that is, the file exists and the syntax of Progress Boards checks out.
-     * 
+     *
      * @throws std::domain_error if the board_file_path is not valid at all
-    */
+     */
     Board(std::string board_file_path);
 
     /**
@@ -57,9 +56,9 @@ public:
 
     /**
      * @brief Sets a file path to where the board will be saved.
-     * 
+     *
      * @returns true if the path was set successfully, otherwise false.
-    */
+     */
     bool set_filepath(const std::string& file_path);
 
     /**
@@ -72,7 +71,7 @@ public:
     /**
      * @brief Adds a CardList object to the board by moving the contents to a
      * dynamic allocated space.
-     * 
+     *
      * @param cardlist CardList rvalue
      *
      * @returns a CardList pointer to the newly allocated object.
@@ -82,7 +81,7 @@ public:
     /**
      * @brief Adds a CardList object to the board by moving the contents to a
      * dynamic allocated space.
-     * 
+     *
      * @param cardlist CardList rvalue
      *
      * @returns a CardList pointer to the newly allocated object.
@@ -101,8 +100,9 @@ public:
 
     /**
      * @brief Reorders the next card after sibling
-    */
-    void reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<CardList> sibling);
+     */
+    void reorder_cardlist(std::shared_ptr<CardList> next,
+                          std::shared_ptr<CardList> sibling);
 
     /**
      * @brief Saves the board information as a file.

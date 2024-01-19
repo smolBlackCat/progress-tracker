@@ -19,8 +19,7 @@ ui::BoardCardButton::BoardCardButton(Board* board)
       board_thumbnail{},
       board_name{},
       board{board} {
-    
-    if (!board) throw std::domain_error{"Fatal"};
+        if (!board) throw std::domain_error{"Fatal"};
     std::string m_text = "<b>";
     m_text += board->get_name();
     m_text += "</b>";

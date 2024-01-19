@@ -58,7 +58,7 @@ ProgressWindow::ProgressWindow()
     // Load application's stylesheet
     auto css_bytes = Gio::Resource::lookup_data_global("/ui/stylesheet.css");
     gsize size = css_bytes->get_size();
-    std::string app_style = (char*) css_bytes->get_data(size);
+    std::string app_style = (char*)css_bytes->get_data(size);
     auto css_provider = Gtk::CssProvider::create();
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);

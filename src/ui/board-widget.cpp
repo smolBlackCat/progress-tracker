@@ -6,8 +6,6 @@
 /**
  * TODO: High memory is allocated in setting background, mainly when the
  * background image is high. Should I try to compress it?
- * 
- * TODO: Implement code that reorders cardlists within the board space
  */
 ui::BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
@@ -65,7 +63,6 @@ bool ui::BoardWidget::save() {
     return false;
 }
 
-// The code for drag and drop goes here !!!
 void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
     auto new_cardlist = Gtk::make_managed<ui::Cardlist>(*this, cardlist_refptr);
     cardlist_vector.push_back(new_cardlist);
@@ -83,7 +80,8 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
         Glib::Value<ui::Cardlist*>::value_type(), Gdk::DragAction::MOVE);
     dnd_target_controller->signal_drop().connect(
         [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
-            if (G_VALUE_HOLDS(value.gobj(), Glib::Value<ui::Cardlist*>::value_type())) {
+            if (G_VALUE_HOLDS(value.gobj(),
+                              Glib::Value<ui::Cardlist*>::value_type())) {
                 Glib::Value<ui::Cardlist*> dropped_value;
                 dropped_value.init(value.gobj());
 
@@ -94,7 +92,8 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
                 return true;
             }
             return false;
-        }, false);
+        },
+        false);
     new_cardlist->get_header().add_controller(dnd_target_controller);
 
     // The new cardlist should be appended before the add_button

@@ -55,6 +55,7 @@ private:
     Gtk::Stack* p_background_selector_stack;
     Gtk::ColorDialogButton* p_colour_button;
     Gtk::Image* p_file_image;
+
     // File Dialog attributes helpers
     Glib::RefPtr<Gio::File> selected_file;
     Gdk::RGBA selected_colour;

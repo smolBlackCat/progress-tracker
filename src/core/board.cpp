@@ -4,17 +4,14 @@
 #include <cctype>
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <regex>
 #include <stdexcept>
-#include <format>
 
-Board::Board() : Item{""} { }
+Board::Board() : Item{""} {}
 
 Board::Board(std::string name, std::string background)
-    : Item{name},
-      background{},
-      cardlist_vector{},
-      file_path{} {
+    : Item{name}, background{}, cardlist_vector{}, file_path{} {
     if (!is_background(background)) {
         throw std::domain_error{"given background is not of background type."};
     }
@@ -22,20 +19,21 @@ Board::Board(std::string name, std::string background)
     this->background = background;
 }
 
-Board::Board(std::string board_file_path) :
-    Item{"none"},
-    background{},
-    cardlist_vector{},
-    file_path{board_file_path} {
-
+Board::Board(std::string board_file_path)
+    : Item{"none"},
+      background{},
+      cardlist_vector{},
+      file_path{board_file_path} {
     if (!std::filesystem::exists(file_path))
-        throw std::domain_error{std::format("filename {} does not exist.", file_path)};
+        throw std::domain_error{
+            std::format("filename {} does not exist.", file_path)};
 
     tinyxml2::XMLDocument doc;
 
     auto error_code = doc.LoadFile(file_path.c_str());
     if (error_code != 0) {
-        throw std::domain_error{std::format("It was not possible to load the file on {}", file_path)};
+        throw std::domain_error{std::format(
+            "It was not possible to load the file on {}", file_path)};
     }
 
     // Set basic Item attributes: name
@@ -43,21 +41,24 @@ Board::Board(std::string board_file_path) :
     const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
 
     if (!board_element) {
-        throw std::domain_error{std::format("{} is not a progress xml file.", file_path)};
+        throw std::domain_error{
+            std::format("{} is not a progress xml file.", file_path)};
     }
 
     auto board_element_name = board_element->FindAttribute("name");
     auto board_element_background = board_element->FindAttribute("background");
 
     if (!(board_element_name && board_element_background)) {
-        throw std::domain_error{std::format("{} is not a progress xml file.", file_path)};
+        throw std::domain_error{
+            std::format("{} is not a progress xml file.", file_path)};
     }
 
     name = board_element_name->Value();
     background = board_element_background->Value();
 
     if (name.empty() || !is_background(background)) {
-        throw std::domain_error{std::format("{} is not a well formed progress xml file.", file_path)};
+        throw std::domain_error{std::format(
+            "{} is not a well formed progress xml file.", file_path)};
     }
 
     const tinyxml2::XMLElement* list_element =
@@ -66,7 +67,8 @@ Board::Board(std::string board_file_path) :
     while (list_element) {
         auto cur_cardlist_name = list_element->Attribute("name");
         if (!cur_cardlist_name) {
-            throw std::domain_error{std::format("{} is not a valid progress xml file.", file_path)};
+            throw std::domain_error{
+                std::format("{} is not a valid progress xml file.", file_path)};
         }
 
         CardList cur_cardlist{cur_cardlist_name};
@@ -77,7 +79,8 @@ Board::Board(std::string board_file_path) :
             auto cur_card_name = card_element->Attribute("name");
 
             if (!cur_card_name) {
-                throw std::domain_error{std::format("{} is not a valid progress xml file.", file_path)};
+                throw std::domain_error{std::format(
+                    "{} is not a valid progress xml file.", file_path)};
             }
             Card cur_card{cur_card_name};
             cur_cardlist.add_card(std::move(cur_card));
@@ -103,10 +106,10 @@ std::string Board::get_background() const { return background; }
 bool Board::set_filepath(const std::string& file_path) {
     std::filesystem::path p{file_path};
 
-    if (std::filesystem::exists(file_path)
-        or (!std::filesystem::exists(p.parent_path())))
+    if (std::filesystem::exists(file_path) or
+        (!std::filesystem::exists(p.parent_path())))
         return false;
-    
+
     this->file_path = file_path;
     return true;
 }
@@ -127,7 +130,9 @@ std::shared_ptr<CardList> Board::add_cardlist(CardList& cardlist) {
 
 std::shared_ptr<CardList> Board::add_cardlist(CardList&& cardlist) {
     std::shared_ptr<CardList> new_cardlist{new CardList{cardlist}};
-    if (new_cardlist) { cardlist_vector.push_back(new_cardlist); }
+    if (new_cardlist) {
+        cardlist_vector.push_back(new_cardlist);
+    }
     return new_cardlist;
 }
 
@@ -141,7 +146,8 @@ bool Board::remove_cardlist(CardList& cardlist) {
     return false;
 }
 
-void Board::reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<CardList> sibling) {
+void Board::reorder_cardlist(std::shared_ptr<CardList> next,
+                             std::shared_ptr<CardList> sibling) {
     size_t next_i = -1;
     size_t sibling_i = -1;
 
@@ -155,7 +161,8 @@ void Board::reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<Car
     }
 
     if (next_i == -1 || sibling_i == -1) {
-        throw std::invalid_argument{"Either next or sibling are not children of this cardlist"};
+        throw std::invalid_argument{
+            "Either next or sibling are not children of this cardlist"};
     }
 
     auto next_it = std::next(cardlist_vector.begin(), next_i);
@@ -164,10 +171,10 @@ void Board::reorder_cardlist(std::shared_ptr<CardList> next, std::shared_ptr<Car
 
     sibling_i -= 1;
 
-    if (sibling_i == cardlist_vector.size()-1) {
+    if (sibling_i == cardlist_vector.size() - 1) {
         cardlist_vector.push_back(temp_v);
     } else {
-        auto sibling_it = std::next(cardlist_vector.begin(), sibling_i+1);
+        auto sibling_it = std::next(cardlist_vector.begin(), sibling_i + 1);
         cardlist_vector.insert(sibling_it, temp_v);
     }
 }
@@ -183,7 +190,8 @@ std::string Board::get_background_type() const {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 
-    if (std::regex_match(background, rgba1_r) || std::regex_match(background, rgba1_r)) {
+    if (std::regex_match(background, rgba1_r) ||
+        std::regex_match(background, rgba1_r)) {
         return "colour";
     } else if (std::filesystem::exists(background)) {
         return "file";

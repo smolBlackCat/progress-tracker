@@ -8,8 +8,8 @@
 #include <gtkmm/window.h>
 
 #include "../core/board.h"
-#include "create_board_dialog.h"
 #include "board-widget.h"
+#include "create_board_dialog.h"
 
 namespace ui {
 /**
