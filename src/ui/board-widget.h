@@ -19,25 +19,52 @@
 
 namespace ui {
 
-class BoardWidget;
-
+/**
+ * @brief Widget that holds a list of CardLists
+*/
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
     BoardWidget();
 
     ~BoardWidget() override;
 
+    /**
+     * @brief Sets and updates the board widget.
+     * 
+     * @param board pointer to a board object.
+     * 
+     * @details Essentially, what this method does is cleaning the previous
+     *          settings existent within the widget, if there is one, and
+     *          setting a new board to the widget. It also dynamically sets
+     *          every aspect of the board: background and its cards and lists.
+    */
     void set(Board* board);
 
+    /**
+     * @brief Cleans the BoardWidget to an empty state, that is, there will be
+     *        no pointer to a board object and also the information on
+     *        background and cardlists is also deleted.
+    */
     void clear();
 
+    /**
+     * @brief Saves the contents edited in the Board class.
+    */
     bool save();
 
     /**
-     * @brief Creates a new Cardlist widget along with a CardList data model.
+     * @brief Adds a new Cardlist widget based on a given smart pointer pointing
+     *        to a CardList object.
+     * 
+     * @param cardlist_ptr smart pointer pointing to the cardlist.
      */
-    void add_cardlist(std::shared_ptr<CardList> cardlist_refptr);
+    void add_cardlist(std::shared_ptr<CardList> cardlist_ptr);
 
+    /**
+     * @brief Removes a Cardlist widget.
+     * 
+     * @param cardlist reference to the cardlist to be removed.
+    */
     bool remove_cardlist(ui::Cardlist& cardlist);
 
 private:

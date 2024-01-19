@@ -7,15 +7,14 @@
 namespace ui {
 
 /**
- * @brief Class for representing a widget for selecting a
- * kanban board.
+ * @brief Button working as a frame to show the user the board's wallpaper
  */
 class BoardCardButton : public Gtk::Button {
 public:
     /**
-     * @brief BoardCardButton constructor
-     * @param board Board object reference from which basic information will be
-     *              gathered from
+     * @brief BoardCardButton constructor.
+     * @param board Board object pointer from which basic information will be
+     *              gathered from.
      */
     BoardCardButton(Board* board);
 

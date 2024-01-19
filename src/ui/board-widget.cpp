@@ -56,6 +56,7 @@ void ui::BoardWidget::clear() {
         root.remove(*cardlist_widget);
     }
     cardlist_vector.clear();
+    board = nullptr;
 }
 
 bool ui::BoardWidget::save() {

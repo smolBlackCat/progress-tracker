@@ -129,5 +129,6 @@ void ProgressWindow::go_to_main_menu() {
     home_button.set_visible(false);
     add_board_button.set_visible();
     set_title("Progress");
+    board_widget.save();
 }
 }  // namespace ui

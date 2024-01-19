@@ -10,8 +10,7 @@ namespace ui {
 /**
  * @class CreateBoardDialog
  *
- * @brief Class representing a custom dialog window for getting the board's name
- * and the board's background.
+ * @brief Custom dialog window for creating new boards.
  */
 class CreateBoardDialog : public Gtk::Window {
 public:
@@ -28,24 +27,15 @@ private:
      */
     void create_board();
 
-    /**
-     * @brief Closes the dialog window.
-     */
     void close_window();
 
     void setup_dialog_buttons();
 
     void on_bg_button_click();
 
-    /**
-     * @brief Callback that stores the selected file into selected_file;
-     */
     void on_filedialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
                               const Glib::RefPtr<Gtk::FileDialog>& dialog);
 
-    /**
-     * @brief Callback that stores the selected file into selected_colour;
-     */
     void on_colourbutton_set();
 
     const Glib::RefPtr<Gtk::Builder>& builder;

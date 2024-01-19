@@ -46,14 +46,19 @@ public:
     bool remove_card(Card& card);
 
     /**
-     * @brief Creates a pointer to a constant vector object.
-     *
-     * @param card \ref Card instance.
-     *
-     * @returns the pointer pointing to a constant vector object.
+     * TODO: Remove this method. card vector should not be accessible.
      */
     std::vector<std::shared_ptr<Card>>& get_card_vector();
 
+    /**
+     * @brief Reorders the cards in a way that next is put after sibling.
+     * 
+     * @param next Card to be put after sibling
+     * @param sibling Card where next will be put after
+     * 
+     * @throws std::invalid_argument if either next or sibling are not children
+     * of this cardlist
+    */
     void reorder_card(std::shared_ptr<Card> next,
                       std::shared_ptr<Card> sibling);
 

@@ -26,9 +26,6 @@ public:
 protected:
     Application();
 
-    /**
-     * @brief Load boards into the application
-     */
     void on_startup() override;
     void on_activate() override;
 

@@ -118,6 +118,10 @@ public:
 
     std::string get_background_type() const;
 
+    /**
+     * TODO: Remove this method. Don't give access to the underlying vector
+     * holding the cardlists. Implement a way of iterating within the class
+    */
     std::vector<std::shared_ptr<CardList>>& get_cardlists();
 
 private:
