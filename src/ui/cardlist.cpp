@@ -75,10 +75,16 @@ void ui::Cardlist::setup_drag_and_drop(ui::CardWidget* card) {
     // DragSource Settings
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
-    Glib::Value<ui::CardWidget*> value_new_cardptr;
-    value_new_cardptr.init(Glib::Value<ui::CardWidget*>::value_type());
-    value_new_cardptr.set(card);
-    drag_source_c->set_content(Gdk::ContentProvider::create(value_new_cardptr));
+    drag_source_c->signal_prepare().connect(
+        [card, drag_source_c](double x, double y) {
+            Glib::Value<ui::CardWidget*> value_new_cardptr;
+            value_new_cardptr.init(Glib::Value<ui::CardWidget*>::value_type());
+            value_new_cardptr.set(card);
+            auto card_paintable_widget = Gtk::WidgetPaintable::create(*card);
+            drag_source_c->set_icon(card_paintable_widget, x, y);
+            return Gdk::ContentProvider::create(value_new_cardptr);
+        }, false
+    );
     card->add_controller(drag_source_c);
 
     // DropTarget Settings

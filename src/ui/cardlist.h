@@ -14,6 +14,9 @@ namespace ui {
 #define CARDLIST_TITLE_FORMAT \
     "<span font-weight=\"bold\" size=\"large\">{}</span>"
 
+#define CARDLIST_STYLE \
+    "list.rich-list {{transition-property: opacity; transition-duration: 0.5s; border-radius: 20px; opacity: {};}}"
+
 class BoardWidget;
 
 class CardWidget;

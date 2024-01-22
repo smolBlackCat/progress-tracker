@@ -68,18 +68,34 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
     auto new_cardlist = Gtk::make_managed<ui::Cardlist>(*this, cardlist_refptr);
     cardlist_vector.push_back(new_cardlist);
 
-    auto dnd_source_controller = Gtk::DragSource::create();
-    Glib::Value<ui::Cardlist*> value_cardlistptr;
-    value_cardlistptr.init(Glib::Value<ui::Cardlist*>::value_type());
-    value_cardlistptr.set(new_cardlist);
-    auto content_provider = Gdk::ContentProvider::create(value_cardlistptr);
-    dnd_source_controller->set_actions(Gdk::DragAction::MOVE);
-    dnd_source_controller->set_content(content_provider);
-    new_cardlist->get_header().add_controller(dnd_source_controller);
+    auto drag_source_c = Gtk::DragSource::create();
+    drag_source_c->signal_prepare().connect(
+        [new_cardlist, drag_source_c](double x, double y) {
+            Glib::Value<ui::Cardlist*> value_cardlistptr;
+            value_cardlistptr.init(Glib::Value<ui::Cardlist*>::value_type());
+            value_cardlistptr.set(new_cardlist);
+            auto cardlist_widget_paintable = Gtk::WidgetPaintable::create(*new_cardlist);
+            drag_source_c->set_icon(cardlist_widget_paintable, x, y);
+            return Gdk::ContentProvider::create(value_cardlistptr);
+        }, false
+    );
+    drag_source_c->signal_drag_begin().connect(
+        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
+            new_cardlist->set_opacity(0.5);
+        }, false
+    );
+    drag_source_c->signal_drag_cancel().connect(
+        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag, Gdk::DragCancelReason reason) {
+            new_cardlist->set_opacity(1);
+            return true;
+        }, false
+    );
+    drag_source_c->set_actions(Gdk::DragAction::MOVE);
+    new_cardlist->get_header().add_controller(drag_source_c);
 
-    auto dnd_target_controller = Gtk::DropTarget::create(
+    auto drop_target_cardlist = Gtk::DropTarget::create(
         Glib::Value<ui::Cardlist*>::value_type(), Gdk::DragAction::MOVE);
-    dnd_target_controller->signal_drop().connect(
+    drop_target_cardlist->signal_drop().connect(
         [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::Cardlist*>::value_type())) {
@@ -90,12 +106,34 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
                 root.reorder_child_after(*dropped_cardlist, *new_cardlist);
                 board->reorder_cardlist(dropped_cardlist->get_cardlist_refptr(),
                                         new_cardlist->get_cardlist_refptr());
+                dropped_cardlist->set_opacity(1);
                 return true;
             }
             return false;
         },
         false);
-    new_cardlist->get_header().add_controller(dnd_target_controller);
+    new_cardlist->get_header().add_controller(drop_target_cardlist);
+
+    auto drop_target_card = Gtk::DropTarget::create(
+        Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
+    drop_target_card->signal_drop().connect(
+        [new_cardlist](const Glib::ValueBase& value, double x, double y) {
+            if (G_VALUE_HOLDS(value.gobj(), Glib::Value<ui::CardWidget*>::value_type())) {
+                Glib::Value<ui::CardWidget*> dropped_value;
+                dropped_value.init(value.gobj());
+
+                auto dropped_card = dropped_value.get();
+                if (!new_cardlist->is_child(dropped_card)) {
+                    auto card_in_dropped = dropped_card->get_card();
+                    dropped_card->remove();
+                    new_cardlist->add_card(card_in_dropped);
+                    new_cardlist->get_cardlist_refptr()->add_card(*card_in_dropped);
+                }
+                return true;
+            }
+            return false;
+        }, false);
+    new_cardlist->add_controller(drop_target_card);
 
     // The new cardlist should be appended before the add_button
     root.append(*new_cardlist);
