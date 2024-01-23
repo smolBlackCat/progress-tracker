@@ -36,26 +36,12 @@ don't want to create tests binaries.)
     src/progress-tracker
     ```
 
-## Project current state
+## How the Project is looking like
 
-At this point, you should get a console message displaying the app's version and
-an empty window like this.
+### Main View of the application
 
-<figure>
-    <caption>Main View of the appplication</caption>
-    <img src="docs/empty_window.png">
-</figure>
+![yay](docs/main-view.png)
 
-<br>
+### Board View
 
-<figure>
-    <caption>About Dialog (icon won't be present)</caption>
-    <img src="docs/about_window.png">
-</figure>
-
-<br>
-
-<figure>
-    <caption><b>Improved CreateBoardDialog UI</b></caption>
-    <img src="docs/create_board_dialog.png">
-</figure>
+![yay](docs/board-view.png)
