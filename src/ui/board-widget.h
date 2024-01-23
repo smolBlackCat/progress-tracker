@@ -12,7 +12,9 @@
     "#board-root {transition-property: background-image, background-color;}"
 #define CSS_FORMAT_FILE                                                       \
     "#board-root {{transition-property: background-image, background-color; " \
-    "background-image: url(file:{}); background-position: center;}}"
+    "background-size: cover;" \
+    "background-repeat: no-repeat;" \
+    "background-image: url(file:{});}}"
 #define CSS_FORMAT_RGB                                                        \
     "#board-root {{transition-property: background-image, background-color; " \
     "background-color: {};}}"
