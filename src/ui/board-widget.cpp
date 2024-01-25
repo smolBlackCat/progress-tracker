@@ -56,20 +56,16 @@ void ui::BoardWidget::clear() {
         root.remove(*cardlist_widget);
     }
     cardlist_vector.clear();
-    board = nullptr;
 }
 
 bool ui::BoardWidget::save() {
-    if (board && board->is_modified()){
-        std::cout << "Saved yay" << std::endl;
-        bool success = board->save_as_xml();
-        delete board;
-        board = nullptr;
-        return success;
+    bool success;
+    if (board->is_modified()){
+        success = board->save_as_xml();
     }
     delete board;
     board = nullptr;
-    return false;
+    return success;
 }
 
 void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
