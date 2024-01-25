@@ -45,6 +45,8 @@ public:
      */
     bool remove_card(Card& card);
 
+    bool is_modified() override;
+
     /**
      * TODO: Remove this method. card vector should not be accessible.
      */
@@ -64,4 +66,6 @@ public:
 
 private:
     std::vector<std::shared_ptr<Card>> card_vector;
+
+    bool cards_modified();
 };

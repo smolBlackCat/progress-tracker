@@ -11,9 +11,18 @@ Item::Item(std::string name) : name{name} {
     id = distribution(gen);
 }
 
-void Item::set_name(std::string other) { name = other; }
+void Item::set_name(std::string other) {
+    name = other;
+    modified = true;
+}
+
+void Item::set_modified(bool modified) {
+    this->modified = modified;
+}
 
 std::string Item::get_name() const { return name; }
+
+bool Item::is_modified() { return modified; }
 
 bool Item::operator==(const Item& item) const {
     return item.get_name() == name && item.id == id;

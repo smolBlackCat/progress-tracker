@@ -28,11 +28,22 @@ public:
     void set_name(std::string other);
 
     /**
+     * @brief Sets modified state
+    */
+   void set_modified(bool modified);
+
+    /**
      * @brief Gets the name of the object.
      *
      * @returns String as the name of the object.
      */
     std::string get_name() const;
+
+    /**
+     * @brief Produces true if the Item object was modified.
+    */
+    virtual bool is_modified();
+
 
     /**
      * @brief Gets the object's ID.
@@ -46,4 +57,5 @@ public:
 protected:
     std::string name;
     unsigned long long id;
+    bool modified = false;
 };

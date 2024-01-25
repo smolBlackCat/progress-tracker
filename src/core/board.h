@@ -124,6 +124,14 @@ public:
     */
     std::vector<std::shared_ptr<CardList>>& get_cardlists();
 
+    /**
+     * @brief Returns true if the board was modified in some way, otherwise
+     * False.
+     * 
+     * @returns a boolean indicating if the board was modified.
+    */
+    bool is_modified() override;
+
 private:
     std::string background, file_path;
 
@@ -140,6 +148,8 @@ private:
      * @returns True if the background is of background type, otherwise False.
      */
     bool is_background(std::string& background) const;
+
+    bool cardlists_modified();
 
     tinyxml2::XMLDocument* xml_doc();
 };

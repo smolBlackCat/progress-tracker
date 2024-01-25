@@ -60,7 +60,10 @@ void ui::BoardWidget::clear() {
 }
 
 bool ui::BoardWidget::save() {
-    if (board) return board->save_as_xml();
+    if (board && board->is_modified()){
+        std::cout << "Saved yay" << std::endl;
+        return board->save_as_xml();
+    }
     return false;
 }
 

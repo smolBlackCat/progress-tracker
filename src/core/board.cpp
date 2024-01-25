@@ -87,10 +87,12 @@ Board::Board(std::string board_file_path)
 
             card_element = card_element->NextSiblingElement("card");
         }
+        cur_cardlist.set_modified(false);
         this->add_cardlist(std::move(cur_cardlist));
 
         list_element = list_element->NextSiblingElement("list");
     }
+    modified = false;
 }
 
 bool Board::set_background(std::string other) {
@@ -132,6 +134,7 @@ std::shared_ptr<CardList> Board::add_cardlist(CardList&& cardlist) {
     std::shared_ptr<CardList> new_cardlist{new CardList{cardlist}};
     if (new_cardlist) {
         cardlist_vector.push_back(new_cardlist);
+        modified = true;
     }
     return new_cardlist;
 }
@@ -140,6 +143,7 @@ bool Board::remove_cardlist(CardList& cardlist) {
     for (size_t i = 0; i < cardlist_vector.size(); i++) {
         if (cardlist == (*cardlist_vector.at(i))) {
             cardlist_vector.erase(cardlist_vector.begin() + i);
+            modified = true;
             return true;
         }
     }
@@ -177,6 +181,7 @@ void Board::reorder_cardlist(std::shared_ptr<CardList> next,
         auto sibling_it = std::next(cardlist_vector.begin(), sibling_i + 1);
         cardlist_vector.insert(sibling_it, temp_v);
     }
+    modified = true;
 }
 
 bool Board::save_as_xml() {
@@ -211,6 +216,19 @@ bool Board::is_background(std::string& background) const {
     return std::regex_match(background, rgba_r) ||
            std::regex_match(background, rgba1_r) ||
            std::filesystem::exists(background);
+}
+
+bool Board::cardlists_modified() {
+    for (auto& cardlist: cardlist_vector) {
+        if (cardlist->is_modified()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Board::is_modified() {
+    return modified || cardlists_modified();
 }
 
 tinyxml2::XMLDocument* Board::xml_doc() {

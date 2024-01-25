@@ -250,3 +250,47 @@ TEST_CASE("Cards reordering within a CardList") {
     std::string expected_order1[] = {"Programming", "Productivity", "Planning"};
     CHECK(order_match(cardlist.get_card_vector(), expected_order1));
 }
+
+TEST_CASE("Checking for board modification: Adding cards to a cardlist") {
+    create_dummy_file("TestBoard", "rgba(0,0,0,1)", "test-board.xml");
+
+    Board test_board{"test-board.xml"};
+
+    test_board.get_cardlists()[0]->add_card(Card{"Fatal"});
+
+    CHECK(test_board.is_modified());
+    std::filesystem::remove("./test-board.xml");
+}
+
+TEST_CASE("Checking for board modification: Adding cardlists to a board") {
+    create_dummy_file("TestBoard", "rgba(0,0,0,1)", "test-board.xml");
+
+    Board test_board{"test-board.xml"};
+    test_board.add_cardlist(CardList{"New Cardlist"});
+
+    CHECK(test_board.is_modified());
+    std::filesystem::remove("./test-board.xml");
+}
+
+TEST_CASE("Checking for board modification: Reordering Items") {
+    create_dummy_file("TestBoard", "rgba(0,0,0,1)", "test-board.xml");
+
+    Board test_board{"test-board.xml"};
+
+    // Reordering Cardlists
+    auto cardlist1 = test_board.get_cardlists()[0];
+    auto cardlist2 = test_board.get_cardlists()[1];
+
+    test_board.reorder_cardlist(cardlist2, cardlist1);
+
+    CHECK(test_board.is_modified());
+    std::filesystem::remove("./test-board.xml");
+}
+
+TEST_CASE("Checking for board modification: No modification at all") {
+    create_dummy_file("TestBoard", "rgba(0,0,0,1)", "test-board.xml");
+
+    Board test_board{"test-board.xml"};
+    CHECK_FALSE(test_board.is_modified());
+    std::filesystem::remove("./test-board.xml");
+}
