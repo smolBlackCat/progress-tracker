@@ -29,7 +29,7 @@ public:
     ProgressWindow();
     ~ProgressWindow() override;
 
-    void add_board(Board* board);
+    void add_board(std::string board_filepath);
 
 private:
     Gtk::HeaderBar header_bar;

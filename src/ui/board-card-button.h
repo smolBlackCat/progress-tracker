@@ -16,9 +16,9 @@ public:
      * @param board Board object pointer from which basic information will be
      *              gathered from.
      */
-    BoardCardButton(Board* board);
+    BoardCardButton(std::string board_filepath);
 
-    Board* board;
+    std::string board_filepath;
 
 private:
     Gtk::Box root_box;

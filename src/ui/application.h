@@ -19,9 +19,6 @@ namespace ui {
 class Application : public Gtk::Application {
 public:
     static Glib::RefPtr<ui::Application> create();
-    ~Application() override;
-
-    void add_board(Board* board);
 
 protected:
     Application();
@@ -31,6 +28,6 @@ protected:
 
 private:
     ProgressWindow main_window;
-    std::vector<Board*> boards;
+
 };
 }  // namespace ui

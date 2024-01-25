@@ -87,14 +87,7 @@ void CreateBoardDialog::create_board() {
         message_dialog->show(*this);
     } else {
         board->save_as_xml();
-        // FIXME: This is definitely a backbone for spaghetti code.
-        // I'll have to consider if having a separate application class is
-        // really useful
-        ((ui::Application*)((ui::ProgressWindow*)get_transient_for())
-             ->get_application()
-             .get())
-            ->add_board(board);
-        ((ui::ProgressWindow*)get_transient_for())->add_board(board);
+        ((ui::ProgressWindow*) get_transient_for())->add_board(new_file_path);
         close_window();
     }
 }

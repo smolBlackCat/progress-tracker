@@ -62,8 +62,13 @@ void ui::BoardWidget::clear() {
 bool ui::BoardWidget::save() {
     if (board && board->is_modified()){
         std::cout << "Saved yay" << std::endl;
-        return board->save_as_xml();
+        bool success = board->save_as_xml();
+        delete board;
+        board = nullptr;
+        return success;
     }
+    delete board;
+    board = nullptr;
     return false;
 }
 

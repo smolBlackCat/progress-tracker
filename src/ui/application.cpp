@@ -9,16 +9,7 @@ Glib::RefPtr<ui::Application> ui::Application::create() {
 }
 
 ui::Application::Application()
-    : Gtk::Application{"com.moura.Progress"}, main_window{}, boards{} {}
-
-ui::Application::~Application() {
-    for (Board* board : boards) {
-        delete board;
-        board = nullptr;
-    }
-}
-
-void ui::Application::add_board(Board* board) { boards.push_back(board); }
+    : Gtk::Application{"com.moura.Progress"}, main_window{} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
@@ -37,9 +28,7 @@ void ui::Application::on_startup() {
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();
             if (board_filename.ends_with(".xml")) {
-                Board* cur_board = new Board{board_filename};
-                boards.push_back(cur_board);
-                main_window.add_board(cur_board);
+                main_window.add_board(board_filename);
             }
         }
     }

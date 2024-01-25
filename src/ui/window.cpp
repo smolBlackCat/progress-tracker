@@ -91,9 +91,10 @@ ProgressWindow::ProgressWindow()
 
 ProgressWindow::~ProgressWindow() { delete create_board_dialog; }
 
-void ProgressWindow::add_board(Board* board) {
-    auto new_board_card = Gtk::make_managed<BoardCardButton>(board);
-    new_board_card->signal_clicked().connect([this, board]() {
+void ProgressWindow::add_board(std::string board_filepath) {
+    auto new_board_card = Gtk::make_managed<BoardCardButton>(board_filepath);
+    new_board_card->signal_clicked().connect([this, board_filepath]() {
+        Board* board = new Board{board_filepath};
         stack.set_visible_child("main_board");
         board_widget.set(board);
         home_button.set_visible();
