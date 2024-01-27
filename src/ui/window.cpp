@@ -1,9 +1,8 @@
 #include "window.h"
 
-#include <giomm/menu.h>
-#include <giomm/simpleactiongroup.h>
-
 #include <iostream>
+#include <filesystem>
+#include <format>
 
 #include "board-card-button.h"
 
@@ -28,19 +27,62 @@ ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) {
 
 ProgressAboutDialog::~ProgressAboutDialog() {}
 
+DeleteBoardsBar::DeleteBoardsBar(Gtk::FlowBox& boards_grid,
+                                 ui::ProgressWindow& app_window)
+    : Gtk::Revealer{},
+      root{Gtk::Orientation::HORIZONTAL},
+      bar_text{"Select the boards to be deleted"},
+      bar_button_delete{"Delete"},
+      bar_button_cancel{"Cancel"},
+      boards_grid{boards_grid},
+      app_window{app_window} {
+    set_child(root);
+    set_name("delete-board-infobar");
+    set_transition_type(Gtk::RevealerTransitionType::SLIDE_UP);
+
+    bar_text.set_margin(4);
+    bar_text.set_markup(std::format("<b>{}</b>", bar_text.get_text().c_str()));
+    bar_button_delete.set_margin(4);
+    bar_button_delete.add_css_class("destructive-action");
+    bar_button_cancel.set_margin(4);
+    bar_button_cancel.add_css_class("suggested-action");
+    root.append(bar_text);
+    root.append(bar_button_delete);
+    root.append(bar_button_cancel);
+    root.set_spacing(4);
+
+    bar_button_delete.signal_clicked().connect(
+        sigc::mem_fun(*this, &DeleteBoardsBar::on_delete_boards));
+    bar_button_cancel.signal_clicked().connect(
+        sigc::mem_fun(app_window, &ProgressWindow::off_delete_board));
+}
+
+void DeleteBoardsBar::on_delete_boards() {
+    auto selected_children = boards_grid.get_selected_children();
+    for (auto& fb_child_p: selected_children) {
+        ui::BoardCardButton* cur_child = (ui::BoardCardButton*) fb_child_p->get_child();
+        std::filesystem::remove(cur_child->board_filepath);
+        boards_grid.remove(*cur_child);
+    }
+
+    app_window.off_delete_board();
+}
+
 ProgressWindow::ProgressWindow()
     : header_bar(),
       add_board_button(),
+      root{Gtk::Orientation::VERTICAL},
+      board_grid_menu{Gio::Menu::create()},
+      board_main_menu{Gio::Menu::create()},
       home_button{},
       menu_button(),
       about_dialog(*this),
       current_page{"board_grid"},
       board_grid{},
       board_widget{},
-      stack{} {
+      stack{},
+      delete_boards_bar{board_grid, *this} {
     set_title("Progress");
-    set_default_size(600, 600);
-    set_size_request(600, 600);
 
     set_titlebar(header_bar);
     header_bar.pack_end(menu_button);
@@ -78,11 +120,17 @@ ProgressWindow::ProgressWindow()
     board_grid.set_valign(Gtk::Align::START);
     board_grid.set_expand(false);
     board_grid.set_selection_mode();
-
     Gtk::ScrolledWindow scrl_window{};
+    scrl_window.set_size_request(600, 600);
     scrl_window.set_child(board_grid);
+    root.append(scrl_window);
+    delete_boards_bar.set_halign(Gtk::Align::CENTER);
+    delete_boards_bar.set_valign(Gtk::Align::END);
+    delete_boards_bar.set_vexpand();
+    delete_boards_bar.set_margin_bottom(10);
+    root.append(delete_boards_bar);
 
-    stack.add(scrl_window, "board_grid");
+    stack.add(root, "board_grid");
     stack.add(board_widget, "main_board");
     stack.set_transition_type(Gtk::StackTransitionType::SLIDE_LEFT_RIGHT);
 
@@ -92,29 +140,45 @@ ProgressWindow::ProgressWindow()
 ProgressWindow::~ProgressWindow() { delete create_board_dialog; }
 
 void ProgressWindow::add_board(std::string board_filepath) {
-    auto new_board_card = Gtk::make_managed<BoardCardButton>(board_filepath);
-    new_board_card->signal_clicked().connect([this, board_filepath]() {
-        Board* board = new Board{board_filepath};
-        stack.set_visible_child("main_board");
-        board_widget.set(board);
-        home_button.set_visible();
-        add_board_button.set_visible(false);
-        set_title(board->get_name());
-    });
-    board_grid.append(*new_board_card);
+    auto new_board_card =
+        Gtk::make_managed<BoardCardButton>(board_filepath);
+    board_grid.insert(*new_board_card, 0);
+    auto fb_child_p = board_grid.get_child_at_index(0);
+    new_board_card->signal_clicked().connect(
+        [this, board_filepath, fb_child_p]() {
+            if (!this->on_delete_mode) {
+                Board* board = new Board{board_filepath};
+                stack.set_visible_child("main_board");
+                menu_button.set_menu_model(board_main_menu);
+                board_widget.set(board);
+                home_button.set_visible();
+                add_board_button.set_visible(false);
+                set_title(board->get_name());
+            } else {
+                if (fb_child_p->is_selected()) {
+                    board_grid.unselect_child(*fb_child_p);
+                } else {
+                    board_grid.select_child(*fb_child_p);
+                }
+            }
+        });
 }
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
     action_group->add_action("about",
                              sigc::mem_fun(*this, &ProgressWindow::show_about));
+    action_group->add_action(
+        "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board));
 
-    auto menu = Gio::Menu::create();
-    menu->append("About", "win.about");
+    board_grid_menu->append("Delete Boards", "win.delete");
+    board_grid_menu->append("About", "win.about");
+
+    board_main_menu->append("About", "win.about");
 
     menu_button.insert_action_group("win", action_group);
     menu_button.set_icon_name("open-menu");
-    menu_button.set_menu_model(menu);
+    menu_button.set_menu_model(board_grid_menu);
 }
 
 void ProgressWindow::show_about() { about_dialog.set_visible(); }
@@ -127,9 +191,22 @@ void ProgressWindow::go_to_main_board() {
 
 void ProgressWindow::go_to_main_menu() {
     stack.set_visible_child("board_grid");
+    menu_button.set_menu_model(board_grid_menu);
     home_button.set_visible(false);
     add_board_button.set_visible();
     set_title("Progress");
     board_widget.save();
+}
+
+void ProgressWindow::on_delete_board() {
+    on_delete_mode = true;
+    board_grid.set_selection_mode(Gtk::SelectionMode::MULTIPLE);
+    delete_boards_bar.set_reveal_child();
+}
+
+void ProgressWindow::off_delete_board() {
+    on_delete_mode = false;
+    delete_boards_bar.set_reveal_child(false);
+    board_grid.set_selection_mode(Gtk::SelectionMode::NONE);
 }
 }  // namespace ui

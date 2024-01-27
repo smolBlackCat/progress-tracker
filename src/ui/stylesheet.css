@@ -1,3 +1,8 @@
 list.rich-list {
     border-radius: 20px;
 }
+
+#delete-board-infobar {
+    background-color: cadetblue;
+    border-radius: 4px;
+}
