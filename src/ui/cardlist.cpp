@@ -9,10 +9,8 @@
 ui::CardListHeader::CardListHeader(std::shared_ptr<CardList>& cardlist_refptr)
     : EditableLabelHeader{}, cardlist_refptr{cardlist_refptr} {
     set_label(cardlist_refptr->get_name());
-}
-
-void ui::CardListHeader::set_label(std::string new_label) {
-    label.set_markup(std::format(CARDLIST_TITLE_FORMAT, new_label));
+    label.set_name("cardlist-title");
+    entry.set_name("cardlist-title");
 }
 
 void ui::CardListHeader::on_confirm_changes() {

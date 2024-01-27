@@ -11,12 +11,6 @@
 
 namespace ui {
 
-#define CARDLIST_TITLE_FORMAT \
-    "<span font-weight=\"bold\" size=\"large\">{}</span>"
-
-#define CARDLIST_STYLE \
-    "list.rich-list {{transition-property: opacity; transition-duration: 0.5s; border-radius: 20px; opacity: {};}}"
-
 class BoardWidget;
 
 class CardWidget;
@@ -25,12 +19,10 @@ class CardListHeader : public EditableLabelHeader {
 public:
     CardListHeader(std::shared_ptr<CardList>& cardlist_refptr);
 
-    void set_label(std::string new_label);
-
 protected:
     std::shared_ptr<CardList> cardlist_refptr;
 
-    void on_confirm_changes();
+    void on_confirm_changes() override;
 };
 
 class Cardlist : public Gtk::ListBox {

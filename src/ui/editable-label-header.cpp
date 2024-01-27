@@ -18,10 +18,20 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     auto editing_box =
         Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
     editing_box->set_spacing(4);
+    entry.set_valign(Gtk::Align::CENTER);
+    entry.set_halign(Gtk::Align::START);
+    entry.set_hexpand();
+    entry.set_size_request(Cardlist::CARDLIST_SIZE -
+                           confirm_changes_button.get_width());
     editing_box->append(entry);
+    confirm_changes_button.set_valign(Gtk::Align::CENTER);
+    confirm_changes_button.set_halign(Gtk::Align::END);
+    confirm_changes_button.set_hexpand();
     editing_box->append(confirm_changes_button);
     revealer.set_child(*editing_box);
     revealer.set_transition_type(Gtk::RevealerTransitionType::SWING_DOWN);
+    revealer.set_halign(Gtk::Align::CENTER);
+    revealer.set_hexpand();
     append(revealer);
 
     auto label_box = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
