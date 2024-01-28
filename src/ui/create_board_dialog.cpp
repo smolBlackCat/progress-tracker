@@ -24,10 +24,6 @@ CreateBoardDialog::CreateBoardDialog(
 }
 
 void CreateBoardDialog::on_bg_button_click() {
-    /**
-     * TODO: Code is not filtering the files properly, probably due to wrong
-     * mime types.
-     */
     auto dialog = Gtk::FileDialog::create();
 
     dialog->set_title("Select a file");
@@ -49,7 +45,6 @@ void CreateBoardDialog::on_bg_button_click() {
             dialog));
 }
 
-// TODO: Implement cleanup code for whenever the dialog is closed
 void CreateBoardDialog::close_window() {
     set_visible(false);
 
@@ -70,6 +65,18 @@ std::string lower(std::string s) {
 // boards with the same name. Implement better code that allows boards with the
 // same name.
 void CreateBoardDialog::create_board() {
+    if (p_board_name_entry->get_text_length() == 0) {
+        auto message_dialog =  Gtk::AlertDialog::create("Empty board names are not allowed");
+        message_dialog->show(*this);
+        return;
+    }
+
+    if (!selected_file && p_background_selector_stack->get_visible_child_name() == "as-file") {
+        auto message_dialog =  Gtk::AlertDialog::create("A file must be selected");
+        message_dialog->show(*this);
+        return;
+    }
+    
     std::string background_type =
         p_background_selector_stack->get_visible_child_name();
     std::string background = background_type == "as-file"
