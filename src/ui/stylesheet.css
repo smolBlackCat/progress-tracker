@@ -11,3 +11,8 @@ list.rich-list {
     font-weight: bold;
     font-size: large;
 }
+
+#image-label {
+    font-weight: bold;
+    font-size: medium;
+}
