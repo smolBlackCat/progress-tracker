@@ -5,6 +5,8 @@
 #include "../core/board.h"
 #include "board-widget.h"
 #include "create_board_dialog.h"
+#include "preferences-board-dialog.h"
+#include "board-card-button.h"
 
 namespace ui {
 /**
@@ -66,11 +68,11 @@ private:
      * board_main: Shows the kanban todo list
      */
     std::string current_page;
-    int index = 0;
     bool on_delete_mode = false;
 
     ui::ProgressAboutDialog about_dialog;
     ui::CreateBoardDialog* create_board_dialog;
+    ui::PreferencesBoardDialog* preferences_board_dialog;
 
     void setup_menu_button();
     void show_about();

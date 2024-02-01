@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../core/board.h"
+#include "board-card-button.h"
 #include "cardlist.h"
 
 #define CSS_FORMAT \
@@ -40,7 +41,7 @@ public:
      *          setting a new board to the widget. It also dynamically sets
      *          every aspect of the board: background and its cards and lists.
     */
-    void set(Board* board);
+    void set(Board* board, BoardCardButton* board_card_button);
 
     /**
      * @brief Cleans the BoardWidget to an empty state, that is, there will be
@@ -69,13 +70,15 @@ public:
     */
     bool remove_cardlist(ui::Cardlist& cardlist);
 
+    ui::BoardCardButton* board_card_button;
+
+    bool set_background();
+
 private:
     Gtk::Box root;
     Gtk::Button add_button;
     Board* board;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::Cardlist*> cardlist_vector;
-
-    bool set_background();
 };
 }  // namespace ui

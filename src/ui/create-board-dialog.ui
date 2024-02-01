@@ -119,19 +119,13 @@
       <object class="GtkHeaderBar" id="headerbar">
         <property name="show-title-buttons">False</property>
         <child type="start">
-          <object class="GtkButton" id="cancel-button">
+          <object class="GtkButton" id="left-button">
             <property name="label">Cancel</property>
-            <style>
-              <class name="destructive-action"/>
-            </style>
           </object>
         </child>
         <child type="end">
-          <object class="GtkButton" id="create-button">
+          <object class="GtkButton" id="right-button">
             <property name="label">Create</property>
-            <style>
-              <class name="suggested-action"/>
-            </style>
           </object>
         </child>
       </object>

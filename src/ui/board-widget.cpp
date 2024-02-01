@@ -12,7 +12,8 @@ ui::BoardWidget::BoardWidget()
       root{Gtk::Orientation::HORIZONTAL},
       add_button{"Add List"},
       cardlist_vector{},
-      board{nullptr} {
+      board{nullptr},
+      board_card_button{nullptr} {
     set_child(root);
     set_name("board-root");
 
@@ -36,11 +37,12 @@ ui::BoardWidget::BoardWidget()
 
 ui::BoardWidget::~BoardWidget() {}
 
-void ui::BoardWidget::set(Board* board) {
-    if (!board) return;
+void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
+    if (! (board || board_card_button)) return;
 
     clear();
     this->board = board;
+    this->board_card_button = board_card_button;
 
     // Code updating cardlists
     for (auto& cardlist : board->get_cardlists()) {
@@ -63,6 +65,7 @@ bool ui::BoardWidget::save() {
     if (board->is_modified()){
         success = board->save_as_xml();
     }
+    board_card_button->update(board);
     delete board;
     board = nullptr;
     return success;

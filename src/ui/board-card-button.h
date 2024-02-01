@@ -18,11 +18,14 @@ public:
      */
     BoardCardButton(std::string board_filepath);
 
-    std::string board_filepath;
+    std::string get_filepath();
+    void update(Board* board);
 
 private:
     Gtk::Box root_box;
     Gtk::Image board_thumbnail;
     Gtk::Label board_name;
+
+    std::string board_filepath;
 };
 }  // namespace ui

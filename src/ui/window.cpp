@@ -1,8 +1,8 @@
 #include "window.h"
 
-#include <iostream>
 #include <filesystem>
 #include <format>
+#include <iostream>
 
 #include "board-card-button.h"
 
@@ -59,9 +59,10 @@ DeleteBoardsBar::DeleteBoardsBar(Gtk::FlowBox& boards_grid,
 
 void DeleteBoardsBar::on_delete_boards() {
     auto selected_children = boards_grid.get_selected_children();
-    for (auto& fb_child_p: selected_children) {
-        ui::BoardCardButton* cur_child = (ui::BoardCardButton*) fb_child_p->get_child();
-        std::filesystem::remove(cur_child->board_filepath);
+    for (auto& fb_child_p : selected_children) {
+        ui::BoardCardButton* cur_child =
+            (ui::BoardCardButton*)fb_child_p->get_child();
+        std::filesystem::remove(cur_child->get_filepath());
         boards_grid.remove(*cur_child);
     }
 
@@ -92,10 +93,17 @@ ProgressWindow::ProgressWindow()
 
     auto builder =
         Gtk::Builder::create_from_resource("/ui/create-board-dialog.ui");
+    auto builder1 =
+        Gtk::Builder::create_from_resource("/ui/create-board-dialog.ui");
     create_board_dialog =
         Gtk::Builder::get_widget_derived<ui::CreateBoardDialog>(builder,
                                                                 "create-board");
+    preferences_board_dialog =
+        Gtk::Builder::get_widget_derived<ui::PreferencesBoardDialog>(
+            builder1, "create-board", nullptr, board_widget, *this);
+
     create_board_dialog->set_transient_for(*this);
+    preferences_board_dialog->set_transient_for(*this);
 
     // Load application's stylesheet
     auto css_bytes = Gio::Resource::lookup_data_global("/ui/stylesheet.css");
@@ -140,17 +148,17 @@ ProgressWindow::ProgressWindow()
 ProgressWindow::~ProgressWindow() { delete create_board_dialog; }
 
 void ProgressWindow::add_board(std::string board_filepath) {
-    auto new_board_card =
-        Gtk::make_managed<BoardCardButton>(board_filepath);
+    auto new_board_card = Gtk::make_managed<BoardCardButton>(board_filepath);
     board_grid.insert(*new_board_card, 0);
     auto fb_child_p = board_grid.get_child_at_index(0);
     new_board_card->signal_clicked().connect(
-        [this, board_filepath, fb_child_p]() {
+        [this, new_board_card, fb_child_p]() {
             if (!this->on_delete_mode) {
-                Board* board = new Board{board_filepath};
+                Board* board = new Board{new_board_card->get_filepath()};
                 stack.set_visible_child("main_board");
                 menu_button.set_menu_model(board_main_menu);
-                board_widget.set(board);
+                board_widget.set(board, new_board_card);
+                preferences_board_dialog->set_board(board);
                 home_button.set_visible();
                 add_board_button.set_visible(false);
                 set_title(board->get_name());
@@ -162,7 +170,7 @@ void ProgressWindow::add_board(std::string board_filepath) {
                 }
             }
         });
-}
+}   
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
@@ -170,10 +178,13 @@ void ProgressWindow::setup_menu_button() {
                              sigc::mem_fun(*this, &ProgressWindow::show_about));
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board));
+    action_group->add_action(
+        "preferences", [this]() { preferences_board_dialog->set_visible(); });
 
     board_grid_menu->append("Delete Boards", "win.delete");
     board_grid_menu->append("About", "win.about");
 
+    board_main_menu->append("Preferences", "win.preferences");
     board_main_menu->append("About", "win.about");
 
     menu_button.insert_action_group("win", action_group);

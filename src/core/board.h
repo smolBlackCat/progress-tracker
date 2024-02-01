@@ -118,6 +118,8 @@ public:
 
     std::string get_background_type() const;
 
+    const std::string get_filepath() const;
+
     /**
      * TODO: Remove this method. Don't give access to the underlying vector
      * holding the cardlists. Implement a way of iterating within the class
@@ -131,6 +133,12 @@ public:
      * @returns a boolean indicating if the board was modified.
     */
     bool is_modified() override;
+
+    /**
+     * @brief Generates a filename given a base. What it actually does is to
+     * lowercase the given base and give an id if needed.
+    */
+    static const std::string new_filename(std::string base);
 
 private:
     std::string background, file_path;

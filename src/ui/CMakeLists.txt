@@ -3,7 +3,9 @@ pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
 add_library(ui window.cpp
                application.cpp
+               board-dialog.cpp
                create_board_dialog.cpp
+               preferences-board-dialog.cpp
                board-card-button.cpp
                board-widget.cpp
                cardlist.cpp

@@ -7,6 +7,8 @@
 #include <format>
 #include <regex>
 #include <stdexcept>
+#include <random>
+#include <string>
 
 Board::Board() : Item{""} {}
 
@@ -205,6 +207,10 @@ std::string Board::get_background_type() const {
     return "invalid";
 }
 
+const std::string Board::get_filepath() const {
+    return file_path;
+}
+
 std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
     return cardlist_vector;
 }
@@ -229,6 +235,42 @@ bool Board::cardlists_modified() {
 
 bool Board::is_modified() {
     return modified || cardlists_modified();
+}
+
+std::string format_basename(std::string basename) {
+    std::transform(basename.begin(), basename.end(), basename.begin(),
+        [](unsigned char c) {
+            return std::tolower(c);
+        });
+    for (auto& c: basename) {
+        if (c == ' ') {
+            c = '-';
+        }
+    }
+    return basename;
+}
+
+// TODO: Board class deserves a BoardManager class
+const std::string Board::new_filename(std::string base) {
+    std::string boards_dir =
+        std::string{std::getenv("HOME")}+"/.config/progress/boards/";
+    std::string filename = "";
+    if (std::filesystem::exists(boards_dir)) {
+        std::string basename = format_basename(base);
+        filename = boards_dir+basename+".xml";
+        if (std::filesystem::exists(filename)) {
+            std::random_device r;
+            std::default_random_engine e1(r());
+            std::uniform_int_distribution<int> uniform_dist(1, 1000);
+            int unique_id = uniform_dist(e1);
+            filename = boards_dir+basename+std::to_string(unique_id)+".xml";
+            while (std::filesystem::exists(filename)) {
+                unique_id = uniform_dist(e1);
+                filename = boards_dir+basename+std::to_string(unique_id)+".xml";
+            }
+        }
+    }
+    return filename;
 }
 
 tinyxml2::XMLDocument* Board::xml_doc() {
