@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "cardlist.h"
+#include "cardlist-widget.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr)
     : ui::EditableLabelHeader{card_refptr->get_name()},
@@ -18,7 +18,7 @@ void ui::CardWidget::remove() {
     }
 }
 
-void ui::CardWidget::set_cardlist(ui::Cardlist* cardlist_p) {
+void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
     if (cardlist_p) {
         this->cardlist_p = cardlist_p;
     }

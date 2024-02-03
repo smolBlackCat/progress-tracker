@@ -15,9 +15,8 @@ BoardDialog::BoardDialog(BaseObjectType* cobject,
       p_right_button{builder->get_widget<Gtk::Button>("right-button")},
       p_select_file_button{
           builder->get_widget<Gtk::Button>("select-file-button")} {
-    
-    p_left_button->signal_clicked()
-        .connect(sigc::mem_fun(*this, &BoardDialog::close_window));
+    p_left_button->signal_clicked().connect(
+        sigc::mem_fun(*this, &BoardDialog::close_window));
     p_colour_button->property_rgba().signal_changed().connect(
         sigc::mem_fun(*this, &BoardDialog::on_colourbutton_set));
     p_select_file_button->signal_clicked().connect(
@@ -52,9 +51,8 @@ void BoardDialog::on_bg_button_click() {
 
     dialog->open(
         *this,
-        sigc::bind(
-            sigc::mem_fun(*this, &ui::BoardDialog::on_filedialog_finish),
-            dialog));
+        sigc::bind(sigc::mem_fun(*this, &ui::BoardDialog::on_filedialog_finish),
+                   dialog));
 }
 
 void BoardDialog::on_filedialog_finish(

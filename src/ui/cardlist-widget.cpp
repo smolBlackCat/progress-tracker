@@ -1,4 +1,4 @@
-#include "cardlist.h"
+#include "cardlist-widget.h"
 
 #include <format>
 #include <iostream>
@@ -17,7 +17,7 @@ void ui::CardListHeader::on_confirm_changes() {
     cardlist_refptr->set_name(label.get_text());
 }
 
-ui::Cardlist::Cardlist(BoardWidget& board,
+ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                        std::shared_ptr<CardList> cardlist_refptr)
     : Gtk::ListBox{},
       add_card_button{"Add card"},
@@ -64,12 +64,12 @@ ui::Cardlist::Cardlist(BoardWidget& board,
     get_row_at_index(1)->set_activatable(false);
 }
 
-void ui::Cardlist::reorder_card(ui::CardWidget& next, ui::CardWidget& sibling) {
+void ui::CardlistWidget::reorder_card(ui::CardWidget& next, ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
     cardlist_refptr->reorder_card(next.get_card(), sibling.get_card());
 }
 
-void ui::Cardlist::setup_drag_and_drop(ui::CardWidget* card) {
+void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
     // DragSource Settings
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
@@ -113,7 +113,7 @@ void ui::Cardlist::setup_drag_and_drop(ui::CardWidget* card) {
     card->add_controller(drop_target_c);
 }
 
-void ui::Cardlist::remove_card(ui::CardWidget* card) {
+void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     root.remove(*card);
     cardlist_refptr->remove_card(*card->get_card());
 
@@ -124,7 +124,7 @@ void ui::Cardlist::remove_card(ui::CardWidget* card) {
     }
 }
 
-ui::CardWidget* ui::Cardlist::add_card(std::shared_ptr<Card> card) {
+ui::CardWidget* ui::CardlistWidget::add_card(std::shared_ptr<Card> card) {
     auto new_card = Gtk::make_managed<ui::CardWidget>(card);
     cards_tracker.push_back(new_card);
     new_card->set_cardlist(this);
@@ -134,19 +134,19 @@ ui::CardWidget* ui::Cardlist::add_card(std::shared_ptr<Card> card) {
     return new_card;
 }
 
-ui::CardWidget* ui::Cardlist::add_card() {
+ui::CardWidget* ui::CardlistWidget::add_card() {
     return add_card(cardlist_refptr->add_card(Card{"New Card"}));
 }
 
-std::shared_ptr<CardList>& ui::Cardlist::get_cardlist_refptr() {
+std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist_refptr() {
     return cardlist_refptr;
 }
 
-bool ui::Cardlist::is_child(ui::CardWidget* card) {
+bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
     for (auto& card_ : cards_tracker) {
         if (card == card_) return true;
     }
     return false;
 }
 
-ui::CardListHeader& ui::Cardlist::get_header() { return cardlist_header; }
+ui::CardListHeader& ui::CardlistWidget::get_header() { return cardlist_header; }

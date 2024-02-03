@@ -1,18 +1,19 @@
 #pragma once
 
 #include "../core/board.h"
-#include "board-widget.h"
 #include "board-dialog.h"
+#include "board-widget.h"
 
 namespace ui {
 /**
  * @brief Window dialog presenting the current settings of a board
-*/
+ */
 class PreferencesBoardDialog : public BoardDialog {
 public:
     PreferencesBoardDialog(BaseObjectType* cobject,
                            const Glib::RefPtr<Gtk::Builder>& builder,
-                           Board* board, BoardWidget& board_widget, Gtk::Window& app_window);
+                           Board* board, BoardWidget& board_widget,
+                           Gtk::Window& app_window);
 
     void set_board(Board* board);
 

@@ -38,7 +38,7 @@ ui::BoardWidget::BoardWidget()
 ui::BoardWidget::~BoardWidget() {}
 
 void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
-    if (! (board || board_card_button)) return;
+    if (!(board || board_card_button)) return;
 
     clear();
     this->board = board;
@@ -62,7 +62,7 @@ void ui::BoardWidget::clear() {
 
 bool ui::BoardWidget::save() {
     bool success;
-    if (board->is_modified()){
+    if (board->is_modified()) {
         success = board->save_as_xml();
     }
     board_card_button->update(board);
@@ -72,44 +72,48 @@ bool ui::BoardWidget::save() {
 }
 
 void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
-    auto new_cardlist = Gtk::make_managed<ui::Cardlist>(*this, cardlist_refptr);
+    auto new_cardlist =
+        Gtk::make_managed<ui::CardlistWidget>(*this, cardlist_refptr);
     cardlist_vector.push_back(new_cardlist);
 
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->signal_prepare().connect(
         [new_cardlist, drag_source_c](double x, double y) {
-            Glib::Value<ui::Cardlist*> value_cardlistptr;
-            value_cardlistptr.init(Glib::Value<ui::Cardlist*>::value_type());
+            Glib::Value<ui::CardlistWidget*> value_cardlistptr;
+            value_cardlistptr.init(
+                Glib::Value<ui::CardlistWidget*>::value_type());
             value_cardlistptr.set(new_cardlist);
-            auto cardlist_widget_paintable = Gtk::WidgetPaintable::create(*new_cardlist);
+            auto cardlist_widget_paintable =
+                Gtk::WidgetPaintable::create(*new_cardlist);
             drag_source_c->set_icon(cardlist_widget_paintable, x, y);
             return Gdk::ContentProvider::create(value_cardlistptr);
-        }, false
-    );
+        },
+        false);
     drag_source_c->signal_drag_begin().connect(
         [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
             new_cardlist->set_opacity(0.5);
-        }, false
-    );
+        },
+        false);
     drag_source_c->signal_drag_cancel().connect(
-        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag, Gdk::DragCancelReason reason) {
+        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag,
+                       Gdk::DragCancelReason reason) {
             new_cardlist->set_opacity(1);
             return true;
-        }, false
-    );
+        },
+        false);
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     new_cardlist->get_header().add_controller(drag_source_c);
 
     auto drop_target_cardlist = Gtk::DropTarget::create(
-        Glib::Value<ui::Cardlist*>::value_type(), Gdk::DragAction::MOVE);
+        Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_cardlist->signal_drop().connect(
         [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
             if (G_VALUE_HOLDS(value.gobj(),
-                              Glib::Value<ui::Cardlist*>::value_type())) {
-                Glib::Value<ui::Cardlist*> dropped_value;
+                              Glib::Value<ui::CardlistWidget*>::value_type())) {
+                Glib::Value<ui::CardlistWidget*> dropped_value;
                 dropped_value.init(value.gobj());
 
-                ui::Cardlist* dropped_cardlist = dropped_value.get();
+                ui::CardlistWidget* dropped_cardlist = dropped_value.get();
                 root.reorder_child_after(*dropped_cardlist, *new_cardlist);
                 board->reorder_cardlist(dropped_cardlist->get_cardlist_refptr(),
                                         new_cardlist->get_cardlist_refptr());
@@ -125,7 +129,8 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_card->signal_drop().connect(
         [new_cardlist](const Glib::ValueBase& value, double x, double y) {
-            if (G_VALUE_HOLDS(value.gobj(), Glib::Value<ui::CardWidget*>::value_type())) {
+            if (G_VALUE_HOLDS(value.gobj(),
+                              Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;
                 dropped_value.init(value.gobj());
 
@@ -134,12 +139,14 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove();
                     new_cardlist->add_card(card_in_dropped);
-                    new_cardlist->get_cardlist_refptr()->add_card(*card_in_dropped);
+                    new_cardlist->get_cardlist_refptr()->add_card(
+                        *card_in_dropped);
                 }
                 return true;
             }
             return false;
-        }, false);
+        },
+        false);
     new_cardlist->add_controller(drop_target_card);
 
     // The new cardlist should be appended before the add_button
@@ -165,7 +172,7 @@ bool ui::BoardWidget::set_background() {
     return false;
 }
 
-bool ui::BoardWidget::remove_cardlist(ui::Cardlist& cardlist) {
+bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
     board->remove_cardlist(*(cardlist.get_cardlist_refptr()));

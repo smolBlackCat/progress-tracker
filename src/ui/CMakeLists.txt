@@ -8,7 +8,7 @@ add_library(ui window.cpp
                preferences-board-dialog.cpp
                board-card-button.cpp
                board-widget.cpp
-               cardlist.cpp
+               cardlist-widget.cpp
                card.cpp
                editable-label-header.cpp)
 

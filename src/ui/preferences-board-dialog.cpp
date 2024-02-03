@@ -53,7 +53,8 @@ void PreferencesBoardDialog::close_window() {
 
 void PreferencesBoardDialog::on_save_changes() {
     if (board) {
-        if (p_background_selector_stack->get_visible_child_name() == "as-file") {
+        if (p_background_selector_stack->get_visible_child_name() ==
+            "as-file") {
             if (!file_selected) {
                 auto message_dialog = Gtk::AlertDialog::create("Select a file");
                 message_dialog->show(*this);

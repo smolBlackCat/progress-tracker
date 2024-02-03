@@ -6,15 +6,16 @@ namespace ui {
 
 class BoardDialog : public Gtk::Window {
 public:
-
-    BoardDialog(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder);
+    BoardDialog(BaseObjectType* cobject,
+                const Glib::RefPtr<Gtk::Builder>& builder);
     virtual ~BoardDialog() = default;
 
 protected:
     virtual void close_window();
     virtual void on_bg_button_click();
-    virtual void on_filedialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
-                              const Glib::RefPtr<Gtk::FileDialog>& dialog);
+    virtual void on_filedialog_finish(
+        const Glib::RefPtr<Gio::AsyncResult>& result,
+        const Glib::RefPtr<Gtk::FileDialog>& dialog);
     virtual void on_colourbutton_set();
 
     // File Dialog attributes helpers

@@ -1,7 +1,6 @@
 #include "editable-label-header.h"
 
-#include "card.h"
-#include "cardlist.h"
+#include "cardlist-widget.h"
 
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
@@ -21,7 +20,7 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     entry.set_valign(Gtk::Align::CENTER);
     entry.set_halign(Gtk::Align::START);
     entry.set_hexpand();
-    entry.set_size_request(Cardlist::CARDLIST_SIZE -
+    entry.set_size_request(CardlistWidget::CARDLIST_SIZE -
                            confirm_changes_button.get_width());
     editing_box->append(entry);
     confirm_changes_button.set_valign(Gtk::Align::CENTER);
@@ -46,7 +45,7 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     this->label.set_halign(Gtk::Align::START);
     this->label.set_wrap();
     this->label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
-    this->label.set_size_request(Cardlist::CARDLIST_SIZE -
+    this->label.set_size_request(CardlistWidget::CARDLIST_SIZE -
                                  menu_button.get_width());
     entry.set_text(label);
 

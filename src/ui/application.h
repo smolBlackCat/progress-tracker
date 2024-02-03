@@ -12,9 +12,6 @@ namespace ui {
 
 /**
  * @brief Progress Application class
- *
- * @details class will preload all the boards in the .config/progress directory
- * or create one if there isn't.
  */
 class Application : public Gtk::Application {
 public:
@@ -28,6 +25,5 @@ protected:
 
 private:
     ProgressWindow main_window;
-
 };
 }  // namespace ui

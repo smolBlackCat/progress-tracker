@@ -25,21 +25,16 @@ protected:
     void on_confirm_changes() override;
 };
 
-class Cardlist : public Gtk::ListBox {
+class CardlistWidget : public Gtk::ListBox {
 public:
     static const int CARDLIST_SIZE = 240;
-    Cardlist(BoardWidget& board, std::shared_ptr<CardList> cardlist_refptr);
 
+    CardlistWidget(BoardWidget& board, std::shared_ptr<CardList> cardlist_refptr);
     ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr);
-
     ui::CardWidget* add_card();
-
     void remove_card(ui::CardWidget* card);
-
     std::shared_ptr<CardList>& get_cardlist_refptr();
-
     bool is_child(ui::CardWidget* card);
-
     CardListHeader& get_header();
 
 private:
