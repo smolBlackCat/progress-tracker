@@ -2,8 +2,6 @@
 
 #include "cardlist-widget.h"
 
-#include <iostream>
-
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
 
