@@ -8,6 +8,16 @@ namespace ui {
 
 /**
  * @brief A custom label widget that's editable and extensible
+ *
+ * @details It works as a better EditableLabel from GTK. It supports both
+ * editing and renaming, and new actions can be added to the options button
+ * using add_option method.
+ *
+ * Behaviour:
+ *
+ *      * Double click: Enters renaming mode.
+ *      * Enter click: Exits renaming mode if the header has
+ *                     entered into renaming mode.
  */
 class EditableLabelHeader : public Gtk::Box {
 public:
@@ -32,6 +42,10 @@ protected:
     Gtk::MenuButton menu_button;
     Glib::RefPtr<Gio::SimpleActionGroup> actions;
     Glib::RefPtr<Gio::Menu> menu;
+
+    // Controllers
+    Glib::RefPtr<Gtk::EventControllerKey> key_controller;
+    Glib::RefPtr<Gtk::GestureClick> click_controller;
 
     /**
      * @brief Changes the widget view to editing mode
