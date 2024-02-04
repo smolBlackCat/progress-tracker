@@ -60,14 +60,6 @@ private:
     ui::DeleteBoardsBar delete_boards_bar;
     Gtk::Stack stack;
 
-    /**
-     * There are two kinds of pages:
-     *
-     * board_grid: Shows a view of various boards to be worked on by the user
-     *
-     * board_main: Shows the kanban todo list
-     */
-    std::string current_page;
     bool on_delete_mode = false;
 
     ui::ProgressAboutDialog about_dialog;
@@ -77,7 +69,6 @@ private:
     void setup_menu_button();
     void show_about();
     void show_create_board();
-    void go_to_main_board();
     void go_to_main_menu();
     void on_delete_board();
 };

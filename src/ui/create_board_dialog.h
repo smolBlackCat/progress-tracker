@@ -2,7 +2,6 @@
 
 #include <gtkmm.h>
 
-#include <map>
 #include <string>
 
 #include "board-dialog.h"

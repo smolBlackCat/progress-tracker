@@ -1,8 +1,6 @@
 #include "create_board_dialog.h"
 
-#include <cstdlib>
 #include <format>
-#include <string>
 
 #include "application.h"
 #include "window.h"
@@ -16,12 +14,6 @@ CreateBoardDialog::CreateBoardDialog(
 
     p_right_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CreateBoardDialog::create_board));
-}
-
-std::string lower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    return s;
 }
 
 void CreateBoardDialog::create_board() {

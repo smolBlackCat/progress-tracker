@@ -78,7 +78,6 @@ ProgressWindow::ProgressWindow()
       home_button{},
       menu_button(),
       about_dialog(*this),
-      current_page{"board_grid"},
       board_grid{},
       board_widget{},
       stack{},
@@ -100,7 +99,7 @@ ProgressWindow::ProgressWindow()
                                                                 "create-board");
     preferences_board_dialog =
         Gtk::Builder::get_widget_derived<ui::PreferencesBoardDialog>(
-            builder1, "create-board", nullptr, board_widget, *this);
+            builder1, "create-board", board_widget, *this);
 
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
@@ -145,7 +144,10 @@ ProgressWindow::ProgressWindow()
     set_child(stack);
 }
 
-ProgressWindow::~ProgressWindow() { delete create_board_dialog; }
+ProgressWindow::~ProgressWindow() {
+    delete create_board_dialog;
+    delete preferences_board_dialog;
+}
 
 void ProgressWindow::add_board(std::string board_filepath) {
     auto new_board_card = Gtk::make_managed<BoardCardButton>(board_filepath);
@@ -195,10 +197,6 @@ void ProgressWindow::setup_menu_button() {
 void ProgressWindow::show_about() { about_dialog.set_visible(); }
 
 void ProgressWindow::show_create_board() { create_board_dialog->set_visible(); }
-
-void ProgressWindow::go_to_main_board() {
-    stack.set_visible_child("main_board");
-}
 
 void ProgressWindow::go_to_main_menu() {
     stack.set_visible_child("board_grid");
