@@ -20,7 +20,6 @@ target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 # Link the application's libraries and headers
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
 target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR}/src ${APP_INCLUDES})
-target_include_directories(progress-tracker PUBLIC ${PROJECT_BINARY_DIR}/src)
 
 target_compile_options(progress-tracker PRIVATE -g)
 

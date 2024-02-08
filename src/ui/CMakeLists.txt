@@ -1,6 +1,3 @@
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
-
 add_library(ui window.cpp
                application.cpp
                board-dialog.cpp
