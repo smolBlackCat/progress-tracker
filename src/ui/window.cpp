@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "board-card-button.h"
+#include "i18n.h"
 
 namespace ui {
 
@@ -13,9 +14,9 @@ ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) {
     set_program_name("Progress");
     set_logo(Gdk::Texture::create_from_resource("/ui/com.moura.Progress.svg"));
     set_version("1.0");
-    set_comments("Simple app for storing kanban-style todo lists");
+    set_comments(_("Simple app for storing kanban-style todo lists"));
     set_license_type(Gtk::License::MIT_X11);
-    set_copyright("De Moura © All rights reserved");
+    set_copyright(_("De Moura © All rights reserved"));
     std::vector<Glib::ustring> authors{};
     authors.push_back("De Moura");
     set_authors(authors);
@@ -31,9 +32,9 @@ DeleteBoardsBar::DeleteBoardsBar(Gtk::FlowBox& boards_grid,
                                  ui::ProgressWindow& app_window)
     : Gtk::Revealer{},
       root{Gtk::Orientation::HORIZONTAL},
-      bar_text{"Select the boards to be deleted"},
-      bar_button_delete{"Delete"},
-      bar_button_cancel{"Cancel"},
+      bar_text{_("Select the boards to be deleted")},
+      bar_button_delete{_("Delete")},
+      bar_button_cancel{_("Cancel")},
       boards_grid{boards_grid},
       app_window{app_window} {
     set_child(root);
@@ -172,7 +173,7 @@ void ProgressWindow::add_board(std::string board_filepath) {
                 }
             }
         });
-}   
+}
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
@@ -183,11 +184,11 @@ void ProgressWindow::setup_menu_button() {
     action_group->add_action(
         "preferences", [this]() { preferences_board_dialog->set_visible(); });
 
-    board_grid_menu->append("Delete Boards", "win.delete");
-    board_grid_menu->append("About", "win.about");
+    board_grid_menu->append(_("Delete Boards"), "win.delete");
+    board_grid_menu->append(_("About"), "win.about");
 
-    board_main_menu->append("Preferences", "win.preferences");
-    board_main_menu->append("About", "win.about");
+    board_main_menu->append(_("Preferences"), "win.preferences");
+    board_main_menu->append(_("About"), "win.about");
 
     menu_button.insert_action_group("win", action_group);
     menu_button.set_icon_name("open-menu");

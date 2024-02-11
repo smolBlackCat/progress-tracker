@@ -7,7 +7,8 @@ add_library(ui window.cpp
                board-widget.cpp
                cardlist-widget.cpp
                card.cpp
-               editable-label-header.cpp)
+               editable-label-header.cpp
+               i18n.h)
 
 target_compile_options(ui PRIVATE -g)
 
@@ -18,3 +19,6 @@ target_link_directories(ui PRIVATE ${GTKMM_LIBRARY_DIRS})
 target_compile_options(ui PRIVATE ${GTKMM_CFLAGS_OTHER})
 
 target_link_libraries(ui PRIVATE ${TINYXML2_LIB})
+
+target_link_libraries(ui PRIVATE ${INTL_LIBRARIES})
+target_include_directories(ui PRIVATE ${INTL_INCLUDE_DIR})

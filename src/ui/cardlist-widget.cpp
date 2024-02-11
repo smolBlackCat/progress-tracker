@@ -5,6 +5,7 @@
 
 #include "board-widget.h"
 #include "card.h"
+#include "i18n.h"
 
 ui::CardListHeader::CardListHeader(std::shared_ptr<CardList>& cardlist_refptr)
     : EditableLabelHeader{}, cardlist_refptr{cardlist_refptr} {
@@ -18,9 +19,9 @@ void ui::CardListHeader::on_confirm_changes() {
 }
 
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
-                       std::shared_ptr<CardList> cardlist_refptr)
+                                   std::shared_ptr<CardList> cardlist_refptr)
     : Gtk::ListBox{},
-      add_card_button{"Add card"},
+      add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
       cards_tracker{},
       board{board},
@@ -34,7 +35,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     set_selection_mode(Gtk::SelectionMode::NONE);
 
     cardlist_header.add_option(
-        "remove", "Remove", [this]() { this->board.remove_cardlist(*this); });
+        "remove", _("Remove"), [this]() { this->board.remove_cardlist(*this); });
 
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_halign(Gtk::Align::START);
@@ -64,7 +65,8 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     get_row_at_index(1)->set_activatable(false);
 }
 
-void ui::CardlistWidget::reorder_card(ui::CardWidget& next, ui::CardWidget& sibling) {
+void ui::CardlistWidget::reorder_card(ui::CardWidget& next,
+                                      ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
     cardlist_refptr->reorder_card(next.get_card(), sibling.get_card());
 }
@@ -81,8 +83,8 @@ void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
             auto card_paintable_widget = Gtk::WidgetPaintable::create(*card);
             drag_source_c->set_icon(card_paintable_widget, x, y);
             return Gdk::ContentProvider::create(value_new_cardptr);
-        }, false
-    );
+        },
+        false);
     card->add_controller(drag_source_c);
 
     // DropTarget Settings
@@ -135,7 +137,7 @@ ui::CardWidget* ui::CardlistWidget::add_card(std::shared_ptr<Card> card) {
 }
 
 ui::CardWidget* ui::CardlistWidget::add_card() {
-    return add_card(cardlist_refptr->add_card(Card{"New Card"}));
+    return add_card(cardlist_refptr->add_card(Card{_("New Card")}));
 }
 
 std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist_refptr() {

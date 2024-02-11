@@ -1,0 +1,152 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-10 16:59-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:21
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:37
+#: src/ui/board-dialog.cpp:24
+msgid "Cancel"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:22
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:50
+#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:54
+#: src/ui/board-dialog.cpp:25 src/ui/board-dialog.cpp:53
+msgid "Select a file"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:23
+#: src/ui/board-dialog.cpp:26
+msgid "Select File"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:25
+#: src/ui/board-dialog.cpp:28
+msgid "As a file"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:26
+#: src/ui/board-dialog.cpp:29
+msgid "As a colour"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:41
+#: src/ui/board-dialog.cpp:44
+msgid "No file selected"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-dialog.cpp:55
+#: src/ui/board-dialog.cpp:58
+msgid "Image Files"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-widget.cpp:15
+msgid "Add List"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/board-widget.cpp:31
+msgid "New CardList"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/card.cpp:12
+#: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:38
+msgid "Remove"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:24
+msgid "Add card"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:140
+msgid "New Card"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/editable-label-header.cpp:60
+msgid "Rename"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:18
+msgid "Create"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:47
+msgid "It was not possible to create a Board with given name"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:15
+msgid "Edit Board"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:16
+msgid "Save"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:37
+msgid "No file was selected"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:17
+msgid "Simple app for storing kanban-style todo lists"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:19
+msgid "De Moura © All rights reserved"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:35
+msgid "Select the boards to be deleted"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:36
+msgid "Delete"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:187
+msgid "Delete Boards"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:188
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:191
+msgid "About"
+msgstr ""
+
+#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:190
+msgid "Preferences"
+msgstr ""
+
+#: src/ui/board-dialog.cpp:23
+msgid "Board's name"
+msgstr ""
+
+msgid "As a solid colour"
+msgstr ""
+
+msgid "Background"
+msgstr ""

@@ -7,12 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # GTK setup
 find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
-# Internationalisation Setup
 find_package(Intl REQUIRED)
 find_package(Catch2 3 REQUIRED)
-
-pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
 # Tiny XML setup
 find_library(TINYXML2_LIB libtinyxml2 tinyxml2 REQUIRED)
@@ -23,6 +21,8 @@ if (TESTS_ENABLED)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(po)
+add_subdirectory(data)
 add_subdirectory(test)
 
 add_test(NAME CoreTest COMMAND test/core_test)

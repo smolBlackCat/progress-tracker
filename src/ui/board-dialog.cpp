@@ -1,5 +1,7 @@
 #include "board-dialog.h"
 
+#include "i18n.h"
+
 namespace ui {
 BoardDialog::BoardDialog(BaseObjectType* cobject,
                          const Glib::RefPtr<Gtk::Builder>& builder)
@@ -15,6 +17,11 @@ BoardDialog::BoardDialog(BaseObjectType* cobject,
       p_right_button{builder->get_widget<Gtk::Button>("right-button")},
       p_select_file_button{
           builder->get_widget<Gtk::Button>("select-file-button")} {
+    p_board_name_entry->set_placeholder_text(_("Board's name"));
+    p_left_button->set_label(_("Cancel"));
+    p_select_file_label->set_label(_("Select a file"));
+    p_select_file_button->set_label(_("Select File"));
+
     p_left_button->signal_clicked().connect(
         sigc::mem_fun(*this, &BoardDialog::close_window));
     p_colour_button->property_rgba().signal_changed().connect(
@@ -28,7 +35,7 @@ void BoardDialog::close_window() {
 
     // Cleanup any inserted data
     p_board_name_entry->set_text("");
-    p_select_file_label->set_text("No file selected");
+    p_select_file_label->set_text(_("No file selected"));
     p_file_image->property_file().set_value("");
     p_colour_button->set_rgba(Gdk::RGBA("#FFFFFF"));
     file_selected = false;
@@ -37,12 +44,12 @@ void BoardDialog::close_window() {
 void BoardDialog::on_bg_button_click() {
     auto dialog = Gtk::FileDialog::create();
 
-    dialog->set_title("Select a file");
+    dialog->set_title(_("Select a file"));
     dialog->set_modal();
 
     auto filters = Gio::ListStore<Gtk::FileFilter>::create();
     auto image_filter = Gtk::FileFilter::create();
-    image_filter->set_name("Image Files");
+    image_filter->set_name(_("Image Files"));
     image_filter->add_mime_type("image/png");
     image_filter->add_mime_type("image/jpeg");
     image_filter->add_mime_type("image/tiff");

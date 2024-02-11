@@ -21,7 +21,7 @@
         <child>
           <object class="GtkLabel" id="background-title-label">
             <property name="halign">start</property>
-            <property name="label">Background</property>
+            <property name="label" translatable="yes">Background</property>
             <property name="margin-start">10</property>
             <property name="margin-top">10</property>
             <attributes>
@@ -50,7 +50,7 @@
                 <child>
                   <object class="GtkStackPage">
                     <property name="name">as-file</property>
-                    <property name="title">As a file</property>
+                    <property name="title" translatable="yes">As a file</property>
                     <property name="child">
                       <object class="GtkBox">
                         <property name="spacing">4</property>
@@ -90,7 +90,7 @@
                 <child>
                   <object class="GtkStackPage">
                     <property name="name">as-colour</property>
-                    <property name="title">As a solid colour</property>
+                    <property name="title" translatable="yes">As a colour</property>
                     <property name="child">
                       <object class="GtkBox">
                         <property name="orientation">vertical</property>

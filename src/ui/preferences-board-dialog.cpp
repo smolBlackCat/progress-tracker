@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include "i18n.h"
+
 namespace ui {
 
 PreferencesBoardDialog::PreferencesBoardDialog(
@@ -10,8 +12,8 @@ PreferencesBoardDialog::PreferencesBoardDialog(
     : BoardDialog{cobject, builder},
       board_widget{board_widget},
       app_window{app_window} {
-    set_title("Edit Board");
-    p_right_button->set_label("Save");
+    set_title(_("Edit Board"));
+    p_right_button->set_label(_("Save"));
     p_right_button->add_css_class("suggested-action");
 
     p_right_button->signal_clicked().connect(
@@ -32,7 +34,7 @@ void PreferencesBoardDialog::set_board(Board* board) {
         // it implies that no file was selected. Then clean everything
         // from other boards
         file_selected = false;
-        p_select_file_label->set_label("No file was selected");
+        p_select_file_label->set_label(_("No file was selected"));
         p_file_image->set("");
 
         p_colour_button->set_rgba(Gdk::RGBA{board->get_background()});
@@ -49,7 +51,7 @@ void PreferencesBoardDialog::close_window() {
 void PreferencesBoardDialog::on_save_changes() {
     if (p_background_selector_stack->get_visible_child_name() == "as-file") {
         if (!file_selected) {
-            auto message_dialog = Gtk::AlertDialog::create("Select a file");
+            auto message_dialog = Gtk::AlertDialog::create(_("Select a file"));
             message_dialog->show(*this);
             // The information is not saved in disk.
             return;

@@ -1,5 +1,7 @@
 #include "board-widget.h"
 
+#include "i18n.h"
+
 #include <format>
 #include <iostream>
 
@@ -10,7 +12,7 @@
 ui::BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
-      add_button{"Add List"},
+      add_button{_("Add List")},
       cardlist_vector{},
       board{nullptr},
       board_card_button{nullptr} {
@@ -26,7 +28,7 @@ ui::BoardWidget::BoardWidget()
     css_provider_refptr->load_from_data(CSS_FORMAT);
 
     add_button.signal_clicked().connect([this]() {
-        add_cardlist(board->add_cardlist(CardList{"New CardList"}));
+        add_cardlist(board->add_cardlist(CardList{_("New CardList")}));
     });
     add_button.set_halign(Gtk::Align::START);
     add_button.set_valign(Gtk::Align::START);

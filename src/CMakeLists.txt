@@ -17,6 +17,10 @@ target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIRS})
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
+# i18n Settings
+target_link_libraries(progress-tracker PRIVATE ${INTL_LIBRARIES})
+target_include_directories(progress-tracker PRIVATE ${INTL_INCLUDE_DIR})
+
 # Link the application's libraries and headers
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
 target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR}/src ${APP_INCLUDES})

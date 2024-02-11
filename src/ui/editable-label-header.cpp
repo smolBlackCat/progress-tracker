@@ -1,6 +1,7 @@
 #include "editable-label-header.h"
 
 #include "cardlist-widget.h"
+#include "i18n.h"
 
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
@@ -56,7 +57,7 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     confirm_changes_button.signal_clicked().connect(
         sigc::mem_fun(*this, &ui::EditableLabelHeader::exit_editing_mode));
 
-    add_option("edit", "Rename",
+    add_option("edit", _("Rename"),
                sigc::mem_fun(*this, &ui::EditableLabelHeader::to_editing_mode));
     menu_button.insert_action_group("label-header", actions);
     menu_button.set_menu_model(menu);
@@ -68,18 +69,18 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     // Setting up Controllers
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
-            if (keycode == 36 && revealer.get_child_revealed()) { // The user has clicked enter
+            if (keycode == 36 &&
+                revealer.get_child_revealed()) {  // The user has clicked enter
                 exit_editing_mode();
             }
-        }, false
-    );
+        },
+        false);
     click_controller->signal_released().connect(
         [this](int n_press, double x, double y) {
             if (n_press >= 2 && (!revealer.get_child_revealed())) {
                 to_editing_mode();
             }
-        }
-    );
+        });
     add_controller(key_controller);
     add_controller(click_controller);
 }

@@ -3,12 +3,13 @@
 #include <iostream>
 
 #include "cardlist-widget.h"
+#include "i18n.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr)
     : ui::EditableLabelHeader{card_refptr->get_name()},
       card_refptr{card_refptr},
       cardlist_p{nullptr} {
-    add_option("remove", "Remove",
+    add_option("remove", _("Remove"),
                sigc::mem_fun(*this, &ui::CardWidget::remove));
 }
 
