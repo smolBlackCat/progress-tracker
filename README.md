@@ -45,6 +45,12 @@ make
 sudo make install
 ```
 
+## Running the Project
+After installing, simply issue the command `progress-tracker`, or you can also
+start it from the applications menu of your desktop environment.
+
+![Progress Icon](docs/progress-in-appmenu.png)
+
 ## TODO
 
 * Distribute installable packages
