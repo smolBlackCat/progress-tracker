@@ -34,3 +34,9 @@ foreach(PO_SOURCE PO_NAME IN ZIP_LISTS PO_SOURCES PO_NAMES)
     add_custom_target("compile_${PO_NAME}" DEPENDS ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME})
     add_dependencies(progress-tracker "compile_${PO_NAME}")
 endforeach()
+
+include(GNUInstallDirs)
+foreach(PO_NAME IN LISTS PO_NAMES)
+    install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
+            DESTINATION ${CMAKE_INSTALL_LOCALEDIR}/${PO_NAME}/LC_MESSAGES)
+endforeach()

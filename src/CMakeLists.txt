@@ -44,3 +44,8 @@ add_custom_command(
 )
 add_custom_target(generate_resources DEPENDS resources.cpp)
 add_dependencies(progress-tracker generate_resources)
+
+include(GNUInstallDirs)
+install(TARGETS progress-tracker
+        RUNTIME
+        DESTINATION ${CMAKE_INSTALL_BINDIR})

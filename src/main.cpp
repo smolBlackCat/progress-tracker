@@ -12,7 +12,7 @@
  */
 int main(int argc, char *argv[]) {
     std::setlocale(LC_ALL, "");
-    bindtextdomain("progress-tracker", (std::string{getenv("PWD")}+"/locales").c_str());
+    bindtextdomain("progress-tracker", "/usr/local/share/locale");
     textdomain("progress-tracker");
 
     std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION
