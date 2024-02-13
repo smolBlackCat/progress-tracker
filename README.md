@@ -1,47 +1,51 @@
 # Progress Tracker
 
-Project is still in development.
+![Application's Window](docs/main-view.png)
 
-## How to build and run the project for now?
+Progress is a TODO app that uses the kanban-style to organise tasks. The uses
+varies from keeping track of a project's progress to organising personal tasks. It allows the user to edit the board using an idiomatic drag-and-drop system, and also
+customise boards according to the user preference.
 
-The program is being developed only for Linux. Cross-platform will come after
-the Linux version is made.
+## Build
 
-To build on Linux:
+### Dependencies
 
-1. Install the required dependencies. For now the only dependency being used
-here is the gui toolkit gtkmm and the test framework catch2 (optional if you
-don't want to create tests binaries.)
+* cmake
+* libgtkmm-4.0-dev
+* libtinyxml2-dev
+* catch2 (for testing)
 
-    `sudo apt install libgtkmm-4.0-dev libtinyxml2-dev catch2`
+### Instructions
 
-2. You also have to have cmake installed.
+1. Install the dependencies needed to build the project
 
-    `sudo apt install cmake`
+```sh
+# catch2 is totally optional. Install it if you're going to run tests
+sudo apt install libgtkmm-4.0-dev libtinyxml2-dev catch2
+```
 
-3. Configure and build the project using cmake.
+2. Clone the project's repo
 
-    ```sh
-    mkdir build/
-    cd build/
-    # set DTESTS_ENABLED=True if you want to run the tests
-    # (ps. they have all passed ;))
-    cmake ../progress-tracker/ -DTESTS_ENABLED=False
-    ```
+```sh
+git clone https://github.com/smolBlackCat/progress-tracker.git
+```
 
-4. After that, you can build and run the project.
+3. Compile the project
 
-    ```sh
-    make
-    src/progress-tracker
-    ```
+```sh
+mkdir build/
+cd build/
+cmake ../ .
+make
+```
 
-## How the Project is looking like
+4. Install the project
 
-### Main View of the application
+```sh
+sudo make install
+```
 
-![yay](docs/main-view.png)
+## TODO
 
-### Board View
-
-![yay](docs/board-view.png)
+* Distribute installable packages
+* Work on Windows build
