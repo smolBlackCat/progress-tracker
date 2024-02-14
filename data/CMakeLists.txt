@@ -3,6 +3,6 @@ set(APP_DESKTOP_ENTRY ${CMAKE_CURRENT_SOURCE_DIR}/Progress.desktop)
 
 include(GNUInstallDirs)
 install(FILES ${APP_DESKTOP_ENTRY}
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications/)
+        DESTINATION /usr/share/applications/)
 install(FILES ${APP_ICON}
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/progress-tracker/)
+        DESTINATION /usr/share/progress-tracker/)
