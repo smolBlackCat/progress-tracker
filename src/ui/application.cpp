@@ -9,10 +9,18 @@ Glib::RefPtr<ui::Application> ui::Application::create() {
 }
 
 ui::Application::Application()
-    : Gtk::Application{"com.moura.Progress"}, main_window{} {}
+    : Gtk::Application{"com.moura.Progress"} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
+
+    auto window_builder = Gtk::Builder::create_from_resource("/ui/app-window.ui");
+    main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
+        window_builder, "app-window");
+    if (!main_window) {
+        exit(1);
+    }
+
     std::string app_dir{std::getenv("HOME")};
     app_dir += +"/.config/progress/boards";
 
@@ -28,15 +36,15 @@ void ui::Application::on_startup() {
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();
             if (board_filename.ends_with(".xml")) {
-                main_window.add_board(board_filename);
+                main_window->add_board(board_filename);
             }
         }
     }
 
-    add_window(main_window);
+    add_window(*main_window);
 }
 
 void ui::Application::on_activate() {
     Gtk::Application::on_activate();
-    main_window.set_visible();
+    main_window->set_visible();
 }

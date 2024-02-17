@@ -32,9 +32,10 @@ set(GLIB_FLAGS --target=resources.cpp)
 set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
 set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/ui)
 
-list(APPEND RESOURCES ui/com.moura.Progress.svg)
-list(APPEND RESOURCES ui/create-board-dialog.ui)
-list(APPEND RESOURCES ui/stylesheet.css)
+list(APPEND RESOURCES ui/com.moura.Progress.svg
+                      ui/app-window.ui
+                      ui/create-board-dialog.ui
+                      ui/stylesheet.css)
 
 add_custom_command(
     OUTPUT resources.cpp

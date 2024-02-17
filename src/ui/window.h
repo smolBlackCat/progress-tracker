@@ -25,14 +25,14 @@ class ProgressWindow;
 */
 class DeleteBoardsBar : public Gtk::Revealer {
 public:
-    DeleteBoardsBar(Gtk::FlowBox& boards_grid, ui::ProgressWindow& app_window);
+    DeleteBoardsBar(Gtk::FlowBox* boards_grid, ui::ProgressWindow& app_window);
 
 private:
     Gtk::Box root;
     Gtk::Label bar_text;
     Gtk::Button bar_button_delete, bar_button_cancel;
 
-    Gtk::FlowBox& boards_grid;
+    Gtk::FlowBox* boards_grid;
     ui::ProgressWindow& app_window;
 
     void on_delete_boards();
@@ -43,28 +43,22 @@ private:
  */
 class ProgressWindow : public Gtk::Window {
 public:
-    ProgressWindow();
+    ProgressWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder);
     ~ProgressWindow() override;
 
     void add_board(std::string board_filepath);
     void off_delete_board();
 
 private:
-    Gtk::HeaderBar header_bar;
-    Gtk::Button add_board_button, home_button;
-    Glib::RefPtr<Gio::Menu> board_grid_menu, board_main_menu;
-    Gtk::MenuButton menu_button, board_menu_button;
-    Gtk::Box root;
-    Gtk::FlowBox board_grid;
-    ui::BoardWidget board_widget;
-    ui::DeleteBoardsBar delete_boards_bar;
-    Gtk::Stack stack;
+    const Glib::RefPtr<Gtk::Builder> window_builder;
 
     bool on_delete_mode = false;
 
     ui::ProgressAboutDialog about_dialog;
     ui::CreateBoardDialog* create_board_dialog;
     ui::PreferencesBoardDialog* preferences_board_dialog;
+    ui::DeleteBoardsBar delete_boards_bar;
+    ui::BoardWidget board_widget;
 
     void setup_menu_button();
     void show_about();

@@ -23,7 +23,6 @@ protected:
     void on_startup() override;
     void on_activate() override;
 
-private:
-    ProgressWindow main_window;
+    ProgressWindow* main_window = nullptr;
 };
 }  // namespace ui
