@@ -19,7 +19,7 @@ public:
     BoardCardButton(std::string board_filepath);
 
     std::string get_filepath();
-    void update(Board* board);
+    void set_filepath(std::string board_filepath);
 
 private:
     Gtk::Box root_box;

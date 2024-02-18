@@ -116,7 +116,7 @@ public:
      */
     bool save_as_xml();
 
-    std::string get_background_type() const;
+    static std::string get_background_type(std::string background);
 
     const std::string get_filepath() const;
 
