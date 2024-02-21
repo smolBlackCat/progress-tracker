@@ -13,6 +13,7 @@ customise boards according to the user preference.
 * cmake
 * libgtkmm-4.0-dev
 * libtinyxml2-dev
+* gettext
 * catch2 (for testing)
 
 ### Instructions
@@ -21,7 +22,7 @@ customise boards according to the user preference.
 
 ```sh
 # catch2 is totally optional. Install it if you're going to run tests
-sudo apt install libgtkmm-4.0-dev libtinyxml2-dev catch2
+sudo apt install libgtkmm-4.0-dev libtinyxml2-dev gettext catch2
 ```
 
 2. Clone the project's repo
