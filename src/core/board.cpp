@@ -193,7 +193,7 @@ bool Board::save_as_xml() {
     return result == tinyxml2::XML_SUCCESS;
 }
 
-std::string Board::get_background_type(std::string background) {
+std::string Board::get_background_type() const {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 

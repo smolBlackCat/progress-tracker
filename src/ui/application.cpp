@@ -36,7 +36,7 @@ void ui::Application::on_startup() {
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();
             if (board_filename.ends_with(".xml")) {
-                main_window->get_window_controller().add_board(board_filename);
+                main_window->add_board(board_filename);
             }
         }
     }

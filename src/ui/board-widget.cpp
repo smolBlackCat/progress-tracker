@@ -9,14 +9,13 @@
  * TODO: High memory is allocated in setting background, mainly when the
  * background image is high. Should I try to compress it?
  */
-ui::BoardWidget::BoardWidget(ui::WindowController& window_controller)
+ui::BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
       cardlist_vector{},
       board{nullptr},
-      board_card_button{nullptr},
-      window_controller{window_controller} {
+      board_card_button{nullptr} {
     set_child(root);
     set_name("board-root");
 
@@ -51,7 +50,7 @@ void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
     for (auto& cardlist : board->get_cardlists()) {
         add_cardlist(cardlist);
     }
-    set_background(board->get_background());
+    set_background();
 }
 
 void ui::BoardWidget::clear() {
@@ -63,17 +62,14 @@ void ui::BoardWidget::clear() {
     cardlist_vector.clear();
 }
 
-bool ui::BoardWidget::save(bool free_board) {
+bool ui::BoardWidget::save() {
     bool success;
     if (board->is_modified()) {
         success = board->save_as_xml();
     }
-    board_card_button->set_filepath(board->get_filepath());
-
-    if (free_board) {
-        delete board;
-        board = nullptr;
-    }
+    board_card_button->update(board);
+    delete board;
+    board = nullptr;
     return success;
 }
 
@@ -160,49 +156,22 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
     root.reorder_child_after(add_button, *new_cardlist);
 }
 
-// FIXME: We're checking the background's type twice
-bool ui::BoardWidget::set_background(std::string background) {
-    if (!board->set_background(background)) {
-        return false;
-    }
+bool ui::BoardWidget::set_background() {
+    if (!board) return false;
 
-    if (Board::get_background_type(background) == "colour") {
+    if (board->get_background_type() == "colour") {
         css_provider_refptr->load_from_data(
             std::format(CSS_FORMAT_RGB, board->get_background()));
         std::cout << "Colour background set" << std::endl;
-    } else if (Board::get_background_type(background) == "file") {
+        return true;
+    } else if (board->get_background_type() == "file") {
         css_provider_refptr->load_from_data(
             std::format(CSS_FORMAT_FILE, board->get_background()));
         std::cout << "File background set" << std::endl;
+        return true;
     }
 
-    return true;
-}
-
-std::string ui::BoardWidget::get_background() const {
-    return board->get_background();
-}
-
-bool ui::BoardWidget::set_name(std::string name) {
-    if (name.length() == 0 || (!board)) {
-        return false;
-    }
-
-    board->set_name(name);
-    window_controller.set_title(name);
-    return true;
-}
-
-std::string ui::BoardWidget::name() {
-    return board->get_name();
-}
-
-bool ui::BoardWidget::set_filepath(std::string filepath) {
-    return board->set_filepath(filepath);
-}
-
-std::string ui::BoardWidget::get_filepath() {
-    return board->get_filepath();
+    return false;
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {

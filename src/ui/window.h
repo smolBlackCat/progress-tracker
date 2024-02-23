@@ -2,14 +2,13 @@
 
 #include <gtkmm.h>
 
+#include "../core/board.h"
 #include "board-widget.h"
 #include "create_board_dialog.h"
 #include "preferences-board-dialog.h"
 #include "board-card-button.h"
-#include "window-controller.h"
 
 namespace ui {
-
 /**
  * Progress app about dialog.
  */
@@ -26,14 +25,17 @@ class ProgressWindow;
 */
 class DeleteBoardsBar : public Gtk::Revealer {
 public:
-    DeleteBoardsBar(WindowController& window_controller);
+    DeleteBoardsBar(Gtk::FlowBox* boards_grid, ui::ProgressWindow& app_window);
 
 private:
     Gtk::Box root;
     Gtk::Label bar_text;
     Gtk::Button bar_button_delete, bar_button_cancel;
 
-    WindowController& window_controller;
+    Gtk::FlowBox* boards_grid;
+    ui::ProgressWindow& app_window;
+
+    void on_delete_boards();
 };
 
 /**
@@ -44,18 +46,24 @@ public:
     ProgressWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder);
     ~ProgressWindow() override;
 
-    WindowController& get_window_controller();
+    void add_board(std::string board_filepath);
+    void off_delete_board();
 
 private:
     const Glib::RefPtr<Gtk::Builder> window_builder;
+
+    bool on_delete_mode = false;
+
     ui::ProgressAboutDialog about_dialog;
     ui::CreateBoardDialog* create_board_dialog;
     ui::PreferencesBoardDialog* preferences_board_dialog;
     ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
 
-    WindowController window_controller;
-
     void setup_menu_button();
+    void show_about();
+    void show_create_board();
+    void go_to_main_menu();
+    void on_delete_board();
 };
 }  // namespace ui

@@ -8,9 +8,8 @@
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
-    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder, WindowController& window_controller)
-    : BoardDialog{cobject, ref_builder},
-      window_controller{window_controller} {
+    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder)
+    : BoardDialog{cobject, ref_builder} {
     
     set_title(_("Create Board"));
     p_left_button->add_css_class("destructive-action");
@@ -49,7 +48,7 @@ void CreateBoardDialog::create_board() {
         message_dialog->show(*this);
     } else {
         board.save_as_xml();
-        window_controller.add_board(new_file_path);
+        ((ui::ProgressWindow*)get_transient_for())->add_board(new_file_path);
         close_window();
     }
 }

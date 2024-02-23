@@ -10,10 +10,8 @@ public:
                 const Glib::RefPtr<Gtk::Builder>& builder);
     virtual ~BoardDialog() = default;
 
-    virtual void open_window();
-    virtual void close_window();
-
 protected:
+    virtual void close_window();
     virtual void on_bg_button_click();
     virtual void on_filedialog_finish(
         const Glib::RefPtr<Gio::AsyncResult>& result,

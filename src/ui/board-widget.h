@@ -8,7 +8,6 @@
 #include "../core/board.h"
 #include "board-card-button.h"
 #include "cardlist-widget.h"
-#include "window-controller.h"
 
 #define CSS_FORMAT \
     "#board-root {transition-property: background-image, background-color;}"
@@ -23,14 +22,12 @@
 
 namespace ui {
 
-class WindowController;
-
 /**
  * @brief Widget that holds a list of CardLists
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
-    BoardWidget(WindowController& window_controller);
+    BoardWidget();
 
     ~BoardWidget() override;
 
@@ -56,7 +53,7 @@ public:
     /**
      * @brief Saves the contents edited in the Board class.
      */
-    bool save(bool free_board = true);
+    bool save();
 
     /**
      * @brief Adds a new CardlistWidget widget based on a given smart pointer
@@ -75,17 +72,7 @@ public:
 
     ui::BoardCardButton* board_card_button;
 
-    bool set_background(std::string background);
-
-    std::string get_background() const;
-
-    bool set_name(std::string name);
-
-    std::string name();
-
-    bool set_filepath(std::string filepath);
-
-    std::string get_filepath();
+    bool set_background();
 
 private:
     Gtk::Box root;
@@ -93,6 +80,5 @@ private:
     Board* board;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
-    WindowController& window_controller;
 };
 }  // namespace ui

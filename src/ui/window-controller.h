@@ -1,24 +1,16 @@
-#pragma once
-
 #include <gtkmm.h>
 
-#include "board-dialog.h"
 #include "board-widget.h"
 
 namespace ui {
-
-class DeleteBoardsBar;
 
 /**
  * @brief Class implementing behaviours done by the application's window
  */
 class WindowController {
 public:
-    WindowController(const Glib::RefPtr<Gtk::Builder>& window_builder,
-                     Gtk::Window& cb_dialog, Gtk::Window& pref_dialog,
-                     Gtk::Window& about_dialog,
-                     BoardWidget& board_widget,
-                     DeleteBoardsBar& delete_boards_bar);
+    WindowController(Gtk::Window& window_ref, Gtk::FlowBox& board_grid_ref,
+                     Gtk::Stack stack_ref, ui::BoardWidget& board_widget_ref, Gtk::Button& add_board_button);
 
     /**
      * @brief Adds a board to the application's board grid.
@@ -46,7 +38,7 @@ public:
     /**
      * @brief Exits deletion mode
      */
-    void off_delete_board_mode();
+    void on_delete_board_mode();
 
     /**
      * @brief Changes the application view to the board grid view
@@ -68,11 +60,6 @@ public:
      */
     void set_title(std::string title);
 
-protected:
-    const Glib::RefPtr<Gtk::Builder>& window_builder;
-    Gtk::Window &cb_dialog, &pref_dialog, &about_dialog;
-    DeleteBoardsBar& delete_boards_bar;
-    BoardWidget& board_widget;
-    bool on_delete_mode = false;
+private:
 };
 }  // namespace ui

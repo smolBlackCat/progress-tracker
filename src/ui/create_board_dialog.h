@@ -5,7 +5,6 @@
 #include <string>
 
 #include "board-dialog.h"
-#include "window-controller.h"
 
 namespace ui {
 
@@ -20,11 +19,9 @@ public:
      * @brief Dialog Window constructor
      */
     CreateBoardDialog(BaseObjectType* cobject,
-                      const Glib::RefPtr<Gtk::Builder>& ref_builder,
-                      WindowController& window_controller);
+                      const Glib::RefPtr<Gtk::Builder>& ref_builder);
 
 private:
-    WindowController& window_controller;
     void create_board();
 };
 }  // namespace ui
