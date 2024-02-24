@@ -7,7 +7,6 @@
 
 #include "../core/board.h"
 #include "board-card-button.h"
-#include "cardlist-widget.h"
 
 #define CSS_FORMAT \
     "#board-root {transition-property: background-image, background-color;}"
@@ -22,12 +21,15 @@
 
 namespace ui {
 
+class ProgressWindow;
+class CardlistWidget;
+
 /**
  * @brief Widget that holds a list of CardLists
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
-    BoardWidget();
+    BoardWidget(ProgressWindow& app_window);
 
     ~BoardWidget() override;
 
@@ -35,6 +37,8 @@ public:
      * @brief Sets and updates the board widget.
      *
      * @param board pointer to a board object.
+     * @param board_card_button pointer to a BoardCardButton object that have
+     * opened this board
      *
      * @details Essentially, what this method does is cleaning the previous
      *          settings existent within the widget, if there is one, and
@@ -46,14 +50,16 @@ public:
     /**
      * @brief Cleans the BoardWidget to an empty state, that is, there will be
      *        no pointer to a board object and also the information on
-     *        background and cardlists is also deleted.
+     *        background and cardlist objects are also deleted.
      */
     void clear();
 
     /**
      * @brief Saves the contents edited in the Board class.
+     *
+     * @param free indicates whether to free allocated memory by Board
      */
-    bool save();
+    bool save(bool free = true);
 
     /**
      * @brief Adds a new CardlistWidget widget based on a given smart pointer
@@ -70,15 +76,52 @@ public:
      */
     bool remove_cardlist(ui::CardlistWidget& cardlist);
 
-    ui::BoardCardButton* board_card_button;
+    /**
+     * @brief Sets the Board background
+     *
+     * @param background string referring to a background, either of
+     * "colour" or "file" or even "invalid"
+     */
+    bool set_background(std::string background);
 
-    bool set_background();
+    /**
+     * @brief Retrieves the background string
+     */
+    std::string get_background();
+
+    /**
+     * @brief Updates board's name, reflecting those changes to the application
+     * window
+     *
+     * @param board_name new name for the board
+     */
+    void set_board_name(std::string board_name);
+
+    /**
+     * @brief Retrieves the board's name
+     */
+    std::string get_board_name();
+
+    /**
+     * @brief Sets a new filepath from where the current board object will be
+     * loaded from
+     *
+     * @param board_filepath path to a board file
+     */
+    void set_filepath(std::string board_filepath);
+
+    /**
+     * @brief Retrieves the current board file path
+     */
+    std::string get_filepath();
 
 private:
     Gtk::Box root;
     Gtk::Button add_button;
     Board* board;
+    BoardCardButton* board_card_button;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
+    ProgressWindow& app_window;
 };
 }  // namespace ui

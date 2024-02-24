@@ -8,6 +8,7 @@
 #include "../core/cardlist.h"
 #include "card.h"
 #include "editable-label-header.h"
+#include "board-widget.h"
 
 namespace ui {
 

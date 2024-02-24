@@ -3,12 +3,15 @@
 #include <gtkmm.h>
 
 #include "../core/board.h"
-#include "board-widget.h"
-#include "create_board_dialog.h"
-#include "preferences-board-dialog.h"
 #include "board-card-button.h"
+#include "board-widget.h"
 
 namespace ui {
+
+class BoardWidget;
+class CreateBoardDialog;
+class PreferencesBoardDialog;
+
 /**
  * Progress app about dialog.
  */
@@ -22,20 +25,17 @@ class ProgressWindow;
 
 /**
  * @brief Bar widget that asks user confirmation to delete selected boards.
-*/
+ */
 class DeleteBoardsBar : public Gtk::Revealer {
 public:
-    DeleteBoardsBar(Gtk::FlowBox* boards_grid, ui::ProgressWindow& app_window);
+    DeleteBoardsBar(ui::ProgressWindow& app_window);
 
 private:
     Gtk::Box root;
     Gtk::Label bar_text;
     Gtk::Button bar_button_delete, bar_button_cancel;
 
-    Gtk::FlowBox* boards_grid;
     ui::ProgressWindow& app_window;
-
-    void on_delete_boards();
 };
 
 /**
@@ -43,11 +43,47 @@ private:
  */
 class ProgressWindow : public Gtk::Window {
 public:
-    ProgressWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder);
+    ProgressWindow(BaseObjectType* cobject,
+                   const Glib::RefPtr<Gtk::Builder>& builder);
     ~ProgressWindow() override;
 
     void add_board(std::string board_filepath);
-    void off_delete_board();
+
+    /**
+     * @brief Shows application information
+     */
+    void show_about_dialog();
+
+    /**
+     * @brief Presents dialog for creating boards
+     */
+    void show_create_board_dialog();
+
+    /**
+     * @brief Enters deletion mode, where the user will select all boards to
+     * be deleted
+     */
+    void on_delete_board_mode();
+
+    /**
+     * @brief Exits deletion mode
+     */
+    void off_delete_board_mode();
+
+    /**
+     * @brief Changes the application view to the board grid view
+     */
+    void on_main_menu();
+
+    /**
+     * @brief Changes the application view to board view
+     */
+    void on_board_view();
+
+    /**
+     * @brief Deletes all selected boards if window is in delete mode.
+     */
+    void delete_selected_boards();
 
 private:
     const Glib::RefPtr<Gtk::Builder> window_builder;
@@ -61,9 +97,5 @@ private:
     ui::BoardWidget board_widget;
 
     void setup_menu_button();
-    void show_about();
-    void show_create_board();
-    void go_to_main_menu();
-    void on_delete_board();
 };
 }  // namespace ui

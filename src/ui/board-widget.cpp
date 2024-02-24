@@ -1,21 +1,24 @@
 #include "board-widget.h"
 
-#include "i18n.h"
-
 #include <format>
 #include <iostream>
+#include "window.h"
+#include "cardlist-widget.h"
+
+#include "i18n.h"
 
 /**
  * TODO: High memory is allocated in setting background, mainly when the
  * background image is high. Should I try to compress it?
  */
-ui::BoardWidget::BoardWidget()
+ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
       cardlist_vector{},
       board{nullptr},
-      board_card_button{nullptr} {
+      board_card_button{nullptr},
+      app_window{app_window} {
     set_child(root);
     set_name("board-root");
 
@@ -50,7 +53,7 @@ void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
     for (auto& cardlist : board->get_cardlists()) {
         add_cardlist(cardlist);
     }
-    set_background();
+    set_background(board->get_background());
 }
 
 void ui::BoardWidget::clear() {
@@ -62,14 +65,16 @@ void ui::BoardWidget::clear() {
     cardlist_vector.clear();
 }
 
-bool ui::BoardWidget::save() {
+bool ui::BoardWidget::save(bool free) {
     bool success;
     if (board->is_modified()) {
         success = board->save_as_xml();
     }
     board_card_button->update(board);
-    delete board;
-    board = nullptr;
+    if (free) {
+        delete board;
+        board = nullptr;
+    }
     return success;
 }
 
@@ -156,27 +161,70 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
     root.reorder_child_after(add_button, *new_cardlist);
 }
 
-bool ui::BoardWidget::set_background() {
-    if (!board) return false;
-
-    if (board->get_background_type() == "colour") {
-        css_provider_refptr->load_from_data(
-            std::format(CSS_FORMAT_RGB, board->get_background()));
-        std::cout << "Colour background set" << std::endl;
-        return true;
-    } else if (board->get_background_type() == "file") {
-        css_provider_refptr->load_from_data(
-            std::format(CSS_FORMAT_FILE, board->get_background()));
-        std::cout << "File background set" << std::endl;
-        return true;
-    }
-
-    return false;
-}
-
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
     board->remove_cardlist(*(cardlist.get_cardlist_refptr()));
     return true;
+}
+
+bool ui::BoardWidget::set_background(std::string background) {
+    // We don't check for nullptr in this method because it is only called if
+    // board is already valid
+    if (!board->set_background(background)) {
+        return false;
+    }
+
+    std::string bg_type = Board::get_background_type(background);
+    if (bg_type == "colour") {
+        css_provider_refptr->load_from_data(
+            std::format(CSS_FORMAT_RGB, background));
+        std::cout << "Colour background set" << std::endl;
+    } else if (bg_type == "file") {
+        css_provider_refptr->load_from_data(
+            std::format(CSS_FORMAT_FILE, background));
+        std::cout << "File background set" << std::endl;
+    }
+
+    return true;
+}
+
+std::string ui::BoardWidget::get_background() {
+    if (!board) {
+        return "";
+    }
+    return board->get_background();
+}
+
+void ui::BoardWidget::set_board_name(std::string board_name) {
+    if (!board) {
+        return;
+    }
+
+    app_window.set_title(board_name);
+    board->set_name(board_name);
+}
+
+std::string ui::BoardWidget::get_board_name() {
+    if (!board) {
+        return "";
+    }
+
+    return board->get_name();
+}
+
+void ui::BoardWidget::set_filepath(std::string board_filepath) {
+    if (!board) {
+        return;
+    }
+
+    board->set_filepath(board_filepath);
+}
+
+std::string ui::BoardWidget::get_filepath() {
+    if (!board) {
+        return "";
+    }
+
+    return board->get_filepath();
 }

@@ -4,13 +4,13 @@
 
 #include "application.h"
 #include "i18n.h"
-#include "window.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
-    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder)
-    : BoardDialog{cobject, ref_builder} {
-    
+    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder,
+    ProgressWindow& app_window)
+    : BoardDialog{cobject, ref_builder},
+      app_window{app_window} {
     set_title(_("Create Board"));
     p_left_button->add_css_class("destructive-action");
     p_right_button->add_css_class("suggested-action");
@@ -48,7 +48,7 @@ void CreateBoardDialog::create_board() {
         message_dialog->show(*this);
     } else {
         board.save_as_xml();
-        ((ui::ProgressWindow*)get_transient_for())->add_board(new_file_path);
+        app_window.add_board(new_file_path);
         close_window();
     }
 }

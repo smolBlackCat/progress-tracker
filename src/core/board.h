@@ -116,8 +116,6 @@ public:
      */
     bool save_as_xml();
 
-    std::string get_background_type() const;
-
     const std::string get_filepath() const;
 
     /**
@@ -139,6 +137,8 @@ public:
      * lowercase the given base and give an id if needed.
     */
     static const std::string new_filename(std::string base);
+
+    static std::string get_background_type(std::string background);
 
 private:
     std::string background, file_path;

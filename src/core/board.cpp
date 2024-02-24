@@ -5,9 +5,9 @@
 #include <cstdlib>
 #include <filesystem>
 #include <format>
+#include <random>
 #include <regex>
 #include <stdexcept>
-#include <random>
 #include <string>
 
 Board::Board() : Item{""} {}
@@ -193,23 +193,7 @@ bool Board::save_as_xml() {
     return result == tinyxml2::XML_SUCCESS;
 }
 
-std::string Board::get_background_type() const {
-    std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
-    std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
-
-    if (std::regex_match(background, rgba1_r) ||
-        std::regex_match(background, rgba1_r)) {
-        return "colour";
-    } else if (std::filesystem::exists(background)) {
-        return "file";
-    }
-
-    return "invalid";
-}
-
-const std::string Board::get_filepath() const {
-    return file_path;
-}
+const std::string Board::get_filepath() const { return file_path; }
 
 std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
     return cardlist_vector;
@@ -225,7 +209,7 @@ bool Board::is_background(std::string& background) const {
 }
 
 bool Board::cardlists_modified() {
-    for (auto& cardlist: cardlist_vector) {
+    for (auto& cardlist : cardlist_vector) {
         if (cardlist->is_modified()) {
             return true;
         }
@@ -233,16 +217,12 @@ bool Board::cardlists_modified() {
     return false;
 }
 
-bool Board::is_modified() {
-    return modified || cardlists_modified();
-}
+bool Board::is_modified() { return modified || cardlists_modified(); }
 
 std::string format_basename(std::string basename) {
     std::transform(basename.begin(), basename.end(), basename.begin(),
-        [](unsigned char c) {
-            return std::tolower(c);
-        });
-    for (auto& c: basename) {
+                   [](unsigned char c) { return std::tolower(c); });
+    for (auto& c : basename) {
         if (c == ' ') {
             c = '-';
         }
@@ -253,24 +233,40 @@ std::string format_basename(std::string basename) {
 // TODO: Board class deserves a BoardManager class
 const std::string Board::new_filename(std::string base) {
     std::string boards_dir =
-        std::string{std::getenv("HOME")}+"/.config/progress/boards/";
+        std::string{std::getenv("HOME")} + "/.config/progress/boards/";
     std::string filename = "";
     if (std::filesystem::exists(boards_dir)) {
         std::string basename = format_basename(base);
-        filename = boards_dir+basename+".xml";
+        filename = boards_dir + basename + ".xml";
         if (std::filesystem::exists(filename)) {
             std::random_device r;
             std::default_random_engine e1(r());
             std::uniform_int_distribution<int> uniform_dist(1, 1000);
             int unique_id = uniform_dist(e1);
-            filename = boards_dir+basename+std::to_string(unique_id)+".xml";
+            filename =
+                boards_dir + basename + std::to_string(unique_id) + ".xml";
             while (std::filesystem::exists(filename)) {
                 unique_id = uniform_dist(e1);
-                filename = boards_dir+basename+std::to_string(unique_id)+".xml";
+                filename =
+                    boards_dir + basename + std::to_string(unique_id) + ".xml";
             }
         }
     }
     return filename;
+}
+
+std::string Board::get_background_type(std::string background) {
+    std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
+    std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
+
+    if (std::regex_match(background, rgba1_r) ||
+        std::regex_match(background, rgba1_r)) {
+        return "colour";
+    } else if (std::filesystem::exists(background)) {
+        return "file";
+    }
+
+    return "invalid";
 }
 
 tinyxml2::XMLDocument* Board::xml_doc() {

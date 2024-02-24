@@ -30,6 +30,10 @@ BoardDialog::BoardDialog(BaseObjectType* cobject,
         sigc::mem_fun(*this, &BoardDialog::on_bg_button_click));
 }
 
+void BoardDialog::open_window() {
+    set_visible();
+}
+
 void BoardDialog::close_window() {
     set_visible(false);
 
