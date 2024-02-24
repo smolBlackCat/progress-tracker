@@ -1,5 +1,4 @@
 add_library(ui window.cpp
-               window-controller.cpp
                application.cpp
                board-dialog.cpp
                create_board_dialog.cpp

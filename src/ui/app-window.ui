@@ -13,7 +13,7 @@
                 </child>
                 <child type="start">
                     <object class="GtkButton" id="add-board-button">
-                        <property name="icon-name">gtk-add</property>
+                        <property name="icon-name">list-add-symbolic</property>
                         <property name="visible">true</property>
                     </object>
                 </child>
