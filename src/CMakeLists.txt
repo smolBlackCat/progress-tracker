@@ -25,8 +25,6 @@ target_include_directories(progress-tracker PRIVATE ${INTL_INCLUDE_DIR})
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
 target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR}/src ${APP_INCLUDES})
 
-target_compile_options(progress-tracker PRIVATE -g)
-
 # Resources Settings
 set(GLIB_FLAGS --target=resources.cpp)
 set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)

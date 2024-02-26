@@ -10,8 +10,6 @@ add_library(ui window.cpp
                editable-label-header.cpp
                i18n.h)
 
-target_compile_options(ui PRIVATE -g)
-
 # Link GTKMM libraries
 target_link_libraries(ui PRIVATE ${GTKMM_LIBRARIES})
 target_include_directories(ui PRIVATE ${GTKMM_INCLUDE_DIRS})
