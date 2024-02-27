@@ -10,22 +10,20 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 
 find_package(Intl REQUIRED)
-find_package(Catch2 3 REQUIRED)
+find_package(Catch2 3)
 
 # Tiny XML setup
 find_library(TINYXML2_LIB libtinyxml2 tinyxml2 REQUIRED)
 
-set(TESTS_ENABLED true)
-if (TESTS_ENABLED)
-    enable_testing()
-endif()
-
 add_subdirectory(src)
 add_subdirectory(po)
 add_subdirectory(data)
-add_subdirectory(test)
 
-add_test(NAME CoreTest COMMAND test/core_test)
+if(${Catch2_FOUND})
+    add_subdirectory(test)
+    include(CTest)
+    add_test(NAME CoreTest COMMAND test/core_test)
+endif()
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gabriel de Moura")
