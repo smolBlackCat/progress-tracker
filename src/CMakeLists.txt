@@ -28,17 +28,17 @@ target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR}/src ${
 # Resources Settings
 set(GLIB_FLAGS --target=resources.cpp)
 set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
-set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/ui)
+set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/resources/ui)
 
-list(APPEND RESOURCES ui/com.moura.Progress.svg
-                      ui/app-window.ui
-                      ui/create-board-dialog.ui
-                      ui/stylesheet.css)
+list(APPEND RESOURCES resources/ui/com.moura.Progress.svg
+                      resources/ui/app-window.ui
+                      resources/ui/create-board-dialog.ui
+                      resources/ui/stylesheet.css)
 
 add_custom_command(
     OUTPUT resources.cpp
-    COMMAND glib-compile-resources ${CMAKE_CURRENT_SOURCE_DIR}/ui/resources.xml ${GLIB_FLAGS}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ui/resources.xml
+    COMMAND glib-compile-resources ${CMAKE_CURRENT_SOURCE_DIR}/resources.xml ${GLIB_FLAGS}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources.xml
     ${RESOURCES}
 )
 add_custom_target(generate_resources DEPENDS resources.cpp)
