@@ -70,7 +70,9 @@ void CardList::reorder_card(std::shared_ptr<Card> next,
     std::shared_ptr<Card> temp_v = card_vector[next_i];
     card_vector.erase(next_it);
 
-    sibling_i -= 1;
+    if (next_i < sibling_i) {
+        sibling_i -= 1;
+    }
 
     if (sibling_i == card_vector.size() - 1) {
         card_vector.push_back(temp_v);

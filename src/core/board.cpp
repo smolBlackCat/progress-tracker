@@ -175,7 +175,10 @@ void Board::reorder_cardlist(std::shared_ptr<CardList> next,
     std::shared_ptr<CardList> temp_v = cardlist_vector[next_i];
     cardlist_vector.erase(next_it);
 
-    sibling_i -= 1;
+    // Support for right to left drags and drops
+    if (next_i < sibling_i) {
+        sibling_i -= 1;
+    }
 
     if (sibling_i == cardlist_vector.size() - 1) {
         cardlist_vector.push_back(temp_v);
