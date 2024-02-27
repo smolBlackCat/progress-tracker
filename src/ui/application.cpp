@@ -4,17 +4,21 @@
 #include <filesystem>
 #include <iostream>
 
+#include <app_info.h>
+
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
 
 ui::Application::Application()
-    : Gtk::Application{"com.moura.Progress"} {}
+    : Gtk::Application{BUILD_TYPE != "Release" ? "com.moura.ProgressDebug"
+                                               : "com.moura.Progress"} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
 
-    auto window_builder = Gtk::Builder::create_from_resource("/ui/app-window.ui");
+    auto window_builder =
+        Gtk::Builder::create_from_resource("/ui/app-window.ui");
     main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
         window_builder, "app-window");
     if (!main_window) {

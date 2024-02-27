@@ -20,3 +20,4 @@ target_link_libraries(ui PRIVATE ${TINYXML2_LIB})
 
 target_link_libraries(ui PRIVATE ${INTL_LIBRARIES})
 target_include_directories(ui PRIVATE ${INTL_INCLUDE_DIR})
+target_include_directories(ui PRIVATE ${PROJECT_BINARY_DIR}/src)
