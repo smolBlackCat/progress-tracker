@@ -97,5 +97,6 @@ private:
     ui::BoardWidget board_widget;
 
     void setup_menu_button();
+    bool on_window_close();
 };
 }  // namespace ui

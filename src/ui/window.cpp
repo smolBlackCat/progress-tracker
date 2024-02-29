@@ -65,6 +65,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       about_dialog{*this},
       board_widget{*this},
       delete_boards_bar{*this} {
+    signal_close_request().connect(
+        sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
     auto cbd_builder =
         Gtk::Builder::create_from_resource("/ui/create-board-dialog.ui");
     auto cbd_builder1 =
@@ -206,5 +208,14 @@ void ProgressWindow::setup_menu_button() {
 
     window_builder->get_widget<Gtk::MenuButton>("app-menu-button")
         ->insert_action_group("win", action_group);
+}
+
+bool ProgressWindow::on_window_close() {
+    auto app_stack = window_builder->get_widget<Gtk::Stack>("app-stack");
+    if (app_stack->get_visible_child_name() == "board-page") {
+        board_widget.save();
+    }
+    set_visible(false);
+    return true;
 }
 }  // namespace ui
