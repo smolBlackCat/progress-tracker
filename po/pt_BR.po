@@ -152,3 +152,6 @@ msgstr "Cor sólida"
 
 msgid "Background"
 msgstr "Papel de Parede"
+
+msgid "It was not possible to load this board"
+msgstr "Não foi possível carregar este quadro"

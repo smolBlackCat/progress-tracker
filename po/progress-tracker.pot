@@ -150,3 +150,6 @@ msgstr ""
 
 msgid "Background"
 msgstr ""
+
+msgid "It was not possible to load this board"
+msgstr ""

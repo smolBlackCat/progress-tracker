@@ -8,6 +8,7 @@
 #include "create_board_dialog.h"
 #include "i18n.h"
 #include "preferences-board-dialog.h"
+#include "../core/exceptions.h"
 
 namespace ui {
 
@@ -122,7 +123,19 @@ void ProgressWindow::add_board(std::string board_filepath) {
     new_board_card->signal_clicked().connect(
         [this, new_board_card, fb_child_p]() {
             if (!this->on_delete_mode) {
-                Board* board = new Board{new_board_card->get_filepath()};
+                Board* board;
+                try {
+                    board = new Board{new_board_card->get_filepath()};
+                } catch (std::invalid_argument& err) {
+                    // This catches both board_parse_errors and general
+                    // invalid_argument exceptions
+                    Gtk::AlertDialog::create(
+                        _("It was not possible to load this board"))->show(*this);
+
+                    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
+                        ->remove(*new_board_card);
+                    return;
+                }
                 on_board_view();
                 board_widget.set(board, new_board_card);
                 set_title(board->get_name());

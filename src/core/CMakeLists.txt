@@ -1,1 +1,1 @@
-add_library(core item.cpp card.cpp cardlist.cpp board.cpp)
+add_library(core item.cpp card.cpp cardlist.cpp board.cpp exceptions.cpp)

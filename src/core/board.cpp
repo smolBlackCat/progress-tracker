@@ -7,15 +7,17 @@
 #include <format>
 #include <random>
 #include <regex>
-#include <stdexcept>
 #include <string>
+
+#include "exceptions.h"
 
 Board::Board() : Item{""} {}
 
 Board::Board(std::string name, std::string background)
     : Item{name}, background{}, cardlist_vector{}, file_path{} {
     if (!is_background(background)) {
-        throw std::domain_error{"given background is not of background type."};
+        throw std::invalid_argument{
+            "given background is not of background type."};
     }
 
     this->background = background;
@@ -27,14 +29,14 @@ Board::Board(std::string board_file_path)
       cardlist_vector{},
       file_path{board_file_path} {
     if (!std::filesystem::exists(file_path))
-        throw std::domain_error{
+        throw std::invalid_argument{
             std::format("filename {} does not exist.", file_path)};
 
     tinyxml2::XMLDocument doc;
 
     auto error_code = doc.LoadFile(file_path.c_str());
     if (error_code != 0) {
-        throw std::domain_error{std::format(
+        throw std::invalid_argument{std::format(
             "It was not possible to load the file on {}", file_path)};
     }
 
@@ -43,7 +45,7 @@ Board::Board(std::string board_file_path)
     const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
 
     if (!board_element) {
-        throw std::domain_error{
+        throw board_parse_error{
             std::format("{} is not a progress xml file.", file_path)};
     }
 
@@ -51,7 +53,7 @@ Board::Board(std::string board_file_path)
     auto board_element_background = board_element->FindAttribute("background");
 
     if (!(board_element_name && board_element_background)) {
-        throw std::domain_error{
+        throw board_parse_error{
             std::format("{} is not a progress xml file.", file_path)};
     }
 
@@ -59,7 +61,7 @@ Board::Board(std::string board_file_path)
     background = board_element_background->Value();
 
     if (name.empty() || !is_background(background)) {
-        throw std::domain_error{std::format(
+        throw board_parse_error{std::format(
             "{} is not a well formed progress xml file.", file_path)};
     }
 
@@ -69,7 +71,7 @@ Board::Board(std::string board_file_path)
     while (list_element) {
         auto cur_cardlist_name = list_element->Attribute("name");
         if (!cur_cardlist_name) {
-            throw std::domain_error{
+            throw board_parse_error{
                 std::format("{} is not a valid progress xml file.", file_path)};
         }
 
@@ -81,7 +83,7 @@ Board::Board(std::string board_file_path)
             auto cur_card_name = card_element->Attribute("name");
 
             if (!cur_card_name) {
-                throw std::domain_error{std::format(
+                throw board_parse_error{std::format(
                     "{} is not a valid progress xml file.", file_path)};
             }
             Card cur_card{cur_card_name};
