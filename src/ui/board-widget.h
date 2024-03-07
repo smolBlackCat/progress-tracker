@@ -3,6 +3,7 @@
 #include <gtkmm.h>
 
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "../core/board.h"
@@ -115,6 +116,8 @@ public:
      */
     std::string get_filepath();
 
+    bool on_drag;
+
 private:
     Gtk::Box root;
     Gtk::Button add_button;
@@ -123,5 +126,13 @@ private:
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
     ProgressWindow& app_window;
+    double x, y;
+
+    /**
+     * @brief Sets up automatic scrolling for every time the users drags either
+     * cards or cardlists across the screen the BoardWidget will scroll as
+     * needed.
+     */
+    void setup_auto_scrolling();
 };
 }  // namespace ui

@@ -1,11 +1,14 @@
 #include "board-widget.h"
 
+#include <chrono>
 #include <format>
 #include <iostream>
-#include "window.h"
-#include "cardlist-widget.h"
 
+#include "cardlist-widget.h"
 #include "i18n.h"
+#include "window.h"
+
+using namespace std::chrono_literals;
 
 /**
  * TODO: High memory is allocated in setting background, mainly when the
@@ -21,6 +24,9 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       app_window{app_window} {
     set_child(root);
     set_name("board-root");
+
+    // Auto scrolling setting
+    setup_auto_scrolling();
 
     root.set_spacing(25);
     root.set_margin(10);
@@ -40,7 +46,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     root.append(add_button);
 }
 
-ui::BoardWidget::~BoardWidget() {}
+ui::BoardWidget::~BoardWidget() { }
 
 void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
     if (!(board || board_card_button)) return;
@@ -97,14 +103,16 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
         },
         false);
     drag_source_c->signal_drag_begin().connect(
-        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
+        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
             new_cardlist->set_opacity(0.5);
+            on_drag = true;
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
-        [new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag,
-                       Gdk::DragCancelReason reason) {
+        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag,
+                             Gdk::DragCancelReason reason) {
             new_cardlist->set_opacity(1);
+            on_drag = false;
             return true;
         },
         false);
@@ -227,4 +235,33 @@ std::string ui::BoardWidget::get_filepath() {
     }
 
     return board->get_filepath();
+}
+
+void ui::BoardWidget::setup_auto_scrolling() {
+    auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
+    drop_controller_motion_c->signal_motion().connect(
+        [this](double x, double y) {
+            this->x = x;
+            this->y = y;
+        }
+    );
+    this->add_controller(drop_controller_motion_c);
+
+    Glib::signal_timeout().connect([this]() {
+        double cur_max_width = this->get_width();
+        auto hadjustment = this->get_hadjustment();
+        double lower = hadjustment->get_lower();
+        double upper = hadjustment->get_upper();
+
+        if (on_drag) {
+            if (x >= (cur_max_width * 0.8)) {
+                double new_value = hadjustment->get_value() + 3;
+                hadjustment->set_value(new_value >= upper ? upper : new_value);
+            } else if (x <= (cur_max_width * 0.2)) {
+                double new_value = hadjustment->get_value() - 3;
+                hadjustment->set_value(new_value <= lower ? lower : new_value);
+            }
+        }
+        return true;
+    }, 10);
 }

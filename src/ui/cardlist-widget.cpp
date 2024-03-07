@@ -34,8 +34,9 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     set_size_request(CARDLIST_SIZE, CARDLIST_SIZE * 2);
     set_selection_mode(Gtk::SelectionMode::NONE);
 
-    cardlist_header.add_option(
-        "remove", _("Remove"), [this]() { this->board.remove_cardlist(*this); });
+    cardlist_header.add_option("remove", _("Remove"), [this]() {
+        this->board.remove_cardlist(*this);
+    });
 
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_halign(Gtk::Align::START);
@@ -85,6 +86,15 @@ void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
             return Gdk::ContentProvider::create(value_new_cardptr);
         },
         false);
+    drag_source_c->signal_drag_begin().connect([this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
+        this->board.on_drag = true;
+    }, false);
+    drag_source_c->signal_drag_cancel().connect(
+        [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
+               Gdk::DragCancelReason reason) {
+                this->board.on_drag = false;
+                return true;
+        }, false);
     card->add_controller(drag_source_c);
 
     // DropTarget Settings
