@@ -102,6 +102,7 @@ void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this, card](const Glib::ValueBase& value, double x, double y) {
+            this->board.on_drag = false;
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;

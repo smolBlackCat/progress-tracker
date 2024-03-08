@@ -123,6 +123,7 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
         Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_cardlist->signal_drop().connect(
         [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
+            on_drag = false;
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardlistWidget*>::value_type())) {
                 Glib::Value<ui::CardlistWidget*> dropped_value;
@@ -143,7 +144,8 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
     auto drop_target_card = Gtk::DropTarget::create(
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_card->signal_drop().connect(
-        [new_cardlist](const Glib::ValueBase& value, double x, double y) {
+        [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
+            on_drag = false;
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;

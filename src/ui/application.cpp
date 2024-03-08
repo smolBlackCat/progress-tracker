@@ -1,18 +1,20 @@
 #include "application.h"
 
+#include <app_info.h>
+
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
-
-#include <app_info.h>
 
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
 
 ui::Application::Application()
-    : Gtk::Application{BUILD_TYPE != "Release" ? "com.moura.ProgressDebug"
-                                               : "com.moura.Progress"} {}
+    : Gtk::Application{std::strcmp(BUILD_TYPE, "Release") != 0
+                           ? "com.moura.ProgressDebug"
+                           : "com.moura.Progress"} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();

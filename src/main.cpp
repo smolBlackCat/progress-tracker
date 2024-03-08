@@ -12,9 +12,9 @@
  */
 int main(int argc, char *argv[]) {
     std::setlocale(LC_ALL, "");
-    std::string locale_dir = BUILD_TYPE == "Release"
-                       ? "/usr/share/locale"
-                       : (std::string{getenv("PWD")} + "/locales");
+    std::string locale_dir = std::strcmp(BUILD_TYPE, "Release") != 0
+                                 ? "/usr/share/locale"
+                                 : (std::string{getenv("PWD")} + "/locales");
     bindtextdomain("progress-tracker", locale_dir.c_str());
     textdomain("progress-tracker");
 
