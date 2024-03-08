@@ -21,7 +21,8 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       cardlist_vector{},
       board{nullptr},
       board_card_button{nullptr},
-      app_window{app_window} {
+      app_window{app_window},
+      on_drag{false} {
     set_child(root);
     set_name("board-root");
 
