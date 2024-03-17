@@ -8,8 +8,8 @@
 #include "ui/application.h"
 
 std::string get_locale_dir() {
-    if (strcmp(BUILD_TYPE, "Release") != 0) {
-        return strcmp(FLATPAK, "True") == 0? "/app/share/locales/":"/usr/share/locales";
+    if (strcmp(BUILD_TYPE, "Release") == 0) {
+        return strcmp(FLATPAK, "True") == 0? "/app/share/locale/":"/usr/share/locale/";
     } else {
         return std::string{getenv("PWD")} + "/locales/";
     }
@@ -20,7 +20,9 @@ std::string get_locale_dir() {
  */
 int main(int argc, char *argv[]) {
     std::setlocale(LC_ALL, "");
-    bindtextdomain("progress-tracker", get_locale_dir().c_str());
+    std::string locale_dir = get_locale_dir();
+    std::cout << locale_dir << std::endl;
+    bindtextdomain("progress-tracker", locale_dir.c_str());
     textdomain("progress-tracker");
 
     std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION
