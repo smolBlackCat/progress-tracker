@@ -1,6 +1,6 @@
 # Progress Tracker
 
-![Application's Window](docs/main-view.png)
+![Application's Window](docs/progress-app.png)
 
 Progress is a TODO app that uses the kanban-style to organise tasks. The uses
 varies from keeping track of a project's progress to organising personal tasks. It allows the user to edit the board using an idiomatic drag-and-drop system, and also
@@ -21,7 +21,7 @@ customise boards according to the user preference.
 1. Install the dependencies needed to build the project
 
 ```sh
-# catch2 is totally optional. Install it if you're going to run tests
+# catch2 is totally optional. Install it only if you're going to run tests
 sudo apt install libgtkmm-4.0-dev libtinyxml2-dev gettext catch2
 ```
 
@@ -51,8 +51,3 @@ After installing, simply issue the command `progress-tracker`, or you can also
 start it from the applications menu of your desktop environment.
 
 ![Progress Icon](docs/progress-in-appmenu.png)
-
-## TODO
-
-* Distribute installable packages
-* Work on Windows build
