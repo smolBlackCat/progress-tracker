@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.moura.Progress</id>
+  <name>Progress</name>
+  <summary>Kanban-style productivity app for organising tasks</summary>
+  <developer id="com.moura">
+    <name>Gabriel de Moura</name>
+  </developer>
+  <url type="homepage">https://github.com/smolBlackCat/progress-tracker</url>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+
+  <screenshots>
+    <screenshot>
+      <image>https://github.com/smolBlackCat/progress-tracker/tree/main/docs/progress-app.png</image>
+      <caption>Board grid</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/smolBlackCat/progress-tracker/tree/main/docs/progress-app2.png</image>
+      <caption>Board grid</caption>
+    </screenshot>
+  </screenshots>
+  
+  <description>
+    <p>
+      Progress is a simple application that organises your tasks on a board and
+      allows the user to put them into different card lists across the board.
+    </p>
+  </description>
+  <categories>
+    <category>ProjectManagement</category>
+    <category>Office</category>
+  </categories>
+
+  <releases>
+    <release date="2024-03-16" version="1.0">
+      <description>
+        <p>
+          First official release of Progress 1.0
+        </p>
+      </description>
+    </release>
+  </releases>
+
+  <launchable type="desktop-id">com.moura.Progress.desktop</launchable>
+</component>

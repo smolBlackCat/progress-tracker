@@ -36,3 +36,7 @@
 
 # Ignore build
 build/
+
+# Ignore flatpak folders
+.flatpak*/
+flatpak-build/

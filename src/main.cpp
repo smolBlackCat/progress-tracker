@@ -7,15 +7,20 @@
 
 #include "ui/application.h"
 
+std::string get_locale_dir() {
+    if (strcmp(BUILD_TYPE, "Release") != 0) {
+        return strcmp(FLATPAK, "True") == 0? "/app/share/locales/":"/usr/share/locales";
+    } else {
+        return std::string{getenv("PWD")} + "/locales/";
+    }
+}
+
 /**
  * Progress app main entry.
  */
 int main(int argc, char *argv[]) {
     std::setlocale(LC_ALL, "");
-    std::string locale_dir = std::strcmp(BUILD_TYPE, "Release") != 0
-                                 ? "/usr/share/locale"
-                                 : (std::string{getenv("PWD")} + "/locales");
-    bindtextdomain("progress-tracker", locale_dir.c_str());
+    bindtextdomain("progress-tracker", get_locale_dir().c_str());
     textdomain("progress-tracker");
 
     std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION

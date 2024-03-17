@@ -4,6 +4,5 @@ Name=Progress
 StartupWMClass=com.moura.Progress
 Comment="Kanban style todo app"
 Comment[pt_BR]="Aplicação de TODO no estilo kanban"
-Categories=Productivity;Work
 Exec=progress-tracker
-Icon=/usr/share/progress-tracker/com.moura.Progress.svg
+Icon=com.moura.Progress

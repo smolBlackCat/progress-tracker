@@ -36,6 +36,11 @@ foreach(PO_SOURCE PO_NAME IN ZIP_LISTS PO_SOURCES PO_NAMES)
 endforeach()
 
 foreach(PO_NAME IN LISTS PO_NAMES)
-    install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
-            DESTINATION /usr/share/locale/${PO_NAME}/LC_MESSAGES)
+    if (${FLATPAK})
+        install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
+                DESTINATION /app/share/locale/${PO_NAME}/LC_MESSAGES)
+    else()
+        install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
+                DESTINATION /usr/share/locale/${PO_NAME}/LC_MESSAGES)
+    endif()
 endforeach()

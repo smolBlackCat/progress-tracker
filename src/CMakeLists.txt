@@ -44,6 +44,12 @@ add_custom_command(
 add_custom_target(generate_resources DEPENDS resources.cpp)
 add_dependencies(progress-tracker generate_resources)
 
-install(TARGETS progress-tracker
-        RUNTIME
-        DESTINATION /usr/bin/)
+if (${FLATPAK})
+    install(TARGETS progress-tracker
+            RUNTIME
+            DESTINATION /app/bin/)
+else()
+    install(TARGETS progress-tracker
+            RUNTIME
+            DESTINATION /usr/bin/)
+endif()
