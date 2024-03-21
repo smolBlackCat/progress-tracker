@@ -11,6 +11,18 @@
             "config-opts": [
                 "-Dmaintainer-mode=false"
             ],
+            "cleanup": [
+		"*.a",
+		"*.la",
+		"/include",
+		"/lib/gdkmm-4.0",
+		"/lib/gtkmm-4.0",
+		"/lib/pkgconfig",
+		"/man",
+		"/share/aclocal",
+		"/share/man",
+		"/share/pkgconfig"
+    	     ],
             "sources": [
                 {
                     "type": "archive",
@@ -26,6 +38,12 @@
                         "-Dmaintainer-mode=false",
                         "-Dbuild-examples=false"
                     ],
+                    "cleanup": [
+		        "*.la",
+		        "/include/sigc++-3.0",
+		        "/lib/pkgconfig",
+		        "/lib/sigc++-3.0"
+            	    ],
                     "sources": [
                         {
                             "type": "archive",
@@ -41,6 +59,12 @@
                         "-Dmaintainer-mode=false",
                         "-Dbuild-examples=false"
                     ],
+                    "cleanup": [
+                	"*.la",
+                	"/include",
+                	"/lib/cairomm-1.16",
+                	"/lib/pkgconfig"
+            	    ],
                     "sources": [
                         {
                             "type": "archive",
@@ -55,6 +79,15 @@
                     "config-opts": [
                         "-Dbuild-examples=false"
                     ],
+                    "cleanup": [
+		        "*.la",
+		        "/include/glibmm-2.68",
+		        "/include/giomm-2.68",
+		        "/lib/glibmm-2.68",
+		        "/lib/giomm-2.68",
+		        "/lib/libglibmm_generate_extra_defs*",
+		        "/lib/pkgconfig"
+            	    ],
                     "sources": [
                         {
                             "type": "archive",
@@ -72,7 +105,13 @@
                             "url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.2.tar.xz",
                             "sha256": "1bc5ab4ea3280442580d68318226dab36ceedfc3288f9d83711cf7cfab50a9fb"
                         }
-                    ]
+                    ],
+                    "cleanup": [
+		        "*.la",
+		        "/include/pangomm-2.48",
+		        "/lib/pangomm-2.48",
+		        "/lib/pkgconfig"
+            	    ]
                 }
             ]
         },
@@ -83,7 +122,7 @@
                 {
                     "type": "git",
                     "url": "https://github.com/leethomason/tinyxml2.git",
-                    "branch": "v10.0.0"
+                    "tag": "10.0.0"
                 }
             ]
         },
@@ -97,8 +136,9 @@
             ],
             "sources": [
                 {
-                    "type": "dir",
-                    "path": "./"
+                    "type": "git",
+                    "url": "https://github.com/smolBlackCat/progress-tracker.git",
+                    "tag": "v1.0"
                 }
             ]
         }
