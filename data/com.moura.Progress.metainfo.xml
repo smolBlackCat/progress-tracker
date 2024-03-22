@@ -14,13 +14,13 @@
   <content_rating type="oars-1.1" />
 
   <screenshots>
-    <screenshot type="default">
+    <screenshot type="thumbnail" width="722" height="778">
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
-      <caption>Board grid</caption>
+      <caption>Board Grid</caption>
     </screenshot>
-    <screenshot>
+    <screenshot type="thumbnail" width="1285" height="887">
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app2.png</image>
-      <caption>Board grid</caption>
+      <caption>Board view</caption>
     </screenshot>
   </screenshots>
   
