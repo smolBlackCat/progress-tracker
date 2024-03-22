@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>com.moura.Progress</id>
   <name>Progress</name>
-  <summary>Kanban-style productivity app for organising tasks</summary>
+  <summary>Kanban-style task organiser</summary>
   <developer id="com.moura">
     <name>Gabriel de Moura</name>
   </developer>
@@ -13,11 +13,11 @@
 
   <screenshots>
     <screenshot>
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/docs/progress-app.png</image>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
       <caption>Board grid</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/docs/progress-app2.png</image>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app2.png</image>
       <caption>Board grid</caption>
     </screenshot>
   </screenshots>

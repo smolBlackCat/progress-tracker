@@ -69,7 +69,7 @@
                         {
                             "type": "archive",
                             "url": "https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz",
-                            "sha1": "c24339d5962e2bcbbea85b2fc66347e71fd3db8c"
+                            "sha512": "61dc639eabe8502e1262c53c92fe57c5647e5ab9931f86ed51e657df1b7d0e3e58c2571910a05236cc0dca8d52f1f693aed99a553430f14d0fb87be1832a6b62"
                         }
                     ]
                 },
@@ -128,7 +128,7 @@
         },
         {
             "name": "progress-tracker",
-            "buildsystem": "cmake",
+            "buildsystem": "cmake-ninja",
             "builddir": true,
             "config-opts": [
                 "-DFLATPAK=True",
@@ -145,8 +145,9 @@
     ],
     "finish-args": [
         "--filesystem=home",
-        "--socket=x11",
+        "--socket=fallback-x11",
         "--socket=wayland",
-        "--device=dri"
+        "--device=dri",
+        "--share=ipc"
     ]
 }
