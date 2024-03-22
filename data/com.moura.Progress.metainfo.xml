@@ -14,7 +14,7 @@
   <content_rating type="oars-1.1" />
 
   <screenshots>
-    <screenshot type="thumbnail" width="722" height="778">
+    <screenshot type="default">
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
       <caption>Board Grid</caption>
     </screenshot>
