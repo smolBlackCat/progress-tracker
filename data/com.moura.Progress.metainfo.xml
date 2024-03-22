@@ -12,7 +12,7 @@
   <project_license>MIT</project_license>
 
   <screenshots>
-    <screenshot>
+    <screenshot type="default">
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
       <caption>Board grid</caption>
     </screenshot>
