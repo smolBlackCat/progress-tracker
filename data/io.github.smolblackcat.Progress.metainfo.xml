@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.progresstracker.Progress</id>
+  <id>io.github.smolblackcat.Progress</id>
   <name>Progress</name>
   <summary>Kanban-style task organiser</summary>
-  <developer id="com.moura">
+  <developer id="io.github.smolblackcat">
     <name>Gabriel de Moura</name>
   </developer>
   <url type="homepage">https://github.com/smolBlackCat/progress-tracker</url>
@@ -23,7 +23,7 @@
       <caption>Board view</caption>
     </screenshot>
   </screenshots>
-  
+
   <description>
     <p>
       Progress is a simple application that organises your tasks on a board and
@@ -45,5 +45,5 @@
     </release>
   </releases>
 
-  <launchable type="desktop-id">io.github.progresstracker.Progress.desktop</launchable>
+  <launchable type="desktop-id">io.github.smolblackcat.Progress.desktop</launchable>
 </component>

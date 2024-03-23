@@ -1,6 +1,6 @@
-set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/io.github.progresstracker.Progress.svg)
-set(APP_DESKTOP_ENTRY ${CMAKE_CURRENT_SOURCE_DIR}/io.github.progresstracker.Progress.desktop)
-set(APP_METAINFO ${CMAKE_CURRENT_SOURCE_DIR}/io.github.progresstracker.Progress.metainfo.xml)
+set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/io.github.smolblackcat.Progress.svg)
+set(APP_DESKTOP_ENTRY ${CMAKE_CURRENT_SOURCE_DIR}/io.github.smolblackcat.Progress.desktop)
+set(APP_METAINFO ${CMAKE_CURRENT_SOURCE_DIR}/io.github.smolblackcat.Progress.metainfo.xml)
 
 if(${FLATPAK})
     install(FILES ${APP_DESKTOP_ENTRY}

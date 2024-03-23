@@ -1,5 +1,5 @@
 {
-    "id": "io.github.progress.Progress",
+    "id": "io.github.smolblackcat.Progress",
     "runtime": "org.gnome.Platform",
     "sdk": "org.gnome.Sdk",
     "runtime-version": "46",
@@ -143,9 +143,8 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/smolBlackCat/progress-tracker.git",
-                    "tag": "v1.0"
+                    "type": "dir",
+                    "path": "./"
                 }
             ]
         }

@@ -30,7 +30,7 @@ set(GLIB_FLAGS --target=resources.cpp)
 set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
 set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/resources/ui)
 
-list(APPEND RESOURCES resources/ui/io.github.progresstracker.Progress.svg
+list(APPEND RESOURCES resources/ui/io.github.smolblackcat.Progress.svg
                       resources/ui/app-window.ui
                       resources/ui/create-board-dialog.ui
                       resources/ui/stylesheet.css)
