@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.moura.Progress</id>
+  <id>io.github.progresstracker.Progress</id>
   <name>Progress</name>
   <summary>Kanban-style task organiser</summary>
   <developer id="com.moura">
@@ -45,5 +45,5 @@
     </release>
   </releases>
 
-  <launchable type="desktop-id">com.moura.Progress.desktop</launchable>
+  <launchable type="desktop-id">io.github.progresstracker.Progress.desktop</launchable>
 </component>
