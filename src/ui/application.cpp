@@ -27,8 +27,14 @@ void ui::Application::on_startup() {
         exit(1);
     }
 
-    std::string app_dir{std::getenv("HOME")};
-    app_dir += +"/.config/progress/boards";
+    std::string app_dir;
+    if (strcmp(FLATPAK, "True") == 0) {
+        app_dir = std::getenv("XDG_CONFIG_HOME");
+        app_dir += "/progress/boards";
+    } else {
+        app_dir = std::getenv("HOME");
+        app_dir += "/.config/progress/boards";
+    }
 
     if (!std::filesystem::exists(app_dir)) {
         if (!std::filesystem::create_directories(app_dir)) {
