@@ -1,6 +1,6 @@
 <gresources>
     <gresource prefix="ui">
-        <file>com.moura.Progress.svg</file>
+        <file>io.github.progresstracker.Progress.svg</file>
         <file>stylesheet.css</file>
         <file>create-board-dialog.ui</file>
         <file>app-window.ui</file>

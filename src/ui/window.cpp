@@ -12,10 +12,10 @@
 
 namespace ui {
 
-// TODO: Remove hardcoded text. Add support for other languages
 ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) {
     set_program_name("Progress");
-    set_logo(Gdk::Texture::create_from_resource("/ui/com.moura.Progress.svg"));
+    set_logo(Gdk::Texture::create_from_resource(
+        "/ui/io.github.progresstracker.Progress.svg"));
     set_version("1.0");
     set_comments(_("Simple app for storing kanban-style todo lists"));
     set_license_type(Gtk::License::MIT_X11);

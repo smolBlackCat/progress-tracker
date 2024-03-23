@@ -13,8 +13,8 @@ Glib::RefPtr<ui::Application> ui::Application::create() {
 
 ui::Application::Application()
     : Gtk::Application{std::strcmp(BUILD_TYPE, "Release") != 0
-                           ? "com.moura.ProgressDebug"
-                           : "com.moura.Progress"} {}
+                           ? "io.github.progresstracker.ProgressDebug"
+                           : "io.github.progresstracker.Progress"} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
