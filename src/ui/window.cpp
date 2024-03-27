@@ -40,6 +40,7 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
       app_window{app_window} {
     set_child(root);
     set_name("delete-board-infobar");
+    bar_text.set_name("delete-board-infobar-text");
     set_transition_type(Gtk::RevealerTransitionType::SLIDE_UP);
 
     bar_text.set_margin(4);
