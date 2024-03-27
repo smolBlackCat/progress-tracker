@@ -104,7 +104,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
     delete_boards_bar.set_margin_bottom(10);
-    builder->get_widget<Gtk::Box>("root-box")->append(delete_boards_bar);
+    builder->get_widget<Gtk::Overlay>("app-overlay")->add_overlay(delete_boards_bar);
     builder->get_widget<Gtk::Stack>("app-stack")
         ->add(board_widget, "board-page");
 }
