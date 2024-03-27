@@ -6,6 +6,7 @@
   <developer id="io.github.smolblackcat">
     <name>Gabriel de Moura</name>
   </developer>
+
   <url type="homepage">https://github.com/smolBlackCat/progress-tracker</url>
 
   <metadata_license>MIT</metadata_license>
@@ -18,7 +19,7 @@
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
       <caption>Board Grid</caption>
     </screenshot>
-    <screenshot type="thumbnail" width="1285" height="887">
+    <screenshot>
       <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app2.png</image>
       <caption>Board view</caption>
     </screenshot>
