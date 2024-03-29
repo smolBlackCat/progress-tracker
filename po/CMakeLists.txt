@@ -7,9 +7,11 @@ set(MO_FILENAME progress-tracker.mo)
 set(LOCALE_DIRECTORY ${PROJECT_BINARY_DIR}/locales)
 file(MAKE_DIRECTORY ${LOCALE_DIRECTORY})
 
-list(APPEND PO_NAMES pt_BR)
-list(APPEND PO_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/pt_BR.po)
+list(APPEND PO_NAMES pt_BR nl)
+
+foreach(PO_NAME IN LISTS PO_NAMES)
+	list(APPEND PO_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${PO_NAME}.po)
+endforeach()
 
 # Updates all the translation files whenever
 foreach(PO_SOURCE PO_NAME IN ZIP_LISTS PO_SOURCES PO_NAMES)
