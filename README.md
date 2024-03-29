@@ -1,19 +1,31 @@
+![Progress Icon](data/io.github.smolblackcat.Progress.svg)
+
 # Progress
 
-![Application's Window](pictures/progress-app-presentation.png)
-
 Progress is a TODO app that uses the kanban-style to organise tasks. The uses
-varies from keeping track of a project's progress to organising personal tasks. It allows the user to edit the board using an idiomatic drag-and-drop system, and also
-customise boards according to the user preference.
+varies from keeping track of a project's progress to organising personal tasks.
+It allows the user to edit the board using an idiomatic drag-and-drop system, and
+also customise boards according to the user preference.
 
 ## Installation
 
-The project offers some alternatives for installing and utilising Progress. The distribution used should not affect the normal usage of the application.
+The project offers some alternatives for installing and utilising Progress.
+The distribution used should not affect the normal usage of the application.
 
 Currently, the project is available in the distributions described below:
 
+* Flatpak Distribution
 * Debian package
 * Build from source
+
+### Flatpak
+
+Progress is now available to be downloaded as a flatpak app
+
+<a href="https://flathub.org/en-GB/apps/io.github.smolblackcat.Progress">
+<img src="https://flathub.org/assets/badges/flathub-badge-i-en.png" width="150px" height="50px" />
+</a>
+
 
 ### Debian-based distros
 
