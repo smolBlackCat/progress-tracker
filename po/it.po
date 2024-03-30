@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-10 16:59-0300\n"
-"PO-Revision-Date: 2024-03-29 20:17+0100\n"
+"PO-Revision-Date: 2024-03-30 13:17+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -60,7 +60,7 @@ msgstr "Aggiungi elenco"
 
 #: /home/moura/Projects/progress-tracker/src/ui/board-widget.cpp:31
 msgid "New CardList"
-msgstr ""
+msgstr "Nuovo elenco di schede"
 
 #: /home/moura/Projects/progress-tracker/src/ui/card.cpp:12
 #: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:38
@@ -69,11 +69,11 @@ msgstr "Rimuovi"
 
 #: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:24
 msgid "Add card"
-msgstr ""
+msgstr "Aggiungi scheda"
 
 #: /home/moura/Projects/progress-tracker/src/ui/cardlist-widget.cpp:140
 msgid "New Card"
-msgstr ""
+msgstr "Nuova scheda"
 
 #: /home/moura/Projects/progress-tracker/src/ui/editable-label-header.cpp:60
 msgid "Rename"
