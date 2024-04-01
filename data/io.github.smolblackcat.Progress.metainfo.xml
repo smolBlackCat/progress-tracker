@@ -12,15 +12,28 @@
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#889bc8</color>
+    <color type="primary" scheme_preference="dark">#161846</color>
+  </branding>
+
   <content_rating type="oars-1.1" />
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app.png</image>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-light1.png</image>
+      <caption>Board Grid</caption>
+    </screenshot>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-light2.png</image>
+      <caption>Board view</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-dark1.png</image>
       <caption>Board Grid</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-app2.png</image>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-dark2.png</image>
       <caption>Board view</caption>
     </screenshot>
   </screenshots>
