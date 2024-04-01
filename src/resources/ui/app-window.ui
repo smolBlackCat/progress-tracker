@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
     <requires lib="gtk" version="4.10"/>
-    <object class="GtkWindow" id="app-window">
+    <object class="GtkApplicationWindow" id="app-window">
         <property name="title">Progress</property>
         <property name="width-request">400</property>
         <property name="height-request">400</property>

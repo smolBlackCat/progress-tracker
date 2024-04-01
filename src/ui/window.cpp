@@ -62,7 +62,7 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
 
 ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                const Glib::RefPtr<Gtk::Builder>& builder)
-    : Gtk::Window{cobject},
+    : Gtk::ApplicationWindow{cobject},
       window_builder{builder},
       about_dialog{*this},
       board_widget{*this},

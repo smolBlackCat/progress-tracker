@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
+pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
 
 find_package(Intl REQUIRED)
 find_package(Catch2 3)

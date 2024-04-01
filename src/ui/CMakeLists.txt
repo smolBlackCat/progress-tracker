@@ -16,6 +16,11 @@ target_include_directories(ui PRIVATE ${GTKMM_INCLUDE_DIRS})
 target_link_directories(ui PRIVATE ${GTKMM_LIBRARY_DIRS})
 target_compile_options(ui PRIVATE ${GTKMM_CFLAGS_OTHER})
 
+target_link_libraries(ui PRIVATE ${ADWAITA_LIBRARIES})
+target_include_directories(ui PRIVATE ${ADWAITA_INCLUDE_DIRS})
+target_link_directories(ui PRIVATE ${ADWAITA_LIBRARY_DIRS})
+target_compile_options(ui PRIVATE ${ADWAITA_CFLAGS_OTHER})
+
 target_link_libraries(ui PRIVATE ${TINYXML2_LIB})
 
 target_link_libraries(ui PRIVATE ${INTL_LIBRARIES})
