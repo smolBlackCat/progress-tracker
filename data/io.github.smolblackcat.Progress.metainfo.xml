@@ -37,6 +37,19 @@
   </categories>
 
   <releases>
+    <release date="2024-04-01" version="1.1">
+      <description>
+        <p>Bug Fixes and Improvements</p>
+        <ul>
+          <li>Board grid UI enhance</li>
+          <li>Fix segmentation fault error when moving cards onto themselves</li>
+          <li>Progress is better integrated on GNOME systems</li>
+          <li>Add Dutch translation</li>
+          <li>Add Italian translation</li>
+          <li>Add Spanish translation</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-03-16" version="1.0">
       <description>
         <p>
