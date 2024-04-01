@@ -40,3 +40,4 @@ build/
 # Ignore flatpak folders
 .flatpak*/
 flatpak-build/
+repo/

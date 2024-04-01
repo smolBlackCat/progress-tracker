@@ -61,7 +61,7 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
                sigc::mem_fun(*this, &ui::EditableLabelHeader::to_editing_mode));
     menu_button.insert_action_group("label-header", actions);
     menu_button.set_menu_model(menu);
-    menu_button.set_icon_name("open-menu-symbolic");
+    menu_button.set_icon_name("view-more-horizontal-symbolic");
     menu_button.set_valign(Gtk::Align::START);
     menu_button.set_hexpand();
     menu_button.set_halign(Gtk::Align::END);

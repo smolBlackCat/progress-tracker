@@ -2,8 +2,12 @@ list.rich-list {
     border-radius: 20px;
 }
 
+#delete-board-infobar-text {
+  color: #ffffff;
+}
+
 #delete-board-infobar {
-    background-color: cadetblue;
+    background-color: #1a5fb4;
     border-radius: 5px;
 }
 

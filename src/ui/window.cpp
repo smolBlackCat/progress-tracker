@@ -40,6 +40,7 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
       app_window{app_window} {
     set_child(root);
     set_name("delete-board-infobar");
+    bar_text.set_name("delete-board-infobar-text");
     set_transition_type(Gtk::RevealerTransitionType::SLIDE_UP);
 
     bar_text.set_margin(4);
@@ -61,7 +62,7 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
 
 ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                const Glib::RefPtr<Gtk::Builder>& builder)
-    : Gtk::Window{cobject},
+    : Gtk::ApplicationWindow{cobject},
       window_builder{builder},
       about_dialog{*this},
       board_widget{*this},
@@ -104,7 +105,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
     delete_boards_bar.set_margin_bottom(10);
-    builder->get_widget<Gtk::Box>("root-box")->append(delete_boards_bar);
+    builder->get_widget<Gtk::Overlay>("app-overlay")->add_overlay(delete_boards_bar);
     builder->get_widget<Gtk::Stack>("app-stack")
         ->add(board_widget, "board-page");
 }

@@ -41,7 +41,7 @@ private:
 /**
  * Progress application window.
  */
-class ProgressWindow : public Gtk::Window {
+class ProgressWindow : public Gtk::ApplicationWindow {
 public:
     ProgressWindow(BaseObjectType* cobject,
                    const Glib::RefPtr<Gtk::Builder>& builder);

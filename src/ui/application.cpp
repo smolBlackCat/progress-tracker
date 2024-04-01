@@ -1,6 +1,7 @@
 #include "application.h"
 
 #include <app_info.h>
+#include <adwaita.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -18,6 +19,7 @@ ui::Application::Application()
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
+    adw_init();
 
     auto window_builder =
         Gtk::Builder::create_from_resource("/ui/app-window.ui");

@@ -108,6 +108,13 @@ void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
                 Glib::Value<ui::CardWidget*> dropped_value;
                 dropped_value.init(value.gobj());
                 auto dropped_card = dropped_value.get();
+
+                // If the dropped card is self, simply cancel the
+                // drop action gracefully
+                if (dropped_card == card) {
+                    return true;
+                }
+
                 if (is_child(dropped_card)) {
                     reorder_card(*dropped_card, *card);
                 } else {
