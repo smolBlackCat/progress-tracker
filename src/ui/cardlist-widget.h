@@ -6,9 +6,9 @@
 
 #include "../core/card.h"
 #include "../core/cardlist.h"
+#include "board-widget.h"
 #include "card.h"
 #include "editable-label-header.h"
-#include "board-widget.h"
 
 namespace ui {
 
@@ -30,7 +30,8 @@ class CardlistWidget : public Gtk::ListBox {
 public:
     static const int CARDLIST_SIZE = 240;
 
-    CardlistWidget(BoardWidget& board, std::shared_ptr<CardList> cardlist_refptr);
+    CardlistWidget(BoardWidget& board,
+                   std::shared_ptr<CardList> cardlist_refptr);
     ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr);
     ui::CardWidget* add_card();
     void remove_card(ui::CardWidget* card);

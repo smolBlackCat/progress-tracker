@@ -4,11 +4,11 @@
 #include <format>
 #include <iostream>
 
+#include "../core/exceptions.h"
 #include "board-card-button.h"
 #include "create_board_dialog.h"
 #include "i18n.h"
 #include "preferences-board-dialog.h"
-#include "../core/exceptions.h"
 
 namespace ui {
 
@@ -105,7 +105,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
     delete_boards_bar.set_margin_bottom(10);
-    builder->get_widget<Gtk::Overlay>("app-overlay")->add_overlay(delete_boards_bar);
+    builder->get_widget<Gtk::Overlay>("app-overlay")
+        ->add_overlay(delete_boards_bar);
     builder->get_widget<Gtk::Stack>("app-stack")
         ->add(board_widget, "board-page");
 }
@@ -131,7 +132,8 @@ void ProgressWindow::add_board(std::string board_filepath) {
                     // This catches both board_parse_errors and general
                     // invalid_argument exceptions
                     Gtk::AlertDialog::create(
-                        _("It was not possible to load this board"))->show(*this);
+                        _("It was not possible to load this board"))
+                        ->show(*this);
 
                     window_builder->get_widget<Gtk::FlowBox>("boards-grid")
                         ->remove(*new_board_card);

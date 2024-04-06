@@ -1,7 +1,7 @@
 #include "application.h"
 
-#include <app_info.h>
 #include <adwaita.h>
+#include <app_info.h>
 
 #include <cstdlib>
 #include <cstring>

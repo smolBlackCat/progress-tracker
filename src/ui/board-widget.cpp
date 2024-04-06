@@ -47,7 +47,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     root.append(add_button);
 }
 
-ui::BoardWidget::~BoardWidget() { }
+ui::BoardWidget::~BoardWidget() {}
 
 void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
     if (!(board || board_card_button)) return;
@@ -246,25 +246,28 @@ void ui::BoardWidget::setup_auto_scrolling() {
         [this](double x, double y) {
             this->x = x;
             this->y = y;
-        }
-    );
+        });
     this->add_controller(drop_controller_motion_c);
 
-    Glib::signal_timeout().connect([this]() {
-        double cur_max_width = this->get_width();
-        auto hadjustment = this->get_hadjustment();
-        double lower = hadjustment->get_lower();
-        double upper = hadjustment->get_upper();
+    Glib::signal_timeout().connect(
+        [this]() {
+            double cur_max_width = this->get_width();
+            auto hadjustment = this->get_hadjustment();
+            double lower = hadjustment->get_lower();
+            double upper = hadjustment->get_upper();
 
-        if (on_drag) {
-            if (x >= (cur_max_width * 0.8)) {
-                double new_value = hadjustment->get_value() + 3;
-                hadjustment->set_value(new_value >= upper ? upper : new_value);
-            } else if (x <= (cur_max_width * 0.2)) {
-                double new_value = hadjustment->get_value() - 3;
-                hadjustment->set_value(new_value <= lower ? lower : new_value);
+            if (on_drag) {
+                if (x >= (cur_max_width * 0.8)) {
+                    double new_value = hadjustment->get_value() + 3;
+                    hadjustment->set_value(new_value >= upper ? upper
+                                                              : new_value);
+                } else if (x <= (cur_max_width * 0.2)) {
+                    double new_value = hadjustment->get_value() - 3;
+                    hadjustment->set_value(new_value <= lower ? lower
+                                                              : new_value);
+                }
             }
-        }
-        return true;
-    }, 10);
+            return true;
+        },
+        10);
 }
