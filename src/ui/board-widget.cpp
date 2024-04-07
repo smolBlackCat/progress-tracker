@@ -90,82 +90,7 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
         Gtk::make_managed<ui::CardlistWidget>(*this, cardlist_refptr);
     cardlist_vector.push_back(new_cardlist);
 
-    auto drag_source_c = Gtk::DragSource::create();
-    drag_source_c->signal_prepare().connect(
-        [new_cardlist, drag_source_c](double x, double y) {
-            Glib::Value<ui::CardlistWidget*> value_cardlistptr;
-            value_cardlistptr.init(
-                Glib::Value<ui::CardlistWidget*>::value_type());
-            value_cardlistptr.set(new_cardlist);
-            auto cardlist_widget_paintable =
-                Gtk::WidgetPaintable::create(*new_cardlist);
-            drag_source_c->set_icon(cardlist_widget_paintable, x, y);
-            return Gdk::ContentProvider::create(value_cardlistptr);
-        },
-        false);
-    drag_source_c->signal_drag_begin().connect(
-        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
-            new_cardlist->set_opacity(0.5);
-            on_drag = true;
-        },
-        false);
-    drag_source_c->signal_drag_cancel().connect(
-        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag,
-                             Gdk::DragCancelReason reason) {
-            new_cardlist->set_opacity(1);
-            on_drag = false;
-            return true;
-        },
-        false);
-    drag_source_c->set_actions(Gdk::DragAction::MOVE);
-    new_cardlist->get_header().add_controller(drag_source_c);
-
-    auto drop_target_cardlist = Gtk::DropTarget::create(
-        Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
-    drop_target_cardlist->signal_drop().connect(
-        [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
-            on_drag = false;
-            if (G_VALUE_HOLDS(value.gobj(),
-                              Glib::Value<ui::CardlistWidget*>::value_type())) {
-                Glib::Value<ui::CardlistWidget*> dropped_value;
-                dropped_value.init(value.gobj());
-
-                ui::CardlistWidget* dropped_cardlist = dropped_value.get();
-                root.reorder_child_after(*dropped_cardlist, *new_cardlist);
-                board->reorder_cardlist(dropped_cardlist->get_cardlist_refptr(),
-                                        new_cardlist->get_cardlist_refptr());
-                dropped_cardlist->set_opacity(1);
-                return true;
-            }
-            return false;
-        },
-        false);
-    new_cardlist->get_header().add_controller(drop_target_cardlist);
-
-    auto drop_target_card = Gtk::DropTarget::create(
-        Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
-    drop_target_card->signal_drop().connect(
-        [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
-            on_drag = false;
-            if (G_VALUE_HOLDS(value.gobj(),
-                              Glib::Value<ui::CardWidget*>::value_type())) {
-                Glib::Value<ui::CardWidget*> dropped_value;
-                dropped_value.init(value.gobj());
-
-                auto dropped_card = dropped_value.get();
-                if (!new_cardlist->is_child(dropped_card)) {
-                    auto card_in_dropped = dropped_card->get_card();
-                    dropped_card->remove();
-                    new_cardlist->add_card(card_in_dropped);
-                    new_cardlist->get_cardlist_refptr()->add_card(
-                        *card_in_dropped);
-                }
-                return true;
-            }
-            return false;
-        },
-        false);
-    new_cardlist->add_controller(drop_target_card);
+    setup_drag_and_drop(new_cardlist);
 
     // The new cardlist should be appended before the add_button
     root.append(*new_cardlist);
@@ -270,4 +195,88 @@ void ui::BoardWidget::setup_auto_scrolling() {
             return true;
         },
         10);
+}
+
+void ui::BoardWidget::setup_drag_and_drop(ui::CardlistWidget* new_cardlist) {
+    // CardLists will be dragged from their header (EditableLabelHeader object).
+    // The drop contains a pointer to this cardlist object.
+    auto drag_source_c = Gtk::DragSource::create();
+    drag_source_c->signal_prepare().connect(
+        [new_cardlist, drag_source_c](double x, double y) {
+            Glib::Value<ui::CardlistWidget*> value_cardlistptr;
+            value_cardlistptr.init(
+                Glib::Value<ui::CardlistWidget*>::value_type());
+            value_cardlistptr.set(new_cardlist);
+            auto cardlist_widget_paintable =
+                Gtk::WidgetPaintable::create(*new_cardlist);
+            drag_source_c->set_icon(cardlist_widget_paintable, x, y);
+            return Gdk::ContentProvider::create(value_cardlistptr);
+        },
+        false);
+    drag_source_c->signal_drag_begin().connect(
+        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag) {
+            new_cardlist->set_opacity(0.5);
+            on_drag = true;
+        },
+        false);
+    drag_source_c->signal_drag_cancel().connect(
+        [this, new_cardlist](const Glib::RefPtr<Gdk::Drag>& drag,
+                             Gdk::DragCancelReason reason) {
+            new_cardlist->set_opacity(1);
+            on_drag = false;
+            return true;
+        },
+        false);
+    drag_source_c->set_actions(Gdk::DragAction::MOVE);
+    new_cardlist->get_header().add_controller(drag_source_c);
+
+    // A CardList is being dropped onto new_cardlist, reorder the drop after
+    // new_cardlist.
+    auto drop_target_cardlist = Gtk::DropTarget::create(
+        Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
+    drop_target_cardlist->signal_drop().connect(
+        [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
+            on_drag = false;
+            if (G_VALUE_HOLDS(value.gobj(),
+                              Glib::Value<ui::CardlistWidget*>::value_type())) {
+                Glib::Value<ui::CardlistWidget*> dropped_value;
+                dropped_value.init(value.gobj());
+
+                ui::CardlistWidget* dropped_cardlist = dropped_value.get();
+                root.reorder_child_after(*dropped_cardlist, *new_cardlist);
+                board->reorder_cardlist(dropped_cardlist->get_cardlist_refptr(),
+                                        new_cardlist->get_cardlist_refptr());
+                dropped_cardlist->set_opacity(1);
+                return true;
+            }
+            return false;
+        },
+        false);
+    new_cardlist->get_header().add_controller(drop_target_cardlist);
+
+    // Detect cards being dropped in this cardlist
+    auto drop_target_card = Gtk::DropTarget::create(
+        Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
+    drop_target_card->signal_drop().connect(
+        [this, new_cardlist](const Glib::ValueBase& value, double x, double y) {
+            on_drag = false;
+            if (G_VALUE_HOLDS(value.gobj(),
+                              Glib::Value<ui::CardWidget*>::value_type())) {
+                Glib::Value<ui::CardWidget*> dropped_value;
+                dropped_value.init(value.gobj());
+
+                auto dropped_card = dropped_value.get();
+                if (!new_cardlist->is_child(dropped_card)) {
+                    auto card_in_dropped = dropped_card->get_card();
+                    dropped_card->remove();
+                    new_cardlist->add_card(card_in_dropped);
+                    new_cardlist->get_cardlist_refptr()->add_card(
+                        *card_in_dropped);
+                }
+                return true;
+            }
+            return false;
+        },
+        false);
+    new_cardlist->add_controller(drop_target_card);
 }

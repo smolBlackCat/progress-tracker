@@ -134,5 +134,10 @@ private:
      * needed.
      */
     void setup_auto_scrolling();
+
+    /**
+     * @brief Sets up drag and drop system of the board
+     */
+    void setup_drag_and_drop(ui::CardlistWidget* new_cardlist);
 };
 }  // namespace ui
