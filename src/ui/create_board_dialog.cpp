@@ -1,9 +1,10 @@
 #include "create_board_dialog.h"
 
+#include <glibmm/i18n.h>
+
 #include <format>
 
 #include "application.h"
-#include "i18n.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(

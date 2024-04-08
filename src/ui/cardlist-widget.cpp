@@ -1,11 +1,12 @@
 #include "cardlist-widget.h"
 
+#include <glibmm/i18n.h>
+
 #include <format>
 #include <iostream>
 
 #include "board-widget.h"
 #include "card.h"
-#include "i18n.h"
 
 ui::CardListHeader::CardListHeader(std::shared_ptr<CardList>& cardlist_refptr)
     : EditableLabelHeader{}, cardlist_refptr{cardlist_refptr} {

@@ -7,7 +7,10 @@
 namespace ui {
 
 /**
- * @brief Button working as a frame to show the user the board's wallpaper
+ * @brief Custom Gtk::Button implementation that allocates a Board object and
+ *        opens the board view. It also shows the user to which Board the button
+ *        will lead to when clicked by presenting the board's name and the
+ *        board's background as a thumbnail.
  */
 class BoardCardButton : public Gtk::Button {
 public:
@@ -18,8 +21,28 @@ public:
      */
     BoardCardButton(std::string board_filepath);
 
+    /**
+     * @brief Returns the filepath pointing to the Board object to be allocated
+     *        when clicking this button.
+     */
     std::string get_filepath();
+
+    /**
+     * @brief Updates the Button settings
+     *
+     * @param board Board object pointer to load the settings from
+     */
     void update(Board* board);
+
+    /**
+     * @brief Updates the button's title
+     */
+    void set_name_(const std::string& name);
+
+    /**
+     * @brief Updates the button's thumbnail
+     */
+    void set_background(const std::string& background);
 
 private:
     Gtk::Box root_box;

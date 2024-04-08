@@ -22,16 +22,16 @@ namespace ui {
 class EditableLabelHeader : public Gtk::Box {
 public:
     EditableLabelHeader();
-    EditableLabelHeader(std::string label);
+    EditableLabelHeader(const std::string& label);
 
-    const std::string get_text();
+    std::string get_text();
 
-    virtual void set_label(std::string new_label);
+    virtual void set_label(const std::string& new_label);
 
     /**
      * @brief Add an extra option to be selected in the menu button
      */
-    void add_option(const std::string name, const std::string title_name,
+    void add_option(const std::string& name, const std::string& title_name,
                     const Gio::ActionMap::ActivateSlot& procedure);
 
 protected:

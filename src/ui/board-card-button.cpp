@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <format>
 #include <string>
 
 uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
@@ -23,9 +24,6 @@ ui::BoardCardButton::BoardCardButton(std::string board_filepath)
         throw std::domain_error{"Fatal"};
 
     Board board{board_filepath};
-    std::string m_text = "<b>";
-    m_text += board.get_name();
-    m_text += "</b>";
 
     set_valign(Gtk::Align::CENTER);
     set_halign(Gtk::Align::CENTER);
@@ -33,21 +31,11 @@ ui::BoardCardButton::BoardCardButton(std::string board_filepath)
 
     set_expand(false);
 
-    board_name.set_markup(m_text);
+    set_name_(board.get_name());
     board_name.set_valign(Gtk::Align::CENTER);
     board_name.set_vexpand(false);
 
-    if (std::filesystem::exists(board.get_background())) {
-        auto board_bg_image = Gdk::Pixbuf::create_from_file(
-            board.get_background(), 256, 256, false);
-        board_thumbnail.set(board_bg_image);
-    } else {
-        auto solid_colour =
-            Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-        Gdk::RGBA colour{board.get_background()};
-        solid_colour->fill(rgb_to_hex(colour));
-        board_thumbnail.set(solid_colour);
-    }
+    set_background(board.get_background());
     board_thumbnail.set_size_request(256, 256);
     board_thumbnail.set_margin_top(10);
 
@@ -61,18 +49,27 @@ std::string ui::BoardCardButton::get_filepath() { return board_filepath; }
 
 void ui::BoardCardButton::update(Board* board) {
     board_filepath = board->get_filepath();
-    std::string m_text = "<b>";
-    m_text += board->get_name();
-    m_text += "</b>";
-    board_name.set_markup(m_text);
-    if (std::filesystem::exists(board->get_background())) {
+    set_name_(board->get_name());
+    set_background(board->get_background());
+}
+
+void ui::BoardCardButton::set_name_(const std::string& name) {
+    board_name.set_markup(std::string{std::format("<b>{}</b>", name)});
+}
+
+/**
+ * TODO: The logic for setting background here is flawed. Add way out in case
+ * the background (image file) gets deleted.
+*/
+void ui::BoardCardButton::set_background(const std::string& background) {
+    if (std::filesystem::exists(background)) {
         auto board_bg_image = Gdk::Pixbuf::create_from_file(
-            board->get_background(), 256, 256, false);
+            background, 256, 256, false);
         board_thumbnail.set(board_bg_image);
     } else {
         auto solid_colour =
             Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-        Gdk::RGBA colour{board->get_background()};
+        Gdk::RGBA colour{background};
         solid_colour->fill(rgb_to_hex(colour));
         board_thumbnail.set(solid_colour);
     }

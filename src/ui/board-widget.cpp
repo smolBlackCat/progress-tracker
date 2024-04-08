@@ -1,11 +1,12 @@
 #include "board-widget.h"
 
+#include <glibmm/i18n.h>
+
 #include <chrono>
 #include <format>
 #include <iostream>
 
 #include "cardlist-widget.h"
-#include "i18n.h"
 #include "window.h"
 
 using namespace std::chrono_literals;
@@ -18,11 +19,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
-      cardlist_vector{},
-      board{nullptr},
-      board_card_button{nullptr},
-      app_window{app_window},
-      on_drag{false} {
+      app_window{app_window} {
     set_child(root);
     set_name("board-root");
 
@@ -50,26 +47,26 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
 ui::BoardWidget::~BoardWidget() {}
 
 void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
-    if (!(board || board_card_button)) return;
+    if (board && board_card_button) {
+        clear();
+        this->board = board;
+        this->board_card_button = board_card_button;
 
-    clear();
-    this->board = board;
-    this->board_card_button = board_card_button;
-
-    // Code updating cardlists
-    for (auto& cardlist : board->get_cardlists()) {
-        add_cardlist(cardlist);
+        // Code updating cardlists
+        for (auto& cardlist : board->get_cardlists()) {
+            add_cardlist(cardlist);
+        }
+        set_background(board->get_background());
     }
-    set_background(board->get_background());
 }
 
 void ui::BoardWidget::clear() {
-    if (cardlist_vector.empty()) return;
-
-    for (auto cardlist_widget : cardlist_vector) {
-        root.remove(*cardlist_widget);
+    if (!cardlist_vector.empty()) {
+        for (auto& cardlist_widget : cardlist_vector) {
+            root.remove(*cardlist_widget);
+        }
+        cardlist_vector.clear();
     }
-    cardlist_vector.clear();
 }
 
 bool ui::BoardWidget::save(bool free) {
@@ -100,11 +97,11 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
-    board->remove_cardlist(*(cardlist.get_cardlist_refptr()));
+    board->remove_cardlist(*cardlist.get_cardlist_refptr());
     return true;
 }
 
-bool ui::BoardWidget::set_background(std::string background) {
+bool ui::BoardWidget::set_background(const std::string& background) {
     // We don't check for nullptr in this method because it is only called if
     // board is already valid
     if (!board->set_background(background)) {
@@ -115,54 +112,37 @@ bool ui::BoardWidget::set_background(std::string background) {
     if (bg_type == "colour") {
         css_provider_refptr->load_from_data(
             std::format(CSS_FORMAT_RGB, background));
-        std::cout << "Colour background set" << std::endl;
     } else if (bg_type == "file") {
         css_provider_refptr->load_from_data(
             std::format(CSS_FORMAT_FILE, background));
-        std::cout << "File background set" << std::endl;
     }
 
     return true;
 }
 
 std::string ui::BoardWidget::get_background() {
-    if (!board) {
-        return "";
-    }
-    return board->get_background();
+    return board ? board->get_background() : "";
 }
 
-void ui::BoardWidget::set_board_name(std::string board_name) {
-    if (!board) {
-        return;
+void ui::BoardWidget::set_board_name(const std::string& board_name) {
+    if (board) {
+        app_window.set_title(board_name);
+        board->set_name(board_name);
     }
-
-    app_window.set_title(board_name);
-    board->set_name(board_name);
 }
 
 std::string ui::BoardWidget::get_board_name() {
-    if (!board) {
-        return "";
-    }
-
-    return board->get_name();
+    return board ? board->get_name() : "";
 }
 
-void ui::BoardWidget::set_filepath(std::string board_filepath) {
-    if (!board) {
-        return;
+void ui::BoardWidget::set_filepath(const std::string& board_filepath) {
+    if (board) {
+        board->set_filepath(board_filepath);
     }
-
-    board->set_filepath(board_filepath);
 }
 
 std::string ui::BoardWidget::get_filepath() {
-    if (!board) {
-        return "";
-    }
-
-    return board->get_filepath();
+    return board ? board->get_filepath() : "";
 }
 
 void ui::BoardWidget::setup_auto_scrolling() {

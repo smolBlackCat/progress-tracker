@@ -1,8 +1,8 @@
 #include "preferences-board-dialog.h"
 
-#include <filesystem>
+#include <glibmm/i18n.h>
 
-#include "i18n.h"
+#include <filesystem>
 
 namespace ui {
 
@@ -18,6 +18,7 @@ PreferencesBoardDialog::PreferencesBoardDialog(
         sigc::mem_fun(*this, &PreferencesBoardDialog::on_save_changes));
 }
 
+// TODO: Enhance error checking
 void PreferencesBoardDialog::load_board() {
     p_board_name_entry->set_text(board_widget.get_board_name());
     if (Board::get_background_type(board_widget.get_background()) == "file") {
@@ -58,6 +59,8 @@ void PreferencesBoardDialog::on_save_changes() {
     }
     board_widget.set_board_name(p_board_name_entry->get_text());
 
+    // FIXME: There's no need to recreate a new filename if the name is not
+    // changed
     std::string previous_filepath = board_widget.get_filepath();
     board_widget.set_filepath(
         Board::new_filename(p_board_name_entry->get_text()));

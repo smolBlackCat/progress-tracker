@@ -11,6 +11,7 @@ namespace ui {
 class BoardWidget;
 class CreateBoardDialog;
 class PreferencesBoardDialog;
+class ProgressWindow;
 
 /**
  * Progress app about dialog.
@@ -20,8 +21,6 @@ public:
     ProgressAboutDialog(Gtk::Window& parent);
     ~ProgressAboutDialog() override;
 };
-
-class ProgressWindow;
 
 /**
  * @brief Bar widget that asks user confirmation to delete selected boards.

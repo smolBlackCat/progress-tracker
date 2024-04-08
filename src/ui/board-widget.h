@@ -39,7 +39,7 @@ public:
      *
      * @param board pointer to a board object.
      * @param board_card_button pointer to a BoardCardButton object that have
-     * opened this board
+     *        opened this board
      *
      * @details Essentially, what this method does is cleaning the previous
      *          settings existent within the widget, if there is one, and
@@ -83,7 +83,7 @@ public:
      * @param background string referring to a background, either of
      * "colour" or "file" or even "invalid"
      */
-    bool set_background(std::string background);
+    bool set_background(const std::string& background);
 
     /**
      * @brief Retrieves the background string
@@ -96,7 +96,7 @@ public:
      *
      * @param board_name new name for the board
      */
-    void set_board_name(std::string board_name);
+    void set_board_name(const std::string& board_name);
 
     /**
      * @brief Retrieves the board's name
@@ -109,20 +109,20 @@ public:
      *
      * @param board_filepath path to a board file
      */
-    void set_filepath(std::string board_filepath);
+    void set_filepath(const std::string& board_filepath);
 
     /**
      * @brief Retrieves the current board file path
      */
     std::string get_filepath();
 
-    bool on_drag;
+    bool on_drag = false;
 
 private:
     Gtk::Box root;
     Gtk::Button add_button;
-    Board* board;
-    BoardCardButton* board_card_button;
+    Board* board = nullptr;
+    BoardCardButton* board_card_button = nullptr;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
     ProgressWindow& app_window;

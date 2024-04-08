@@ -1,18 +1,14 @@
 #include "editable-label-header.h"
 
+#include <glibmm/i18n.h>
+
 #include "cardlist-widget.h"
-#include "i18n.h"
 
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
 
-EditableLabelHeader::EditableLabelHeader(std::string label)
+EditableLabelHeader::EditableLabelHeader(const std::string& label)
     : Gtk::Box{Gtk::Orientation::VERTICAL},
-      revealer{},
-      label{},
-      entry{},
-      confirm_changes_button{},
-      menu_button{},
       menu{Gio::Menu::create()},
       actions{Gio::SimpleActionGroup::create()},
       key_controller{Gtk::EventControllerKey::create()},
@@ -85,9 +81,9 @@ EditableLabelHeader::EditableLabelHeader(std::string label)
     add_controller(click_controller);
 }
 
-const std::string EditableLabelHeader::get_text() { return label.get_text(); }
+std::string EditableLabelHeader::get_text() { return label.get_text(); }
 
-void EditableLabelHeader::set_label(std::string new_label) {
+void EditableLabelHeader::set_label(const std::string& new_label) {
     label.set_label(new_label);
     entry.set_text(new_label);
 };
@@ -110,7 +106,7 @@ void EditableLabelHeader::exit_editing_mode() {
 void EditableLabelHeader::on_confirm_changes() {}
 
 void EditableLabelHeader::add_option(
-    const std::string name, const std::string title_name,
+    const std::string& name, const std::string& title_name,
     const Gio::ActionMap::ActivateSlot& procedure) {
     actions->add_action(name, procedure);
     menu->append(title_name, std::string{"label-header"} + "." + name);

@@ -45,7 +45,6 @@ void ui::Application::on_startup() {
                 << std::endl;
         }
     } else {
-        // Load all boards information onto memory
         for (const auto& dir_entry :
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();

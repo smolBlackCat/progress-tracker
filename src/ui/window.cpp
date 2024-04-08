@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include <glibmm/i18n.h>
+
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -7,7 +9,6 @@
 #include "../core/exceptions.h"
 #include "board-card-button.h"
 #include "create_board_dialog.h"
-#include "i18n.h"
 #include "preferences-board-dialog.h"
 
 namespace ui {
@@ -83,14 +84,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
 
-    // Load application's stylesheet
-    auto css_bytes = Gio::Resource::lookup_data_global("/ui/stylesheet.css");
-    gsize size = css_bytes->get_size();
-    std::string app_style = (char*)css_bytes->get_data(size);
     auto css_provider = Gtk::CssProvider::create();
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    css_provider->load_from_data(app_style.c_str());
+    css_provider->load_from_resource("/ui/stylesheet.css");
 
     builder->get_widget<Gtk::Button>("home-button")
         ->signal_clicked()
