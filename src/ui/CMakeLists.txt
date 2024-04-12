@@ -7,8 +7,7 @@ add_library(ui window.cpp
                board-widget.cpp
                cardlist-widget.cpp
                card.cpp
-               editable-label-header.cpp
-               i18n.h)
+               editable-label-header.cpp)
 
 # Link GTKMM libraries
 target_link_libraries(ui PRIVATE ${GTKMM_LIBRARIES})

@@ -9,7 +9,8 @@
 
 std::string get_locale_dir() {
     if (strcmp(BUILD_TYPE, "Release") == 0) {
-        return strcmp(FLATPAK, "True") == 0? "/app/share/locale/":"/usr/share/locale/";
+        return strcmp(FLATPAK, "True") == 0 ? "/app/share/locale/"
+                                            : "/usr/share/locale/";
     } else {
         return std::string{getenv("PWD")} + "/locales/";
     }

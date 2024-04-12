@@ -1,16 +1,16 @@
 #include "create_board_dialog.h"
 
+#include <glibmm/i18n.h>
+
 #include <format>
 
 #include "application.h"
-#include "i18n.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
     BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder,
     ProgressWindow& app_window)
-    : BoardDialog{cobject, ref_builder},
-      app_window{app_window} {
+    : BoardDialog{cobject, ref_builder}, app_window{app_window} {
     set_title(_("Create Board"));
     p_left_button->add_css_class("destructive-action");
     p_right_button->add_css_class("suggested-action");
@@ -44,7 +44,8 @@ void CreateBoardDialog::create_board() {
     Board board = Board{p_board_name_entry->get_text(), background};
     std::string new_file_path = Board::new_filename(board.get_name());
     if (!board.set_filepath(new_file_path)) {
-        auto message_dialog = Gtk::AlertDialog::create(_("It was not possible to create a Board with given name"));
+        auto message_dialog = Gtk::AlertDialog::create(
+            _("It was not possible to create a Board with given name"));
         message_dialog->show(*this);
     } else {
         board.save_as_xml();

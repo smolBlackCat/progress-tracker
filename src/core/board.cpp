@@ -1,6 +1,7 @@
 #include "board.h"
 
 #include <app_info.h>
+
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -14,7 +15,7 @@
 
 Board::Board() : Item{""} {}
 
-Board::Board(std::string name, std::string background)
+Board::Board(const std::string& name, const std::string& background)
     : Item{name}, background{}, cardlist_vector{}, file_path{} {
     if (!is_background(background)) {
         throw std::invalid_argument{
@@ -24,7 +25,7 @@ Board::Board(std::string name, std::string background)
     this->background = background;
 }
 
-Board::Board(std::string board_file_path)
+Board::Board(const std::string& board_file_path)
     : Item{"none"},
       background{},
       cardlist_vector{},
@@ -87,25 +88,22 @@ Board::Board(std::string board_file_path)
                 throw board_parse_error{std::format(
                     "{} is not a valid progress xml file.", file_path)};
             }
-            Card cur_card{cur_card_name};
-            cur_cardlist.add_card(std::move(cur_card));
+            cur_cardlist.add_card(Card{cur_card_name});
 
             card_element = card_element->NextSiblingElement("card");
         }
         cur_cardlist.set_modified(false);
-        this->add_cardlist(std::move(cur_cardlist));
+        this->add_cardlist(cur_cardlist);
 
         list_element = list_element->NextSiblingElement("list");
     }
     modified = false;
 }
 
-bool Board::set_background(std::string other) {
-    if (is_background(other)) {
-        background = other;
-        return true;
-    }
-    return false;
+bool Board::set_background(const std::string& other) {
+    bool valid_background = is_background(other);
+    if (valid_background) background = other;
+    return valid_background;
 }
 
 std::string Board::get_background() const { return background; }
@@ -127,16 +125,12 @@ std::string Board::xml_structure() {
     auto doc = xml_doc();
     doc->Print(&printer);
     xml_struct = printer.CStr();
-    delete doc;
     return xml_struct;
 }
 
-std::shared_ptr<CardList> Board::add_cardlist(CardList& cardlist) {
-    return add_cardlist(std::move(cardlist));
-}
-
-std::shared_ptr<CardList> Board::add_cardlist(CardList&& cardlist) {
-    std::shared_ptr<CardList> new_cardlist{new CardList{cardlist}};
+std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
+    std::shared_ptr<CardList> new_cardlist =
+        std::make_shared<CardList>(cardlist);
     if (new_cardlist) {
         cardlist_vector.push_back(new_cardlist);
         modified = true;
@@ -144,7 +138,7 @@ std::shared_ptr<CardList> Board::add_cardlist(CardList&& cardlist) {
     return new_cardlist;
 }
 
-bool Board::remove_cardlist(CardList& cardlist) {
+bool Board::remove_cardlist(const CardList& cardlist) {
     for (size_t i = 0; i < cardlist_vector.size(); i++) {
         if (cardlist == (*cardlist_vector.at(i))) {
             cardlist_vector.erase(cardlist_vector.begin() + i);
@@ -193,9 +187,8 @@ void Board::reorder_cardlist(std::shared_ptr<CardList> next,
 }
 
 bool Board::save_as_xml() {
-    tinyxml2::XMLDocument* doc = xml_doc();
-    auto result = doc->SaveFile((file_path).c_str());
-    delete doc;
+    auto doc = xml_doc();
+    auto result = doc->SaveFile(file_path.c_str());
     return result == tinyxml2::XML_SUCCESS;
 }
 
@@ -205,7 +198,7 @@ std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
     return cardlist_vector;
 }
 
-bool Board::is_background(std::string& background) const {
+bool Board::is_background(const std::string& background) const {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 
@@ -237,7 +230,7 @@ std::string format_basename(std::string basename) {
 }
 
 // TODO: Board class deserves a BoardManager class
-const std::string Board::new_filename(std::string base) {
+const std::string Board::new_filename(const std::string& base) {
     std::string boards_dir;
     if (strcmp(FLATPAK, "True") == 0) {
         boards_dir =
@@ -267,11 +260,11 @@ const std::string Board::new_filename(std::string base) {
     return filename;
 }
 
-std::string Board::get_background_type(std::string background) {
+std::string Board::get_background_type(const std::string& background) {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
 
-    if (std::regex_match(background, rgba1_r) ||
+    if (std::regex_match(background, rgba_r) ||
         std::regex_match(background, rgba1_r)) {
         return "colour";
     } else if (std::filesystem::exists(background)) {
@@ -281,20 +274,20 @@ std::string Board::get_background_type(std::string background) {
     return "invalid";
 }
 
-tinyxml2::XMLDocument* Board::xml_doc() {
-    auto doc = new tinyxml2::XMLDocument{};
+std::unique_ptr<tinyxml2::XMLDocument> Board::xml_doc() {
+    auto doc = std::make_unique<tinyxml2::XMLDocument>();
 
     tinyxml2::XMLElement* board_element = doc->NewElement("board");
     board_element->SetAttribute("name", name.c_str());
     board_element->SetAttribute("background", background.c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto cardlist : cardlist_vector) {
+    for (auto& cardlist : cardlist_vector) {
         // Create list
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
 
-        for (auto card : cardlist->get_card_vector()) {
+        for (auto& card : cardlist->get_card_vector()) {
             // Create card
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());

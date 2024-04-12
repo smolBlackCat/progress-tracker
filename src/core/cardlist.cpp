@@ -4,13 +4,9 @@
 #include <iterator>
 #include <stdexcept>
 
-CardList::CardList(std::string name) : Item{name}, card_vector{} {}
+CardList::CardList(const std::string& name) : Item{name}, card_vector{} {}
 
-std::shared_ptr<Card> CardList::add_card(Card& card) {
-    return add_card(std::move(card));
-}
-
-std::shared_ptr<Card> CardList::add_card(Card&& card) {
+std::shared_ptr<Card> CardList::add_card(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
     if (new_card) {
         card_vector.push_back(new_card);
@@ -19,7 +15,7 @@ std::shared_ptr<Card> CardList::add_card(Card&& card) {
     return new_card;
 }
 
-bool CardList::remove_card(Card& card) {
+bool CardList::remove_card(const Card& card) {
     for (size_t i = 0; i < card_vector.size(); i++) {
         if (card == *card_vector.at(i)) {
             card_vector.erase(card_vector.begin() + i);
@@ -31,7 +27,7 @@ bool CardList::remove_card(Card& card) {
 }
 
 bool CardList::cards_modified() {
-    for (auto& card: card_vector) {
+    for (auto& card : card_vector) {
         if (card->is_modified()) {
             return true;
         }
@@ -39,9 +35,7 @@ bool CardList::cards_modified() {
     return false;
 }
 
-bool CardList::is_modified() {
-    return modified || cards_modified();
-}
+bool CardList::is_modified() { return modified || cards_modified(); }
 
 std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
     return card_vector;

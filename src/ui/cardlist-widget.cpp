@@ -1,11 +1,12 @@
 #include "cardlist-widget.h"
 
+#include <glibmm/i18n.h>
+
 #include <format>
 #include <iostream>
 
 #include "board-widget.h"
 #include "card.h"
-#include "i18n.h"
 
 ui::CardListHeader::CardListHeader(std::shared_ptr<CardList>& cardlist_refptr)
     : EditableLabelHeader{}, cardlist_refptr{cardlist_refptr} {
@@ -86,15 +87,18 @@ void ui::CardlistWidget::setup_drag_and_drop(ui::CardWidget* card) {
             return Gdk::ContentProvider::create(value_new_cardptr);
         },
         false);
-    drag_source_c->signal_drag_begin().connect([this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
-        this->board.on_drag = true;
-    }, false);
+    drag_source_c->signal_drag_begin().connect(
+        [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
+            this->board.on_drag = true;
+        },
+        false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
-                this->board.on_drag = false;
-                return true;
-        }, false);
+            this->board.on_drag = false;
+            return true;
+        },
+        false);
     card->add_controller(drag_source_c);
 
     // DropTarget Settings

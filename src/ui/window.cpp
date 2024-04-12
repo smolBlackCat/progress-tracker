@@ -1,14 +1,15 @@
 #include "window.h"
 
+#include <glibmm/i18n.h>
+
 #include <filesystem>
 #include <format>
 #include <iostream>
 
+#include "../core/exceptions.h"
 #include "board-card-button.h"
 #include "create_board_dialog.h"
-#include "i18n.h"
 #include "preferences-board-dialog.h"
-#include "../core/exceptions.h"
 
 namespace ui {
 
@@ -83,14 +84,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
 
-    // Load application's stylesheet
-    auto css_bytes = Gio::Resource::lookup_data_global("/ui/stylesheet.css");
-    gsize size = css_bytes->get_size();
-    std::string app_style = (char*)css_bytes->get_data(size);
     auto css_provider = Gtk::CssProvider::create();
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    css_provider->load_from_data(app_style.c_str());
+    css_provider->load_from_resource("/ui/stylesheet.css");
 
     builder->get_widget<Gtk::Button>("home-button")
         ->signal_clicked()
@@ -105,7 +102,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
     delete_boards_bar.set_margin_bottom(10);
-    builder->get_widget<Gtk::Overlay>("app-overlay")->add_overlay(delete_boards_bar);
+    builder->get_widget<Gtk::Overlay>("app-overlay")
+        ->add_overlay(delete_boards_bar);
     builder->get_widget<Gtk::Stack>("app-stack")
         ->add(board_widget, "board-page");
 }
@@ -131,7 +129,8 @@ void ProgressWindow::add_board(std::string board_filepath) {
                     // This catches both board_parse_errors and general
                     // invalid_argument exceptions
                     Gtk::AlertDialog::create(
-                        _("It was not possible to load this board"))->show(*this);
+                        _("It was not possible to load this board"))
+                        ->show(*this);
 
                     window_builder->get_widget<Gtk::FlowBox>("boards-grid")
                         ->remove(*new_board_card);

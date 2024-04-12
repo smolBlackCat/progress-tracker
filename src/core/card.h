@@ -14,5 +14,5 @@ public:
      *
      * @param name The card's title.
      */
-    Card(std::string name);
+    Card(const std::string& name);
 };
