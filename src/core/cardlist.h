@@ -16,7 +16,7 @@ public:
     /**
      * @brief CardList constructor;
      */
-    CardList(std::string name);
+    CardList(const std::string& name);
 
     /**
      * @brief Adds a Card object to the cardlist by moving the Card object
@@ -24,15 +24,7 @@ public:
      *
      * @returns A pointer to the allocated object. It may be nullptr
      */
-    std::shared_ptr<Card> add_card(Card& card);
-
-    /**
-     * @brief Adds a Card object to the cardlist by moving the Card object
-     * into a newly allocated space.
-     *
-     * @returns A pointer to the allocated object. It may be nullptr
-     */
-    std::shared_ptr<Card> add_card(Card&& card);
+    std::shared_ptr<Card> add_card(const Card& card);
 
     /**
      * @brief Removes a Card object from the cardlist.
@@ -43,7 +35,7 @@ public:
      *          False may be returned when the requested Card to be removed is
      *          not present in the cardlist.
      */
-    bool remove_card(Card& card);
+    bool remove_card(const Card& card);
 
     bool is_modified() override;
 
@@ -54,13 +46,13 @@ public:
 
     /**
      * @brief Reorders the cards in a way that next is put after sibling.
-     * 
+     *
      * @param next Card to be put after sibling
      * @param sibling Card where next will be put after
-     * 
+     *
      * @throws std::invalid_argument if either next or sibling are not children
      * of this cardlist
-    */
+     */
     void reorder_card(std::shared_ptr<Card> next,
                       std::shared_ptr<Card> sibling);
 

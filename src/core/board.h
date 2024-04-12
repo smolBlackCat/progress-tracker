@@ -23,7 +23,7 @@ public:
      * @param background The board's background. It can be either a path to an
      *                   image or a solid colour RGBA representation.
      */
-    Board(std::string name, std::string background);
+    Board(const std::string& name, const std::string& background);
 
     /**
      * @brief Constructs a Board object from a filepath
@@ -35,7 +35,7 @@ public:
      *
      * @throws std::domain_error if the board_file_path is not valid at all
      */
-    Board(std::string board_file_path);
+    Board(const std::string& board_file_path);
 
     /**
      * @brief Changes the background information of the board.
@@ -45,7 +45,7 @@ public:
      * @returns True if the background member was successfully set, otherwise
      * False.
      */
-    bool set_background(std::string other);
+    bool set_background(const std::string& other);
 
     /**
      * @brief Returns the current background value
@@ -72,21 +72,11 @@ public:
      * @brief Adds a CardList object to the board by moving the contents to a
      * dynamic allocated space.
      *
-     * @param cardlist CardList rvalue
+     * @param cardlist CardList object
      *
      * @returns a CardList pointer to the newly allocated object.
      */
-    std::shared_ptr<CardList> add_cardlist(CardList& cardlist);
-
-    /**
-     * @brief Adds a CardList object to the board by moving the contents to a
-     * dynamic allocated space.
-     *
-     * @param cardlist CardList rvalue
-     *
-     * @returns a CardList pointer to the newly allocated object.
-     */
-    std::shared_ptr<CardList> add_cardlist(CardList&& cardlist);
+    std::shared_ptr<CardList> add_cardlist(const CardList& cardlist);
 
     /**
      * @brief Removes a CardList object from the board and free the allocated
@@ -96,7 +86,7 @@ public:
      *          False is returned if the CardList object requested to be
      *          removed isn't in the board.
      */
-    bool remove_cardlist(CardList& cardlist);
+    bool remove_cardlist(const CardList& cardlist);
 
     /**
      * @brief Reorders the next card after sibling
@@ -121,24 +111,24 @@ public:
     /**
      * TODO: Remove this method. Don't give access to the underlying vector
      * holding the cardlists. Implement a way of iterating within the class
-    */
+     */
     std::vector<std::shared_ptr<CardList>>& get_cardlists();
 
     /**
      * @brief Returns true if the board was modified in some way, otherwise
      * False.
-     * 
+     *
      * @returns a boolean indicating if the board was modified.
-    */
+     */
     bool is_modified() override;
 
     /**
      * @brief Generates a filename given a base. What it actually does is to
      * lowercase the given base and give an id if needed.
-    */
-    static const std::string new_filename(std::string base);
+     */
+    static const std::string new_filename(const std::string& base);
 
-    static std::string get_background_type(std::string background);
+    static std::string get_background_type(const std::string& background);
 
 private:
     std::string background, file_path;
@@ -155,9 +145,9 @@ private:
      *
      * @returns True if the background is of background type, otherwise False.
      */
-    bool is_background(std::string& background) const;
+    bool is_background(const std::string& background) const;
 
     bool cardlists_modified();
 
-    tinyxml2::XMLDocument* xml_doc();
+    std::unique_ptr<tinyxml2::XMLDocument> xml_doc();
 };

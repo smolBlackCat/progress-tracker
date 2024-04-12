@@ -3,7 +3,7 @@
 #include <chrono>
 #include <random>
 
-Item::Item(std::string name) : name{name} {
+Item::Item(const std::string& name) : name{name} {
     std::default_random_engine gen(
         (long)std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<unsigned long long> distribution(1,
@@ -11,14 +11,12 @@ Item::Item(std::string name) : name{name} {
     id = distribution(gen);
 }
 
-void Item::set_name(std::string other) {
+void Item::set_name(const std::string& other) {
     name = other;
     modified = true;
 }
 
-void Item::set_modified(bool modified) {
-    this->modified = modified;
-}
+void Item::set_modified(bool modified) { this->modified = modified; }
 
 std::string Item::get_name() const { return name; }
 

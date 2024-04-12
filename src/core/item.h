@@ -16,7 +16,7 @@ public:
      *
      * @param name The item's name.
      */
-    Item(std::string name);
+    Item(const std::string& name);
 
     virtual ~Item() = default;
 
@@ -25,12 +25,12 @@ public:
      *
      * @param other New name.
      */
-    void set_name(std::string other);
+    void set_name(const std::string& other);
 
     /**
      * @brief Sets modified state
-    */
-   void set_modified(bool modified);
+     */
+    void set_modified(bool modified);
 
     /**
      * @brief Gets the name of the object.
@@ -41,9 +41,8 @@ public:
 
     /**
      * @brief Produces true if the Item object was modified.
-    */
+     */
     virtual bool is_modified();
-
 
     /**
      * @brief Gets the object's ID.
