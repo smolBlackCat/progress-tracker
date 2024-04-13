@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libadwaita-1/adwaita.h>
 #include <gtkmm.h>
 
 #include "../core/board.h"
@@ -16,10 +17,23 @@ class ProgressWindow;
 /**
  * Progress app about dialog.
  */
-class ProgressAboutDialog : public Gtk::AboutDialog {
+class ProgressAboutDialog {
 public:
     ProgressAboutDialog(Gtk::Window& parent);
-    ~ProgressAboutDialog() override;
+    ~ProgressAboutDialog();
+
+    /**
+     * @brief Presents the about dialog on screen
+    */
+    void show();
+
+    std::vector<const char*> translators_names = {"Heimen Stoffels <vistausss@fastmail.com>", "Albano Battistella <>", "haggen 88 <>"};
+
+protected:
+    void setup();
+
+    AdwDialog* about_dialogp;
+    Gtk::Widget& parent;
 };
 
 /**
