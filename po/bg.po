@@ -156,11 +156,5 @@ msgstr "Изтриване"
 msgid "It was not possible to load this board"
 msgstr "Не беше възможно да се зареди тази дъска"
 
-#~ msgid "About"
-#~ msgstr "Относно"
-
-#~ msgid "Simple app for storing kanban-style todo lists"
-#~ msgstr "Просто приложение за съхраняване на списъци с задачи в канбан стил"
-
-#~ msgid "As a solid colour"
-#~ msgstr "Като плътен цвят"
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"

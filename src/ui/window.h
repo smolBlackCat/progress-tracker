@@ -27,8 +27,6 @@ public:
     */
     void show();
 
-    std::vector<const char*> translators_names = {"Heimen Stoffels <vistausss@fastmail.com>", "Albano Battistella <>", "haggen 88 <>"};
-
 protected:
     void setup();
 

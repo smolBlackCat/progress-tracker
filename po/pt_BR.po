@@ -157,13 +157,5 @@ msgstr "Deletar"
 msgid "It was not possible to load this board"
 msgstr "Não foi possível carregar este quadro"
 
-#~ msgid "About"
-#~ msgstr "Sobre"
-
-#~ msgid "Simple app for storing kanban-style todo lists"
-#~ msgstr ""
-#~ "Aplicação simples para armazenar listas de afazeres no estilo kanban"
-
-#, fuzzy
-#~ msgid "As a solid colour"
-#~ msgstr "Cor sólida"
+msgid "translator-credits"
+msgstr "Gabriel de Moura <smolblackcat@proton.me>"

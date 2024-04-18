@@ -156,13 +156,3 @@ msgstr "Wissen"
 #: src/ui/window.cpp:172
 msgid "It was not possible to load this board"
 msgstr "Het bord kan niet worden geladen"
-
-#~ msgid "About"
-#~ msgstr "Over"
-
-#~ msgid "Simple app for storing kanban-style todo lists"
-#~ msgstr ""
-#~ "Een eenvoudige toepassing voor het maken van takenlijsten in kanbanstijl"
-
-#~ msgid "As a solid colour"
-#~ msgstr "Als vaste kleur"

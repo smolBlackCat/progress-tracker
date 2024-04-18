@@ -153,4 +153,6 @@ msgstr ""
 
 #: src/ui/window.cpp:172
 msgid "It was not possible to load this board"
+
+msgid "translator-credits"
 msgstr ""
