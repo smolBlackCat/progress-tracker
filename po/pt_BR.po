@@ -139,7 +139,7 @@ msgstr "Nenhum arquivo foi selecionado"
 #. Translators: Replace "translator-credits" with your names, one name per line
 #: src/ui/window.cpp:55
 msgid "translator-credits"
-msgstr "Gabriel de Moura <moura@moura>"
+msgstr "Gabriel de Moura <smolblackcat@proton.me>"
 
 #: src/ui/window.cpp:62
 msgid "De Moura © All rights reserved"
