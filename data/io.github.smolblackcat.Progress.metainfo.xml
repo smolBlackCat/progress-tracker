@@ -8,6 +8,9 @@
   </developer>
 
   <url type="homepage">https://github.com/smolBlackCat/progress-tracker</url>
+  <url type="bugtracker">https://github.com/smolBlackCat/progress-tracker/issues</url>
+  <url type="vcs-browser">https://github.com/smolBlackCat/progress-tracker</url>
+  <url type="translate">https://github.com/smolBlackCat/progress-tracker/tree/main/po</url>
 
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
