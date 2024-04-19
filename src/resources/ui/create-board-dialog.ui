@@ -90,7 +90,7 @@
                 <child>
                   <object class="GtkStackPage">
                     <property name="name">as-colour</property>
-                    <property name="title" translatable="yes">As a colour</property>
+                    <property name="title" translatable="yes">As a color</property>
                     <property name="child">
                       <object class="GtkBox">
                         <property name="orientation">vertical</property>
