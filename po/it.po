@@ -155,5 +155,11 @@ msgstr "Elimina"
 msgid "It was not possible to load this board"
 msgstr "Non è stato possibile caricare questa bacheca"
 
-msgid "translator-credits"
-msgstr "Albano Battistella <albanobattistella@gmail.com>"
+#~ msgid "About"
+#~ msgstr "Informazioni"
+
+#~ msgid "Simple app for storing kanban-style todo lists"
+#~ msgstr "Semplice app per archiviare elenchi di cose da fare in stile kanban"
+
+#~ msgid "As a solid colour"
+#~ msgstr "Come un colore solido"

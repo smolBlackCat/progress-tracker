@@ -14,9 +14,26 @@
 namespace ui {
 
 ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
-    : parent{parent} {}
+    : parent{parent} {
+    // set_program_name("Progress");
+    // set_logo(Gdk::Texture::create_from_resource(
+    //     "/ui/io.github.smolblackcat.Progress.svg"));
+    // set_version("1.0");
+    // set_comments(_("Simple app for storing kanban-style todo lists"));
+    // set_license_type(Gtk::License::MIT_X11);
+    // set_copyright(_("De Moura © All rights reserved"));
+    // std::vector<Glib::ustring> authors{};
+    // authors.push_back("De Moura");
+    // set_authors(authors);
 
-ProgressAboutDialog::~ProgressAboutDialog() { g_object_unref(about_dialogp); }
+    // set_hide_on_close();
+    // set_modal();
+    // set_transient_for(parent);
+}
+
+ProgressAboutDialog::~ProgressAboutDialog() {
+    g_object_unref(about_dialogp);
+}
 
 void ProgressAboutDialog::show() {
     setup();
@@ -26,8 +43,8 @@ void ProgressAboutDialog::show() {
 void ProgressAboutDialog::setup() {
     about_dialogp = adw_about_dialog_new();
 
-    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
-                                          "Progress");
+    adw_about_dialog_set_application_name(
+        ADW_ABOUT_DIALOG(about_dialogp), "Progress");
     adw_about_dialog_set_version(ADW_ABOUT_DIALOG(about_dialogp), "1.2");
     adw_about_dialog_set_developer_name(
         ADW_ABOUT_DIALOG(about_dialogp), "Gabriel de Moura");
@@ -45,12 +62,14 @@ void ProgressAboutDialog::setup() {
         _("De Moura © All rights reserved"));
     adw_about_dialog_set_issue_url(
         ADW_ABOUT_DIALOG(about_dialogp),
-        "https://github.com/smolBlackCat/progress-tracker/issues");
+        "https://github.com/smolBlackCat/progress-tracker/issues"
+    );
     adw_about_dialog_set_website(
         ADW_ABOUT_DIALOG(about_dialogp),
         "https://github.com/smolBlackCat/progress-tracker");
-    adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(about_dialogp),
-                                          "io.github.smolblackcat.Progress");
+    adw_about_dialog_set_application_icon(
+        ADW_ABOUT_DIALOG(about_dialogp),
+        "io.github.smolblackcat.Progress");
 }
 
 DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)

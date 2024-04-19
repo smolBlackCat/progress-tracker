@@ -30,60 +30,7 @@ msgstr "Añadir tarjeta"
 msgid "Main Menu"
 msgstr ""
 
-#: /home/moura/Projects/progress-tracker/src/ui/editable-label-header.cpp:60
-msgid "Rename"
-msgstr "Renombrar"
-
-#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:14
-msgid "Create Board"
-msgstr "Crear tablero"
-
-#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:18
-msgid "Create"
-msgstr "Crear"
-
-#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:26
-msgid "Empty board names are not allowed"
-msgstr "No se permiten nombres de tablero vacíos"
-
-#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:34
-msgid "A file must be selected"
-msgstr "Se debe seleccionar un archivo"
-
-#: /home/moura/Projects/progress-tracker/src/ui/create_board_dialog.cpp:47
-msgid "It was not possible to create a Board with given name"
-msgstr "No ha sido posible crear un tablero con el nombre dado"
-
-#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:15
-msgid "Edit Board"
-msgstr "Editar tablero"
-
-#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:16
-msgid "Save"
-msgstr "Guardar"
-
-#: /home/moura/Projects/progress-tracker/src/ui/preferences-board-dialog.cpp:37
-msgid "No file was selected"
-msgstr "No se seleccionó ningún archivo"
-
-#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:17
-msgid "Simple app for storing kanban-style todo lists"
-msgstr ""
-"Una sencilla aplicación para almacenar listas de tareas al estilo Kanban"
-
-#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:19
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Todos los derechos reservados"
-
-#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:35
-msgid "Select the boards to be deleted"
-msgstr "Seleccione los tableros que desea eliminar"
-
-#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:36
-msgid "Delete"
-msgstr "Eliminar"
-
-#: /home/moura/Projects/progress-tracker/src/ui/window.cpp:187
+#: src/resources/ui/app-window.ui:70
 msgid "Delete Boards"
 msgstr "Eliminar Tableros"
 
@@ -209,5 +156,12 @@ msgstr "Eliminar"
 msgid "It was not possible to load this board"
 msgstr "No ha sido posible cargar este tablero"
 
-msgid "translator-credits"
-msgstr "haggen88"
+#~ msgid "About"
+#~ msgstr "Acerca de"
+
+#~ msgid "Simple app for storing kanban-style todo lists"
+#~ msgstr ""
+#~ "Una sencilla aplicación para almacenar listas de tareas al estilo Kanban"
+
+#~ msgid "As a solid colour"
+#~ msgstr "Como color sólido"
