@@ -154,3 +154,7 @@ msgstr "Achtergrond"
 
 msgid "It was not possible to load this board"
 msgstr "Het bord kan niet worden geladen"
+
+#: src/ui/window.cpp:55
+msgid "translator-credits"
+msgstr "Heimen Stoffels <vistausss@fastmail.com>"

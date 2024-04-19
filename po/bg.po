@@ -153,3 +153,7 @@ msgstr "Фон"
 
 msgid "It was not possible to load this board"
 msgstr "Не беше възможно да се зареди тази дъска"
+
+#: src/ui/window.cpp:55
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"

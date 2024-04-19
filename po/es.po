@@ -153,3 +153,7 @@ msgstr "Fondo"
 
 msgid "It was not possible to load this board"
 msgstr "No ha sido posible cargar este tablero"
+
+#: src/ui/window.cpp:55
+msgid "translator-credits"
+msgstr "haggen88"

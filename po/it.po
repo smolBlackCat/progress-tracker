@@ -152,3 +152,7 @@ msgstr "Sfondo"
 
 msgid "It was not possible to load this board"
 msgstr "Non è stato possibile caricare questa bacheca"
+
+#: src/ui/window.cpp:55
+msgid "translator-credits"
+msgstr "Albano Battistella <albanobattistella@gmail.com>"
