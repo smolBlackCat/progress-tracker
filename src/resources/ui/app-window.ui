@@ -71,7 +71,7 @@
                 <attribute name="action">win.delete</attribute>
             </item>
             <item>
-                <attribute name="label" translatable="yes">About</attribute>
+                <attribute name="label" translatable="yes">About Progress</attribute>
                 <attribute name="action">win.about</attribute>
             </item>
         </section>
@@ -83,7 +83,7 @@
                 <attribute name="action">win.preferences</attribute>
             </item>
             <item>
-                <attribute name="label" translatable="yes">About</attribute>
+                <attribute name="label" translatable="yes">About Progress</attribute>
                 <attribute name="action">win.about</attribute>
             </item>
         </section>
