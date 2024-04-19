@@ -20,7 +20,7 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:13
 msgid "Homepage"
-msgstr ""
+msgstr "Página Inicial"
 
 #: src/resources/ui/app-window.ui:20
 #, fuzzy
@@ -29,7 +29,7 @@ msgstr "Adicionar cartão"
 
 #: src/resources/ui/app-window.ui:28
 msgid "Main Menu"
-msgstr ""
+msgstr "Menu Principal"
 
 #: src/resources/ui/app-window.ui:70
 msgid "Delete Boards"
@@ -37,7 +37,7 @@ msgstr "Deletar Quadros"
 
 #: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
 msgid "About Progress"
-msgstr ""
+msgstr "Sobre Progress"
 
 #: src/resources/ui/app-window.ui:82
 msgid "Preferences"
