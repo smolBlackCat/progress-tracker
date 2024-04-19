@@ -23,9 +23,8 @@ msgid "Homepage"
 msgstr "Página Inicial"
 
 #: src/resources/ui/app-window.ui:20
-#, fuzzy
 msgid "Add Board"
-msgstr "Adicionar cartão"
+msgstr "Criar Quadro"
 
 #: src/resources/ui/app-window.ui:28
 msgid "Main Menu"
