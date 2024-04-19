@@ -49,13 +49,10 @@ void ProgressAboutDialog::setup() {
     adw_about_dialog_set_developer_name(
         ADW_ABOUT_DIALOG(about_dialogp), "Gabriel de Moura");
 
-    // TODO: Some names might have to be translated
     adw_about_dialog_set_translator_credits(
         ADW_ABOUT_DIALOG(about_dialogp),
-        "Heimen Stoffels <vistausss@fastmail.com>\n"
-        "Albano Battistella <albanobattistella@gmail.com>\n"
-        "hagen 88\n"
-        "Gabriel de Moura <smolblackcat@proton.me>"
+        //Translators: Replace "translator-credits" with your names, one name per line
+        _("translator-credits")
     );
 
     adw_about_dialog_set_license_type(

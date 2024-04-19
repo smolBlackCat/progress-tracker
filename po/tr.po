@@ -1,167 +1,182 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Turkish translation of io.github.smolblackcat.Progress.
+# Copyright (C) 2024 io.github.smolblackcat.Progress COPYRIGHT HOLDER
+# This file is distributed under the same license as the io.github.smolblackcat.Progress package.
+#
+# Sabri Ünal <yakushabb@gmail.com>, 2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: io.github.smolblackcat.Progress\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-19 13:33+0300\n"
-"PO-Revision-Date: 2024-03-30 13:30-0300\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: es\n"
+"PO-Revision-Date: 2024-04-19 13:36+0300\n"
+"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
+"Language-Team: Turkish <takim@gnome.org.tr>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
 #: src/resources/ui/app-window.ui:13
 msgid "Homepage"
-msgstr ""
+msgstr "Ana Sayfa"
 
 #: src/resources/ui/app-window.ui:20
-#, fuzzy
 msgid "Add Board"
-msgstr "Añadir tarjeta"
+msgstr "Pano Ekle"
 
 #: src/resources/ui/app-window.ui:28
 msgid "Main Menu"
-msgstr ""
+msgstr "Ana Menü"
 
 #: src/resources/ui/app-window.ui:70
 msgid "Delete Boards"
-msgstr "Eliminar Tableros"
+msgstr "Panoları Sil"
 
 #: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
 msgid "About Progress"
-msgstr ""
+msgstr "Progress Hakkında"
 
 #: src/resources/ui/app-window.ui:82
 msgid "Preferences"
-msgstr "Preferencias"
+msgstr "Tercihler"
 
 #: src/resources/ui/create-board-dialog.ui:24
 msgid "Background"
-msgstr "Fondo"
+msgstr "Arka plan"
 
 #: src/resources/ui/create-board-dialog.ui:53
 msgid "As a file"
-msgstr "Como archivo"
+msgstr "Dosya olarak"
 
 #: src/resources/ui/create-board-dialog.ui:93
 msgid "As a color"
-msgstr "Como color"
+msgstr "Renk olarak"
 
 #: src/ui/board-dialog.cpp:20
 msgid "Board's name"
-msgstr "Nombre del tablero"
+msgstr "Pano adı"
 
 #: src/ui/board-dialog.cpp:21 src/ui/window.cpp:80
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "İptal"
 
 #: src/ui/board-dialog.cpp:22 src/ui/board-dialog.cpp:49
 #: src/ui/preferences-board-dialog.cpp:51
 msgid "Select a file"
-msgstr "Seleccione un archivo"
+msgstr "Dosya seç"
 
 #: src/ui/board-dialog.cpp:23
 msgid "Select File"
-msgstr "Seleccionar archivo"
+msgstr "Dosya Seç"
 
 #: src/ui/board-dialog.cpp:40
 msgid "No file selected"
-msgstr "No se ha seleccionado ningún archivo"
+msgstr "Dosya seçilmedi"
 
 #: src/ui/board-dialog.cpp:54
 msgid "Image Files"
-msgstr "Archivos de imagen"
+msgstr "Görüntü Dosyaları"
 
 #: src/ui/board-widget.cpp:21
 msgid "Add List"
-msgstr "Añadir lista"
+msgstr "Liste Ekle"
 
 #: src/ui/board-widget.cpp:38
 msgid "New CardList"
-msgstr "Nueva lista de tarjetas"
+msgstr "Yeni CardList"
 
 #: src/ui/card.cpp:13 src/ui/cardlist-widget.cpp:38
 msgid "Remove"
-msgstr "Eliminar"
+msgstr "Kaldır"
 
 #: src/ui/cardlist-widget.cpp:25
 msgid "Add card"
-msgstr "Añadir tarjeta"
+msgstr "Kart ekle"
 
 #: src/ui/cardlist-widget.cpp:162
 msgid "New Card"
-msgstr "Nueva tarjeta"
+msgstr "Yeni Kart"
 
 #: src/ui/create_board_dialog.cpp:14
 msgid "Create Board"
-msgstr "Crear tablero"
+msgstr "Pano Oluştur"
 
 #: src/ui/create_board_dialog.cpp:18
 msgid "Create"
-msgstr "Crear"
+msgstr "Oluştur"
 
 #: src/ui/create_board_dialog.cpp:26
 msgid "Empty board names are not allowed"
-msgstr "No se permiten nombres de tablero vacíos"
+msgstr "Boş pano adlarına izin verilmez"
 
 #: src/ui/create_board_dialog.cpp:34
 msgid "A file must be selected"
-msgstr "Se debe seleccionar un archivo"
+msgstr "Bir dosya seçilmeli"
 
 #: src/ui/create_board_dialog.cpp:48
 msgid "It was not possible to create a Board with given name"
-msgstr "No ha sido posible crear un tablero con el nombre dado"
+msgstr "Verilen adla pano oluşturulamadı"
 
 #: src/ui/editable-label-header.cpp:56
 msgid "Rename"
-msgstr "Renombrar"
+msgstr "Yeniden Adlandır"
 
 #: src/ui/preferences-board-dialog.cpp:13
 msgid "Edit Board"
-msgstr "Editar tablero"
+msgstr "Panoyu Düzenle"
 
 #: src/ui/preferences-board-dialog.cpp:14
 msgid "Save"
-msgstr "Guardar"
+msgstr "Kaydet"
 
 #: src/ui/preferences-board-dialog.cpp:35
 msgid "No file was selected"
-msgstr "No se seleccionó ningún archivo"
+msgstr "Hiçbir dosya seçilmedi"
 
 #. Translators: Replace "translator-credits" with your names, one name per line
 #: src/ui/window.cpp:55
 msgid "translator-credits"
-msgstr "haggen88"
+msgstr "Sabri Ünal <yakushabb@gmail.com>"
 
 #: src/ui/window.cpp:62
 msgid "De Moura © All rights reserved"
-msgstr "De Moura © Todos los derechos reservados"
+msgstr "De Moura © Tüm hakları saklıdır"
 
 #: src/ui/window.cpp:78
 msgid "Select the boards to be deleted"
-msgstr "Seleccione los tableros que desea eliminar"
+msgstr "Silinecek panoları seç"
 
 #: src/ui/window.cpp:79
 msgid "Delete"
-msgstr "Eliminar"
+msgstr "Sil"
 
 #: src/ui/window.cpp:172
 msgid "It was not possible to load this board"
-msgstr "No ha sido posible cargar este tablero"
+msgstr "Bu pano yüklenemedi"
 
 #~ msgid "About"
-#~ msgstr "Acerca de"
+#~ msgstr "Hakkında"
 
-#~ msgid "Simple app for storing kanban-style todo lists"
-#~ msgstr ""
-#~ "Una sencilla aplicación para almacenar listas de tareas al estilo Kanban"
+#~ msgid "Kanban style todo app"
+#~ msgstr "Kanban tarzı yapılacaklar uygulaması"
 
-#~ msgid "As a solid colour"
-#~ msgstr "Como color sólido"
+#~ msgid "Kanban;Todo;Progress;"
+#~ msgstr "Kanban;Yapılacaklar;İlerleme;"
+
+#~ msgid "Kanban-style task organiser"
+#~ msgstr "Kanban tarzı görev düzenleyici"
+
+#~ msgid "Gabriel de Moura"
+#~ msgstr "Gabriel de Moura"
+
+#~ msgid "Board Grid"
+#~ msgstr "Pano Izgarası"
+
+#~ msgid "Board view"
+#~ msgstr "Pano görünümü"
+
+#~ msgid "Progress is a simple application that organises your tasks on a board and allows the user to put them into different card lists across the board."
+#~ msgstr "İlerleme, görevlerinizi pano üzerinde düzenleyen ve kullanıcının bunları pano üzerinde farklı kart listelerine koymasını sağlayan basit bir uygulamadır."

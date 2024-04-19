@@ -2,7 +2,9 @@
 Type=Application
 Name=Progress
 StartupWMClass=io.github.smolblackcat.Progress
-Comment="Kanban style todo app"
-Comment[pt_BR]="Aplicação de TODO no estilo kanban"
+Comment=Kanban style todo app
+Categories=ProjectManagement;Office;
+Keywords=Kanban;Todo;Progress;
+Comment[pt_BR]=Aplicação de TODO no estilo kanban
 Exec=progress-tracker
 Icon=io.github.smolblackcat.Progress

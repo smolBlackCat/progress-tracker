@@ -10,12 +10,14 @@
                 <child type="start">
                     <object class="GtkButton" id="home-button">
                         <property name="icon-name">go-home</property>
+                        <property name="tooltip-text" translatable="yes">Homepage</property>
                         <property name="visible">false</property>
                     </object>
                 </child>
                 <child type="start">
                     <object class="GtkButton" id="add-board-button">
                         <property name="icon-name">list-add-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Add Board</property>
                         <property name="visible">true</property>
                     </object>
                 </child>
@@ -23,6 +25,7 @@
                     <object class="GtkMenuButton" id="app-menu-button">
                         <property name="menu-model">board-grid-menu</property>
                         <property name="icon-name">open-menu-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Main Menu</property>
                         <property name="primary">true</property>
                     </object>
                 </child>
@@ -64,11 +67,11 @@
     <menu id="board-grid-menu">
         <section>
             <item>
-                <attribute name="label" translatable="true">Delete Boards</attribute>
+                <attribute name="label" translatable="yes">Delete Boards</attribute>
                 <attribute name="action">win.delete</attribute>
             </item>
             <item>
-                <attribute name="label" translatable="true">About</attribute>
+                <attribute name="label" translatable="yes">About Progress</attribute>
                 <attribute name="action">win.about</attribute>
             </item>
         </section>
@@ -76,11 +79,11 @@
     <menu id="board-menu">
         <section>
             <item>
-                <attribute name="label" translatable="true">Preferences</attribute>
+                <attribute name="label" translatable="yes">Preferences</attribute>
                 <attribute name="action">win.preferences</attribute>
             </item>
             <item>
-                <attribute name="label" translatable="true">About</attribute>
+                <attribute name="label" translatable="yes">About Progress</attribute>
                 <attribute name="action">win.about</attribute>
             </item>
         </section>
