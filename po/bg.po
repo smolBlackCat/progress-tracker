@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-19 13:33+0300\n"
-"PO-Revision-Date: 2024-04-22 20:36+0200\n"
+"PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
 "Language: bg\n"
@@ -36,7 +36,7 @@ msgstr "Премахване на дъските"
 
 #: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
 msgid "About Progress"
-msgstr "Относно"
+msgstr "Относно „Progress“"
 
 #: src/resources/ui/app-window.ui:82
 msgid "Preferences"
