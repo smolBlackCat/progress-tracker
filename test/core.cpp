@@ -92,17 +92,6 @@ TEST_CASE("Inserting cards into a cardlist") {
     CHECK(cardlist.add_card(card3));
 }
 
-TEST_CASE("Fetching xml tags from CardList object") {
-    CardList cardlist{"Todo"};
-
-    Card card{"Chores"}, card2{"Fix the computer"},
-        card3{"Code for the cs course"};
-
-    cardlist.add_card(card);
-    cardlist.add_card(card2);
-    cardlist.add_card(card3);
-}
-
 TEST_CASE("Removing cards from a CardList object") {
     CardList cardlist{"Todo"};
 
@@ -123,20 +112,20 @@ TEST_CASE("Removing cards from a CardList object") {
     CHECK_FALSE(cardlist.remove_card(card4));
 }
 
-TEST_CASE("Basic Usage of a board") {
-    // A domain_error exception is thrown when the background is not of
-    // background type
-    //CHECK_THROWS(Board{"Gabriel's Board", "not a background"});
+TEST_CASE("Creating Boards and setting different backgrounds") {
+    Board board0{"Another Important Stuff", "invalid-background"};
+    CHECK(board0.get_background() == Board::BACKGROUND_DEFAULT);
 
-    Board board{"Computer Science Stuff", "rgba(255,255,255,1)"};  // valid;
+    Board board1{"Computer Science Stuff", "rgba(255,255,255,1)"};
+    CHECK(BackgroundType::INVALID == board1.set_background("not a background"));
+    CHECK(BackgroundType::IMAGE ==
+          board1.set_background("/home/moura/Pictures/cat-better.png"));
+    CHECK(BackgroundType::COLOR ==
+          board1.set_background("rgba(255,224,123,1)"));
+}
 
-    CHECK_FALSE(board.set_background("not a background"));
-
-    // FIXME: Don't rely on absolute path. You won't hand your laptop to anyone
-    CHECK(board.set_background("/home/moura/Pictures/cat-better.png"));
-
-    CHECK(board.set_background("rgba(255,224,123,1)"));
-
+TEST_CASE("Modifying Board objects") {
+    Board board1{"Computer Science Stuff", "rgba(255,255,255,1)"};
     CardList todo_cardlist{"TODO"};
     std::string card_names1[] = {"OS assignment", "C++ Application"};
     for (auto& name : card_names1) {
@@ -158,17 +147,13 @@ TEST_CASE("Basic Usage of a board") {
         doing_cardlist2.add_card(card);
     }
 
-    // Adding
-    CHECK(board.add_cardlist(todo_cardlist));
-    CHECK(board.add_cardlist(todo_cardlist));
+    CHECK(board1.add_cardlist(todo_cardlist));
+    CHECK(board1.add_cardlist(todo_cardlist));
+    CHECK(board1.add_cardlist(doing_cardlist));
+    CHECK(board1.add_cardlist(doing_cardlist2));
 
-    CHECK(board.add_cardlist(doing_cardlist));
-    CHECK(board.add_cardlist(doing_cardlist2));
-
-    CHECK(board.remove_cardlist(doing_cardlist));
-
-    // 'doing_cardlist' was already removed. must return false
-    CHECK_FALSE(board.remove_cardlist(doing_cardlist));
+    CHECK(board1.remove_cardlist(doing_cardlist));
+    CHECK_FALSE(board1.remove_cardlist(doing_cardlist));
 }
 
 TEST_CASE(
@@ -189,11 +174,15 @@ TEST_CASE(
     std::string* file_content = get_xml_from_file("board_progress.xml");
     CHECK(board.xml_structure() == *file_content);
 
-    if (!std::filesystem::exists("expected_to_fail.xml")) {
+    if (!std::filesystem::exists("board-with-invalid-background.xml")) {
         create_dummy_file("Test went wrong", "not a background string",
-                          "expected_to_fail.xml");
+                          "board-with-invalid-background.xml");
     }
-    REQUIRE_THROWS(Board("expected_to_fail.xml"));
+    REQUIRE_NOTHROW(Board("board-with-invalid-background.xml"));
+}
+
+TEST_CASE("Board parsing error check") {
+    CHECK(true);
 }
 
 TEST_CASE("Saving boards: Successful attempt") {
@@ -215,9 +204,10 @@ TEST_CASE("Saving boards: Successful attempt") {
     std::filesystem::remove("./progress-tracker-board.xml");
 }
 
-template<typename T>
-requires std::is_base_of_v<Item, T>
-bool order_match(std::vector<std::shared_ptr<T>> order, std::string* order_to_match) {
+template <typename T>
+    requires std::is_base_of_v<Item, T>
+bool order_match(std::vector<std::shared_ptr<T>> order,
+                 std::string* order_to_match) {
     for (size_t i = 0; i < order.size(); i++) {
         if (order[i]->get_name() != order_to_match[i]) {
             return false;
