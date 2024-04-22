@@ -101,23 +101,25 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     return true;
 }
 
-bool ui::BoardWidget::set_background(const std::string& background) {
-    // We don't check for nullptr in this method because it is only called if
-    // board is already valid
-    if (!board->set_background(background)) {
-        return false;
+void ui::BoardWidget::set_background(const std::string& background) {
+    BackgroundType bg_type = board->set_background(background);
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, background));
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_FILE, background));
+            break;
+        }
+        case BackgroundType::INVALID: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+            break;
+        }
     }
-
-    std::string bg_type = Board::get_background_type(background);
-    if (bg_type == "colour") {
-        css_provider_refptr->load_from_data(
-            std::format(CSS_FORMAT_RGB, background));
-    } else if (bg_type == "file") {
-        css_provider_refptr->load_from_data(
-            std::format(CSS_FORMAT_FILE, background));
-    }
-
-    return true;
 }
 
 std::string ui::BoardWidget::get_background() {

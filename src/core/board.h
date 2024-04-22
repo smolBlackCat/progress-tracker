@@ -7,6 +7,8 @@
 #include "cardlist.h"
 #include "item.h"
 
+enum class BackgroundType { COLOR, IMAGE, INVALID };
+
 /**
  * @class Board
  *
@@ -38,14 +40,15 @@ public:
     Board(const std::string& board_file_path);
 
     /**
-     * @brief Changes the background information of the board.
+     * @brief Changes the background information of the board. If the given
+     *        background is BackgroundType::INVALID, then the background will
+     *        fall back for a default defined in Board::BACKGROUND_DEFAULT.
      *
      * @param other The new background.
      *
-     * @returns True if the background member was successfully set, otherwise
-     * False.
+     * @returns a BackgroundType for later processing. It may be ignored
      */
-    bool set_background(const std::string& other);
+    BackgroundType set_background(const std::string& other);
 
     /**
      * @brief Returns the current background value
@@ -128,26 +131,19 @@ public:
      */
     static const std::string new_filename(const std::string& base);
 
-    static std::string get_background_type(const std::string& background);
+    /**
+     * @brief Returns the type of a given background
+     *
+     * @returns a BackgroundType enum informing the background's type
+     */
+    static BackgroundType get_background_type(const std::string& background);
+
+    static const std::string BACKGROUND_DEFAULT;
 
 private:
     std::string background, file_path;
-
-    // All CardLists pointers points to a dynamic object.
     std::vector<std::shared_ptr<CardList>> cardlist_vector;
 
-    /**
-     * @brief Checks whether a given string is of background type.
-     *
-     * @details The way this method checks if background is of background type
-     *          is by checking whether the string is a file path or colour code
-     *          (RGBA).
-     *
-     * @returns True if the background is of background type, otherwise False.
-     */
-    bool is_background(const std::string& background) const;
-
     bool cardlists_modified();
-
     std::unique_ptr<tinyxml2::XMLDocument> xml_doc();
 };

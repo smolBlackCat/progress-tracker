@@ -13,97 +13,110 @@
 
 #include "exceptions.h"
 
+const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
+
 Board::Board() : Item{""} {}
 
 Board::Board(const std::string& name, const std::string& background)
-    : Item{name}, background{}, cardlist_vector{}, file_path{} {
-    if (!is_background(background)) {
-        throw std::invalid_argument{
-            "given background is not of background type."};
-    }
-
-    this->background = background;
+    : Item{name} {
+    set_background(background);
 }
 
 Board::Board(const std::string& board_file_path)
-    : Item{"none"},
-      background{},
-      cardlist_vector{},
-      file_path{board_file_path} {
+    : Item{""}, file_path{board_file_path} {
     if (!std::filesystem::exists(file_path))
-        throw std::invalid_argument{
-            std::format("filename {} does not exist.", file_path)};
+        throw std::invalid_argument{std::format(
+            "Progress Board XML file given does not exist: {}", file_path)};
 
     tinyxml2::XMLDocument doc;
 
     auto error_code = doc.LoadFile(file_path.c_str());
     if (error_code != 0) {
         throw std::invalid_argument{std::format(
-            "It was not possible to load the file on {}", file_path)};
+            "Failed to load Progress Board XML file given: {}\n"
+            "Error code: {}", file_path, (int) error_code)};
     }
 
-    // Set basic Item attributes: name
-
-    const tinyxml2::XMLElement* board_element = doc.FirstChildElement("board");
+    auto board_element = doc.FirstChildElement("board");
 
     if (!board_element) {
         throw board_parse_error{
-            std::format("{} is not a progress xml file.", file_path)};
+            std::format("Failed to parse given Progress Board XML file: {}\n"
+                        "\"board\" element was could not be found",
+                        file_path)};
     }
 
     auto board_element_name = board_element->FindAttribute("name");
     auto board_element_background = board_element->FindAttribute("background");
 
     if (!(board_element_name && board_element_background)) {
+        std::string missing_attr = board_element_name ? "background" : "name";
         throw board_parse_error{
-            std::format("{} is not a progress xml file.", file_path)};
+            std::format("Failed to parse given Progress Board XML file: {}\n"
+                        "\"{}\" attribute could not be found",
+                        missing_attr, file_path)};
     }
 
     name = board_element_name->Value();
-    background = board_element_background->Value();
 
-    if (name.empty() || !is_background(background)) {
-        throw board_parse_error{std::format(
-            "{} is not a well formed progress xml file.", file_path)};
+    // TODO: It'd be good practise to log a warning message informing it was
+    // not possible to set a background, and the default one is going to be set
+    set_background(board_element_background->Value());
+
+    if (name.empty()) {
+        throw board_parse_error{
+            std::format("Failed to parse given Progress Board XML file: {}\n"
+                        "Boards with empty names are not allowed",
+                        file_path)};
     }
 
-    const tinyxml2::XMLElement* list_element =
-        board_element->FirstChildElement("list");
+    auto list_element = board_element->FirstChildElement("list");
 
     while (list_element) {
         auto cur_cardlist_name = list_element->Attribute("name");
+
         if (!cur_cardlist_name) {
-            throw board_parse_error{
-                std::format("{} is not a valid progress xml file.", file_path)};
+            throw board_parse_error{std::format(
+                "Failed to parse given Progress Board XML file: {}\n"
+                "A \"list\" element failed to parsed."
+                "{}:{}",
+                file_path, list_element->GetLineNum(),
+                list_element->GetText())};
         }
 
         CardList cur_cardlist{cur_cardlist_name};
+        auto card_element = list_element->FirstChildElement("card");
 
-        const tinyxml2::XMLElement* card_element =
-            list_element->FirstChildElement("card");
         while (card_element) {
             auto cur_card_name = card_element->Attribute("name");
 
             if (!cur_card_name) {
                 throw board_parse_error{std::format(
-                    "{} is not a valid progress xml file.", file_path)};
+                    "Failed to parse given Progress Board XML file: {}\n"
+                    "Failed to load {} \"list\" element\n",
+                    "\"card\" element on line {} has no name attribute",
+                    file_path, cur_cardlist_name, card_element->GetLineNum())};
             }
-            cur_cardlist.add_card(Card{cur_card_name});
 
+            cur_cardlist.add_card(Card{cur_card_name});
             card_element = card_element->NextSiblingElement("card");
         }
         cur_cardlist.set_modified(false);
-        this->add_cardlist(cur_cardlist);
+        add_cardlist(cur_cardlist);
 
         list_element = list_element->NextSiblingElement("list");
     }
     modified = false;
 }
 
-bool Board::set_background(const std::string& other) {
-    bool valid_background = is_background(other);
-    if (valid_background) background = other;
-    return valid_background;
+BackgroundType Board::set_background(const std::string& other) {
+    BackgroundType bg_type = Board::get_background_type(other);
+    if (!(bg_type == BackgroundType::INVALID)) {
+        background = other;
+    } else {
+        background = Board::BACKGROUND_DEFAULT;
+    }
+    return bg_type;
 }
 
 std::string Board::get_background() const { return background; }
@@ -198,15 +211,6 @@ std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
     return cardlist_vector;
 }
 
-bool Board::is_background(const std::string& background) const {
-    std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
-    std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
-
-    return std::regex_match(background, rgba_r) ||
-           std::regex_match(background, rgba1_r) ||
-           std::filesystem::exists(background);
-}
-
 bool Board::cardlists_modified() {
     for (auto& cardlist : cardlist_vector) {
         if (cardlist->is_modified()) {
@@ -260,18 +264,16 @@ const std::string Board::new_filename(const std::string& base) {
     return filename;
 }
 
-std::string Board::get_background_type(const std::string& background) {
+BackgroundType Board::get_background_type(const std::string& background) {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};
     std::regex rgba1_r{"rgb\\(\\d{1,3},\\d{1,3},\\d{1,3}\\)"};
-
     if (std::regex_match(background, rgba_r) ||
         std::regex_match(background, rgba1_r)) {
-        return "colour";
+        return BackgroundType::COLOR;
     } else if (std::filesystem::exists(background)) {
-        return "file";
+        return BackgroundType::IMAGE;
     }
-
-    return "invalid";
+    return BackgroundType::INVALID;
 }
 
 std::unique_ptr<tinyxml2::XMLDocument> Board::xml_doc() {

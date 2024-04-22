@@ -18,25 +18,28 @@ PreferencesBoardDialog::PreferencesBoardDialog(
         sigc::mem_fun(*this, &PreferencesBoardDialog::on_save_changes));
 }
 
-// TODO: Enhance error checking
 void PreferencesBoardDialog::load_board() {
     p_board_name_entry->set_text(board_widget.get_board_name());
-    if (Board::get_background_type(board_widget.get_background()) == "file") {
-        selected_file =
-            Gio::File::create_for_path(board_widget.get_background());
-        p_file_image->set(board_widget.get_background());
-        p_select_file_label->set_text(board_widget.get_background());
-        file_selected = true;
-    } else {
-        // If this board doesn't have a solid colour as background,
-        // it implies that no file was selected. Then clean everything
-        // from other boards
-        file_selected = false;
-        p_select_file_label->set_label(_("No file was selected"));
-        p_file_image->set("");
+    BackgroundType bg_type =
+        Board::get_background_type(board_widget.get_background());
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            file_selected = false;
+            p_select_file_label->set_label(_("No file was selected"));
+            p_file_image->set("");
 
-        p_colour_button->set_rgba(Gdk::RGBA{board_widget.get_background()});
-        selected_colour.set(board_widget.get_background());
+            p_colour_button->set_rgba(Gdk::RGBA{board_widget.get_background()});
+            selected_colour.set(board_widget.get_background());
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            file_selected = true;
+            selected_file =
+                Gio::File::create_for_path(board_widget.get_background());
+            p_file_image->set(board_widget.get_background());
+            p_select_file_label->set_text(board_widget.get_background());
+            break;
+        }
     }
 }
 
