@@ -92,7 +92,7 @@ Board::Board(const std::string& board_file_path)
             if (!cur_card_name) {
                 throw board_parse_error{std::format(
                     "Failed to parse given Progress Board XML file: {}\n"
-                    "Failed to load {} \"list\" element\n",
+                    "Failed to load {} \"list\" element\n"
                     "\"card\" element on line {} has no name attribute",
                     file_path, cur_cardlist_name, card_element->GetLineNum())};
             }
