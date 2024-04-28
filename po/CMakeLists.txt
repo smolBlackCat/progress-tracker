@@ -7,7 +7,7 @@ set(MO_FILENAME progress-tracker.mo)
 set(LOCALE_DIRECTORY ${PROJECT_BINARY_DIR}/locales)
 file(MAKE_DIRECTORY ${LOCALE_DIRECTORY})
 
-list(APPEND PO_NAMES bg es it nl pt_BR tr)
+list(APPEND PO_NAMES bg es it nl pt_BR ru_RU tr uk_UA)
 
 foreach(PO_NAME IN LISTS PO_NAMES)
 	list(APPEND PO_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${PO_NAME}.po)
