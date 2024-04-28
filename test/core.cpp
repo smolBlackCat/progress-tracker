@@ -2,6 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <type_traits>
 
 #include "board.h"
@@ -181,8 +182,155 @@ TEST_CASE(
     REQUIRE_NOTHROW(Board("board-with-invalid-background.xml"));
 }
 
-TEST_CASE("Board parsing error check") {
-    CHECK(true);
+void write_to(const std::string& filename, const std::string& data) {
+    std::ofstream output_file{filename};
+
+    if (output_file.is_open()) {
+        output_file << data;
+        output_file.close();
+    } else {
+        std::cerr << "It was not possible to create file " << filename
+                  << std::endl;
+    }
+}
+
+TEST_CASE("Triggering Progress Board XML parsing errors") {
+    CHECK_THROWS(Board{"board-does-not-exist.xml"});
+
+    std::string invalid_boards_xml[] = {
+        // Board doesn't have a name attribute
+        "<board>"
+        "background=\"rgb(4,31,33)\">"
+        "<list name=\"To Learn\">"
+        "<card name=\"Agile Software Development\"/>"
+        "<card name=\"Requirements Engineering\"/>"
+        "<card name=\"System Modeling\"/>"
+        "<card name=\"Case Studies\"/>"
+        "</list>"
+        "<list name=\"Studying\">"
+        "<card name=\"Software Processes\"/>"
+        "<card name=\"Coping with change\"/>"
+        "<card name=\"Process Improvement\"/>"
+        "</list>"
+        "<list name=\"Studied\">"
+        "<card name=\"Introduction to Software Engineering\"/>"
+        "<card name=\"Software Engineering ethics\"/>"
+        "<card name=\"Professional Software Development\"/>"
+        "<card name=\"Integration and configuration\"/>"
+        "</list>"
+        "<list name=\"To Review\">"
+        "<card name=\"Incremental Development\"/>"
+        "<card name=\"Process Activities\"/>"
+        "</list>"
+        "</board>",
+
+        // Board has an empty name
+        "<board name=\"\" "
+        "background=\"rgb(4,31,33)\">"
+        "<list name=\"To Learn\">"
+        "<card name=\"Agile Software Development\"/>"
+        "<card name=\"Requirements Engineering\"/>"
+        "<card name=\"System Modeling\"/>"
+        "<card name=\"Case Studies\"/>"
+        "</list>"
+        "<list name=\"Studying\">"
+        "<card name=\"Software Processes\"/>"
+        "<card name=\"Coping with change\"/>"
+        "<card name=\"Process Improvement\"/>"
+        "</list>"
+        "<list name=\"Studied\">"
+        "<card name=\"Introduction to Software Engineering\"/>"
+        "<card name=\"Software Engineering ethics\"/>"
+        "<card name=\"Professional Software Development\"/>"
+        "<card name=\"Integration and configuration\"/>"
+        "</list>"
+        "<list name=\"To Review\">"
+        "<card name=\"Incremental Development\"/>"
+        "<card name=\"Process Activities\"/>"
+        "</list>"
+        "</board>",
+
+        // Board has ill-formed list elements
+        "<board name=\"Software Engineering Subject\" "
+        "background=\"rgb(4,31,33)\">"
+        "<list name=\"To Learn\">"
+        "<card name=\"Agile Software Development\"/>"
+        "<card name=\"Requirements Engineering\"/>"
+        "<card name=\"System Modeling\"/>"
+        "<card name=\"Case Studies\"/>"
+        "</list>"
+        "<list>"  // list element must have a name attribute
+        "<card name=\"Software Processes\"/>"
+        "<card name=\"Coping with change\"/>"
+        "<card name=\"Process Improvement\"/>"
+        "</list>"
+        "<list name=\"Studied\">"
+        "<card name=\"Introduction to Software Engineering\"/>"
+        "<card name=\"Software Engineering ethics\"/>"
+        "<card name=\"Professional Software Development\"/>"
+        "<card name=\"Integration and configuration\"/>"
+        "</list>"
+        "<list name=\"To Review\">"
+        "<card name=\"Incremental Development\"/>"
+        "<card name=\"Process Activities\"/>"
+        "</list>"
+        "</board>",
+
+        // Board have an ill-formed card element
+        "<board name=\"Software Engineering Subject\" "
+        "background=\"rgb(4,31,33)\">"
+        "<list name=\"To Learn\">"
+        "<card name=\"Agile Software Development\"/>"
+        "<card name=\"Requirements Engineering\"/>"
+        "<card name=\"System Modeling\"/>"
+        "<card name=\"Case Studies\"/>"
+        "</list>"
+        "<list name=\"Studying\">"
+        "<card/>"  // Culprit card
+        "<card name=\"Coping with change\"/>"
+        "<card name=\"Process Improvement\"/>"
+        "</list>"
+        "<list name=\"Studied\">"
+        "<card name=\"Introduction to Software Engineering\"/>"
+        "<card name=\"Software Engineering ethics\"/>"
+        "<card name=\"Professional Software Development\"/>"
+        "<card name=\"Integration and configuration\"/>"
+        "</list>"
+        "<list name=\"To Review\">"
+        "<card name=\"Incremental Development\"/>"
+        "<card name=\"Process Activities\"/>"
+        "</list>"
+        "</board>",
+
+        // Board is not defined at all
+        "<list name=\"To Learn\">"
+        "<card name=\"Agile Software Development\"/>"
+        "<card name=\"Requirements Engineering\"/>"
+        "<card name=\"System Modeling\"/>"
+        "<card name=\"Case Studies\"/>"
+        "</list>"
+        "<list name=\"Studying\">"
+        "<card name=\"Software Processes\"/>"
+        "<card name=\"Coping with change\"/>"
+        "<card name=\"Process Improvement\"/>"
+        "</list>"
+        "<list name=\"Studied\">"
+        "<card name=\"Introduction to Software Engineering\"/>"
+        "<card name=\"Software Engineering ethics\"/>"
+        "<card name=\"Professional Software Development\"/>"
+        "<card name=\"Integration and configuration\"/>"
+        "</list>"
+        "<list name=\"To Review\">"
+        "<card name=\"Incremental Development\"/>"
+        "<card name=\"Process Activities\"/>"
+        "</list>"};
+
+    for (int i = 0; i < 5; i++) {
+        std::string filename = std::format("board-{}.xml", i);
+        write_to(filename, invalid_boards_xml[i]);
+        CHECK_THROWS(Board{filename});
+        std::filesystem::remove("./" + filename);
+    }
 }
 
 TEST_CASE("Saving boards: Successful attempt") {
