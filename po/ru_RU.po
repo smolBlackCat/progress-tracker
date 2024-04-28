@@ -1,0 +1,158 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-19 13:33+0300\n"
+"PO-Revision-Date: 2024-04-28 21:10+0300\n"
+"Last-Translator: volkov <volkovissocool@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: src/resources/ui/app-window.ui:13
+msgid "Homepage"
+msgstr "Домашняя страница"
+
+#: src/resources/ui/app-window.ui:20
+msgid "Add Board"
+msgstr "Добавить доску"
+
+#: src/resources/ui/app-window.ui:28
+msgid "Main Menu"
+msgstr "Главное меню"
+
+#: src/resources/ui/app-window.ui:70
+msgid "Delete Boards"
+msgstr "Удаление досок"
+
+#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+msgid "About Progress"
+msgstr "Про приложение"
+
+#: src/resources/ui/app-window.ui:82
+msgid "Preferences"
+msgstr "Настройки"
+
+#: src/resources/ui/create-board-dialog.ui:24
+msgid "Background"
+msgstr "Добавить обои в качестве…"
+
+#: src/resources/ui/create-board-dialog.ui:53
+msgid "As a file"
+msgstr "Файла изображения"
+
+#: src/resources/ui/create-board-dialog.ui:93
+msgid "As a color"
+msgstr "Сплошного цвета"
+
+#: src/ui/board-dialog.cpp:20
+msgid "Board's name"
+msgstr "Название доски"
+
+#: src/ui/board-dialog.cpp:21 src/ui/window.cpp:80
+msgid "Cancel"
+msgstr "Отменить"
+
+#: src/ui/board-dialog.cpp:22 src/ui/board-dialog.cpp:49
+#: src/ui/preferences-board-dialog.cpp:51
+msgid "Select a file"
+msgstr "Выбрать файл"
+
+#: src/ui/board-dialog.cpp:23
+msgid "Select File"
+msgstr "Выбрать файл"
+
+#: src/ui/board-dialog.cpp:40
+msgid "No file selected"
+msgstr "Файл не был выбран"
+
+#: src/ui/board-dialog.cpp:54
+msgid "Image Files"
+msgstr "Файлы изображений"
+
+#: src/ui/board-widget.cpp:21
+msgid "Add List"
+msgstr "Добавить список"
+
+#: src/ui/board-widget.cpp:38
+msgid "New CardList"
+msgstr "Новый список карточек"
+
+#: src/ui/card.cpp:13 src/ui/cardlist-widget.cpp:38
+msgid "Remove"
+msgstr "Удалить"
+
+#: src/ui/cardlist-widget.cpp:25
+msgid "Add card"
+msgstr "Добавить карточку"
+
+#: src/ui/cardlist-widget.cpp:162
+msgid "New Card"
+msgstr "Новая карточка"
+
+#: src/ui/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr "Создать доску"
+
+#: src/ui/create_board_dialog.cpp:18
+msgid "Create"
+msgstr "Создать"
+
+#: src/ui/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr "Нельзя создать доску с пустым именем"
+
+#: src/ui/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr "Нужно выбрать файл"
+
+#: src/ui/create_board_dialog.cpp:48
+msgid "It was not possible to create a Board with given name"
+msgstr "Не удалось создать доску с таким названием"
+
+#: src/ui/editable-label-header.cpp:56
+msgid "Rename"
+msgstr "Переименовать"
+
+#: src/ui/preferences-board-dialog.cpp:13
+msgid "Edit Board"
+msgstr "Редактирование доски"
+
+#: src/ui/preferences-board-dialog.cpp:14
+msgid "Save"
+msgstr "Сохранить"
+
+#: src/ui/preferences-board-dialog.cpp:35
+msgid "No file was selected"
+msgstr "Файл не был выбран"
+
+# Что такое "Канбан" - https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BD%D0%B1%D0%B0%D0%BD
+#. Translators: Replace "translator-credits" with your names, one name per line
+#: src/ui/window.cpp:55
+msgid "translator-credits"
+msgstr "volkov <volkovissocool@gmail.com>"
+
+#: src/ui/window.cpp:62
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Все права защищены"
+
+#: src/ui/window.cpp:78
+msgid "Select the boards to be deleted"
+msgstr "Выберите доски для удаления"
+
+#: src/ui/window.cpp:79
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/ui/window.cpp:172
+msgid "It was not possible to load this board"
+msgstr "Не удалось загрузить эту доску"
