@@ -49,7 +49,13 @@ void ui::Application::on_startup() {
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path();
             if (board_filename.ends_with(".xml")) {
-                main_window->add_board(board_filename);
+                try {
+                    main_window->add_board(board_filename);
+                } catch (std::invalid_argument& err) {
+                    // TODO: Add code keeping track of how many failures to
+                    // load boards
+                    std::cerr << err.what() << std::endl;
+                }
             }
         }
     }
