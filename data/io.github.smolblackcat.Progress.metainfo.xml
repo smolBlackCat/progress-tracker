@@ -53,6 +53,18 @@
   </categories>
 
   <releases>
+    <release date="2024-04-28" version="1.2">
+      <description>
+        <p>The current minor releases brings some additions and improvements</p>
+        <ul>
+          <li>Utilise Adwaita About Dialogs</li>
+          <li>Added Bulgarian Translation</li>
+          <li>Added Turkish Translation</li>
+          <li>Progress will not fail to start in case the boards are corrupted</li>
+          <li>Added tooltips</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-04-01" version="1.1">
       <description>
         <p>Bug Fixes and Improvements</p>
