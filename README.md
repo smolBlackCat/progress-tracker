@@ -34,7 +34,7 @@ the dependencies themselves. All they have to do is download the .deb package
 and install it using apt-get (or apt).
 
 ```sh
-sudo apt install ./progress-tracker-1.0.deb
+sudo apt install ./progress-tracker-1.2.deb
 ```
 
 After that, the system should have updated the desktop database and the
@@ -54,6 +54,7 @@ manager.
 
 * cmake
 * libgtkmm-4.0-dev
+* libadwaita-1-dev
 * libtinyxml2-dev
 * gettext
 * catch2 (for testing)
@@ -64,7 +65,7 @@ manager.
 
     ```sh
     # catch2 is totally optional. Install it only if you're going to run tests
-    sudo apt install libgtkmm-4.0-dev libtinyxml2-dev gettext catch2
+    sudo apt install libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev gettext catch2
     ```
 
 2. Clone the project's repo
