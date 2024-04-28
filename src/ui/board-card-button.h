@@ -18,6 +18,8 @@ public:
      * @brief BoardCardButton constructor.
      * @param board Board object pointer from which basic information will be
      *              gathered from.
+     *
+     * @throws std::invalid_argument when the file given does not exist
      */
     BoardCardButton(std::string board_filepath);
 
