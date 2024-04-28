@@ -32,9 +32,10 @@ Board::Board(const std::string& board_file_path)
 
     auto error_code = doc.LoadFile(file_path.c_str());
     if (error_code != 0) {
-        throw std::invalid_argument{std::format(
-            "Failed to load Progress Board XML file given: {}\n"
-            "Error code: {}", file_path, (int) error_code)};
+        throw std::invalid_argument{
+            std::format("Failed to load Progress Board XML file given: {}\n"
+                        "Error code: {}",
+                        file_path, (int)error_code)};
     }
 
     auto board_element = doc.FirstChildElement("board");
@@ -78,10 +79,8 @@ Board::Board(const std::string& board_file_path)
         if (!cur_cardlist_name) {
             throw board_parse_error{std::format(
                 "Failed to parse given Progress Board XML file: {}\n"
-                "A \"list\" element failed to parsed."
-                "{}:{}",
-                file_path, list_element->GetLineNum(),
-                list_element->GetText())};
+                "A \"list\" element on line {} failed to parsed.",
+                file_path, list_element->GetLineNum())};
         }
 
         CardList cur_cardlist{cur_cardlist_name};
