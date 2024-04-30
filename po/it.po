@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-19 13:33+0300\n"
-"PO-Revision-Date: 2024-03-30 13:17+0100\n"
+"PO-Revision-Date: 2024-04-28 13:17+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -18,16 +18,15 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:13
 msgid "Homepage"
-msgstr ""
+msgstr "Homepage"
 
 #: src/resources/ui/app-window.ui:20
-#, fuzzy
 msgid "Add Board"
-msgstr "Aggiungi scheda"
+msgstr "Aggiungi bacheca"
 
 #: src/resources/ui/app-window.ui:28
 msgid "Main Menu"
-msgstr ""
+msgstr "Pagina principale"
 
 #: src/resources/ui/app-window.ui:70
 msgid "Delete Boards"
@@ -35,7 +34,7 @@ msgstr "Elimina bacheche"
 
 #: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
 msgid "About Progress"
-msgstr ""
+msgstr "Informazioni su Progress"
 
 #: src/resources/ui/app-window.ui:82
 msgid "Preferences"
