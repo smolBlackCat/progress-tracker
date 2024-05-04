@@ -32,8 +32,8 @@ public:
 
     CardlistWidget(BoardWidget& board,
                    std::shared_ptr<CardList> cardlist_refptr);
-    ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr);
-    ui::CardWidget* add_card();
+    ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr,
+                             bool is_new = false);
     void remove_card(ui::CardWidget* card);
     std::shared_ptr<CardList>& get_cardlist_refptr();
     bool is_child(ui::CardWidget* card);

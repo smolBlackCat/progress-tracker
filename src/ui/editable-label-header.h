@@ -33,6 +33,16 @@ public:
      */
     void add_option(const std::string& name, const std::string& title_name,
                     const Gio::ActionMap::ActivateSlot& procedure);
+    
+    /**
+     * @brief Changes the widget view to editing mode
+     */
+    void to_editing_mode();
+
+    /**
+     * @brief Changes the widget view out of editing mode
+     */
+    void exit_editing_mode();
 
 protected:
     Gtk::Revealer revealer;
@@ -46,16 +56,6 @@ protected:
     // Controllers
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
-
-    /**
-     * @brief Changes the widget view to editing mode
-     */
-    void to_editing_mode();
-
-    /**
-     * @brief Changes the widget view out of editing mode
-     */
-    void exit_editing_mode();
 
     /**
      * @brief Updates the label

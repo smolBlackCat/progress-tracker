@@ -42,7 +42,9 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_halign(Gtk::Align::START);
     add_card_button.set_hexpand(false);
-    add_card_button.signal_clicked().connect([this]() { add_card(); });
+    add_card_button.signal_clicked().connect([this]() {
+        add_card(this->cardlist_refptr->add_card(Card{_("New Card")}), true);
+    });
     root.append(add_card_button);
 
     append(cardlist_header);
@@ -148,18 +150,16 @@ void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     }
 }
 
-ui::CardWidget* ui::CardlistWidget::add_card(std::shared_ptr<Card> card) {
+ui::CardWidget* ui::CardlistWidget::add_card(std::shared_ptr<Card> card,
+                                             bool is_new) {
     auto new_card = Gtk::make_managed<ui::CardWidget>(card);
+    if (is_new) new_card->to_editing_mode();
     cards_tracker.push_back(new_card);
     new_card->set_cardlist(this);
     root.append(*new_card);
     root.reorder_child_after(add_card_button, *new_card);
     setup_drag_and_drop(new_card);
     return new_card;
-}
-
-ui::CardWidget* ui::CardlistWidget::add_card() {
-    return add_card(cardlist_refptr->add_card(Card{_("New Card")}));
 }
 
 std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist_refptr() {

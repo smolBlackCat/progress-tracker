@@ -67,8 +67,11 @@ public:
      * pointing to a CardList object.
      *
      * @param cardlist_ptr smart pointer pointing to the cardlist.
+     * @param is_new bool indicating whether the cardlist is completely new (has
+     *               not been loaded from a file) or not
      */
-    void add_cardlist(std::shared_ptr<CardList> cardlist_ptr);
+    void add_cardlist(std::shared_ptr<CardList> cardlist_ptr,
+                      bool is_new = false);
 
     /**
      * @brief Removes a CardlistWidget widget.

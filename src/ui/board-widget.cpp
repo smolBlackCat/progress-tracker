@@ -35,7 +35,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     css_provider_refptr->load_from_data(CSS_FORMAT);
 
     add_button.signal_clicked().connect([this]() {
-        add_cardlist(board->add_cardlist(CardList{_("New CardList")}));
+        add_cardlist(board->add_cardlist(CardList{_("New CardList")}), true);
     });
     add_button.set_halign(Gtk::Align::START);
     add_button.set_valign(Gtk::Align::START);
@@ -82,9 +82,11 @@ bool ui::BoardWidget::save(bool free) {
     return success;
 }
 
-void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr) {
+void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr,
+                                   bool is_new) {
     auto new_cardlist =
         Gtk::make_managed<ui::CardlistWidget>(*this, cardlist_refptr);
+    if (is_new) new_cardlist->get_header().to_editing_mode();
     cardlist_vector.push_back(new_cardlist);
 
     setup_drag_and_drop(new_cardlist);
