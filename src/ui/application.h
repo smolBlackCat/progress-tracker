@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libadwaita-1/adwaita.h>
 #include <glibmm.h>
 #include <gtkmm/application.h>
 
@@ -16,6 +15,9 @@ namespace ui {
  */
 class Application : public Gtk::Application {
 public:
+    static constexpr const char* PROGRESS_WINDOW =
+        "/io/github/smolblackcat/Progress/app-window.ui";
+
     static Glib::RefPtr<ui::Application> create();
 
 protected:

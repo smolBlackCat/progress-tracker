@@ -103,10 +103,9 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       css_provider{Gtk::CssProvider::create()} {
     signal_close_request().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
-    auto cbd_builder = Gtk::Builder::create_from_resource(
-        "/io/github/smolblackcat/Progress/create-board-dialog.ui");
-    auto cbd_builder1 = Gtk::Builder::create_from_resource(
-        "/io/github/smolblackcat/Progress/create-board-dialog.ui");
+
+    auto cbd_builder = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
+    auto cbd_builder1 = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
     create_board_dialog =
         Gtk::Builder::get_widget_derived<ui::CreateBoardDialog>(
             cbd_builder, "create-board", *this);
@@ -241,10 +240,10 @@ void ProgressWindow::setup_menu_button() {
 void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
         css_provider->load_from_resource(
-            "/io/github/smolblackcat/Progress/style-dark.css");
+            ProgressWindow::STYLE_DARK_CSS);
     } else {
         css_provider->load_from_resource(
-            "/io/github/smolblackcat/Progress/style.css");
+            ProgressWindow::STYLE_CSS);
     }
 }
 

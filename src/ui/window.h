@@ -54,6 +54,13 @@ private:
  */
 class ProgressWindow : public Gtk::ApplicationWindow {
 public:
+    static constexpr const char* STYLE_DARK_CSS =
+        "/io/github/smolblackcat/Progress/style-dark.css";
+    static constexpr const char* STYLE_CSS =
+        "/io/github/smolblackcat/Progress/style.css";
+    static constexpr const char* CREATE_BOARD_DIALOG =
+        "/io/github/smolblackcat/Progress/create-board-dialog.ui";
+
     ProgressWindow(BaseObjectType* cobject,
                    const Glib::RefPtr<Gtk::Builder>& builder);
     ~ProgressWindow() override;

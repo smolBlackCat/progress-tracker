@@ -33,7 +33,7 @@ protected:
  */
 class CardlistWidget : public Gtk::ListBox {
 public:
-    static const int CARDLIST_SIZE = 240;
+    static constexpr int CARDLIST_SIZE = 240;
 
     /**
      * @brief CardlistWidget's constructor

@@ -1,5 +1,6 @@
 #include "application.h"
 
+#include <adwaita.h>
 #include <app_info.h>
 
 #include <cstdlib>
@@ -20,8 +21,7 @@ void ui::Application::on_startup() {
     Gtk::Application::on_startup();
     adw_init();
 
-    auto window_builder = Gtk::Builder::create_from_resource(
-        "/io/github/smolblackcat/Progress/app-window.ui");
+    auto window_builder = Gtk::Builder::create_from_resource(PROGRESS_WINDOW);
     main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
         window_builder, "app-window");
     if (!main_window) {
