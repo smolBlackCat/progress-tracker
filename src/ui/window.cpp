@@ -42,7 +42,7 @@ void ProgressAboutDialog::setup() {
 
     adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
                                           "Progress");
-    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(about_dialogp), "1.2");
+    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(about_dialogp), "1.3");
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
                                         "Gabriel de Moura");
 
