@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libadwaita-1/adwaita.h>
 #include <gtkmm.h>
+#include <libadwaita-1/adwaita.h>
 
 #include "../core/board.h"
 #include "board-card-button.h"
@@ -24,10 +24,8 @@ public:
 
     /**
      * @brief Presents the about dialog on screen
-    */
+     */
     void show();
-
-    std::vector<const char*> translators_names = {"Heimen Stoffels <vistausss@fastmail.com>", "Albano Battistella <>", "haggen 88 <>"};
 
 protected:
     void setup();
@@ -60,7 +58,7 @@ public:
                    const Glib::RefPtr<Gtk::Builder>& builder);
     ~ProgressWindow() override;
 
-    void add_board(std::string board_filepath);
+    void add_board(const std::string& board_filepath);
 
     /**
      * @brief Shows application information
@@ -98,7 +96,7 @@ public:
      */
     void delete_selected_boards();
 
-private:
+protected:
     const Glib::RefPtr<Gtk::Builder> window_builder;
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
@@ -110,9 +108,15 @@ private:
     ui::PreferencesBoardDialog* preferences_board_dialog;
     ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
+    Gtk::Button *home_button_p, *add_board_button_p;
+    Gtk::Overlay* app_overlay_p;
+    Gtk::Stack* app_stack_p;
+    Gtk::FlowBox* boards_grid_p;
+    Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
+    Gtk::MenuButton* app_menu_button_p;
 
     void setup_menu_button();
-    void load_app_style();
+    void load_appropriate_style();
     bool on_window_close();
 };
 }  // namespace ui

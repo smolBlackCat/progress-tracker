@@ -13,22 +13,8 @@
 
 namespace ui {
 
-ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) : parent{parent} {
-    // set_program_name("Progress");
-    // set_logo(Gdk::Texture::create_from_resource(
-    //     "/ui/io.github.smolblackcat.Progress.svg"));
-    // set_version("1.0");
-    // set_comments(_("Simple app for storing kanban-style todo lists"));
-    // set_license_type(Gtk::License::MIT_X11);
-    // set_copyright(_("De Moura © All rights reserved"));
-    // std::vector<Glib::ustring> authors{};
-    // authors.push_back("De Moura");
-    // set_authors(authors);
-
-    // set_hide_on_close();
-    // set_modal();
-    // set_transient_for(parent);
-}
+ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
+    : parent{parent} {}
 
 ProgressAboutDialog::~ProgressAboutDialog() { g_object_unref(about_dialogp); }
 
@@ -102,12 +88,19 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       about_dialog{*this},
       board_widget{*this},
       delete_boards_bar{*this},
+      home_button_p{builder->get_widget<Gtk::Button>("home-button")},
+      add_board_button_p{builder->get_widget<Gtk::Button>("add-board-button")},
+      app_overlay_p{builder->get_widget<Gtk::Overlay>("app-overlay")},
+      app_stack_p{builder->get_widget<Gtk::Stack>("app-stack")},
+      boards_grid_p{builder->get_widget<Gtk::FlowBox>("boards-grid")},
+      board_grid_menu_p{
+          window_builder->get_object<Gio::MenuModel>("board-grid-menu")},
+      board_menu_p{window_builder->get_object<Gio::MenuModel>("board-menu")},
+      app_menu_button_p{
+          builder->get_widget<Gtk::MenuButton>("app-menu-button")},
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()} {
-    Gtk::StyleProvider::add_provider_for_display(
-        get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
-
     signal_close_request().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
     auto cbd_builder = Gtk::Builder::create_from_resource(
@@ -124,32 +117,29 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
 
-    load_app_style();
+    Gtk::StyleProvider::add_provider_for_display(
+        get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    load_appropriate_style();
     g_signal_connect_after(
         G_OBJECT(adw_style_manager), "notify::dark",
         G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,
                        gpointer data) {
-            reinterpret_cast<ProgressWindow*>(data)->load_app_style();
+            reinterpret_cast<ProgressWindow*>(data)->load_appropriate_style();
         }),
         this);
 
-    builder->get_widget<Gtk::Button>("home-button")
-        ->signal_clicked()
-        .connect(sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
-    builder->get_widget<Gtk::Button>("add-board-button")
-        ->signal_clicked()
-        .connect(
-            sigc::mem_fun(*this, &ProgressWindow::show_create_board_dialog));
+    home_button_p->signal_clicked().connect(
+        sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
+    add_board_button_p->signal_clicked().connect(
+        sigc::mem_fun(*this, &ProgressWindow::show_create_board_dialog));
     setup_menu_button();
 
     delete_boards_bar.set_halign(Gtk::Align::CENTER);
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
     delete_boards_bar.set_margin_bottom(10);
-    builder->get_widget<Gtk::Overlay>("app-overlay")
-        ->add_overlay(delete_boards_bar);
-    builder->get_widget<Gtk::Stack>("app-stack")
-        ->add(board_widget, "board-page");
+    app_overlay_p->add_overlay(delete_boards_bar);
+    app_stack_p->add(board_widget, "board-page");
 }
 
 ProgressWindow::~ProgressWindow() {
@@ -157,39 +147,33 @@ ProgressWindow::~ProgressWindow() {
     delete preferences_board_dialog;
 }
 
-void ProgressWindow::add_board(std::string board_filepath) {
-    auto new_board_card = Gtk::make_managed<BoardCardButton>(board_filepath);
-    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-        ->insert(*new_board_card, 0);
-    auto fb_child_p = window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-                          ->get_child_at_index(0);
-    new_board_card->signal_clicked().connect(
-        [this, new_board_card, fb_child_p]() {
+void ProgressWindow::add_board(const std::string& board_filepath) {
+    auto board_entry_button =
+        Gtk::make_managed<BoardCardButton>(board_filepath);
+    boards_grid_p->insert(*board_entry_button, 0);
+    auto fb_child_p = boards_grid_p->get_child_at_index(0);
+    board_entry_button->signal_clicked().connect(
+        [this, board_entry_button, fb_child_p]() {
             if (!this->on_delete_mode) {
                 Board* board;
                 try {
-                    board = new Board{new_board_card->get_filepath()};
+                    board = new Board{board_entry_button->get_filepath()};
                 } catch (std::invalid_argument& err) {
-                    // This catches both board_parse_errors and general
-                    // invalid_argument exceptions
                     Gtk::AlertDialog::create(
                         _("It was not possible to load this board"))
                         ->show(*this);
 
-                    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-                        ->remove(*new_board_card);
+                    boards_grid_p->remove(*board_entry_button);
                     return;
                 }
                 on_board_view();
-                board_widget.set(board, new_board_card);
+                board_widget.set(board, board_entry_button);
                 set_title(board->get_name());
             } else {
                 if (fb_child_p->is_selected()) {
-                    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-                        ->unselect_child(*fb_child_p);
+                    boards_grid_p->unselect_child(*fb_child_p);
                 } else {
-                    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-                        ->select_child(*fb_child_p);
+                    boards_grid_p->select_child(*fb_child_p);
                 }
             }
         });
@@ -203,51 +187,39 @@ void ProgressWindow::show_create_board_dialog() {
 
 void ProgressWindow::on_delete_board_mode() {
     on_delete_mode = true;
-    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-        ->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
+    boards_grid_p->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
     delete_boards_bar.set_reveal_child();
 }
 
 void ProgressWindow::off_delete_board_mode() {
     on_delete_mode = false;
     delete_boards_bar.set_reveal_child(false);
-    window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-        ->set_selection_mode(Gtk::SelectionMode::NONE);
+    boards_grid_p->set_selection_mode(Gtk::SelectionMode::NONE);
 }
 
 void ProgressWindow::on_main_menu() {
-    window_builder->get_widget<Gtk::Stack>("app-stack")
-        ->set_visible_child("board-grid-page");
-    window_builder->get_widget<Gtk::MenuButton>("app-menu-button")
-        ->set_menu_model(
-            window_builder->get_object<Gio::MenuModel>("board-grid-menu"));
-    window_builder->get_widget<Gtk::Button>("home-button")->set_visible(false);
-    window_builder->get_widget<Gtk::Button>("add-board-button")->set_visible();
+    app_stack_p->set_visible_child("board-grid-page");
+    app_menu_button_p->set_menu_model(board_grid_menu_p);
+    home_button_p->set_visible(false);
+    add_board_button_p->set_visible();
     set_title("Progress");
     board_widget.save();
 }
 
 void ProgressWindow::on_board_view() {
-    window_builder->get_widget<Gtk::Stack>("app-stack")
-        ->set_visible_child("board-page");
-    window_builder->get_widget<Gtk::MenuButton>("app-menu-button")
-        ->set_menu_model(
-            window_builder->get_object<Gio::MenuModel>("board-menu"));
-    window_builder->get_widget<Gtk::Button>("home-button")->set_visible();
-    window_builder->get_widget<Gtk::Button>("add-board-button")
-        ->set_visible(false);
+    app_stack_p->set_visible_child("board-page");
+    app_menu_button_p->set_menu_model(board_menu_p);
+    home_button_p->set_visible();
+    add_board_button_p->set_visible(false);
 }
 
 void ProgressWindow::delete_selected_boards() {
-    auto selected_children =
-        window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-            ->get_selected_children();
-    for (auto& fb_child_p : selected_children) {
+    auto selected_children = boards_grid_p->get_selected_children();
+    for (auto& child : selected_children) {
         ui::BoardCardButton* cur_child =
-            (ui::BoardCardButton*)fb_child_p->get_child();
+            (ui::BoardCardButton*)child->get_child();
         std::filesystem::remove(cur_child->get_filepath());
-        window_builder->get_widget<Gtk::FlowBox>("boards-grid")
-            ->remove(*cur_child);
+        boards_grid_p->remove(*cur_child);
     }
 
     off_delete_board_mode();
@@ -263,11 +235,10 @@ void ProgressWindow::setup_menu_button() {
         "preferences", sigc::mem_fun(*preferences_board_dialog,
                                      &PreferencesBoardDialog::open_window));
 
-    window_builder->get_widget<Gtk::MenuButton>("app-menu-button")
-        ->insert_action_group("win", action_group);
+    app_menu_button_p->insert_action_group("win", action_group);
 }
 
-void ProgressWindow::load_app_style() {
+void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
         css_provider->load_from_resource(
             "/io/github/smolblackcat/Progress/style-dark.css");
@@ -277,9 +248,8 @@ void ProgressWindow::load_app_style() {
     }
 }
 
-bool ProgressWindow::on_window_close() {
-    auto app_stack = window_builder->get_widget<Gtk::Stack>("app-stack");
-    if (app_stack->get_visible_child_name() == "board-page") {
+bool ProgressWindow::on_window_close() {;
+    if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
     set_visible(false);

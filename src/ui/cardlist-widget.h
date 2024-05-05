@@ -13,9 +13,11 @@
 namespace ui {
 
 class BoardWidget;
-
 class CardWidget;
 
+/**
+ * @brief Represents a header for a CardList that allows changing its name.
+ */
 class CardListHeader : public EditableLabelHeader {
 public:
     CardListHeader(std::shared_ptr<CardList>& cardlist_refptr);
@@ -26,17 +28,66 @@ protected:
     void on_confirm_changes() override;
 };
 
+/**
+ * @brief Class that implements the facilities of a card list widget
+ */
 class CardlistWidget : public Gtk::ListBox {
 public:
     static const int CARDLIST_SIZE = 240;
 
+    /**
+     * @brief CardlistWidget's constructor
+     *
+     * @param board BoardWidget reference to where this widget belongs
+     * @param cardlist_refptr CardList smart pointer that this widget is allowed
+     *        to change
+     */
     CardlistWidget(BoardWidget& board,
                    std::shared_ptr<CardList> cardlist_refptr);
+
+    /**
+     * @brief Adds a CardWidget object based on the given Card
+     *
+     * @param card_refptr Card smart pointer
+     * @param is_new bool value indicating whether this card is completely new
+     *               or loaded from file.
+     *
+     * @return The created CardWidget object pointer
+     */
     ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr,
                              bool is_new = false);
+
+    /**
+     * @brief Removes the specified CardWidget
+     *
+     * @param card Pointer to the CardWidget to be deleted.
+     */
     void remove_card(ui::CardWidget* card);
+
+    /**
+     * @brief Retrieves the underlying CardList smart pointer.
+     *
+     * @return Reference to the CardList smart pointer.
+     */
     std::shared_ptr<CardList>& get_cardlist_refptr();
+
+    /**
+     * @brief Determines whether a given CardWidget object belongs to this
+     *        CardlistWidget instance.
+     *
+     * @param card Pointer to the CardWidget object to check
+     *
+     * @return True if the CardWidget belongs to this CardlistWidget,
+     *         false otherwise.
+     */
     bool is_child(ui::CardWidget* card);
+
+    /**
+     * @brief Returns CardListHeader object associated with this CardlistWidget
+     *        instance.
+     *
+     * @return Reference to the CardListHeader object.
+     */
     CardListHeader& get_header();
 
 private:
