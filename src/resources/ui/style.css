@@ -2,6 +2,13 @@ list.rich-list {
     border-radius: 20px;
 }
 
+#card {
+    background-color: #deddda;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px #9a9996;
+}
+
 #delete-board-infobar-text {
     color: #ffffff;
 }

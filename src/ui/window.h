@@ -100,6 +100,8 @@ public:
 
 private:
     const Glib::RefPtr<Gtk::Builder> window_builder;
+    AdwStyleManager* adw_style_manager;
+    Glib::RefPtr<Gtk::CssProvider> css_provider;
 
     bool on_delete_mode = false;
 
@@ -110,6 +112,7 @@ private:
     ui::BoardWidget board_widget;
 
     void setup_menu_button();
+    void load_app_style();
     bool on_window_close();
 };
 }  // namespace ui

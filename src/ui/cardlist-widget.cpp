@@ -55,7 +55,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     root.set_size_request(CARDLIST_SIZE, CARDLIST_SIZE);
     root.set_valign(Gtk::Align::FILL);
     root.set_vexpand();
-    root.set_spacing(4);
+    root.set_spacing(15);
     root.set_margin_top(4);
 
     Gtk::ScrolledWindow scr_window{};

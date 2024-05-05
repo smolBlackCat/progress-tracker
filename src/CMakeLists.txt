@@ -33,7 +33,8 @@ set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/resources/u
 list(APPEND RESOURCES resources/ui/io.github.smolblackcat.Progress.svg
                       resources/ui/app-window.ui
                       resources/ui/create-board-dialog.ui
-                      resources/ui/stylesheet.css)
+                      resources/ui/style.css
+                      resources/ui/style-dark.css)
 
 add_custom_command(
     OUTPUT resources.cpp

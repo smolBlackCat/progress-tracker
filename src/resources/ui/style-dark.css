@@ -1,0 +1,29 @@
+list.rich-list {
+    border-radius: 20px;
+}
+
+#card {
+    background-color: #5e5c64;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px #000000;
+}
+
+#delete-board-infobar-text {
+    color: #ffffff;
+}
+
+#delete-board-infobar {
+    background-color: #1a5fb4;
+    border-radius: 5px;
+}
+
+#cardlist-title {
+    font-weight: bold;
+    font-size: large;
+}
+
+#image-label {
+    font-weight: bold;
+    font-size: medium;
+}

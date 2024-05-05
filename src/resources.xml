@@ -1,7 +1,8 @@
 <gresources>
-    <gresource prefix="ui">
+    <gresource prefix="/io/github/smolblackcat/Progress/">
         <file>io.github.smolblackcat.Progress.svg</file>
-        <file>stylesheet.css</file>
+        <file>style.css</file>
+        <file>style-dark.css</file>
         <file>create-board-dialog.ui</file>
         <file>app-window.ui</file>
     </gresource>

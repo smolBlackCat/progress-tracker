@@ -13,8 +13,7 @@
 
 namespace ui {
 
-ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
-    : parent{parent} {
+ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent) : parent{parent} {
     // set_program_name("Progress");
     // set_logo(Gdk::Texture::create_from_resource(
     //     "/ui/io.github.smolblackcat.Progress.svg"));
@@ -31,9 +30,7 @@ ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
     // set_transient_for(parent);
 }
 
-ProgressAboutDialog::~ProgressAboutDialog() {
-    g_object_unref(about_dialogp);
-}
+ProgressAboutDialog::~ProgressAboutDialog() { g_object_unref(about_dialogp); }
 
 void ProgressAboutDialog::show() {
     setup();
@@ -43,33 +40,30 @@ void ProgressAboutDialog::show() {
 void ProgressAboutDialog::setup() {
     about_dialogp = adw_about_dialog_new();
 
-    adw_about_dialog_set_application_name(
-        ADW_ABOUT_DIALOG(about_dialogp), "Progress");
+    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
+                                          "Progress");
     adw_about_dialog_set_version(ADW_ABOUT_DIALOG(about_dialogp), "1.2");
-    adw_about_dialog_set_developer_name(
-        ADW_ABOUT_DIALOG(about_dialogp), "Gabriel de Moura");
+    adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
+                                        "Gabriel de Moura");
 
     adw_about_dialog_set_translator_credits(
         ADW_ABOUT_DIALOG(about_dialogp),
-        //Translators: Replace "translator-credits" with your names, one name per line
-        _("translator-credits")
-    );
+        // Translators: Replace "translator-credits" with your names, one name
+        // per line
+        _("translator-credits"));
 
-    adw_about_dialog_set_license_type(
-        ADW_ABOUT_DIALOG(about_dialogp), GTK_LICENSE_MIT_X11);
-    adw_about_dialog_set_copyright(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        _("De Moura © All rights reserved"));
+    adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(about_dialogp),
+                                      GTK_LICENSE_MIT_X11);
+    adw_about_dialog_set_copyright(ADW_ABOUT_DIALOG(about_dialogp),
+                                   _("De Moura © All rights reserved"));
     adw_about_dialog_set_issue_url(
         ADW_ABOUT_DIALOG(about_dialogp),
-        "https://github.com/smolBlackCat/progress-tracker/issues"
-    );
+        "https://github.com/smolBlackCat/progress-tracker/issues");
     adw_about_dialog_set_website(
         ADW_ABOUT_DIALOG(about_dialogp),
         "https://github.com/smolBlackCat/progress-tracker");
-    adw_about_dialog_set_application_icon(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        "io.github.smolblackcat.Progress");
+    adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(about_dialogp),
+                                          "io.github.smolblackcat.Progress");
 }
 
 DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
@@ -107,13 +101,19 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       window_builder{builder},
       about_dialog{*this},
       board_widget{*this},
-      delete_boards_bar{*this} {
+      delete_boards_bar{*this},
+      adw_style_manager{
+          adw_style_manager_get_for_display(this->get_display()->gobj())},
+      css_provider{Gtk::CssProvider::create()} {
+    Gtk::StyleProvider::add_provider_for_display(
+        get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
     signal_close_request().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
-    auto cbd_builder =
-        Gtk::Builder::create_from_resource("/ui/create-board-dialog.ui");
-    auto cbd_builder1 =
-        Gtk::Builder::create_from_resource("/ui/create-board-dialog.ui");
+    auto cbd_builder = Gtk::Builder::create_from_resource(
+        "/io/github/smolblackcat/Progress/create-board-dialog.ui");
+    auto cbd_builder1 = Gtk::Builder::create_from_resource(
+        "/io/github/smolblackcat/Progress/create-board-dialog.ui");
     create_board_dialog =
         Gtk::Builder::get_widget_derived<ui::CreateBoardDialog>(
             cbd_builder, "create-board", *this);
@@ -124,10 +124,14 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
 
-    auto css_provider = Gtk::CssProvider::create();
-    Gtk::StyleProvider::add_provider_for_display(
-        get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    css_provider->load_from_resource("/ui/stylesheet.css");
+    load_app_style();
+    g_signal_connect_after(
+        G_OBJECT(adw_style_manager), "notify::dark",
+        G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,
+                       gpointer data) {
+            reinterpret_cast<ProgressWindow*>(data)->load_app_style();
+        }),
+        this);
 
     builder->get_widget<Gtk::Button>("home-button")
         ->signal_clicked()
@@ -261,6 +265,16 @@ void ProgressWindow::setup_menu_button() {
 
     window_builder->get_widget<Gtk::MenuButton>("app-menu-button")
         ->insert_action_group("win", action_group);
+}
+
+void ProgressWindow::load_app_style() {
+    if (adw_style_manager_get_dark(adw_style_manager)) {
+        css_provider->load_from_resource(
+            "/io/github/smolblackcat/Progress/style-dark.css");
+    } else {
+        css_provider->load_from_resource(
+            "/io/github/smolblackcat/Progress/style.css");
+    }
 }
 
 bool ProgressWindow::on_window_close() {

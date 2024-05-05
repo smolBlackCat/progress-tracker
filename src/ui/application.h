@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libadwaita-1/adwaita.h>
 #include <glibmm.h>
 #include <gtkmm/application.h>
 
