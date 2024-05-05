@@ -72,5 +72,13 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             board_thumbnail.set(board_bg_image);
             break;
         }
+        case BackgroundType::INVALID: {
+            auto solid_colour =
+                Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
+            Gdk::RGBA colour{0, 0, 0, 1};
+            solid_colour->fill(rgb_to_hex(colour));
+            board_thumbnail.set(solid_colour);
+            break;
+        }
     }
 }

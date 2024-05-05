@@ -40,6 +40,15 @@ void PreferencesBoardDialog::load_board() {
             p_select_file_label->set_text(board_widget.get_background());
             break;
         }
+        case BackgroundType::INVALID: {
+            file_selected = false;
+            p_select_file_label->set_label(_("No file was selected"));
+            p_file_image->set("");
+
+            p_colour_button->set_rgba(Gdk::RGBA{board_widget.get_background()});
+            selected_colour.set(board_widget.get_background());
+            break;
+        }
     }
 }
 
