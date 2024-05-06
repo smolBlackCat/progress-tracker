@@ -14,18 +14,20 @@ namespace ui {
 
 class BoardWidget;
 class CardWidget;
+class CardlistWidget;
 
 /**
  * @brief Represents a header for a CardList that allows changing its name.
  */
 class CardListHeader : public EditableLabelHeader {
 public:
-    CardListHeader(std::shared_ptr<CardList>& cardlist_refptr);
+    CardListHeader(CardlistWidget& cardlist_widget);
 
 protected:
-    std::shared_ptr<CardList> cardlist_refptr;
+    CardlistWidget& cardlist_widget;
 
     void on_confirm_changes() override;
+    void on_cancel_changes() override;
 };
 
 /**
@@ -41,9 +43,12 @@ public:
      * @param board BoardWidget reference to where this widget belongs
      * @param cardlist_refptr CardList smart pointer that this widget is allowed
      *        to change
+     * @param is_new Indicates whether it's completely new, therefore giving the
+     *        user the chance to cancel creation
      */
     CardlistWidget(BoardWidget& board,
-                   std::shared_ptr<CardList> cardlist_refptr);
+                   std::shared_ptr<CardList> cardlist_refptr,
+                   bool is_new = false);
 
     /**
      * @brief Adds a CardWidget object based on the given Card
@@ -63,6 +68,16 @@ public:
      * @param card Pointer to the CardWidget to be deleted.
      */
     void remove_card(ui::CardWidget* card);
+
+    /**
+     * @brief Removes itself from the associated Board
+    */
+    void remove_();
+
+    /**
+     * @brief Sets the name of the card list !!!
+     */
+    void set_name_(const std::string& new_name);
 
     /**
      * @brief Retrieves the underlying CardList smart pointer.
@@ -89,6 +104,8 @@ public:
      * @return Reference to the CardListHeader object.
      */
     CardListHeader& get_header();
+
+    bool is_new;
 
 private:
     // Widgets

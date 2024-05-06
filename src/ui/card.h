@@ -23,7 +23,7 @@ public:
      *
      * @param card_ptr a smart pointer pointing to a Card object.
      */
-    CardWidget(std::shared_ptr<Card> card_refptr);
+    CardWidget(std::shared_ptr<Card> card_refptr, bool is_new = false);
 
     /**
      * @brief Removes itself from the associated CardlistWidget object.
@@ -43,7 +43,9 @@ public:
     std::shared_ptr<Card> get_card();
 
 protected:
+    bool is_new;
     void on_confirm_changes() override;
+    void on_cancel_changes() override;
 
 private:
     std::shared_ptr<Card> card_refptr;

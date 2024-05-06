@@ -33,7 +33,7 @@ public:
      */
     void add_option(const std::string& name, const std::string& title_name,
                     const Gio::ActionMap::ActivateSlot& procedure);
-    
+
     /**
      * @brief Changes the widget view to editing mode
      */
@@ -45,15 +45,16 @@ public:
     void exit_editing_mode();
 
 protected:
+    Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
+        label_box{Gtk::Orientation::HORIZONTAL};
     Gtk::Revealer revealer;
     Gtk::Label label;
     Gtk::Entry entry;
-    Gtk::Button confirm_changes_button;
+    Gtk::Button confirm_changes_button, cancel_changes_button;
     Gtk::MenuButton menu_button;
+
     Glib::RefPtr<Gio::SimpleActionGroup> actions;
     Glib::RefPtr<Gio::Menu> menu;
-
-    // Controllers
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
@@ -61,5 +62,10 @@ protected:
      * @brief Updates the label
      */
     virtual void on_confirm_changes();
+
+    /**
+     * @brief Cancels the changes made to this label
+     */
+    virtual void on_cancel_changes();
 };
 }  // namespace ui

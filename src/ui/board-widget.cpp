@@ -85,8 +85,7 @@ bool ui::BoardWidget::save(bool free) {
 void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr,
                                    bool is_new) {
     auto new_cardlist =
-        Gtk::make_managed<ui::CardlistWidget>(*this, cardlist_refptr);
-    if (is_new) new_cardlist->get_header().to_editing_mode();
+        Gtk::make_managed<ui::CardlistWidget>(*this, cardlist_refptr, is_new);
     cardlist_vector.push_back(new_cardlist);
 
     setup_drag_and_drop(new_cardlist);

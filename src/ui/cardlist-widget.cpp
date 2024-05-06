@@ -8,32 +8,54 @@
 #include "board-widget.h"
 #include "card.h"
 
-ui::CardListHeader::CardListHeader(std::shared_ptr<CardList>& cardlist_refptr)
-    : EditableLabelHeader{}, cardlist_refptr{cardlist_refptr} {
-    set_label(cardlist_refptr->get_name());
+/**
+ * Plan to implement cancel feature
+ *
+ * * EditableLabelHeader objects should have a cancel feature. By default,
+ *   their behavior is that whenever the button is clicked, the label is set
+ *   to the string it was before starting editing_mode.
+ */
+ui::CardListHeader::CardListHeader(CardlistWidget& cardlist_widget)
+    : EditableLabelHeader{}, cardlist_widget{cardlist_widget} {
     label.set_name("cardlist-title");
     entry.set_name("cardlist-title");
 }
 
 void ui::CardListHeader::on_confirm_changes() {
-    cardlist_refptr->set_name(label.get_text());
+    EditableLabelHeader::on_confirm_changes();
+    cardlist_widget.set_name_(label.get_text());
+    cardlist_widget.is_new = false;
+}
+
+void ui::CardListHeader::on_cancel_changes() {
+    EditableLabelHeader::on_cancel_changes();
+    if (cardlist_widget.is_new) {
+        cardlist_widget.remove_();
+    }
 }
 
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
-                                   std::shared_ptr<CardList> cardlist_refptr)
+                                   std::shared_ptr<CardList> cardlist_refptr,
+                                   bool is_new)
     : Gtk::ListBox{},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
       cards_tracker{},
       board{board},
       cardlist_refptr{cardlist_refptr},
-      cardlist_header{cardlist_refptr} {
+      is_new{is_new},
+      cardlist_header{*this} {
     add_css_class("rich-list");
     set_valign(Gtk::Align::START);
     set_vexpand(true);
     set_halign(Gtk::Align::START);
     set_size_request(CARDLIST_SIZE, CARDLIST_SIZE * 2);
     set_selection_mode(Gtk::SelectionMode::NONE);
+
+    if (is_new) {
+        cardlist_header.to_editing_mode();
+    }
+    cardlist_header.set_label(cardlist_refptr->get_name());
 
     cardlist_header.add_option("remove", _("Remove"), [this]() {
         this->board.remove_cardlist(*this);
@@ -150,9 +172,17 @@ void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     }
 }
 
+void ui::CardlistWidget::remove_() {
+    board.remove_cardlist(*this);
+}
+
+void ui::CardlistWidget::set_name_(const std::string& new_name) {
+    cardlist_refptr->set_name(new_name);
+}
+
 ui::CardWidget* ui::CardlistWidget::add_card(std::shared_ptr<Card> card,
                                              bool is_new) {
-    auto new_card = Gtk::make_managed<ui::CardWidget>(card);
+    auto new_card = Gtk::make_managed<ui::CardWidget>(card, is_new);
     if (is_new) new_card->to_editing_mode();
     cards_tracker.push_back(new_card);
     new_card->set_cardlist(this);
