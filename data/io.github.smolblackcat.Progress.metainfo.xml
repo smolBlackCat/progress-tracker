@@ -53,6 +53,21 @@
   </categories>
 
   <releases>
+    <release date="2024-05-06" version="1.3">
+      <description>
+        <p>What's new in Progress 1.3</p>
+        <ul>
+          <li>Italian translation has been updated<li>
+          <li>Russian Translation has been added</li>
+          <li>Ukranian Translation has been added</li>
+          <li>Card widgets have gotten an UI rework</li>
+          <li>
+            A cancel button has been added to cancel creation and renaming of
+            cards and cardlists
+          </li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-04-28" version="1.2">
       <description>
         <p>The current minor releases brings some additions and improvements</p>
