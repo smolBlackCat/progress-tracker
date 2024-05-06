@@ -23,7 +23,6 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     set_child(root);
     set_name("board-root");
 
-    // Auto scrolling setting
     setup_auto_scrolling();
 
     root.set_spacing(25);
@@ -52,7 +51,6 @@ void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
         this->board = board;
         this->board_card_button = board_card_button;
 
-        // Code updating cardlists
         for (auto& cardlist : board->get_cardlists()) {
             add_cardlist(cardlist);
         }
@@ -90,7 +88,6 @@ void ui::BoardWidget::add_cardlist(std::shared_ptr<CardList> cardlist_refptr,
 
     setup_drag_and_drop(new_cardlist);
 
-    // The new cardlist should be appended before the add_button
     root.append(*new_cardlist);
     root.reorder_child_after(add_button, *new_cardlist);
 }
@@ -181,8 +178,6 @@ void ui::BoardWidget::setup_auto_scrolling() {
 }
 
 void ui::BoardWidget::setup_drag_and_drop(ui::CardlistWidget* new_cardlist) {
-    // CardLists will be dragged from their header (EditableLabelHeader object).
-    // The drop contains a pointer to this cardlist object.
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->signal_prepare().connect(
         [new_cardlist, drag_source_c](double x, double y) {
@@ -213,8 +208,6 @@ void ui::BoardWidget::setup_drag_and_drop(ui::CardlistWidget* new_cardlist) {
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     new_cardlist->get_header().add_controller(drag_source_c);
 
-    // A CardList is being dropped onto new_cardlist, reorder the drop after
-    // new_cardlist.
     auto drop_target_cardlist = Gtk::DropTarget::create(
         Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_cardlist->signal_drop().connect(
@@ -237,7 +230,6 @@ void ui::BoardWidget::setup_drag_and_drop(ui::CardlistWidget* new_cardlist) {
         false);
     new_cardlist->get_header().add_controller(drop_target_cardlist);
 
-    // Detect cards being dropped in this cardlist
     auto drop_target_card = Gtk::DropTarget::create(
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_card->signal_drop().connect(
