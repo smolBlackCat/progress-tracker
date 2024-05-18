@@ -2,3 +2,4 @@
 #define MINOR_VERSION ${ProgressTracker_VERSION_MINOR}
 #define BUILD_TYPE "${CMAKE_BUILD_TYPE}"
 #define FLATPAK "${FLATPAK}"
+#define WINDOWS "${WINDOWS}"

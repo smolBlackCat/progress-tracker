@@ -33,8 +33,8 @@ void ui::Application::on_startup() {
         app_dir = std::getenv("XDG_CONFIG_HOME");
         app_dir += "/progress/boards";
     } else if (strcmp(WINDOWS, "True") == 0) {
-        app_dir = std::getenv("%APPDATA%");
-        app_dir += "\\Progress\\Boards"
+        app_dir = std::getenv("APPDATA");
+        app_dir += "\\Progress\\Boards";
     } else {
         app_dir = std::getenv("HOME");
         app_dir += "/.config/progress/boards";
