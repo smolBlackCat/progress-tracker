@@ -119,7 +119,7 @@ public:
      */
     std::string get_filepath();
 
-    bool on_drag = false;
+    bool on_drag;
 
 private:
     Gtk::Box root;

@@ -7,6 +7,8 @@
 
 #include "ui/application.h"
 
+// TODO: Add Windows case
+// TODO: I have the feeling that this can be evaluated at compile-time
 std::string get_locale_dir() {
     if (strcmp(BUILD_TYPE, "Release") == 0) {
         return strcmp(FLATPAK, "True") == 0 ? "/app/share/locale/"

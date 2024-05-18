@@ -19,7 +19,8 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
-      app_window{app_window} {
+con      app_window{app_window},
+      on_drag{false} {
     set_child(root);
     set_name("board-root");
 

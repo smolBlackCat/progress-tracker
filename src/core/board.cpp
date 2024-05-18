@@ -238,6 +238,9 @@ const std::string Board::new_filename(const std::string& base) {
     if (strcmp(FLATPAK, "True") == 0) {
         boards_dir =
             std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards/";
+    } else if (strcmp(WINDOWS, "True") == 0) {
+        boards_dir =
+            std::string{std::getenv("%APPDATA%")} + "\\Progress\\Boards\\"
     } else {
         boards_dir =
             std::string{std::getenv("HOME")} + "/.config/progress/boards/";
