@@ -4,16 +4,16 @@
 # script only after building using make. It is also supposed to be run on a
 # UCRT64 environment
 
-MSYS_ROOT="/ucrt64
+MSYS_ROOT="/ucrt64"
 
-cd build/
+cd "build"
 
 mkdir "share"
 mkdir "lib"
 
-cp -r ${MSYS_ROOT}/share/glib-2.0/ share
-cp -r ${MSYS_ROOT}/share/icons/ share
-cp -r ${MSYS_ROOT}/lib/gdk-pixbuf-2.0/ lib
+cp -r "${MSYS_ROOT}/share/glib-2.0/" "share"
+cp -r "${MSYS_ROOT}/share/icons/" "share"
+cp -r "${MSYS_ROOT}/lib/gdk-pixbuf-2.0/" "lib"
 
 ldd src/progress-tracker.exe | grep '\/ucrt64.*\.dll' -o | xargs -I{} cp "{}" .
 
