@@ -1,20 +1,30 @@
 #include <app_info.h>
 #include <libintl.h>
 
-#include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <locale>
 
 #include "ui/application.h"
 
-// TODO: Add Windows case
-// TODO: I have the feeling that this can be evaluated at compile-time
+/**
+ * @brief Return the app's locale directory.
+ *
+ * @details A different locale directory is returned depending on the build
+ * settings.
+ *
+ * @return A string object containing
+ */
 std::string get_locale_dir() {
     if (strcmp(BUILD_TYPE, "Release") == 0) {
-        return strcmp(FLATPAK, "True") == 0 ? "/app/share/locale/"
-                                            : "/usr/share/locale/";
+        if (strcmp(FLATPAK, "True") == 0) {
+            return "/app/share/locale/";
+        } else {
+            return "/usr/share/locale/";
+        }
     } else {
-        return std::string{getenv("PWD")} + "/locales/";
+        return (std::filesystem::current_path() / "locales").string() +
+               std::string{std::filesystem::path::preferred_separator};
     }
 }
 

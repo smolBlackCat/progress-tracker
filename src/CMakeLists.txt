@@ -10,8 +10,10 @@ list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
 add_executable(progress-tracker main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
-# Setup CMake to use GTK+, tell the compiler where to look for headers
-# and to the linker where to look for libraries
+# Setup GTK
+if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
+    target_link_options(progress-tracker PRIVATE "-mwindows")
+endif()
 target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
 target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIRS})
@@ -49,6 +51,8 @@ if (${FLATPAK})
     install(TARGETS progress-tracker
             RUNTIME
             DESTINATION /app/bin/)
+elseif(${WINDOWS})
+    # Add code that packages app into an installer
 else()
     install(TARGETS progress-tracker
             RUNTIME
