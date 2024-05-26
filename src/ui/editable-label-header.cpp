@@ -2,7 +2,6 @@
 
 #include <glibmm/i18n.h>
 
-#include "app_info.h"
 #include "cardlist-widget.h"
 
 namespace ui {
@@ -77,12 +76,15 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label)
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (revealer.get_child_revealed()) {
-                const guint ENTER = !(strcmp(WINDOWS, "True"))? 13:36;
-                if (keycode == ENTER) {
-                    on_confirm_changes();
-                }
-                else if (keyval == GDK_KEY_Escape) {
-                    on_cancel_changes();
+                switch (keyval) {
+                    case (GDK_KEY_Return): {
+                        on_confirm_changes();
+                        break;
+                    }
+                    case (GDK_KEY_Escape): {
+                        on_cancel_changes();
+                        break;
+                    }
                 }
             }
         },
