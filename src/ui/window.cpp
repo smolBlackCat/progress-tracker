@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "../core/exceptions.h"
+#include "app_info.h"
 #include "board-card-button.h"
 #include "create_board_dialog.h"
 #include "preferences-board-dialog.h"
@@ -28,7 +29,9 @@ void ProgressAboutDialog::setup() {
 
     adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
                                           "Progress");
-    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(about_dialogp), "1.3");
+    adw_about_dialog_set_version(
+        ADW_ABOUT_DIALOG(about_dialogp),
+        std::format("{}.{}", MAJOR_VERSION, MINOR_VERSION).c_str());
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
                                         "Gabriel de Moura");
 
@@ -239,15 +242,14 @@ void ProgressWindow::setup_menu_button() {
 
 void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
-        css_provider->load_from_resource(
-            ProgressWindow::STYLE_DARK_CSS);
+        css_provider->load_from_resource(ProgressWindow::STYLE_DARK_CSS);
     } else {
-        css_provider->load_from_resource(
-            ProgressWindow::STYLE_CSS);
+        css_provider->load_from_resource(ProgressWindow::STYLE_CSS);
     }
 }
 
-bool ProgressWindow::on_window_close() {;
+bool ProgressWindow::on_window_close() {
+    ;
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
