@@ -23,3 +23,6 @@ cp ${MSYS_ROOT}/bin/libxml2-2.dll .
 cp ${MSYS_ROOT}/bin/libiconv-2.dll .
 cp ${MSYS_ROOT}/bin/libcharset-1.dll .
 cp ${MSYS_ROOT}/bin/zlib1.dll .
+
+# Compatibility for older Windows x86_64 systems
+cp "/c/Windows/System32/ucrtbase.dll" .
