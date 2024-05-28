@@ -36,6 +36,10 @@ int main(int argc, char *argv[]) {
     std::string locale_dir = get_locale_dir();
     std::cout << locale_dir << std::endl;
     bindtextdomain("progress-tracker", locale_dir.c_str());
+
+    // Required for correctly decoding text on Windows
+    bind_textdomain_codeset("progres-tracker", "utf-8");
+
     textdomain("progress-tracker");
 
     std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION
