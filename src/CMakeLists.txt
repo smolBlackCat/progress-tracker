@@ -1,3 +1,10 @@
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(APPLICATION_ID "io.github.smolblackcat.Progress")
+else()
+    set(DEBUG True)
+    set(APPLICATION_ID "io.github.smolblackcat.ProgressDebug")
+endif()
+
 configure_file(app_info.h.in app_info.h)
 
 # Set Libraries and include directories

@@ -16,16 +16,16 @@
  * @return A string object containing
  */
 std::string get_locale_dir() {
-    if (strcmp(BUILD_TYPE, "Release") == 0) {
-        if (strcmp(FLATPAK, "True") == 0) {
+    #ifndef DEBUG
+        #ifdef FLATPAK
             return "/app/share/locale/";
-        } else {
+        #else
             return "/usr/share/locale/";
-        }
-    } else {
+        #endif
+    #else
         return (std::filesystem::current_path() / "locales").string() +
                std::string{std::filesystem::path::preferred_separator};
-    }
+    #endif
 }
 
 /**
