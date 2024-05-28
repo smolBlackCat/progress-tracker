@@ -237,7 +237,7 @@ const std::string Board::new_filename(const std::string& base) {
     #ifdef FLATPAK
         std::string boards_dir =
             std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards/";
-    #elif WINDOWS
+    #elif defined(WINDOWS)
         std::string boards_dir =
             std::string{std::getenv("APPDATA")} + "\\Progress\\Boards\\";
     #else

@@ -29,7 +29,7 @@ void ui::Application::on_startup() {
     #ifdef FLATPAK
         std::string app_dir =
             std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards";
-    #elif WINDOWS
+    #elif defined(WINDOWS)
         std::string app_dir =
             std::string{std::getenv("APPDATA")} + "\\Progress\\Boards";
     #else
