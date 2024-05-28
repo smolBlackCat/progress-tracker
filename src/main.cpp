@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     bindtextdomain("progress-tracker", locale_dir.c_str());
 
     // Required for correctly decoding text on Windows
-    bind_textdomain_codeset("progres-tracker", "utf-8");
+    bind_textdomain_codeset("progress-tracker", "utf-8");
 
     textdomain("progress-tracker");
 
