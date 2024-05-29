@@ -13,6 +13,7 @@ mkdir "lib"
 
 cp -r "${MSYS_ROOT}/share/glib-2.0/" "share"
 cp -r "${MSYS_ROOT}/share/icons/" "share"
+cp ../data/io.github.smolblackcat.Progress.svg share/icons/
 cp -r "${MSYS_ROOT}/lib/gdk-pixbuf-2.0/" "lib"
 
 ldd src/progress-tracker.exe | grep '\/ucrt64.*\.dll' -o | xargs -I{} cp "{}" .
