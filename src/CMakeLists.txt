@@ -59,7 +59,9 @@ if (${FLATPAK})
             RUNTIME
             DESTINATION /app/bin/)
 elseif(${WINDOWS})
-    # Add code that packages app into an installer
+    install(TARGETS progress-tracker
+            RUNTIME
+            DESTINATION ${PROJECT_BINARY_DIR}/Progress)
 else()
     install(TARGETS progress-tracker
             RUNTIME

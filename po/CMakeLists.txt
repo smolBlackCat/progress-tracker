@@ -41,6 +41,9 @@ foreach(PO_NAME IN LISTS PO_NAMES)
     if (${FLATPAK})
         install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
                 DESTINATION /app/share/locale/${PO_NAME}/LC_MESSAGES)
+    elseif(${WINDOWS})
+        install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
+                DESTINATION ${PROJECT_BINARY_DIR}/Progress/locale)
     else()
         install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
                 DESTINATION /usr/share/locale/${PO_NAME}/LC_MESSAGES)
