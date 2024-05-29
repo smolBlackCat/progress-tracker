@@ -59,8 +59,18 @@ if (${FLATPAK})
             RUNTIME
             DESTINATION /app/bin/)
 elseif(${WINDOWS})
+    set(SHARE_FOLDER ${PROJECT_BINARY_DIR}/share/)
+    set(LIB_FOLDER ${PROJECT_BINARY_DIR}/lib/)
+    file(GLOB_RECURSE APP_DLLS
+        "${PROJECT_BINARY_DIR}/*.dll")
     install(TARGETS progress-tracker
             RUNTIME
+            DESTINATION ${PROJECT_BINARY_DIR}/Progress)
+    install(FILES ${APP_DLLS}
+            DESTINATION ${PROJECT_BINARY_DIR}/Progress)
+    install(FILES ${SHARE_FOLDER}
+            DESTINATION ${PROJECT_BINARY_DIR}/Progress)
+    install(FILES ${LIB_FOLDER}
             DESTINATION ${PROJECT_BINARY_DIR}/Progress)
 else()
     install(TARGETS progress-tracker
