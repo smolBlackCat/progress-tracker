@@ -16,16 +16,22 @@
  * @return A string object containing
  */
 std::string get_locale_dir() {
-    #ifndef DEBUG
-        #ifdef FLATPAK
-            return "/app/share/locale/";
-        #else
-            return "/usr/share/locale/";
-        #endif
-    #else
-        return (std::filesystem::current_path() / "locales").string() +
-               std::string{std::filesystem::path::preferred_separator};
-    #endif
+#ifndef DEBUG
+#ifdef FLATPAK
+    return "/app/share/locale/";
+#elif defined(WINDOWS) && defined(PORTABLE)
+    return (std::filesystem::current_path() / "locale").string() +
+           std::string{std::filesystem::path::preferred_separator};
+#elif defined(WINDOWS)
+    return std::string{std::getenv("PROGRAMFILES(X86)")} +
+           "\\Progress\\locale\\"
+#else
+    return "/usr/share/locale/";
+#endif
+#else
+    return (std::filesystem::current_path() / "locales").string() +
+           std::string{std::filesystem::path::preferred_separator};
+#endif
 }
 
 /**

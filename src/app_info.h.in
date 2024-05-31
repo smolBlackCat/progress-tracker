@@ -3,6 +3,6 @@
 #cmakedefine DEBUG
 #cmakedefine FLATPAK
 #cmakedefine WINDOWS
-#cmakedefine01 PORTABLE
+#cmakedefine PORTABLE
 
 constexpr const char* APPLICATION_ID = "${APPLICATION_ID}";
