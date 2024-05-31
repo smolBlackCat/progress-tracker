@@ -24,7 +24,7 @@ std::string get_locale_dir() {
            std::string{std::filesystem::path::preferred_separator};
 #elif defined(WINDOWS)
     return std::string{std::getenv("PROGRAMFILES(X86)")} +
-           "\\Progress\\locale\\"
+           "\\Progress\\locale\\";
 #else
     return "/usr/share/locale/";
 #endif
