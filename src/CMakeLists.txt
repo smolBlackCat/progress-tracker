@@ -59,9 +59,14 @@ if (${FLATPAK})
             RUNTIME
             DESTINATION /app/bin/)
 elseif(${WINDOWS})
+    find_program(PYTHON NAMES python3 python)
     add_custom_command(TARGET progress-tracker POST_BUILD
-                       COMMAND sh build-aux/fetch-win32-deps.sh
-                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                       COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/build-aux/fetch-win-deps.py
+                       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    add_custom_command(TARGET progress-tracker POST_BUILD
+                       COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.svg share/icons/
+                       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+
 else()
     install(TARGETS progress-tracker
             RUNTIME
