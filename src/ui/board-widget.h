@@ -126,6 +126,7 @@ private:
 #ifdef WINDOWS
     Gtk::Overlay overlay;
     Gtk::Picture picture;
+    Gtk::ScrolledWindow scr;
 #endif
     Gtk::Box root;
     Gtk::Button add_button;

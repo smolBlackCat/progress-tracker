@@ -23,6 +23,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       on_drag{false},
 #ifdef WINDOWS
       picture{},
+      src{},
       overlay{}
 #endif
 {
@@ -31,7 +32,6 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     set_child(overlay);
     picture.set_keep_aspect_ratio(false);
     overlay.set_child(picture);
-    auto scr = Gtk::ScrolledWindow{};
     scr.set_child(root);
     overlay.add_overlay(scr);
     overlay.set_expand(true);
@@ -181,12 +181,12 @@ void ui::BoardWidget::setup_auto_scrolling() {
             this->x = x;
             this->y = y;
         });
-    this->add_controller(drop_controller_motion_c);
+    scr.add_controller(drop_controller_motion_c);
 
     Glib::signal_timeout().connect(
         [this]() {
-            double cur_max_width = this->get_width();
-            auto hadjustment = this->get_hadjustment();
+            double cur_max_width = scr.get_width();
+            auto hadjustment = src.get_hadjustment();
             double lower = hadjustment->get_lower();
             double upper = hadjustment->get_upper();
 
