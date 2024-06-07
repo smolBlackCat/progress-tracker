@@ -23,7 +23,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       on_drag{false},
 #ifdef WINDOWS
       picture{},
-      src{},
+      scr{},
       overlay{}
 #endif
 {
@@ -186,7 +186,7 @@ void ui::BoardWidget::setup_auto_scrolling() {
     Glib::signal_timeout().connect(
         [this]() {
             double cur_max_width = scr.get_width();
-            auto hadjustment = src.get_hadjustment();
+            auto hadjustment = scr.get_hadjustment();
             double lower = hadjustment->get_lower();
             double upper = hadjustment->get_upper();
 
