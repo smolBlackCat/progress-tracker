@@ -20,8 +20,24 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
       app_window{app_window},
-      on_drag{false} {
+      on_drag{false},
+#ifdef WINDOWS
+      picture{},
+      overlay{}
+#endif
+{
+
+#ifdef WINDOWS
+    set_child(overlay);
+    picture.set_keep_aspect_ratio(false);
+    overlay.set_child(picture);
+    auto scr = Gtk::ScrolledWindow{};
+    scr.set_child(root);
+    overlay.add_overlay(scr);
+    overlay.set_expand(true);
+#else
     set_child(root);
+#endif
     set_name("board-root");
 
     setup_auto_scrolling();
@@ -106,16 +122,28 @@ void ui::BoardWidget::set_background(const std::string& background) {
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
+        #ifdef WINDOWS
+            picture.set_visible(false);
+        #endif
             break;
         }
         case BackgroundType::IMAGE: {
+        #ifdef WINDOWS
+            picture.set_filename(background);
+            picture.set_visible(true);
+            break;
+        #else
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_FILE, background));
             break;
+        #endif
         }
         case BackgroundType::INVALID: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+        #ifdef WINDOWS
+            picture.set_visible(false);
+        #endif
             break;
         }
     }

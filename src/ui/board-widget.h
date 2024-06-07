@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 
+#include "app_info.h"
 #include "../core/board.h"
 #include "board-card-button.h"
 
@@ -122,6 +123,10 @@ public:
     bool on_drag;
 
 private:
+#ifdef WINDOWS
+    Gtk::Overlay overlay;
+    Gtk::Picture picture;
+#endif
     Gtk::Box root;
     Gtk::Button add_button;
     Board* board = nullptr;
