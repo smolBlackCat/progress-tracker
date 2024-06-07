@@ -17,8 +17,6 @@ def get_dlls(MSYSTEM):
         for dll_info in dlls_infos:
             dlls.append(dll_info.split("=>")[0].strip())
 
-        # Needed for 64 bits Windows Vista/7/8
-        dlls.append("ucrtbase.dll")
     elif MSYSTEM == "MINGW32":
         ntldd_command = "ntldd -R src/progress-tracker.exe".split(" ")
         ntldd_output = subprocess.run(
@@ -71,6 +69,10 @@ def main():
 
     for dll in dlls:
         subprocess.run(["cp", f"{ROOT}/bin/{dll}", "."])
+
+    if MSYSTEM == "UCRT64":
+        # Necessary for older 64 bit operating systems
+        subprocess.run("cp /c/Windows/System32/ucrtbase.dll .".split())
 
 
 if __name__ == "__main__":
