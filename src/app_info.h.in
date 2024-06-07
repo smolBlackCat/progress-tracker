@@ -1,3 +1,4 @@
+#pragma once
 #define MAJOR_VERSION ${ProgressTracker_VERSION_MAJOR}
 #define MINOR_VERSION ${ProgressTracker_VERSION_MINOR}
 #cmakedefine DEBUG
