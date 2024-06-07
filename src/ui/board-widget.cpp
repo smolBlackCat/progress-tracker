@@ -19,14 +19,13 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
-      app_window{app_window},
-      on_drag{false},
 #ifdef WINDOWS
       picture{},
       scr{},
-      overlay{}
+      overlay{},
 #endif
-{
+      app_window{app_window},
+      on_drag{false} {
 
 #ifdef WINDOWS
     set_child(overlay);
@@ -181,12 +180,20 @@ void ui::BoardWidget::setup_auto_scrolling() {
             this->x = x;
             this->y = y;
         });
+#ifdef WINDOWS
     scr.add_controller(drop_controller_motion_c);
-
+#else
+    add_controller(drop_controller_motion_c);
+#endif
     Glib::signal_timeout().connect(
         [this]() {
+        #ifdef WINDOWS
             double cur_max_width = scr.get_width();
             auto hadjustment = scr.get_hadjustment();
+        #else
+            double cur_max_width = get_width();
+            auto hadjustment = get_hadjustment();
+        #endif
             double lower = hadjustment->get_lower();
             double upper = hadjustment->get_upper();
 
