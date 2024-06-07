@@ -1,96 +1,80 @@
-![Progress Icon](data/io.github.smolblackcat.Progress.svg)
+<img align="left" style="vertical-align: middle" width="120" height="120" src="data/io.github.smolblackcat.Progress.svg">
 
 # Progress
 
-Progress is a TODO app that uses the kanban-style to organise tasks. The uses
-varies from keeping track of a project's progress to organising personal tasks.
-It allows the user to edit the board using an idiomatic drag-and-drop system, and
-also customise boards according to the user preference.
+Simple kanban-style task organiser
+
+###
+
+![GitHub Release](https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github)
+![Flathub Downloads](https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub)
+![GitHub License](https://img.shields.io/github/license/smolBlackCat/progress-tracker)
+
+<div align="center">
+    <img src="pictures/progress-app-presentation.png">
+</div>
+
+Progress is a simple task management app focused on simplicity yet enough for
+most workflows. It can be used on various contexts, from software development
+to daily tasks. It is written in C++ using GTK 4(gtkmm) and libadwaita.
 
 ## Installation
 
-The project offers some alternatives for installing and utilising Progress.
-The distribution used should not affect the normal usage of the application.
-
-Currently, the project is available in the distributions described below:
-
-* Flatpak Distribution
-* Debian package
-* Build from source
-
 ### Flatpak
 
-Progress is now available to be downloaded as a flatpak app
+Progress is available to download at [Flathub](https://flathub.org/apps/io.github.smolblackcat.Progress).
 
 <a href="https://flathub.org/en-GB/apps/io.github.smolblackcat.Progress">
 <img src="https://flathub.org/assets/badges/flathub-badge-i-en.png" width="150px" height="50px" />
 </a>
 
+### Debian
 
-### Debian-based distros
-
-A debian package is provided so debian-based distro users don't need to download
-the dependencies themselves. All they have to do is download the .deb package
-and install it using apt-get (or apt).
+A debian build is also available. The debian package can be obtained in the [releases](https://github.com/smolBlackCat/progress-tracker/releases) page.
 
 ```sh
-sudo apt install ./progress-tracker-1.2.deb
+sudo apt install ./progress-tracker-1.4.deb
 ```
 
-After that, the system should have updated the desktop database and the
-application will appear in the app menu to be started from there.
+### Building from Source
 
-### Building from source
-
-If you want to develop the app or distribute it in another format, you might
-want to download the source code and build it yourself.
+For contributing to Progress source code, building from source might be the better option.
 
 #### Dependencies
 
-Keep it in mind that the dependencies' name listed here will change depending
-on the distribution you are building the application on. The ones listed here
-are Debian dependencies. Install the appropriate dependencies from your package
-manager.
-
 * cmake
+* python3 (required only if building on Windows)
 * libgtkmm-4.0-dev
 * libadwaita-1-dev
 * libtinyxml2-dev
 * gettext
-* catch2 (for testing)
+* catch2 (optional)
 
-#### Build instructions
+#### Building on Linux
 
-1. Install the dependencies needed to build the project
+1. Install the dependencies
 
     ```sh
-    # catch2 is totally optional. Install it only if you're going to run tests
-    sudo apt install libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev gettext catch2
+    # Use your package manager
+    sudo apt install cmake libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev gettext catch2
     ```
 
-2. Clone the project's repo
+2. Clone the project's repository
 
     ```sh
     git clone https://github.com/smolBlackCat/progress-tracker.git
     ```
 
-3. Configure and compile the project
+3. Configure and compile project.
 
     ```sh
-    # Set -DCMAKE_BUILD_TYPE as "Debug" for debugging tasks
-    cmake -DCMAKE_BUILD_TYPE=Release -S project-root -B build-dir
+    cd progress-tracker/
+    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release
+    cmake --build build/
     ```
 
-4. Install the project
+4. Install the Project
 
     ```sh
-    cd build-dir
-    sudo make install
+    cmake --install build/
     ```
-
-## Running the Project
-
-After installing, simply issue the command `progress-tracker`, or you can also
-start it from the applications menu of your desktop environment.
-
-![Progress Icon](pictures/progress-in-appmenu.png)
