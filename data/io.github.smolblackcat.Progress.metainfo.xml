@@ -53,12 +53,19 @@
   </categories>
 
   <releases>
+    <release date="2024-06-07" version="1.4.1">
+      <description>
+        <p>What's new in Progress 1.4.1</p>
+        <ul>
+          <li>Locale directory resolution optimised</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-05-27" version="1.4">
       <description>
         <p>What's new in Progress 1.4</p>
         <ul>
           <li>Spanish translation has been updated</li>
-          <li>Optimised locale directory resolution</li>
         </ul>
       </description>
     </release>

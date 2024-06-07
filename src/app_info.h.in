@@ -1,5 +1,6 @@
 #define MAJOR_VERSION ${ProgressTracker_VERSION_MAJOR}
 #define MINOR_VERSION ${ProgressTracker_VERSION_MINOR}
+#define PATCH_VERSION ${ProgressTracker_VERSION_PATCH}
 #cmakedefine DEBUG
 #cmakedefine FLATPAK
 #cmakedefine WINDOWS

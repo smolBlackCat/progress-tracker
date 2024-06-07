@@ -31,7 +31,7 @@ void ProgressAboutDialog::setup() {
                                           "Progress");
     adw_about_dialog_set_version(
         ADW_ABOUT_DIALOG(about_dialogp),
-        std::format("{}.{}", MAJOR_VERSION, MINOR_VERSION).c_str());
+        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION).c_str());
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
                                         "Gabriel de Moura");
 
