@@ -75,15 +75,13 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label)
 
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
-            constexpr guint ENTER = 36;
-            constexpr guint ESC_KEY = 9;
             if (revealer.get_child_revealed()) {
-                switch (keycode) {
-                    case (ENTER): {
+                switch (keyval) {
+                    case (GDK_KEY_Return): {
                         on_confirm_changes();
                         break;
                     }
-                    case (ESC_KEY): {
+                    case (GDK_KEY_Escape): {
                         on_cancel_changes();
                         break;
                     }

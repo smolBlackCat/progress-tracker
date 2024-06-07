@@ -1,4 +1,8 @@
 #define MAJOR_VERSION ${ProgressTracker_VERSION_MAJOR}
 #define MINOR_VERSION ${ProgressTracker_VERSION_MINOR}
-#define BUILD_TYPE "${CMAKE_BUILD_TYPE}"
-#define FLATPAK "${FLATPAK}"
+#cmakedefine DEBUG
+#cmakedefine FLATPAK
+#cmakedefine WINDOWS
+#cmakedefine PORTABLE
+
+constexpr const char* APPLICATION_ID = "${APPLICATION_ID}";

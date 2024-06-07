@@ -1,3 +1,10 @@
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(APPLICATION_ID "io.github.smolblackcat.Progress")
+else()
+    set(DEBUG True)
+    set(APPLICATION_ID "io.github.smolblackcat.ProgressDebug")
+endif()
+
 configure_file(app_info.h.in app_info.h)
 
 # Set Libraries and include directories
@@ -10,8 +17,10 @@ list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
 
 add_executable(progress-tracker main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
-# Setup CMake to use GTK+, tell the compiler where to look for headers
-# and to the linker where to look for libraries
+# Setup GTK
+if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
+    target_link_options(progress-tracker PRIVATE "-mwindows")
+endif()
 target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
 target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIRS})
@@ -49,6 +58,15 @@ if (${FLATPAK})
     install(TARGETS progress-tracker
             RUNTIME
             DESTINATION /app/bin/)
+elseif(${WINDOWS})
+    find_program(PYTHON NAMES python3 python)
+    add_custom_command(TARGET progress-tracker POST_BUILD
+                       COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/build-aux/fetch-win-deps.py
+                       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    add_custom_command(TARGET progress-tracker POST_BUILD
+                       COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.svg share/icons/
+                       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+
 else()
     install(TARGETS progress-tracker
             RUNTIME

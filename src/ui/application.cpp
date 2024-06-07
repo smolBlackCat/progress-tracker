@@ -13,9 +13,7 @@ Glib::RefPtr<ui::Application> ui::Application::create() {
 }
 
 ui::Application::Application()
-    : Gtk::Application{std::strcmp(BUILD_TYPE, "Release") != 0
-                           ? "io.github.smolblackcat.ProgressDebug"
-                           : "io.github.smolblackcat.Progress"} {}
+    : Gtk::Application{APPLICATION_ID} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
@@ -28,14 +26,16 @@ void ui::Application::on_startup() {
         exit(1);
     }
 
-    std::string app_dir;
-    if (strcmp(FLATPAK, "True") == 0) {
-        app_dir = std::getenv("XDG_CONFIG_HOME");
-        app_dir += "/progress/boards";
-    } else {
-        app_dir = std::getenv("HOME");
-        app_dir += "/.config/progress/boards";
-    }
+    #ifdef FLATPAK
+        std::string app_dir =
+            std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards";
+    #elif defined(WINDOWS)
+        std::string app_dir =
+            std::string{std::getenv("APPDATA")} + "\\Progress\\Boards";
+    #else
+        std::string app_dir =
+            std::string{std::getenv("HOME")} + "/.config/progress/boards";
+    #endif
 
     if (!std::filesystem::exists(app_dir)) {
         if (!std::filesystem::create_directories(app_dir)) {
@@ -46,7 +46,7 @@ void ui::Application::on_startup() {
     } else {
         for (const auto& dir_entry :
              std::filesystem::directory_iterator(app_dir)) {
-            std::string board_filename = dir_entry.path();
+            std::string board_filename = dir_entry.path().string();
             if (board_filename.ends_with(".xml")) {
                 try {
                     main_window->add_board(board_filename);

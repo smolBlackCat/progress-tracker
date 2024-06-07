@@ -234,14 +234,16 @@ std::string format_basename(std::string basename) {
 
 // TODO: Board class deserves a BoardManager class
 const std::string Board::new_filename(const std::string& base) {
-    std::string boards_dir;
-    if (strcmp(FLATPAK, "True") == 0) {
-        boards_dir =
+    #ifdef FLATPAK
+        std::string boards_dir =
             std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards/";
-    } else {
-        boards_dir =
+    #elif defined(WINDOWS)
+        std::string boards_dir =
+            std::string{std::getenv("APPDATA")} + "\\Progress\\Boards\\";
+    #else
+        std::string boards_dir =
             std::string{std::getenv("HOME")} + "/.config/progress/boards/";
-    }
+    #endif
     std::string filename = "";
     if (std::filesystem::exists(boards_dir)) {
         std::string basename = format_basename(base);

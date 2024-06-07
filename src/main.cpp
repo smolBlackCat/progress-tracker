@@ -1,19 +1,37 @@
 #include <app_info.h>
 #include <libintl.h>
 
-#include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <locale>
 
 #include "ui/application.h"
 
+/**
+ * @brief Return the app's locale directory.
+ *
+ * @details A different locale directory is returned depending on the build
+ * settings.
+ *
+ * @return A string object containing
+ */
 std::string get_locale_dir() {
-    if (strcmp(BUILD_TYPE, "Release") == 0) {
-        return strcmp(FLATPAK, "True") == 0 ? "/app/share/locale/"
-                                            : "/usr/share/locale/";
-    } else {
-        return std::string{getenv("PWD")} + "/locales/";
-    }
+#ifndef DEBUG
+#ifdef FLATPAK
+    return "/app/share/locale/";
+#elif defined(WINDOWS) && defined(PORTABLE)
+    return (std::filesystem::current_path() / "locale").string() +
+           std::string{std::filesystem::path::preferred_separator};
+#elif defined(WINDOWS)
+    return std::string{std::getenv("PROGRAMFILES")} +
+           "\\Progress\\locale\\";
+#else
+    return "/usr/share/locale/";
+#endif
+#else
+    return (std::filesystem::current_path() / "locales").string() +
+           std::string{std::filesystem::path::preferred_separator};
+#endif
 }
 
 /**
@@ -24,6 +42,10 @@ int main(int argc, char *argv[]) {
     std::string locale_dir = get_locale_dir();
     std::cout << locale_dir << std::endl;
     bindtextdomain("progress-tracker", locale_dir.c_str());
+
+    // Required for correctly decoding text on Windows
+    bind_textdomain_codeset("progress-tracker", "utf-8");
+
     textdomain("progress-tracker");
 
     std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION
