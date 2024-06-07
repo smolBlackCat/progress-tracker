@@ -2,7 +2,6 @@
 #include <libintl.h>
 
 #include <filesystem>
-#include <iostream>
 #include <locale>
 
 #include "ui/application.h"
@@ -23,8 +22,7 @@ std::string get_locale_dir() {
     return (std::filesystem::current_path() / "locale").string() +
            std::string{std::filesystem::path::preferred_separator};
 #elif defined(WINDOWS)
-    return std::string{std::getenv("PROGRAMFILES")} +
-           "\\Progress\\locale\\";
+    return std::string{std::getenv("PROGRAMFILES")} + "\\Progress\\locale\\";
 #else
     return "/usr/share/locale/";
 #endif
@@ -39,17 +37,10 @@ std::string get_locale_dir() {
  */
 int main(int argc, char *argv[]) {
     std::setlocale(LC_ALL, "");
-    std::string locale_dir = get_locale_dir();
-    std::cout << locale_dir << std::endl;
-    bindtextdomain("progress-tracker", locale_dir.c_str());
-
-    // Required for correctly decoding text on Windows
+    bindtextdomain("progress-tracker", get_locale_dir().c_str());
     bind_textdomain_codeset("progress-tracker", "utf-8");
-
     textdomain("progress-tracker");
 
-    std::cout << "Progress Tracker " << MAJOR_VERSION << "." << MINOR_VERSION
-              << std::endl;
     auto app = ui::Application::create();
     return app->run(argc, argv);
 }
