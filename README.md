@@ -36,6 +36,16 @@ A debian build is also available. The debian package can be obtained in the [rel
 sudo apt install ./progress-tracker-1.4.deb
 ```
 
+### Windows
+
+Windows installers are also available in the
+[releases](https://github.com/smolBlackCat/progress-tracker/releases) section.
+The installers were tested against the following environments.
+
+* Windows 8
+* Windows 10
+* Windows 11
+
 ### Building from Source
 
 For contributing to Progress source code, building from source might be the better option.
@@ -78,3 +88,35 @@ For contributing to Progress source code, building from source might be the bett
     ```sh
     cmake --install build/
     ```
+
+#### Building on Windows
+
+There are multiple approaches to building projects on Windows. The approach used
+by this project is setting up a [MSYS2 environment](https://www.msys2.org/) and
+downloading the MSYS dependencies similar to the one listed before. Currently,
+the project build settings support only two environments: UCRT64 and MINGW32.
+
+1. Install the dependencies
+
+    ```sh
+    # Replace env with either 'ucrt64' or 'mingw32'
+    pacman -Syu mingw-w64-env-cmake mingw-w64-env-python mingw-w64-env-gtkmm4 \
+        mingw-w64-env-libadwaita mingw-w64-env-tinyxml2 \
+        mingw-w64-env-gettext mingw-w64-env-catch git
+    ```
+
+2. Clone the project's repository
+
+    ```sh
+    git clone https://github.com/smolBlackCat/progress-tracker.git
+    ```
+
+3. Configure and compile project
+
+    ```sh
+    cd progress-tracker/
+    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release -DWINDOWS=True
+    cmake --build build/
+    ```
+4. Build installer using
+[Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
