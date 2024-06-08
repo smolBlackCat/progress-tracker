@@ -118,5 +118,6 @@ the project build settings support only two environments: UCRT64 and MINGW32.
     cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release -DWINDOWS=True
     cmake --build build/
     ```
+
 4. Build installer using
 [Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
