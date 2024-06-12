@@ -159,7 +159,8 @@ msgstr "No ha sido posible cargar este tablero"
 #~ msgstr "Acerca de"
 
 #~ msgid "Simple app for storing kanban-style todo lists"
-#~ msgstr "Una sencilla aplicación para almacenar listas de tareas al estilo Kanban"
+#~ msgstr ""
+#~ "Una sencilla aplicación para almacenar listas de tareas al estilo Kanban"
 
 #~ msgid "As a solid colour"
 #~ msgstr "Como color sólido"
