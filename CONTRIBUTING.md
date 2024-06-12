@@ -59,7 +59,7 @@ is defined in the `PO_NAMES` variable.
     ```
 
 2. Use **msginit** to generate the new POT file. You may also use **msgmerge**
-to update existent translation files
+to update existent translation files.
 
     ```sh
     # This is an example of generating a Brazilian Portuguese POT file
@@ -69,6 +69,11 @@ to update existent translation files
     ```sh
     # Updating the Brazilian Portuguese POT file
     msgmerge -U po/pt_BR.po po/progress-tracker.pot
+
+    # Alternatively, you can simply run ninja/cmake in the build directory, and
+    # all the .po files will be updated.
+    cd build/
+    ninja
     ```
 
 3. Translate the strings.
