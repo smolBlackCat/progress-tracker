@@ -15,7 +15,6 @@
  * @return A string object containing
  */
 std::string get_locale_dir() {
-#ifndef DEBUG
 #ifdef FLATPAK
     return "/app/share/locale/";
 #elif defined(WINDOWS) && defined(PORTABLE)
@@ -25,10 +24,6 @@ std::string get_locale_dir() {
     return std::string{std::getenv("PROGRAMFILES")} + "\\Progress\\locale\\";
 #else
     return "/usr/share/locale/";
-#endif
-#else
-    return (std::filesystem::current_path() / "locales").string() +
-           std::string{std::filesystem::path::preferred_separator};
 #endif
 }
 
