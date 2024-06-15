@@ -52,7 +52,7 @@ void ProgressAboutDialog::setup() {
         ADW_ABOUT_DIALOG(about_dialogp),
         "https://github.com/smolBlackCat/progress-tracker");
     adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(about_dialogp),
-                                          "io.github.smolblackcat.Progress");
+                                          APPLICATION_ID);
 }
 
 DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)

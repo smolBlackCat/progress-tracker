@@ -1,10 +1,3 @@
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(APPLICATION_ID "io.github.smolblackcat.Progress")
-else()
-    set(DEBUG True)
-    set(APPLICATION_ID "io.github.smolblackcat.ProgressDebug")
-endif()
-
 configure_file(app_info.h.in app_info.h)
 
 # Set Libraries and include directories
@@ -68,7 +61,7 @@ elseif(${WINDOWS})
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
 else()
-    install(TARGETS progress-tracker
-            RUNTIME
-            DESTINATION /usr/bin/)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
+            DESTINATION /usr/bin/
+            RENAME ${EXECUTABLE_NAME})
 endif()

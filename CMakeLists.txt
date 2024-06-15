@@ -4,6 +4,20 @@ project(ProgressTracker VERSION 1.4.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# General Settings
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(APP_NAME "Progress (Debug)")
+    set(APPLICATION_ID "io.github.smolblackcat.Progress.Devel")
+    set(APP_ICON io.github.smolblackcat.Progress.Devel.svg)
+    set(EXECUTABLE_NAME "progress-debug")
+    set(DEBUG true)
+else()
+    set(APP_NAME "Progress")
+    set(APPLICATION_ID "io.github.smolblackcat.Progress")
+    set(APP_ICON io.github.smolblackcat.Progress.svg)
+    set(EXECUTABLE_NAME "progress")
+endif()
+
 # GTK setup
 find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
 find_package(PkgConfig REQUIRED)

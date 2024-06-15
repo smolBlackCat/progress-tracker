@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.smolblackcat.Progress</id>
-  <name>Progress</name>
+  <id>@APPLICATION_ID@</id>
+  <name>@APP_NAME@</name>
   <summary>Kanban-style task organiser</summary>
   <developer id="io.github.smolblackcat">
     <name>Gabriel de Moura</name>
@@ -115,5 +115,5 @@
     </release>
   </releases>
 
-  <launchable type="desktop-id">io.github.smolblackcat.Progress.desktop</launchable>
+  <launchable type="desktop-id">@APPLICATION_ID@.desktop</launchable>
 </component>

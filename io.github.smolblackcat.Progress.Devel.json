@@ -1,5 +1,5 @@
 {
-	"id": "io.github.smolblackcat.Progress",
+	"id": "io.github.smolblackcat.Progress.Devel",
 	"runtime": "org.gnome.Platform",
 	"sdk": "org.gnome.Sdk",
 	"runtime-version": "46",
@@ -136,7 +136,7 @@
 			"builddir": true,
 			"config-opts": [
 				"-DFLATPAK=True",
-				"-DCMAKE_BUILD_TYPE=Release"
+				"-DCMAKE_BUILD_TYPE=Debug"
 			],
 			"sources": [
 				{

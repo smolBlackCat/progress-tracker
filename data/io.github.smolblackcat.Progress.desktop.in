@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Progress
-StartupWMClass=io.github.smolblackcat.Progress
+Name=@APP_NAME@
+StartupWMClass=@APPLICATION_ID@
 Comment=Kanban style todo app
 Categories=ProjectManagement;Office;
 Keywords=Kanban;Todo;Progress;
@@ -10,5 +10,5 @@ Keywords[ru_RU]=Kanban;Todo;Progress;канбан;туду;дела;список
 Comment[pt_BR]=Aplicação de TODO no estilo kanban
 Comment[uk_UA]=Додаток для справ у стилі Канбан дошки
 Comment[ru_RU]=Приложение для дел в стиле Канбан доски
-Exec=progress-tracker
-Icon=io.github.smolblackcat.Progress
+Exec=@EXECUTABLE_NAME@
+Icon=@APPLICATION_ID@
