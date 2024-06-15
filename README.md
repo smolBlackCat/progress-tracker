@@ -79,6 +79,8 @@ For contributing to Progress source code, building from source might be the bett
 
     ```sh
     cd progress-tracker/
+
+    # Use DCMAKE_BUILD_TYPE=Debug to build the application in development mode
     cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release
     cmake --build build/
     ```
@@ -86,7 +88,7 @@ For contributing to Progress source code, building from source might be the bett
 4. Install the Project
 
     ```sh
-    cmake --install build/
+    sudo ninja install -C build/
     ```
 
 #### Building on Windows
