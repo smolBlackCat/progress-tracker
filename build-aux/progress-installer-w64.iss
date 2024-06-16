@@ -42,7 +42,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "..\build\src\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\build\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\build\share\*"; DestDir: "{app}\share"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\locales\*"; DestDir: "{app}\locale"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\build\locales\*"; DestDir: "{app}\locale"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\build\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\data\io.github.smolblackcat.Progress.ico"; DestDir: "{app}"; Flags: ignoreversion
 
