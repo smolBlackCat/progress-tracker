@@ -27,7 +27,7 @@ public:
      * @brief Returns the filepath pointing to the Board object to be allocated
      *        when clicking this button.
      */
-    std::string get_filepath();
+    std::string get_filepath() const;
 
     /**
      * @brief Updates the Button settings
@@ -45,6 +45,10 @@ public:
      * @brief Updates the button's thumbnail
      */
     void set_background(const std::string& background);
+
+    bool operator>(const BoardCardButton& other);
+    bool operator<(const BoardCardButton& other);
+    bool operator==(const BoardCardButton& other);
 
 private:
     Gtk::Box root_box;

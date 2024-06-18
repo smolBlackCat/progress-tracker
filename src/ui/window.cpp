@@ -136,6 +136,19 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         sigc::mem_fun(*this, &ProgressWindow::show_create_board_dialog));
     setup_menu_button();
 
+    boards_grid_p->set_sort_func([](Gtk::FlowBoxChild* child1, Gtk::FlowBoxChild*child2) {
+        ui::BoardCardButton* bcb1 = (ui::BoardCardButton*) child1->get_child();
+        ui::BoardCardButton* bcb2 = (ui::BoardCardButton*) child2->get_child();
+
+        if (*bcb1 > *bcb2) {
+            return -1;
+        } else if (*bcb1 < *bcb2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+
     delete_boards_bar.set_halign(Gtk::Align::CENTER);
     delete_boards_bar.set_valign(Gtk::Align::END);
     delete_boards_bar.set_vexpand();
@@ -152,8 +165,9 @@ ProgressWindow::~ProgressWindow() {
 void ProgressWindow::add_board(const std::string& board_filepath) {
     auto board_entry_button =
         Gtk::make_managed<BoardCardButton>(board_filepath);
-    boards_grid_p->insert(*board_entry_button, 0);
-    auto fb_child_p = boards_grid_p->get_child_at_index(0);
+    auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
+    fb_child_p->set_child(*board_entry_button);
+    boards_grid_p->append(*fb_child_p);
     board_entry_button->signal_clicked().connect(
         [this, board_entry_button, fb_child_p]() {
             if (!this->on_delete_mode) {
@@ -204,6 +218,7 @@ void ProgressWindow::on_main_menu() {
     app_menu_button_p->set_menu_model(board_grid_menu_p);
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
+    boards_grid_p->invalidate_sort();
     set_title("Progress");
     board_widget.save();
 }

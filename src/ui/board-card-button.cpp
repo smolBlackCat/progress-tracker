@@ -42,7 +42,7 @@ ui::BoardCardButton::BoardCardButton(std::string board_filepath)
     set_child(root_box);
 }
 
-std::string ui::BoardCardButton::get_filepath() { return board_filepath; }
+std::string ui::BoardCardButton::get_filepath() const { return board_filepath; }
 
 void ui::BoardCardButton::update(Board* board) {
     board_filepath = board->get_filepath();
@@ -81,4 +81,25 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             break;
         }
     }
+}
+
+bool ui::BoardCardButton::operator>(const BoardCardButton& other) {
+    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
+    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
+
+    return this_lm_time > other_lm_time;
+}
+
+bool ui::BoardCardButton::operator<(const BoardCardButton& other) {
+    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
+    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
+
+    return this_lm_time < other_lm_time;
+}
+
+bool ui::BoardCardButton::operator==(const BoardCardButton& other) {
+    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
+    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
+
+    return this_lm_time == other_lm_time;
 }
