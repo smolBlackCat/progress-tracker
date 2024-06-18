@@ -6,7 +6,7 @@ set(APP_DESKTOP_ENTRY ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_ID}.desktop)
 configure_file(io.github.smolblackcat.Progress.metainfo.xml.in ${APPLICATION_ID}.metainfo.xml)
 set(APP_METAINFO ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_ID}.metainfo.xml)
 
-if (${LINUX} AND NOT ${FLATPAK})
+if (LINUX AND NOT FLATPAK)
     install(FILES ${APP_DESKTOP_ENTRY}
             DESTINATION /usr/share/applications/)
     install(FILES ${APP_METAINFO}
