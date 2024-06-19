@@ -6,8 +6,8 @@
 #include <format>
 #include <iostream>
 
+#include "../window.h"
 #include "cardlist-widget.h"
-#include "window.h"
 
 using namespace std::chrono_literals;
 
@@ -121,28 +121,28 @@ void ui::BoardWidget::set_background(const std::string& background) {
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
-        #ifdef WINDOWS
+#ifdef WINDOWS
             picture.set_visible(false);
-        #endif
+#endif
             break;
         }
         case BackgroundType::IMAGE: {
-        #ifdef WINDOWS
+#ifdef WINDOWS
             picture.set_filename(background);
             picture.set_visible(true);
             break;
-        #else
+#else
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_FILE, background));
             break;
-        #endif
+#endif
         }
         case BackgroundType::INVALID: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
-        #ifdef WINDOWS
+#ifdef WINDOWS
             picture.set_visible(false);
-        #endif
+#endif
             break;
         }
     }
@@ -187,13 +187,13 @@ void ui::BoardWidget::setup_auto_scrolling() {
 #endif
     Glib::signal_timeout().connect(
         [this]() {
-        #ifdef WINDOWS
+#ifdef WINDOWS
             double cur_max_width = scr.get_width();
             auto hadjustment = scr.get_hadjustment();
-        #else
+#else
             double cur_max_width = get_width();
             auto hadjustment = get_hadjustment();
-        #endif
+#endif
             double lower = hadjustment->get_lower();
             double upper = hadjustment->get_upper();
 

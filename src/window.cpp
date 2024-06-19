@@ -6,11 +6,11 @@
 #include <format>
 #include <iostream>
 
-#include "../core/exceptions.h"
 #include "app_info.h"
-#include "board-card-button.h"
-#include "create_board_dialog.h"
-#include "preferences-board-dialog.h"
+#include "core/exceptions.h"
+#include "dialog/create_board_dialog.h"
+#include "dialog/preferences-board-dialog.h"
+#include "widgets/board-card-button.h"
 
 namespace ui {
 
@@ -31,7 +31,8 @@ void ProgressAboutDialog::setup() {
                                           "Progress");
     adw_about_dialog_set_version(
         ADW_ABOUT_DIALOG(about_dialogp),
-        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION).c_str());
+        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
+            .c_str());
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
                                         "Gabriel de Moura");
 
@@ -136,9 +137,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         sigc::mem_fun(*this, &ProgressWindow::show_create_board_dialog));
     setup_menu_button();
 
-    boards_grid_p->set_sort_func([](Gtk::FlowBoxChild* child1, Gtk::FlowBoxChild*child2) {
-        ui::BoardCardButton* bcb1 = (ui::BoardCardButton*) child1->get_child();
-        ui::BoardCardButton* bcb2 = (ui::BoardCardButton*) child2->get_child();
+    boards_grid_p->set_sort_func([](Gtk::FlowBoxChild* child1,
+                                    Gtk::FlowBoxChild* child2) {
+        ui::BoardCardButton* bcb1 = (ui::BoardCardButton*)child1->get_child();
+        ui::BoardCardButton* bcb2 = (ui::BoardCardButton*)child2->get_child();
 
         if (*bcb1 > *bcb2) {
             return -1;

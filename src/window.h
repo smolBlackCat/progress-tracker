@@ -3,9 +3,9 @@
 #include <gtkmm.h>
 #include <libadwaita-1/adwaita.h>
 
-#include "../core/board.h"
-#include "board-card-button.h"
-#include "board-widget.h"
+#include "core/board.h"
+#include "widgets/board-card-button.h"
+#include "widgets/board-widget.h"
 
 namespace ui {
 

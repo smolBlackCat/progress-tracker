@@ -3,11 +3,10 @@
 #include <gtkmm.h>
 
 #include <memory>
-#include <thread>
 #include <vector>
 
-#include "app_info.h"
 #include "../core/board.h"
+#include "app_info.h"
 #include "board-card-button.h"
 
 #define CSS_FORMAT \

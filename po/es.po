@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 13:33+0300\n"
+"POT-Creation-Date: 2024-06-19 13:19-0300\n"
 "PO-Revision-Date: 2024-05-10 20:17-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,6 +16,84 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
+
+#: src/window.cpp:43
+msgid "translator-credits"
+msgstr "haggen88"
+
+#: src/window.cpp:48
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Todos los derechos reservados"
+
+#: src/window.cpp:62
+msgid "Select the boards to be deleted"
+msgstr "Seleccione los tableros que desea eliminar"
+
+#: src/window.cpp:63
+msgid "Delete"
+msgstr "Eliminar"
+
+#: src/window.cpp:64 src/dialog/board-dialog.cpp:21
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/window.cpp:181
+msgid "It was not possible to load this board"
+msgstr "No ha sido posible cargar este tablero"
+
+#: src/dialog/board-dialog.cpp:20
+msgid "Board's name"
+msgstr "Nombre del tablero"
+
+#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
+#: src/dialog/preferences-board-dialog.cpp:63
+msgid "Select a file"
+msgstr "Seleccione un archivo"
+
+#: src/dialog/board-dialog.cpp:23
+msgid "Select File"
+msgstr "Seleccionar archivo"
+
+#: src/dialog/board-dialog.cpp:40
+msgid "No file selected"
+msgstr "No se ha seleccionado ningún archivo"
+
+#: src/dialog/board-dialog.cpp:54
+msgid "Image Files"
+msgstr "Archivos de imagen"
+
+#: src/dialog/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr "Crear tablero"
+
+#: src/dialog/create_board_dialog.cpp:18
+msgid "Create"
+msgstr "Crear"
+
+#: src/dialog/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr "No se permiten nombres de tablero vacíos"
+
+#: src/dialog/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr "Se debe seleccionar un archivo"
+
+#: src/dialog/create_board_dialog.cpp:48
+msgid "It was not possible to create a Board with given name"
+msgstr "No ha sido posible crear un tablero con el nombre dado"
+
+#: src/dialog/preferences-board-dialog.cpp:13
+msgid "Edit Board"
+msgstr "Editar tablero"
+
+#: src/dialog/preferences-board-dialog.cpp:14
+msgid "Save"
+msgstr "Guardar"
+
+#: src/dialog/preferences-board-dialog.cpp:28
+#: src/dialog/preferences-board-dialog.cpp:45
+msgid "No file was selected"
+msgstr "No se seleccionó ningún archivo"
 
 #: src/resources/ui/app-window.ui:13
 msgid "Homepage"
@@ -53,107 +131,29 @@ msgstr "Como archivo"
 msgid "As a color"
 msgstr "Como color"
 
-#: src/ui/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Nombre del tablero"
-
-#: src/ui/board-dialog.cpp:21 src/ui/window.cpp:80
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: src/ui/board-dialog.cpp:22 src/ui/board-dialog.cpp:49
-#: src/ui/preferences-board-dialog.cpp:51
-msgid "Select a file"
-msgstr "Seleccione un archivo"
-
-#: src/ui/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Seleccionar archivo"
-
-#: src/ui/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "No se ha seleccionado ningún archivo"
-
-#: src/ui/board-dialog.cpp:54
-msgid "Image Files"
-msgstr "Archivos de imagen"
-
-#: src/ui/board-widget.cpp:21
+#: src/widgets/board-widget.cpp:21
 msgid "Add List"
 msgstr "Añadir lista"
 
-#: src/ui/board-widget.cpp:38
+#: src/widgets/board-widget.cpp:53
 msgid "New CardList"
 msgstr "Nueva lista de tarjetas"
 
-#: src/ui/card.cpp:13 src/ui/cardlist-widget.cpp:38
+#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
 msgid "Remove"
 msgstr "Eliminar"
 
-#: src/ui/cardlist-widget.cpp:25
+#: src/widgets/cardlist-widget.cpp:33
 msgid "Add card"
 msgstr "Añadir tarjeta"
 
-#: src/ui/cardlist-widget.cpp:162
+#: src/widgets/cardlist-widget.cpp:60
 msgid "New Card"
 msgstr "Nueva tarjeta"
 
-#: src/ui/create_board_dialog.cpp:14
-msgid "Create Board"
-msgstr "Crear tablero"
-
-#: src/ui/create_board_dialog.cpp:18
-msgid "Create"
-msgstr "Crear"
-
-#: src/ui/create_board_dialog.cpp:26
-msgid "Empty board names are not allowed"
-msgstr "No se permiten nombres de tablero vacíos"
-
-#: src/ui/create_board_dialog.cpp:34
-msgid "A file must be selected"
-msgstr "Se debe seleccionar un archivo"
-
-#: src/ui/create_board_dialog.cpp:48
-msgid "It was not possible to create a Board with given name"
-msgstr "No ha sido posible crear un tablero con el nombre dado"
-
-#: src/ui/editable-label-header.cpp:56
+#: src/widgets/editable-label-header.cpp:67
 msgid "Rename"
 msgstr "Renombrar"
-
-#: src/ui/preferences-board-dialog.cpp:13
-msgid "Edit Board"
-msgstr "Editar tablero"
-
-#: src/ui/preferences-board-dialog.cpp:14
-msgid "Save"
-msgstr "Guardar"
-
-#: src/ui/preferences-board-dialog.cpp:35
-msgid "No file was selected"
-msgstr "No se seleccionó ningún archivo"
-
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/ui/window.cpp:55
-msgid "translator-credits"
-msgstr "haggen88"
-
-#: src/ui/window.cpp:62
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Todos los derechos reservados"
-
-#: src/ui/window.cpp:78
-msgid "Select the boards to be deleted"
-msgstr "Seleccione los tableros que desea eliminar"
-
-#: src/ui/window.cpp:79
-msgid "Delete"
-msgstr "Eliminar"
-
-#: src/ui/window.cpp:172
-msgid "It was not possible to load this board"
-msgstr "No ha sido posible cargar este tablero"
 
 #~ msgid "About"
 #~ msgstr "Acerca de"

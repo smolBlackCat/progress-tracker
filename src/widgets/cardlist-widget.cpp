@@ -3,18 +3,10 @@
 #include <glibmm/i18n.h>
 
 #include <format>
-#include <iostream>
 
 #include "board-widget.h"
 #include "card.h"
 
-/**
- * Plan to implement cancel feature
- *
- * * EditableLabelHeader objects should have a cancel feature. By default,
- *   their behavior is that whenever the button is clicked, the label is set
- *   to the string it was before starting editing_mode.
- */
 ui::CardListHeader::CardListHeader(CardlistWidget& cardlist_widget)
     : EditableLabelHeader{}, cardlist_widget{cardlist_widget} {
     label.set_name("cardlist-title");
@@ -172,9 +164,7 @@ void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     }
 }
 
-void ui::CardlistWidget::remove_() {
-    board.remove_cardlist(*this);
-}
+void ui::CardlistWidget::remove_() { board.remove_cardlist(*this); }
 
 void ui::CardlistWidget::set_name_(const std::string& new_name) {
     cardlist_refptr->set_name(new_name);

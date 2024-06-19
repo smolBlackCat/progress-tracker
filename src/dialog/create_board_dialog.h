@@ -5,7 +5,7 @@
 #include <string>
 
 #include "board-dialog.h"
-#include "window.h"
+#include "../window.h"
 
 namespace ui {
 
