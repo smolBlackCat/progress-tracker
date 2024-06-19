@@ -218,9 +218,9 @@ void ProgressWindow::on_main_menu() {
     app_menu_button_p->set_menu_model(board_grid_menu_p);
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
-    boards_grid_p->invalidate_sort();
     set_title("Progress");
     board_widget.save();
+    boards_grid_p->invalidate_sort();
 }
 
 void ProgressWindow::on_board_view() {
