@@ -71,7 +71,7 @@ public:
 
     /**
      * @brief Removes itself from the associated Board
-    */
+     */
     void remove_();
 
     /**

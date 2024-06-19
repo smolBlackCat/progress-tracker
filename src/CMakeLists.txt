@@ -1,31 +1,40 @@
 configure_file(app_info.h.in app_info.h)
 
 # Set Libraries and include directories
-add_subdirectory(ui)
 add_subdirectory(core)
-list(APPEND APP_LIBS ui)
-list(APPEND APP_LIBS core)
-list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/ui")
-list(APPEND APP_INCLUDES "${PROJECT_SOURCE_DIR}/core")
+add_subdirectory(dialog)
+add_subdirectory(widgets)
 
-add_executable(progress-tracker main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
+list(APPEND APP_LIBS
+     core
+     progress-dialog
+     progress-widgets)
+list(APPEND APP_INCLUDES
+     "${PROJECT_SOURCE_DIR}/src"
+     "${PROJECT_BINARY_DIR}/src")
+
+add_executable(progress-tracker
+    main.cpp
+    application.cpp
+    application.h
+    window.cpp
+    window.h
+    ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
 # Setup GTK
 if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
-target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
-target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
-target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIRS})
-target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
-# i18n Settings
+target_link_libraries(progress-tracker PRIVATE ${ADWAITA_LIBRARIES})
 target_link_libraries(progress-tracker PRIVATE ${INTL_LIBRARIES})
-target_include_directories(progress-tracker PRIVATE ${INTL_INCLUDE_DIR})
-
-# Link the application's libraries and headers
 target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
-target_include_directories(progress-tracker PRIVATE ${PROJECT_BINARY_DIR}/src ${APP_INCLUDES})
+
+target_include_directories(progress-tracker PRIVATE ${ADWAITA_INCLUDE_DIRS})
+target_include_directories(progress-tracker PRIVATE ${INTL_INCLUDE_DIR})
+target_include_directories(progress-tracker PRIVATE ${APP_INCLUDES})
+
+target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
 # Resources Settings
 set(GLIB_FLAGS --target=resources.cpp)

@@ -1,10 +1,10 @@
-#include <app_info.h>
 #include <libintl.h>
 
 #include <filesystem>
 #include <locale>
 
-#include "ui/application.h"
+#include "app_info.h"
+#include "application.h"
 
 /**
  * @brief Return the app's locale directory.

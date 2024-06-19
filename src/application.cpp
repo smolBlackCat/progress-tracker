@@ -1,19 +1,19 @@
 #include "application.h"
 
 #include <adwaita.h>
-#include <app_info.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
 
+#include "app_info.h"
+
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
 
-ui::Application::Application()
-    : Gtk::Application{APPLICATION_ID} {}
+ui::Application::Application() : Gtk::Application{APPLICATION_ID} {}
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
@@ -26,16 +26,16 @@ void ui::Application::on_startup() {
         exit(1);
     }
 
-    #ifdef FLATPAK
-        std::string app_dir =
-            std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards";
-    #elif defined(WINDOWS)
-        std::string app_dir =
-            std::string{std::getenv("APPDATA")} + "\\Progress\\Boards";
-    #else
-        std::string app_dir =
-            std::string{std::getenv("HOME")} + "/.config/progress/boards";
-    #endif
+#ifdef FLATPAK
+    std::string app_dir =
+        std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards";
+#elif defined(WINDOWS)
+    std::string app_dir =
+        std::string{std::getenv("APPDATA")} + "\\Progress\\Boards";
+#else
+    std::string app_dir =
+        std::string{std::getenv("HOME")} + "/.config/progress/boards";
+#endif
 
     if (!std::filesystem::exists(app_dir)) {
         if (!std::filesystem::create_directories(app_dir)) {

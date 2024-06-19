@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "../core/board.h"
+#include "core/board.h"
 #include "window.h"
 
 namespace ui {

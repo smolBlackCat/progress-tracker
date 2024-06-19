@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 13:33+0300\n"
+"POT-Creation-Date: 2024-06-19 13:19-0300\n"
 "PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -17,6 +17,84 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Gtranslator 45.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: src/window.cpp:43
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"
+
+#: src/window.cpp:48
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Всички права запазени"
+
+#: src/window.cpp:62
+msgid "Select the boards to be deleted"
+msgstr "Изберете дъските, които да бъдат премахнати"
+
+#: src/window.cpp:63
+msgid "Delete"
+msgstr "Изтриване"
+
+#: src/window.cpp:64 src/dialog/board-dialog.cpp:21
+msgid "Cancel"
+msgstr "Отказване"
+
+#: src/window.cpp:181
+msgid "It was not possible to load this board"
+msgstr "Не беше възможно да се зареди тази дъска"
+
+#: src/dialog/board-dialog.cpp:20
+msgid "Board's name"
+msgstr "Име на дъската"
+
+#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
+#: src/dialog/preferences-board-dialog.cpp:63
+msgid "Select a file"
+msgstr "Изберете файл"
+
+#: src/dialog/board-dialog.cpp:23
+msgid "Select File"
+msgstr "Избиране на файл"
+
+#: src/dialog/board-dialog.cpp:40
+msgid "No file selected"
+msgstr "Няма избран файл"
+
+#: src/dialog/board-dialog.cpp:54
+msgid "Image Files"
+msgstr "Изображения"
+
+#: src/dialog/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr "Създаване на дъска"
+
+#: src/dialog/create_board_dialog.cpp:18
+msgid "Create"
+msgstr "Създаване"
+
+#: src/dialog/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr "Не са позволени дъски с празни имена"
+
+#: src/dialog/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr "файл трябва да е избран"
+
+#: src/dialog/create_board_dialog.cpp:48
+msgid "It was not possible to create a Board with given name"
+msgstr "Не беше възможно да се създаде дъска с даденото име"
+
+#: src/dialog/preferences-board-dialog.cpp:13
+msgid "Edit Board"
+msgstr "Редактиране на дъската"
+
+#: src/dialog/preferences-board-dialog.cpp:14
+msgid "Save"
+msgstr "Запазване"
+
+#: src/dialog/preferences-board-dialog.cpp:28
+#: src/dialog/preferences-board-dialog.cpp:45
+msgid "No file was selected"
+msgstr "Няма избран файл"
 
 #: src/resources/ui/app-window.ui:13
 msgid "Homepage"
@@ -54,107 +132,29 @@ msgstr "Като файл"
 msgid "As a color"
 msgstr "Като цвят"
 
-#: src/ui/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Име на дъската"
-
-#: src/ui/board-dialog.cpp:21 src/ui/window.cpp:80
-msgid "Cancel"
-msgstr "Отказване"
-
-#: src/ui/board-dialog.cpp:22 src/ui/board-dialog.cpp:49
-#: src/ui/preferences-board-dialog.cpp:51
-msgid "Select a file"
-msgstr "Изберете файл"
-
-#: src/ui/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Избиране на файл"
-
-#: src/ui/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "Няма избран файл"
-
-#: src/ui/board-dialog.cpp:54
-msgid "Image Files"
-msgstr "Изображения"
-
-#: src/ui/board-widget.cpp:21
+#: src/widgets/board-widget.cpp:21
 msgid "Add List"
 msgstr "Добавяне на списък"
 
-#: src/ui/board-widget.cpp:38
+#: src/widgets/board-widget.cpp:53
 msgid "New CardList"
 msgstr "Нов списък с карти"
 
-#: src/ui/card.cpp:13 src/ui/cardlist-widget.cpp:38
+#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
 msgid "Remove"
 msgstr "Премахване"
 
-#: src/ui/cardlist-widget.cpp:25
+#: src/widgets/cardlist-widget.cpp:33
 msgid "Add card"
 msgstr "Добавяне на карта"
 
-#: src/ui/cardlist-widget.cpp:162
+#: src/widgets/cardlist-widget.cpp:60
 msgid "New Card"
 msgstr "Нова карта"
 
-#: src/ui/create_board_dialog.cpp:14
-msgid "Create Board"
-msgstr "Създаване на дъска"
-
-#: src/ui/create_board_dialog.cpp:18
-msgid "Create"
-msgstr "Създаване"
-
-#: src/ui/create_board_dialog.cpp:26
-msgid "Empty board names are not allowed"
-msgstr "Не са позволени дъски с празни имена"
-
-#: src/ui/create_board_dialog.cpp:34
-msgid "A file must be selected"
-msgstr "файл трябва да е избран"
-
-#: src/ui/create_board_dialog.cpp:48
-msgid "It was not possible to create a Board with given name"
-msgstr "Не беше възможно да се създаде дъска с даденото име"
-
-#: src/ui/editable-label-header.cpp:56
+#: src/widgets/editable-label-header.cpp:67
 msgid "Rename"
 msgstr "Преименуване"
-
-#: src/ui/preferences-board-dialog.cpp:13
-msgid "Edit Board"
-msgstr "Редактиране на дъската"
-
-#: src/ui/preferences-board-dialog.cpp:14
-msgid "Save"
-msgstr "Запазване"
-
-#: src/ui/preferences-board-dialog.cpp:35
-msgid "No file was selected"
-msgstr "Няма избран файл"
-
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/ui/window.cpp:55
-msgid "translator-credits"
-msgstr "twlvnn <kraft_werk@tutanota.com>"
-
-#: src/ui/window.cpp:62
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Всички права запазени"
-
-#: src/ui/window.cpp:78
-msgid "Select the boards to be deleted"
-msgstr "Изберете дъските, които да бъдат премахнати"
-
-#: src/ui/window.cpp:79
-msgid "Delete"
-msgstr "Изтриване"
-
-#: src/ui/window.cpp:172
-msgid "It was not possible to load this board"
-msgstr "Не беше възможно да се зареди тази дъска"
 
 #~ msgid "About"
 #~ msgstr "Относно"

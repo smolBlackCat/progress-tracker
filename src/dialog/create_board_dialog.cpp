@@ -4,7 +4,7 @@
 
 #include <format>
 
-#include "application.h"
+#include "../application.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
