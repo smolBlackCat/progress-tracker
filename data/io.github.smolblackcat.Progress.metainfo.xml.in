@@ -53,6 +53,16 @@
   </categories>
 
   <releases>
+    <release date="2024-06-23" version="1.5.0">
+      <description>
+        <p>What's new in Progress 1.5.0</p>
+        <ul>
+          <li>Board buttons will now appear in the order of modification</li>
+          <li>Preferences Board Dialog will only generate a new name file if
+          the board's name was changed</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-06-07" version="1.4.1">
       <description>
         <p>What's new in Progress 1.4.1</p>
