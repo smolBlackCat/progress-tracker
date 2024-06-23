@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <iostream>
 
-#include "app_info.h"
+#include "utils.h"
 
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
@@ -26,16 +26,7 @@ void ui::Application::on_startup() {
         exit(1);
     }
 
-#ifdef FLATPAK
-    std::string app_dir =
-        std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards";
-#elif defined(WINDOWS)
-    std::string app_dir =
-        std::string{std::getenv("APPDATA")} + "\\Progress\\Boards";
-#else
-    std::string app_dir =
-        std::string{std::getenv("HOME")} + "/.config/progress/boards";
-#endif
+    std::string app_dir = progress_boards_folder();
 
     if (!std::filesystem::exists(app_dir)) {
         if (!std::filesystem::create_directories(app_dir)) {

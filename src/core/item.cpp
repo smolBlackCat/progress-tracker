@@ -20,7 +20,7 @@ void Item::set_modified(bool modified) { this->modified = modified; }
 
 std::string Item::get_name() const { return name; }
 
-bool Item::is_modified() { return modified; }
+bool Item::get_modified() { return modified; }
 
 bool Item::operator==(const Item& item) const {
     return item.get_name() == name && item.id == id;

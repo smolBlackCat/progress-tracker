@@ -62,15 +62,10 @@ public:
         "/io/github/smolblackcat/Progress/create-board-dialog.ui";
 
     ProgressWindow(BaseObjectType* cobject,
-                   const Glib::RefPtr<Gtk::Builder>& builder);
+                   const Glib::RefPtr<Gtk::Builder>& b);
     ~ProgressWindow() override;
 
     void add_board(const std::string& board_filepath);
-
-    /**
-     * @brief Shows application information
-     */
-    void show_about_dialog();
 
     /**
      * @brief Presents dialog for creating boards
@@ -104,7 +99,6 @@ public:
     void delete_selected_boards();
 
 protected:
-    const Glib::RefPtr<Gtk::Builder> window_builder;
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
 

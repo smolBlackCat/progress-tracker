@@ -4,13 +4,10 @@
 
 #include <string>
 
-#include "board-dialog.h"
 #include "../window.h"
+#include "board-dialog.h"
 
 namespace ui {
-
-class ProgressWindow;
-
 /**
  * @class CreateBoardDialog
  *

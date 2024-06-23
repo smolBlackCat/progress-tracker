@@ -37,12 +37,9 @@ public:
      */
     bool remove_card(const Card& card);
 
-    bool is_modified() override;
+    bool get_modified() override;
 
-    /**
-     * TODO: Remove this method. card vector should not be accessible.
-     */
-    std::vector<std::shared_ptr<Card>>& get_card_vector();
+    const std::vector<std::shared_ptr<Card>>& get_card_vector();
 
     /**
      * @brief Reorders the cards in a way that next is put after sibling.

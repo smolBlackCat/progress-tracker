@@ -25,31 +25,31 @@ public:
      *
      * @param other New name.
      */
-    void set_name(const std::string& other);
+    virtual void set_name(const std::string& other);
 
     /**
      * @brief Sets modified state
      */
-    void set_modified(bool modified);
+    virtual void set_modified(bool modified);
 
     /**
      * @brief Gets the name of the object.
      *
      * @returns String as the name of the object.
      */
-    std::string get_name() const;
+    virtual std::string get_name() const;
 
     /**
      * @brief Produces true if the Item object was modified.
      */
-    virtual bool is_modified();
+    virtual bool get_modified();
 
     /**
      * @brief Gets the object's ID.
      *
      * @returns The integer as the object's ID.
      */
-    unsigned long long get_id() const;
+    virtual unsigned long long get_id() const;
 
     bool operator==(const Item& Item) const;
 

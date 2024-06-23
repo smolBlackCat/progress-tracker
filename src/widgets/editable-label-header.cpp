@@ -7,7 +7,9 @@
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
 
-EditableLabelHeader::EditableLabelHeader(const std::string& label)
+EditableLabelHeader::EditableLabelHeader(const std::string& label,
+                                         const std::string& label_css_class,
+                                         const std::string& entry_css_class)
     : Gtk::Box{Gtk::Orientation::VERTICAL},
       menu{Gio::Menu::create()},
       actions{Gio::SimpleActionGroup::create()},
@@ -15,6 +17,9 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label)
       click_controller{Gtk::GestureClick::create()} {
     editing_box.set_spacing(4);
 
+    if (entry_css_class != "") {
+        entry.add_css_class(entry_css_class);
+    }
     entry.set_valign(Gtk::Align::CENTER);
     entry.set_halign(Gtk::Align::START);
     entry.set_hexpand();
@@ -46,6 +51,9 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label)
     label_box.append(menu_button);
     append(label_box);
 
+    if (label_css_class != "") {
+        this->label.add_css_class(label_css_class);
+    }
     this->label.set_label(label);
     this->label.set_xalign(0);
     this->label.set_hexpand(false);
@@ -119,14 +127,26 @@ void EditableLabelHeader::exit_editing_mode() {
     menu_button.set_visible();
 }
 
+sigc::signal_with_accumulator<void, void, std::string>&
+EditableLabelHeader::signal_confirm() {
+    return on_confirm_signal;
+}
+
+sigc::signal_with_accumulator<void, void, std::string>&
+EditableLabelHeader::signal_cancel() {
+    return on_cancel_signal;
+}
+
 void EditableLabelHeader::on_confirm_changes() {
     set_label(entry.get_text());
     exit_editing_mode();
+    on_confirm_signal(label.get_text());
 }
 
 void EditableLabelHeader::on_cancel_changes() {
     exit_editing_mode();
     set_label(label.get_text());
+    on_cancel_signal(label.get_text());
 }
 
 void EditableLabelHeader::add_option(

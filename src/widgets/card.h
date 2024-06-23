@@ -28,7 +28,7 @@ public:
     /**
      * @brief Removes itself from the associated CardlistWidget object.
      */
-    void remove();
+    void remove_from_parent();
 
     /**
      * @brief Sets a new parent to this card.
@@ -44,8 +44,7 @@ public:
 
 protected:
     bool is_new;
-    void on_confirm_changes() override;
-    void on_cancel_changes() override;
+    void setup_drag_and_drop();
 
 private:
     std::shared_ptr<Card> card_refptr;

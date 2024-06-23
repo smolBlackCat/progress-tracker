@@ -2,6 +2,8 @@
 
 #include <gtkmm.h>
 
+#include <compare>
+
 #include "../core/board.h"
 
 namespace ui {
@@ -21,7 +23,7 @@ public:
      *
      * @throws std::invalid_argument when the file given does not exist
      */
-    BoardCardButton(std::string board_filepath);
+    BoardCardButton(const std::string& board_filepath);
 
     /**
      * @brief Returns the filepath pointing to the Board object to be allocated
@@ -46,9 +48,7 @@ public:
      */
     void set_background(const std::string& background);
 
-    bool operator>(const BoardCardButton& other);
-    bool operator<(const BoardCardButton& other);
-    bool operator==(const BoardCardButton& other);
+    std::strong_ordering operator<=>(const BoardCardButton& other) const;
 
 private:
     Gtk::Box root_box;
