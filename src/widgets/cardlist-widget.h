@@ -14,21 +14,6 @@ namespace ui {
 
 class BoardWidget;
 class CardWidget;
-class CardlistWidget;
-
-/**
- * @brief Represents a header for a CardList that allows changing its name.
- */
-class CardListHeader : public EditableLabelHeader {
-public:
-    CardListHeader(CardlistWidget& cardlist_widget);
-
-protected:
-    CardlistWidget& cardlist_widget;
-
-    void on_confirm_changes() override;
-    void on_cancel_changes() override;
-};
 
 /**
  * @brief Class that implements the facilities of a card list widget
@@ -53,14 +38,13 @@ public:
     /**
      * @brief Adds a CardWidget object based on the given Card
      *
-     * @param card_refptr Card smart pointer
-     * @param is_new bool value indicating whether this card is completely new
-     *               or loaded from file.
+     * @param card Card object
+     * @param editing_mode Boolean indicating whether the card widget should
+     * start in editing mode. Default is false
      *
      * @return The created CardWidget object pointer
      */
-    ui::CardWidget* add_card(std::shared_ptr<Card> card_refptr,
-                             bool is_new = false);
+    ui::CardWidget* add_card(const Card& card, bool editing_mode = false);
 
     /**
      * @brief Removes the specified CardWidget
@@ -68,16 +52,6 @@ public:
      * @param card Pointer to the CardWidget to be deleted.
      */
     void remove_card(ui::CardWidget* card);
-
-    /**
-     * @brief Removes itself from the associated Board
-     */
-    void remove_();
-
-    /**
-     * @brief Sets the name of the card list !!!
-     */
-    void set_name_(const std::string& new_name);
 
     /**
      * @brief Retrieves the underlying CardList smart pointer.
@@ -103,23 +77,23 @@ public:
      *
      * @return Reference to the CardListHeader object.
      */
-    CardListHeader& get_header();
+    EditableLabelHeader& get_header();
 
     bool is_new;
+    BoardWidget& board;
+
+    void reorder_cardwidget(ui::CardWidget& next, ui::CardWidget& sibling);
 
 private:
+    void setup_drag_and_drop();
+
     // Widgets
-    CardListHeader cardlist_header;
+    EditableLabelHeader cardlist_header;
     Gtk::Button add_card_button;
     Gtk::Box root;
 
     // Data
-    BoardWidget& board;
     std::shared_ptr<CardList> cardlist_refptr;
     std::vector<ui::CardWidget*> cards_tracker;
-
-    void reorder_card(ui::CardWidget& next, ui::CardWidget& sibling);
-
-    void setup_drag_and_drop(ui::CardWidget* card);
 };
 }  // namespace ui

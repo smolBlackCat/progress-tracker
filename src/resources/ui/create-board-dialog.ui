@@ -74,11 +74,14 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="select-file-label">
-                                <property name="name">image-label</property>
                                 <property name="label">No file selected yet</property>
                                 <property name="halign">center</property>
                                 <property name="vexpand">true</property>
                                 <property name="valign">start</property>
+
+                                <style>
+                                  <class name="image-label"/>
+                                </style>
                               </object>
                             </child>
                           </object>

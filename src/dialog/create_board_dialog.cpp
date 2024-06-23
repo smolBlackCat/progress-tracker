@@ -4,7 +4,7 @@
 
 #include <format>
 
-#include "../application.h"
+#include "../utils.h"
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
@@ -42,7 +42,7 @@ void CreateBoardDialog::create_board() {
                                  ? p_select_file_label->get_text()
                                  : p_colour_button->get_rgba().to_string();
     Board board = Board{p_board_name_entry->get_text(), background};
-    std::string new_file_path = Board::new_filename(board.get_name());
+    std::string new_file_path = gen_unique_filename(board.get_name());
     if (!board.set_filepath(new_file_path)) {
         auto message_dialog = Gtk::AlertDialog::create(
             _("It was not possible to create a Board with given name"));

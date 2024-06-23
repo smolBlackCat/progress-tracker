@@ -19,9 +19,10 @@ add_executable(progress-tracker
     application.h
     window.cpp
     window.h
+    utils.h
+    utils.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
-# Setup GTK
 if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
@@ -49,12 +50,12 @@ list(APPEND RESOURCES resources/ui/io.github.smolblackcat.Progress.svg
 
 add_custom_command(
     OUTPUT resources.cpp
-    COMMAND glib-compile-resources ${CMAKE_CURRENT_SOURCE_DIR}/resources.xml ${GLIB_FLAGS}
+    COMMAND ${GLIB_COMPILE_RESOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources.xml ${GLIB_FLAGS}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources.xml
     ${RESOURCES}
 )
-add_custom_target(generate_resources DEPENDS resources.cpp)
-add_dependencies(progress-tracker generate_resources)
+add_custom_target(progress-resources DEPENDS resources.cpp)
+add_dependencies(progress-tracker progress-resources)
 
 if (${FLATPAK})
     install(TARGETS progress-tracker

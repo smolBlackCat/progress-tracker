@@ -60,16 +60,14 @@ public:
     /**
      * @brief Sets a file path to where the board will be saved.
      *
+     * @param filepath absolute path where the board will be saved
+     *
+     * @param create_dirs Flag indicating whether filepath's parent directory
+     * can be created if it does not exist
+     *
      * @returns true if the path was set successfully, otherwise false.
      */
-    bool set_filepath(const std::string& file_path);
-
-    /**
-     * @brief Returns the xml structure of this board object.
-     *
-     * @returns A string of xml structure of this object.
-     */
-    std::string xml_structure();
+    bool set_filepath(const std::string& file_path, bool create_dirs = true);
 
     /**
      * @brief Adds a CardList object to the board by moving the contents to a
@@ -100,36 +98,30 @@ public:
     /**
      * @brief Saves the board information as a file.
      *
+     * @param create_dirs Flag indicating whether filepath's parent directory
+     * can be created if it does not exist
+     *
      * @details This method will create a new file based on the board's name. It
      *          will start numbering the files in case there are boards with the
      *          same name.
      *
-     * @returns True if the file is created sucessfully. False is returned when
-     *          the files already exists or there was a OS error.
+     * @returns True if the file was created sucessfully. False may be returned
+     * when the board's filepath is invalid (e.g parent directory does not
+     * exist and create_dirs is false or an OS error).
      */
-    bool save_as_xml();
+    bool save_as_xml(bool create_dirs = true);
 
-    const std::string get_filepath() const;
+    std::string get_filepath() const;
 
-    /**
-     * TODO: Remove this method. Don't give access to the underlying vector
-     * holding the cardlists. Implement a way of iterating within the class
-     */
-    std::vector<std::shared_ptr<CardList>>& get_cardlists();
+    const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
 
     /**
      * @brief Returns true if the board was modified in some way, otherwise
      * False.
      *
-     * @returns a boolean indicating if the board was modified.
+     * @returns Boolean indicating if the board was modified.
      */
-    bool is_modified() override;
-
-    /**
-     * @brief Generates a filename given a base. What it actually does is to
-     * lowercase the given base and give an id if needed.
-     */
-    static const std::string new_filename(const std::string& base);
+    bool get_modified() override;
 
     /**
      * @brief Returns the type of a given background
@@ -143,7 +135,4 @@ public:
 private:
     std::string background, file_path;
     std::vector<std::shared_ptr<CardList>> cardlist_vector;
-
-    bool cardlists_modified();
-    std::unique_ptr<tinyxml2::XMLDocument> xml_doc();
 };

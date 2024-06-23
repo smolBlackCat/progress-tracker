@@ -63,15 +63,14 @@ public:
     bool save(bool free = true);
 
     /**
-     * @brief Adds a new CardlistWidget widget based on a given smart pointer
-     * pointing to a CardList object.
+     * @brief Adds a new CardlistWidget widget based on the CardList object.
      *
-     * @param cardlist_ptr smart pointer pointing to the cardlist.
-     * @param is_new bool indicating whether the cardlist is completely new (has
-     *               not been loaded from a file) or not
+     * @param cardlist CardList object
+     * @param editing_mode bool indicating whether the cardlist is completely
+     * new (has not been loaded from a file) or not
      */
-    void add_cardlist(std::shared_ptr<CardList> cardlist_ptr,
-                      bool is_new = false);
+    ui::CardlistWidget* add_cardlist(const CardList& cardlist,
+                                     bool editing_mode = false);
 
     /**
      * @brief Removes a CardlistWidget widget.
@@ -79,6 +78,14 @@ public:
      * @param cardlist reference to the cardlist to be removed.
      */
     bool remove_cardlist(ui::CardlistWidget& cardlist);
+
+    /**
+     * @brief Reorders two CardlistWidget objects.
+     *
+     * @param next widget to be put after sibling
+     * @param sibling widget to be put before next
+     */
+    void reorder_cardlist(CardlistWidget& next, CardlistWidget& sibling);
 
     /**
      * @brief Sets the Board background
@@ -142,10 +149,5 @@ private:
      * needed.
      */
     void setup_auto_scrolling();
-
-    /**
-     * @brief Sets up drag and drop system of the board
-     */
-    void setup_drag_and_drop(ui::CardlistWidget* new_cardlist);
 };
 }  // namespace ui

@@ -14,7 +14,7 @@ uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
     return (r << 24) + (g << 16) + (b << 8) + a;
 }
 
-ui::BoardCardButton::BoardCardButton(std::string board_filepath)
+ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     : Button{},
       root_box{Gtk::Orientation::VERTICAL},
       board_thumbnail{},
@@ -83,23 +83,10 @@ void ui::BoardCardButton::set_background(const std::string& background) {
     }
 }
 
-bool ui::BoardCardButton::operator>(const BoardCardButton& other) {
+std::strong_ordering ui::BoardCardButton::operator<=>(
+    const BoardCardButton& other) const {
     auto this_lm_time = std::filesystem::last_write_time(board_filepath);
     auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
 
-    return this_lm_time > other_lm_time;
-}
-
-bool ui::BoardCardButton::operator<(const BoardCardButton& other) {
-    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
-    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
-
-    return this_lm_time < other_lm_time;
-}
-
-bool ui::BoardCardButton::operator==(const BoardCardButton& other) {
-    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
-    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
-
-    return this_lm_time == other_lm_time;
+    return this_lm_time <=> other_lm_time;
 }

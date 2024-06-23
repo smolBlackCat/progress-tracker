@@ -22,7 +22,9 @@ namespace ui {
 class EditableLabelHeader : public Gtk::Box {
 public:
     EditableLabelHeader();
-    EditableLabelHeader(const std::string& label);
+    EditableLabelHeader(const std::string& label,
+                        const std::string& label_css_class = "",
+                        const std::string& entry_css_class = "");
 
     std::string get_text();
 
@@ -44,6 +46,10 @@ public:
      */
     void exit_editing_mode();
 
+    sigc::signal_with_accumulator<void, void, std::string>& signal_confirm();
+
+    sigc::signal_with_accumulator<void, void, std::string>& signal_cancel();
+
 protected:
     Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
         label_box{Gtk::Orientation::HORIZONTAL};
@@ -58,14 +64,17 @@ protected:
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
+    sigc::signal_with_accumulator<void, void, std::string> on_confirm_signal;
+    sigc::signal_with_accumulator<void, void, std::string> on_cancel_signal;
+
     /**
      * @brief Updates the label
      */
-    virtual void on_confirm_changes();
+    void on_confirm_changes();
 
     /**
      * @brief Cancels the changes made to this label
      */
-    virtual void on_cancel_changes();
+    void on_cancel_changes();
 };
 }  // namespace ui

@@ -4,6 +4,8 @@
 
 #include <filesystem>
 
+#include "../utils.h"
+
 namespace ui {
 
 PreferencesBoardDialog::PreferencesBoardDialog(
@@ -60,25 +62,25 @@ void PreferencesBoardDialog::open_window() {
 void PreferencesBoardDialog::on_save_changes() {
     if (p_background_selector_stack->get_visible_child_name() == "as-file") {
         if (!file_selected) {
-            auto message_dialog = Gtk::AlertDialog::create(_("Select a file"));
-            message_dialog->show(*this);
-            // The information is not saved in disk.
+            Gtk::AlertDialog::create(_("Select a file"))->show(*this);
             return;
         }
         board_widget.set_background(selected_file->get_path());
     } else {
         board_widget.set_background(selected_colour.to_string());
     }
-    board_widget.set_board_name(p_board_name_entry->get_text());
 
-    // FIXME: There's no need to recreate a new filename if the name is not
-    // changed
-    std::string previous_filepath = board_widget.get_filepath();
-    board_widget.set_filepath(
-        Board::new_filename(p_board_name_entry->get_text()));
-    std::filesystem::remove(previous_filepath);
+    std::string previous_name = board_widget.get_board_name();
+    std::string new_name = p_board_name_entry->get_text();
+    if (previous_name != new_name) {
+        board_widget.set_board_name(p_board_name_entry->get_text());
+        std::string previous_filepath = board_widget.get_filepath();
+        board_widget.set_filepath(
+            gen_unique_filename(p_board_name_entry->get_text()));
+        std::filesystem::remove(previous_filepath);
+    }
+
     board_widget.save(false);
-
     close_window();
 }
 }  // namespace ui

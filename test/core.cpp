@@ -1,4 +1,6 @@
 #define CATCH_CONFIG_MAIN
+#include <tinyxml2.h>
+
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
@@ -9,6 +11,32 @@
 #include "card.h"
 #include "cardlist.h"
 #include "item.h"
+
+std::string xml_structure(Board& board) {
+    auto doc = std::make_unique<tinyxml2::XMLDocument>();
+
+    tinyxml2::XMLElement* board_element = doc->NewElement("board");
+    board_element->SetAttribute("name", board.get_name().c_str());
+    board_element->SetAttribute("background", board.get_background().c_str());
+    doc->InsertEndChild(board_element);
+
+    for (auto& cardlist : board.get_cardlist_vector()) {
+        tinyxml2::XMLElement* list_element = doc->NewElement("list");
+        list_element->SetAttribute("name", cardlist->get_name().c_str());
+
+        for (auto& card : cardlist->get_card_vector()) {
+            tinyxml2::XMLElement* card_element = doc->NewElement("card");
+            card_element->SetAttribute("name", card->get_name().c_str());
+            list_element->InsertEndChild(card_element);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+
+    tinyxml2::XMLPrinter printer;
+    doc->Print(&printer);
+
+    return printer.CStr();
+}
 
 void create_dummy_file(const char* board_name, const char* board_background,
                        const char* filename) {
@@ -173,7 +201,7 @@ TEST_CASE(
     Board board{"board_progress.xml"};
 
     std::string* file_content = get_xml_from_file("board_progress.xml");
-    CHECK(board.xml_structure() == *file_content);
+    CHECK(xml_structure(board) == *file_content);
 
     if (!std::filesystem::exists("board-with-invalid-background.xml")) {
         create_dummy_file("Test went wrong", "not a background string",
@@ -339,17 +367,34 @@ TEST_CASE("Saving boards: Successful attempt") {
     board.set_filepath("./progress-tracker-board.xml");
     CHECK(board.save_as_xml());
 
-    std::string xml_structure1 = board.xml_structure();
+    std::string xml_structure1 = xml_structure(board);
 
     auto cardlist = CardList{"Fatal"};
     board.add_cardlist(cardlist);
     CHECK(board.save_as_xml());
 
-    std::string xml_structure2 = board.xml_structure();
+    std::string xml_structure2 = xml_structure(board);
 
     CHECK_FALSE(xml_structure1 == xml_structure2);
 
     std::filesystem::remove("./progress-tracker-board.xml");
+}
+
+TEST_CASE("Saving Boards: Reliability") {
+    std::string base_dir = "./boards/";
+    std::string filepath = base_dir + "marki.xml";
+
+    Board board{"Mark I", "rgb(0,0,0)"};
+
+    REQUIRE(board.set_filepath(filepath) == true);
+    std::filesystem::remove(base_dir);
+    REQUIRE(board.save_as_xml());
+    REQUIRE(std::filesystem::exists(filepath));
+
+    std::filesystem::remove(filepath);
+    std::filesystem::remove(base_dir);
+
+    REQUIRE_FALSE(board.save_as_xml(false));
 }
 
 template <typename T>
@@ -394,9 +439,9 @@ TEST_CASE("Checking for board modification: Adding cards to a cardlist") {
 
     Board test_board{"test-board.xml"};
 
-    test_board.get_cardlists()[0]->add_card(Card{"Fatal"});
+    test_board.get_cardlist_vector()[0]->add_card(Card{"Fatal"});
 
-    CHECK(test_board.is_modified());
+    CHECK(test_board.get_modified());
     std::filesystem::remove("./test-board.xml");
 }
 
@@ -406,7 +451,7 @@ TEST_CASE("Checking for board modification: Adding cardlists to a board") {
     Board test_board{"test-board.xml"};
     test_board.add_cardlist(CardList{"New Cardlist"});
 
-    CHECK(test_board.is_modified());
+    CHECK(test_board.get_modified());
     std::filesystem::remove("./test-board.xml");
 }
 
@@ -416,12 +461,12 @@ TEST_CASE("Checking for board modification: Reordering Items") {
     Board test_board{"test-board.xml"};
 
     // Reordering Cardlists
-    auto cardlist1 = test_board.get_cardlists()[0];
-    auto cardlist2 = test_board.get_cardlists()[1];
+    auto cardlist1 = test_board.get_cardlist_vector()[0];
+    auto cardlist2 = test_board.get_cardlist_vector()[1];
 
     test_board.reorder_cardlist(cardlist2, cardlist1);
 
-    CHECK(test_board.is_modified());
+    CHECK(test_board.get_modified());
     std::filesystem::remove("./test-board.xml");
 }
 
@@ -429,6 +474,6 @@ TEST_CASE("Checking for board modification: No modification at all") {
     create_dummy_file("TestBoard", "rgba(0,0,0,1)", "test-board.xml");
 
     Board test_board{"test-board.xml"};
-    CHECK_FALSE(test_board.is_modified());
+    CHECK_FALSE(test_board.get_modified());
     std::filesystem::remove("./test-board.xml");
 }

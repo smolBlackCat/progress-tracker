@@ -28,16 +28,16 @@ bool CardList::remove_card(const Card& card) {
 
 bool CardList::cards_modified() {
     for (auto& card : card_vector) {
-        if (card->is_modified()) {
+        if (card->get_modified()) {
             return true;
         }
     }
     return false;
 }
 
-bool CardList::is_modified() { return modified || cards_modified(); }
+bool CardList::get_modified() { return modified || cards_modified(); }
 
-std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
+const std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
     return card_vector;
 }
 
