@@ -53,6 +53,15 @@
   </categories>
 
   <releases>
+    <release date="2024-06-28" version="1.5.1">
+      <description>
+        <p>What's new in Progress 1.5.1</p>
+        <ul>
+          <li>Fix bug where the board's background was set only if the board's
+          name was also modified</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-06-23" version="1.5.0">
       <description>
         <p>What's new in Progress 1.5.0</p>
