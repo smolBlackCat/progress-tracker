@@ -26,7 +26,7 @@ A debian build is also available. The debian package can be obtained in the
 [releases][github-release] page.
 
 ```sh
-sudo apt install ./progress-tracker-1.7.deb
+sudo apt install ./progress-tracker-2.0.deb
 ```
 
 ### Windows
@@ -107,7 +107,7 @@ the project build settings support only two environments: UCRT64 and MINGW32.
    # Replace env with either 'ucrt-x86_64' or 'i686'
    pacman -Syu mingw-w64-env-cmake mingw-w64-env-python mingw-w64-env-gtkmm4 \
        mingw-w64-env-libadwaita mingw-w64-env-tinyxml2 \
-       mingw-w64-env-gettext mingw-w64-env-catch mingw-w64-env-spdlog mingw-w64-env-makensis git
+       mingw-w64-env-gettext mingw-w64-env-catch mingw-w64-env-spdlog mingw-w64-env-nsis git
    ```
 
 2. Clone the project's repository
@@ -138,6 +138,10 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 
 If you like what I do and want me to keep doing it, please consider
 supporting me through [PayPal][paypal-link]
+
+
+4. Build installer using
+[Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
 
 [paypal-link]: https://www.paypal.com/donate/?hosted_button_id=9E5ELM2GFRU7U
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
