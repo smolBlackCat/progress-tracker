@@ -92,8 +92,10 @@ public:
      *
      * @param background string referring to a background, either of
      * "colour" or "file" or even "invalid"
+     * @param modify boolean indicating whether the inner board object will
+     * count this operation as a modfication. Default is true
      */
-    void set_background(const std::string& background);
+    void set_background(const std::string& background, bool modify = true);
 
     /**
      * @brief Retrieves the background string

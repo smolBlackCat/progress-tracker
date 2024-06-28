@@ -45,10 +45,12 @@ public:
      *        fall back for a default defined in Board::BACKGROUND_DEFAULT.
      *
      * @param other The new background.
+     * @param modify flag indicating whether to count this operation as a
+     * modification
      *
      * @returns a BackgroundType for later processing. It may be ignored
      */
-    BackgroundType set_background(const std::string& other);
+    BackgroundType set_background(const std::string& other, bool modify = true);
 
     /**
      * @brief Returns the current background value

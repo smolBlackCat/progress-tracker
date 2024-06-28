@@ -106,7 +106,7 @@ Board::Board(const std::string& board_file_path)
     modified = false;
 }
 
-BackgroundType Board::set_background(const std::string& other) {
+BackgroundType Board::set_background(const std::string& other, bool modify) {
     BackgroundType bg_type = Board::get_background_type(other);
 
     switch (bg_type) {
@@ -118,6 +118,8 @@ BackgroundType Board::set_background(const std::string& other) {
             background = Board::BACKGROUND_DEFAULT;
         } break;
     }
+
+    modified = modify ? true : modified;
 
     return bg_type;
 }

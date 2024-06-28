@@ -74,7 +74,7 @@ void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
             root.append(*new_cardlist);
             root.reorder_child_after(add_button, *new_cardlist);
         }
-        set_background(board->get_background());
+        set_background(board->get_background(), false);
     }
 }
 
@@ -126,8 +126,8 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
     root.reorder_child_after(next, sibling);
 }
 
-void ui::BoardWidget::set_background(const std::string& background) {
-    BackgroundType bg_type = board->set_background(background);
+void ui::BoardWidget::set_background(const std::string& background, bool modify) {
+    BackgroundType bg_type = board->set_background(background, modify);
     switch (bg_type) {
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
