@@ -1,18 +1,13 @@
-<img align="left" style="vertical-align: middle" width="120" height="120" src="data/io.github.smolblackcat.Progress.svg">
 
-# Progress
+# ![progress-logo] Progress
 
 Simple kanban-style task organiser
 
-###
+![GitHub Release][github-release-badge]
+![Flathub Downloads][flatpak-release-badge]
+![GitHub License][github-licence]
 
-![GitHub Release](https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github)
-![Flathub Downloads](https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub)
-![GitHub License](https://img.shields.io/github/license/smolBlackCat/progress-tracker)
-
-<div align="center">
-    <img src="pictures/progress-app-presentation.png">
-</div>
+![App Windows](pictures/progress-app-presentation.png)
 
 Progress is a simple task management app focused on simplicity yet enough for
 most workflows. It can be used on various contexts, from software development
@@ -22,24 +17,22 @@ to daily tasks. It is written in C++ using GTK 4(gtkmm) and libadwaita.
 
 ### Flatpak
 
-Progress is available to download at [Flathub](https://flathub.org/apps/io.github.smolblackcat.Progress).
+Progress is available to download at [Flathub][progress-flathub].
 
-<a href="https://flathub.org/en-GB/apps/io.github.smolblackcat.Progress">
-<img src="https://flathub.org/assets/badges/flathub-badge-i-en.png" width="150px" height="50px" />
-</a>
+![flathub-badge][flathub-badge]
 
 ### Debian
 
-A debian build is also available. The debian package can be obtained in the [releases](https://github.com/smolBlackCat/progress-tracker/releases) page.
+A debian build is also available. The debian package can be obtained in the
+[releases][github-release] page.
 
 ```sh
-sudo apt install ./progress-tracker-1.4.deb
+sudo apt install ./progress-tracker-1.5.deb
 ```
 
 ### Windows
 
-Windows installers are also available in the
-[releases](https://github.com/smolBlackCat/progress-tracker/releases) section.
+Windows installers are also available in the [releases][github-release] section.
 The installers were tested against the following environments.
 
 * Windows 8
@@ -48,7 +41,8 @@ The installers were tested against the following environments.
 
 ### Building from Source
 
-For contributing to Progress source code, building from source might be the better option.
+For contributing to Progress source code, building from source might be the
+better option.
 
 #### Dependencies
 
@@ -123,3 +117,11 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 
 4. Build installer using
 [Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
+
+[progress-logo]: data/io.github.smolblackcat.Progress.svg
+[progress-flathub]: https://flathub.org/apps/io.github.smolblackcat.Progress
+[github-release]: https://github.com/smolBlackCat/progress-tracker/releases
+[flathub-badge]: https://flathub.org/assets/badges/flathub-badge-i-en.png
+[github-release-badge]: https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github
+[flatpak-release-badge]: https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub
+[github-licence]: https://img.shields.io/github/license/smolBlackCat/progress-tracker
