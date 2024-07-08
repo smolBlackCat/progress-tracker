@@ -2,16 +2,54 @@
 
 #include <glibmm/i18n.h>
 
+#include <format>
+#include <iostream>
+
+#include "../utils.h"
 #include "cardlist-widget.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     : ui::EditableLabelHeader{card_refptr->get_name()},
       card_refptr{card_refptr},
       cardlist_p{nullptr},
-      is_new{is_new} {
+      is_new{is_new},
+      color_dialog{Gtk::ColorDialog::create()} {
     add_css_class("card");
-    add_option("remove", _("Remove"),
-               sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
+
+    add_option_button(
+        _("Remove"), "remove",
+        sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
+
+    // Colour Section
+    auto cover_submenu = Gio::Menu::create();
+    auto cover_actions = Gio::SimpleActionGroup::create();
+
+    cover_submenu->append(_("Set Colour"), "cover.set-color");
+    cover_submenu->append(_("Clear Colour Frame"), "cover.clear-colour");
+
+    cover_actions->add_action(
+        "set-color", sigc::mem_fun(*this, &ui::CardWidget::open_color_dialog));
+    cover_actions->add_action("clear-colour", [this]() {
+        m_frame.set_visible(false);
+        this->card_refptr->set_color(NO_COLOR);
+    });
+    menu_button.insert_action_group("cover", cover_actions);
+    menu->append_submenu(_("Card Cover"), cover_submenu);
+
+    color_frame.set_content_fit(Gtk::ContentFit::FILL);
+    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, 30);
+    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, 30);
+    m_frame.set_margin_bottom(4);
+
+    m_frame.set_child(color_frame);
+    append(m_frame);
+    reorder_child_at_start(m_frame);
+    m_frame.set_visible(false);
+
+    if (card_refptr->is_color_set()) {
+        colour_selector_button.set_rgba(card_refptr->get_color());
+        set_color(card_refptr->get_color());
+    }
 
     signal_confirm().connect([this](std::string label) {
         this->card_refptr->set_name(label);
@@ -22,6 +60,7 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
             this->remove_from_parent();
         }
     });
+
     setup_drag_and_drop();
 }
 
@@ -29,6 +68,10 @@ void ui::CardWidget::remove_from_parent() {
     if (cardlist_p) {
         cardlist_p->remove_card(this);
     }
+
+    // The pixbuf in color_frame is invalid on drag and drops events.
+    // Thus it is important to clean whatever existent instances.
+    color_frame.set_pixbuf(nullptr);
 }
 
 void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
@@ -98,4 +141,24 @@ void ui::CardWidget::setup_drag_and_drop() {
         },
         false);
     add_controller(drop_target_c);
+}
+
+void ui::CardWidget::open_color_dialog() {
+    color_dialog->choose_rgba(
+        *static_cast<Gtk::Window*>(get_root()),
+        [this](const Glib::RefPtr<Gio::AsyncResult>& result) {
+            try {
+                set_color(color_dialog->choose_rgba_finish(result));
+            } catch (Gtk::DialogError& err) {
+            }
+        });
+}
+
+void ui::CardWidget::set_color(const Gdk::RGBA& color) {
+    auto color_frame_pixbuf = Gdk::Pixbuf::create(
+        Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_SIZE, 30);
+    color_frame_pixbuf->fill(rgb_to_hex(color));
+    card_refptr->set_color(color);
+    color_frame.set_pixbuf(color_frame_pixbuf);
+    this->m_frame.set_visible();
 }

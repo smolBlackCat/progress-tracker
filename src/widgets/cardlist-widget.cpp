@@ -30,7 +30,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     if (is_new) {
         cardlist_header.to_editing_mode();
     }
-    cardlist_header.add_option("remove", _("Remove"), [this]() {
+    cardlist_header.add_option_button(_("Remove"), "remove", [this]() {
         this->board.remove_cardlist(*this);
     });
     cardlist_header.signal_confirm().connect([this](std::string label) {
@@ -46,9 +46,8 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_halign(Gtk::Align::START);
     add_card_button.set_hexpand(false);
-    add_card_button.signal_clicked().connect([this]() {
-        this->add_card(Card{_("New Card")}, true);
-    });
+    add_card_button.signal_clicked().connect(
+        [this]() { this->add_card(Card{_("New Card")}, true); });
     root.append(add_card_button);
 
     append(cardlist_header);

@@ -73,6 +73,7 @@ Board::Board(const std::string& board_file_path)
 
     while (list_element) {
         auto cur_cardlist_name = list_element->Attribute("name");
+        auto cur_cardlist_color = list_element->Attribute("color");
 
         if (!cur_cardlist_name) {
             throw board_parse_error{std::format(
@@ -81,11 +82,16 @@ Board::Board(const std::string& board_file_path)
                 file_path, list_element->GetLineNum())};
         }
 
-        CardList cur_cardlist{cur_cardlist_name};
+        // The extra checking ensures retro compatibiity with Progress 1.0 Board
+        // files
+        CardList cur_cardlist{
+            cur_cardlist_name,
+            cur_cardlist_color ? Gdk::RGBA{cur_cardlist_color} : NO_COLOR};
         auto card_element = list_element->FirstChildElement("card");
 
         while (card_element) {
             auto cur_card_name = card_element->Attribute("name");
+            auto cur_card_color = card_element->Attribute("color");
 
             if (!cur_card_name) {
                 throw board_parse_error{std::format(
@@ -95,7 +101,9 @@ Board::Board(const std::string& board_file_path)
                     file_path, cur_cardlist_name, card_element->GetLineNum())};
             }
 
-            cur_cardlist.add_card(Card{cur_card_name});
+            cur_cardlist.add_card(
+                Card{cur_card_name,
+                     cur_card_color ? Gdk::RGBA{cur_card_color} : NO_COLOR});
             card_element = card_element->NextSiblingElement("card");
         }
         cur_cardlist.set_modified(false);
@@ -214,10 +222,14 @@ bool Board::save_as_xml(bool create_dirs) {
     for (auto& cardlist : cardlist_vector) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
+        list_element->SetAttribute("color",
+                                   cardlist->get_color().to_string().c_str());
 
         for (auto& card : cardlist->get_card_vector()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
+            card_element->SetAttribute("color",
+                                       card->get_color().to_string().c_str());
             list_element->InsertEndChild(card_element);
         }
         board_element->InsertEndChild(list_element);

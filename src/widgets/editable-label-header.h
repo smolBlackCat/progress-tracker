@@ -2,6 +2,7 @@
 
 #include <gtkmm.h>
 
+#include <functional>
 #include <string>
 
 namespace ui {
@@ -33,8 +34,9 @@ public:
     /**
      * @brief Add an extra option to be selected in the menu button
      */
-    void add_option(const std::string& name, const std::string& title_name,
-                    const Gio::ActionMap::ActivateSlot& procedure);
+    void add_option_button(const std::string& title_name,
+                           const std::string& name,
+                           const Glib::SlotSpawnChildSetup& procedure);
 
     /**
      * @brief Changes the widget view to editing mode
@@ -54,13 +56,15 @@ protected:
     Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
         label_box{Gtk::Orientation::HORIZONTAL};
     Gtk::Revealer revealer;
+
     Gtk::Label label;
     Gtk::Entry entry;
     Gtk::Button confirm_changes_button, cancel_changes_button;
+
+    Glib::RefPtr<Gio::SimpleActionGroup> menu_actions;
+    Glib::RefPtr<Gio::Menu> menu;
     Gtk::MenuButton menu_button;
 
-    Glib::RefPtr<Gio::SimpleActionGroup> actions;
-    Glib::RefPtr<Gio::Menu> menu;
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 

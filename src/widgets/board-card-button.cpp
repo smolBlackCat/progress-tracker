@@ -5,14 +5,7 @@
 #include <format>
 #include <string>
 
-uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
-    uint8_t r = static_cast<uint8_t>(colour.get_red_u());
-    uint8_t g = static_cast<uint8_t>(colour.get_green_u());
-    uint8_t b = static_cast<uint8_t>(colour.get_blue_u());
-    uint8_t a = static_cast<uint8_t>(colour.get_alpha_u());
-
-    return (r << 24) + (g << 16) + (b << 8) + a;
-}
+#include "../utils.h"
 
 ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     : Button{},

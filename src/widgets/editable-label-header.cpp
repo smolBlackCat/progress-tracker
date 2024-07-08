@@ -12,7 +12,7 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
                                          const std::string& entry_css_class)
     : Gtk::Box{Gtk::Orientation::VERTICAL},
       menu{Gio::Menu::create()},
-      actions{Gio::SimpleActionGroup::create()},
+      menu_actions{Gio::SimpleActionGroup::create()},
       key_controller{Gtk::EventControllerKey::create()},
       click_controller{Gtk::GestureClick::create()} {
     editing_box.set_spacing(4);
@@ -72,9 +72,11 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
     cancel_changes_button.signal_clicked().connect(
         sigc::mem_fun(*this, &EditableLabelHeader::on_cancel_changes));
 
-    add_option("edit", _("Rename"),
-               sigc::mem_fun(*this, &ui::EditableLabelHeader::to_editing_mode));
-    menu_button.insert_action_group("label-header", actions);
+    add_option_button(
+        _("Rename"), "rename",
+        sigc::mem_fun(*this, &ui::EditableLabelHeader::to_editing_mode));
+
+    menu_button.insert_action_group("label-header", menu_actions);
     menu_button.set_menu_model(menu);
     menu_button.set_icon_name("view-more-horizontal-symbolic");
     menu_button.set_valign(Gtk::Align::START);
@@ -113,7 +115,14 @@ std::string EditableLabelHeader::get_text() { return label.get_text(); }
 void EditableLabelHeader::set_label(const std::string& new_label) {
     label.set_label(new_label);
     entry.set_text(new_label);
-};
+}
+
+void EditableLabelHeader::add_option_button(
+    const std::string& title_name, const std::string& name,
+    const Glib::SlotSpawnChildSetup& procedure) {
+    menu_actions->add_action(name, procedure);
+    menu->append(title_name, std::string{"label-header"} + "." + name);
+}
 
 void EditableLabelHeader::to_editing_mode() {
     label.set_visible(false);
@@ -147,12 +156,5 @@ void EditableLabelHeader::on_cancel_changes() {
     exit_editing_mode();
     set_label(label.get_text());
     on_cancel_signal(label.get_text());
-}
-
-void EditableLabelHeader::add_option(
-    const std::string& name, const std::string& title_name,
-    const Gio::ActionMap::ActivateSlot& procedure) {
-    actions->add_action(name, procedure);
-    menu->append(title_name, std::string{"label-header"} + "." + name);
 }
 }  // namespace ui

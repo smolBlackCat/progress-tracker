@@ -101,7 +101,7 @@ bool ui::BoardWidget::save(bool free) {
 }
 
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
-                                   bool editing_mode) {
+                                                  bool editing_mode) {
     auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
         *this, board->add_cardlist(cardlist), editing_mode);
     cardlist_vector.push_back(new_cardlist);
@@ -126,7 +126,8 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
     root.reorder_child_after(next, sibling);
 }
 
-void ui::BoardWidget::set_background(const std::string& background, bool modify) {
+void ui::BoardWidget::set_background(const std::string& background,
+                                     bool modify) {
     BackgroundType bg_type = board->set_background(background, modify);
     switch (bg_type) {
         case BackgroundType::COLOR: {

@@ -59,3 +59,12 @@ std::string gen_unique_filename(const std::string& base) {
     }
     return filename;
 }
+
+uint32_t rgb_to_hex(const Gdk::RGBA& color) {
+    uint8_t r = static_cast<uint8_t>(color.get_red_u());
+    uint8_t g = static_cast<uint8_t>(color.get_green_u());
+    uint8_t b = static_cast<uint8_t>(color.get_blue_u());
+    uint8_t a = static_cast<uint8_t>(color.get_alpha_u());
+
+    return (r << 24) + (g << 16) + (b << 8) + a;
+}

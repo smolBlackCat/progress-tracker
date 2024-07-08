@@ -3,6 +3,7 @@
 #include <gtkmm.h>
 
 #include <memory>
+#include <string>
 
 #include "../core/card.h"
 #include "cardlist-widget.h"
@@ -40,11 +41,21 @@ public:
      */
     void set_cardlist(ui::CardlistWidget* cardlist_p);
 
+    void set_color(const Gdk::RGBA& color);
+
     std::shared_ptr<Card> get_card();
 
 protected:
     bool is_new;
+    Gtk::Picture color_frame;
+    Gtk::Frame m_frame;
+    Gtk::Button clear_colour_button;
+    Gtk::ColorDialogButton colour_selector_button;
+    Glib::RefPtr<Gtk::ColorDialog> color_dialog;
+    Gtk::Box colour_setting_box;
+
     void setup_drag_and_drop();
+    void open_color_dialog();
 
 private:
     std::shared_ptr<Card> card_refptr;

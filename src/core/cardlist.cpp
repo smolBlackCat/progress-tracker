@@ -4,7 +4,10 @@
 #include <iterator>
 #include <stdexcept>
 
-CardList::CardList(const std::string& name) : Item{name}, card_vector{} {}
+CardList::CardList(const std::string& name, const Gdk::RGBA& color)
+    : Item{name}, card_vector{} {
+    this->color = color;
+}
 
 std::shared_ptr<Card> CardList::add_card(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
@@ -76,3 +79,12 @@ void CardList::reorder_card(std::shared_ptr<Card> next,
     }
     modified = true;
 }
+
+void CardList::set_color(const Gdk::RGBA& color) {
+    this->color = color;
+    modified = true;
+}
+
+Gdk::RGBA CardList::get_color() const { return color; }
+
+bool CardList::is_color_set() { return color != NO_COLOR; }
