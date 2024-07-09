@@ -46,6 +46,10 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
 
     if (card_refptr->is_color_set()) {
         set_color(card_refptr->get_color());
+
+        if (!is_new) {   
+            card_refptr->set_modified(false);
+        }
     }
 
     signal_confirm().connect([this](const std::string& label) {

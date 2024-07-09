@@ -56,6 +56,16 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     add_button.set_hexpand();
 
     root.append(add_button);
+
+    // Auto-saves the Board after 10 secs
+    Glib::signal_timeout().connect(
+        [this]() {
+            if (this->board) {
+                this->save(false);
+            }
+            return true;
+        },
+        BoardWidget::SAVE_INTERVAL);
 }
 
 ui::BoardWidget::~BoardWidget() {}

@@ -224,6 +224,7 @@ bool Board::save_as_xml(bool create_dirs) {
         list_element->SetAttribute("name", cardlist->get_name().c_str());
         list_element->SetAttribute("color",
                                    cardlist->get_color().to_string().c_str());
+        cardlist->set_modified(false);
 
         for (auto& card : cardlist->get_card_vector()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
@@ -231,9 +232,11 @@ bool Board::save_as_xml(bool create_dirs) {
             card_element->SetAttribute("color",
                                        card->get_color().to_string().c_str());
             list_element->InsertEndChild(card_element);
+            card->set_modified(false);
         }
         board_element->InsertEndChild(list_element);
     }
+    set_modified(false);
 
     std::filesystem::path p{file_path};
     if (!std::filesystem::exists(p.parent_path())) {

@@ -30,6 +30,7 @@ class CardlistWidget;
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
+    static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
     BoardWidget(ProgressWindow& app_window);
 
     ~BoardWidget() override;
