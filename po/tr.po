@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.smolblackcat.Progress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 13:19-0300\n"
+"POT-Creation-Date: 2024-07-09 20:38-0300\n"
 "PO-Revision-Date: 2024-04-19 13:36+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -39,7 +39,7 @@ msgstr "Sil"
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/window.cpp:181
+#: src/window.cpp:177
 msgid "It was not possible to load this board"
 msgstr "Bu pano yüklenemedi"
 
@@ -48,7 +48,7 @@ msgid "Board's name"
 msgstr "Pano adı"
 
 #: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:63
+#: src/dialog/preferences-board-dialog.cpp:65
 msgid "Select a file"
 msgstr "Dosya seç"
 
@@ -84,16 +84,16 @@ msgstr "Bir dosya seçilmeli"
 msgid "It was not possible to create a Board with given name"
 msgstr "Verilen adla pano oluşturulamadı"
 
-#: src/dialog/preferences-board-dialog.cpp:13
+#: src/dialog/preferences-board-dialog.cpp:15
 msgid "Edit Board"
 msgstr "Panoyu Düzenle"
 
-#: src/dialog/preferences-board-dialog.cpp:14
+#: src/dialog/preferences-board-dialog.cpp:16
 msgid "Save"
 msgstr "Kaydet"
 
-#: src/dialog/preferences-board-dialog.cpp:28
-#: src/dialog/preferences-board-dialog.cpp:45
+#: src/dialog/preferences-board-dialog.cpp:30
+#: src/dialog/preferences-board-dialog.cpp:47
 msgid "No file was selected"
 msgstr "Hiçbir dosya seçilmedi"
 
@@ -129,7 +129,7 @@ msgstr "Arka plan"
 msgid "As a file"
 msgstr "Dosya olarak"
 
-#: src/resources/ui/create-board-dialog.ui:93
+#: src/resources/ui/create-board-dialog.ui:96
 msgid "As a color"
 msgstr "Renk olarak"
 
@@ -141,19 +141,31 @@ msgstr "Liste Ekle"
 msgid "New CardList"
 msgstr "Yeni CardList"
 
-#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
+#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
 msgid "Remove"
 msgstr "Kaldır"
 
-#: src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:26
+msgid "Set Color"
+msgstr ""
+
+#: src/widgets/card.cpp:27
+msgid "Clear Color Frame"
+msgstr ""
+
+#: src/widgets/card.cpp:34
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/cardlist-widget.cpp:14
 msgid "Add card"
 msgstr "Kart ekle"
 
-#: src/widgets/cardlist-widget.cpp:60
+#: src/widgets/cardlist-widget.cpp:50
 msgid "New Card"
 msgstr "Yeni Kart"
 
-#: src/widgets/editable-label-header.cpp:67
+#: src/widgets/editable-label-header.cpp:76
 msgid "Rename"
 msgstr "Yeniden Adlandır"
 

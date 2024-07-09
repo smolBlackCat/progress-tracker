@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 13:19-0300\n"
+"POT-Creation-Date: 2024-07-09 20:38-0300\n"
 "PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -38,7 +38,7 @@ msgstr "Изтриване"
 msgid "Cancel"
 msgstr "Отказване"
 
-#: src/window.cpp:181
+#: src/window.cpp:177
 msgid "It was not possible to load this board"
 msgstr "Не беше възможно да се зареди тази дъска"
 
@@ -47,7 +47,7 @@ msgid "Board's name"
 msgstr "Име на дъската"
 
 #: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:63
+#: src/dialog/preferences-board-dialog.cpp:65
 msgid "Select a file"
 msgstr "Изберете файл"
 
@@ -83,16 +83,16 @@ msgstr "файл трябва да е избран"
 msgid "It was not possible to create a Board with given name"
 msgstr "Не беше възможно да се създаде дъска с даденото име"
 
-#: src/dialog/preferences-board-dialog.cpp:13
+#: src/dialog/preferences-board-dialog.cpp:15
 msgid "Edit Board"
 msgstr "Редактиране на дъската"
 
-#: src/dialog/preferences-board-dialog.cpp:14
+#: src/dialog/preferences-board-dialog.cpp:16
 msgid "Save"
 msgstr "Запазване"
 
-#: src/dialog/preferences-board-dialog.cpp:28
-#: src/dialog/preferences-board-dialog.cpp:45
+#: src/dialog/preferences-board-dialog.cpp:30
+#: src/dialog/preferences-board-dialog.cpp:47
 msgid "No file was selected"
 msgstr "Няма избран файл"
 
@@ -128,7 +128,7 @@ msgstr "Фон"
 msgid "As a file"
 msgstr "Като файл"
 
-#: src/resources/ui/create-board-dialog.ui:93
+#: src/resources/ui/create-board-dialog.ui:96
 msgid "As a color"
 msgstr "Като цвят"
 
@@ -140,19 +140,31 @@ msgstr "Добавяне на списък"
 msgid "New CardList"
 msgstr "Нов списък с карти"
 
-#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
+#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
 msgid "Remove"
 msgstr "Премахване"
 
-#: src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:26
+msgid "Set Color"
+msgstr ""
+
+#: src/widgets/card.cpp:27
+msgid "Clear Color Frame"
+msgstr ""
+
+#: src/widgets/card.cpp:34
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/cardlist-widget.cpp:14
 msgid "Add card"
 msgstr "Добавяне на карта"
 
-#: src/widgets/cardlist-widget.cpp:60
+#: src/widgets/cardlist-widget.cpp:50
 msgid "New Card"
 msgstr "Нова карта"
 
-#: src/widgets/editable-label-header.cpp:67
+#: src/widgets/editable-label-header.cpp:76
 msgid "Rename"
 msgstr "Преименуване"
 

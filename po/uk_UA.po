@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: https://github.com/smolBlackCat/progress-tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 13:19-0300\n"
+"POT-Creation-Date: 2024-07-09 20:38-0300\n"
 "PO-Revision-Date: 2024-04-28 21:10+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: volkov <volkovissocool@gmail.com>\n"
@@ -39,7 +39,7 @@ msgstr "Видалити"
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/window.cpp:181
+#: src/window.cpp:177
 msgid "It was not possible to load this board"
 msgstr "Не вдалося завантажити цю дошку"
 
@@ -48,7 +48,7 @@ msgid "Board's name"
 msgstr "Назва дошки"
 
 #: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:63
+#: src/dialog/preferences-board-dialog.cpp:65
 msgid "Select a file"
 msgstr "Вибір файлу"
 
@@ -84,16 +84,16 @@ msgstr "Треба обрати файл"
 msgid "It was not possible to create a Board with given name"
 msgstr "Не вдалося створити дошку з такою назвою"
 
-#: src/dialog/preferences-board-dialog.cpp:13
+#: src/dialog/preferences-board-dialog.cpp:15
 msgid "Edit Board"
 msgstr "Редагування дошки"
 
-#: src/dialog/preferences-board-dialog.cpp:14
+#: src/dialog/preferences-board-dialog.cpp:16
 msgid "Save"
 msgstr "Зберегти"
 
-#: src/dialog/preferences-board-dialog.cpp:28
-#: src/dialog/preferences-board-dialog.cpp:45
+#: src/dialog/preferences-board-dialog.cpp:30
+#: src/dialog/preferences-board-dialog.cpp:47
 msgid "No file was selected"
 msgstr "Не було обрано жодного файлу"
 
@@ -129,7 +129,7 @@ msgstr "Відобразити тло як…"
 msgid "As a file"
 msgstr "Файлом зображення"
 
-#: src/resources/ui/create-board-dialog.ui:93
+#: src/resources/ui/create-board-dialog.ui:96
 msgid "As a color"
 msgstr "Суцільним кольором"
 
@@ -141,18 +141,30 @@ msgstr "Додати список"
 msgid "New CardList"
 msgstr "Новий список карток"
 
-#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
+#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
 msgid "Remove"
 msgstr "Видалити"
 
-#: src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:26
+msgid "Set Color"
+msgstr ""
+
+#: src/widgets/card.cpp:27
+msgid "Clear Color Frame"
+msgstr ""
+
+#: src/widgets/card.cpp:34
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/cardlist-widget.cpp:14
 msgid "Add card"
 msgstr "Додати картку"
 
-#: src/widgets/cardlist-widget.cpp:60
+#: src/widgets/cardlist-widget.cpp:50
 msgid "New Card"
 msgstr "Нова картка"
 
-#: src/widgets/editable-label-header.cpp:67
+#: src/widgets/editable-label-header.cpp:76
 msgid "Rename"
 msgstr "Перейменувати"
