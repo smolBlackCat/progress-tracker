@@ -14,15 +14,19 @@ namespace ui {
 class CardlistWidget;
 
 /**
- * @brief Card widget that allows the user to make some modifications like
- * renaming and removing.
+ * @brief Card widget
  */
 class CardWidget : public EditableLabelHeader {
 public:
+    static constexpr int FRAME_HEIGHT = 30;
+
     /**
      * @brief CardWidget constructor
      *
      * @param card_ptr a smart pointer pointing to a Card object.
+     * @param is_new flag indicating whether this object is being created from
+     * scratch rather than being loaded from a Progress board file. True means
+     * the Card did not come from a file otherwise False
      */
     CardWidget(std::shared_ptr<Card> card_refptr, bool is_new = false);
 
@@ -41,8 +45,18 @@ public:
      */
     void set_cardlist(ui::CardlistWidget* cardlist_p);
 
+    /**
+     * @brief Sets this card's colour
+     *
+     * @param color rgba object representing the colour
+     */
     void set_color(const Gdk::RGBA& color);
 
+    /**
+     * @brief Get the underlying Card object from which this widget represents
+     *
+     * @return pointer to the Card object
+     */
     std::shared_ptr<Card> get_card();
 
 protected:
@@ -50,12 +64,12 @@ protected:
     Gtk::Picture color_frame;
     Gtk::Frame m_frame;
     Gtk::Button clear_colour_button;
-    Gtk::ColorDialogButton colour_selector_button;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
     Gtk::Box colour_setting_box;
 
     void setup_drag_and_drop();
     void open_color_dialog();
+    void clear_color();
 
 private:
     std::shared_ptr<Card> card_refptr;

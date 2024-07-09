@@ -20,42 +20,39 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         _("Remove"), "remove",
         sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
 
-    // Colour Section
-    auto cover_submenu = Gio::Menu::create();
-    auto cover_actions = Gio::SimpleActionGroup::create();
+    auto card_cover_submenu = Gio::Menu::create();
+    auto card_cover_actions = Gio::SimpleActionGroup::create();
 
-    cover_submenu->append(_("Set Colour"), "cover.set-color");
-    cover_submenu->append(_("Clear Colour Frame"), "cover.clear-colour");
+    card_cover_submenu->append(_("Set Color"), "cover.set-color");
+    card_cover_submenu->append(_("Clear Color Frame"), "cover.clear-color");
 
-    cover_actions->add_action(
+    card_cover_actions->add_action(
         "set-color", sigc::mem_fun(*this, &ui::CardWidget::open_color_dialog));
-    cover_actions->add_action("clear-colour", [this]() {
-        m_frame.set_visible(false);
-        this->card_refptr->set_color(NO_COLOR);
-    });
-    menu_button.insert_action_group("cover", cover_actions);
-    menu->append_submenu(_("Card Cover"), cover_submenu);
+    card_cover_actions->add_action(
+        "clear-color", sigc::mem_fun(*this, &CardWidget::clear_color));
+    menu_button.insert_action_group("cover", card_cover_actions);
+    menu->append_submenu(_("Card Cover"), card_cover_submenu);
 
     color_frame.set_content_fit(Gtk::ContentFit::FILL);
-    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, 30);
-    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, 30);
-    m_frame.set_margin_bottom(4);
+    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, FRAME_HEIGHT);
 
+    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, FRAME_HEIGHT);
+    m_frame.set_margin_bottom(4);
     m_frame.set_child(color_frame);
-    append(m_frame);
-    reorder_child_at_start(m_frame);
     m_frame.set_visible(false);
 
+    append(m_frame);
+    reorder_child_at_start(m_frame);
+
     if (card_refptr->is_color_set()) {
-        colour_selector_button.set_rgba(card_refptr->get_color());
         set_color(card_refptr->get_color());
     }
 
-    signal_confirm().connect([this](std::string label) {
+    signal_confirm().connect([this](const std::string& label) {
         this->card_refptr->set_name(label);
         this->is_new = false;
     });
-    signal_cancel().connect([this](std::string label) {
+    signal_cancel().connect([this](const std::string& label) {
         if (this->is_new) {
             this->remove_from_parent();
         }
@@ -150,8 +147,15 @@ void ui::CardWidget::open_color_dialog() {
             try {
                 set_color(color_dialog->choose_rgba_finish(result));
             } catch (Gtk::DialogError& err) {
+                // FIXME: This would be a good opportunity to have a logging
+                // system here
             }
         });
+}
+
+void ui::CardWidget::clear_color() {
+    m_frame.set_visible(false);
+    card_refptr->set_color(NO_COLOR);
 }
 
 void ui::CardWidget::set_color(const Gdk::RGBA& color) {

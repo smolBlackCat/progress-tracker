@@ -2,7 +2,6 @@
 
 #include <gtkmm.h>
 
-#include <functional>
 #include <string>
 
 namespace ui {
@@ -32,7 +31,7 @@ public:
     virtual void set_label(const std::string& new_label);
 
     /**
-     * @brief Add an extra option to be selected in the menu button
+     * @brief Add an option to the EditableLabelHeader main menu
      */
     void add_option_button(const std::string& title_name,
                            const std::string& name,
