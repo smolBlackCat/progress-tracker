@@ -1,0 +1,168 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2024 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Gabriel de Moura <smolblackcat@proton.me>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-07-09 20:38-0300\n"
+"PO-Revision-Date: 2024-07-10 11:11-0300\n"
+"Last-Translator: Gabriel de Moura <smolblackcat@proton.me>\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/window.cpp:43
+msgid "translator-credits"
+msgstr "Gabriel de Moura"
+
+#: src/window.cpp:48
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © All rights reserved"
+
+#: src/window.cpp:62
+msgid "Select the boards to be deleted"
+msgstr "Select the boards to be deleted"
+
+#: src/window.cpp:63
+msgid "Delete"
+msgstr "Delete"
+
+#: src/window.cpp:64 src/dialog/board-dialog.cpp:21
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/window.cpp:177
+msgid "It was not possible to load this board"
+msgstr "It was not possible to load this board"
+
+#: src/dialog/board-dialog.cpp:20
+msgid "Board's name"
+msgstr "Board's name"
+
+#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
+#: src/dialog/preferences-board-dialog.cpp:65
+msgid "Select a file"
+msgstr "Select a file"
+
+#: src/dialog/board-dialog.cpp:23
+msgid "Select File"
+msgstr "Select File"
+
+#: src/dialog/board-dialog.cpp:40
+msgid "No file selected"
+msgstr "No file selected"
+
+#: src/dialog/board-dialog.cpp:54
+msgid "Image Files"
+msgstr "Image Files"
+
+#: src/dialog/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr "Create Board"
+
+#: src/dialog/create_board_dialog.cpp:18
+msgid "Create"
+msgstr "Create"
+
+#: src/dialog/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr "Empty board names are not allowed"
+
+#: src/dialog/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr "A file must be selected"
+
+#: src/dialog/create_board_dialog.cpp:48
+msgid "It was not possible to create a Board with given name"
+msgstr "It was not possible to create a Board with given name"
+
+#: src/dialog/preferences-board-dialog.cpp:15
+msgid "Edit Board"
+msgstr "Edit Board"
+
+#: src/dialog/preferences-board-dialog.cpp:16
+msgid "Save"
+msgstr "Save"
+
+#: src/dialog/preferences-board-dialog.cpp:30
+#: src/dialog/preferences-board-dialog.cpp:47
+msgid "No file was selected"
+msgstr "No file was selected"
+
+#: src/resources/ui/app-window.ui:13
+msgid "Homepage"
+msgstr "Homepage"
+
+#: src/resources/ui/app-window.ui:20
+msgid "Add Board"
+msgstr "Add Board"
+
+#: src/resources/ui/app-window.ui:28
+msgid "Main Menu"
+msgstr "Main Menu"
+
+#: src/resources/ui/app-window.ui:70
+msgid "Delete Boards"
+msgstr "Delete Boards"
+
+#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+msgid "About Progress"
+msgstr "About Progress"
+
+#: src/resources/ui/app-window.ui:82
+msgid "Preferences"
+msgstr "Preferences"
+
+#: src/resources/ui/create-board-dialog.ui:24
+msgid "Background"
+msgstr "Background"
+
+#: src/resources/ui/create-board-dialog.ui:53
+msgid "As a file"
+msgstr "As a file"
+
+#: src/resources/ui/create-board-dialog.ui:96
+msgid "As a color"
+msgstr "As a color"
+
+#: src/widgets/board-widget.cpp:21
+msgid "Add List"
+msgstr "Add List"
+
+#: src/widgets/board-widget.cpp:53
+msgid "New CardList"
+msgstr "New CardList"
+
+#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
+msgid "Remove"
+msgstr "Remove"
+
+#: src/widgets/card.cpp:26
+msgid "Set Color"
+msgstr "Set Color"
+
+#: src/widgets/card.cpp:27
+msgid "Clear Color Frame"
+msgstr "Clear Color Frame"
+
+#: src/widgets/card.cpp:34
+msgid "Card Cover"
+msgstr "Card Cover"
+
+#: src/widgets/cardlist-widget.cpp:14
+msgid "Add card"
+msgstr "Add card"
+
+#: src/widgets/cardlist-widget.cpp:50
+msgid "New Card"
+msgstr "New Card"
+
+#: src/widgets/editable-label-header.cpp:76
+msgid "Rename"
+msgstr "Rename"
