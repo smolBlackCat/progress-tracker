@@ -109,6 +109,11 @@ void ui::CardlistWidget::setup_drag_and_drop() {
             return true;
         },
         false);
+    drag_source_c->signal_drag_end().connect(
+        [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
+            this->set_opacity(1);
+            this->board.on_drag = true;
+        });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     cardlist_header.add_controller(drag_source_c);
 
@@ -123,6 +128,11 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 dropped_value.init(value.gobj());
 
                 ui::CardlistWidget* dropped_cardlist = dropped_value.get();
+
+                if (dropped_cardlist == this) {
+                    return true;
+                }
+
                 this->board.reorder_cardlist(*dropped_cardlist, *this);
                 dropped_cardlist->set_opacity(1);
                 return true;
