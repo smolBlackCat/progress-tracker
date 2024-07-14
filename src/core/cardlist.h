@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "card.h"
-#include "colorable.h"
 #include "item.h"
 
 /**
@@ -12,12 +11,12 @@
  *
  * @brief A class representing a single list of cards inside a board.
  */
-class CardList : public Colorable, public Item {
+class CardList : public Item {
 public:
     /**
      * @brief CardList constructor;
      */
-    CardList(const std::string& name, const Gdk::RGBA& color = NO_COLOR);
+    CardList(const std::string& name);
 
     /**
      * @brief Adds a Card object to the cardlist by moving the Card object
@@ -53,17 +52,10 @@ public:
      */
     void reorder_card(std::shared_ptr<Card> next,
                       std::shared_ptr<Card> sibling);
-    
-    void set_color(const Gdk::RGBA& color) override;
-
-    Gdk::RGBA get_color() const override;
-
-    bool is_color_set() override;
 
 private:
     bool cards_modified();
 
 protected:
     std::vector<std::shared_ptr<Card>> card_vector;
-    Gdk::RGBA color = NO_COLOR;
 };

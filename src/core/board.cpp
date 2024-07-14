@@ -73,7 +73,6 @@ Board::Board(const std::string& board_file_path)
 
     while (list_element) {
         auto cur_cardlist_name = list_element->Attribute("name");
-        auto cur_cardlist_color = list_element->Attribute("color");
 
         if (!cur_cardlist_name) {
             throw board_parse_error{std::format(
@@ -82,11 +81,7 @@ Board::Board(const std::string& board_file_path)
                 file_path, list_element->GetLineNum())};
         }
 
-        // The extra checking ensures retro compatibiity with Progress 1.0 Board
-        // files
-        CardList cur_cardlist{
-            cur_cardlist_name,
-            cur_cardlist_color ? Gdk::RGBA{cur_cardlist_color} : NO_COLOR};
+        CardList cur_cardlist{cur_cardlist_name};
         auto card_element = list_element->FirstChildElement("card");
 
         while (card_element) {
@@ -222,8 +217,6 @@ bool Board::save_as_xml(bool create_dirs) {
     for (auto& cardlist : cardlist_vector) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
-        list_element->SetAttribute("color",
-                                   cardlist->get_color().to_string().c_str());
         cardlist->set_modified(false);
 
         for (auto& card : cardlist->get_card_vector()) {
