@@ -53,6 +53,15 @@
   </categories>
 
   <releases>
+    <release date="2024-06-14" version="1.5.2">
+      <description>
+        <p>What's new in Progress 1.5.2</p>
+        <ul>
+          <li>Fix bug where application would crash after dropping a cardlist
+          onto itself</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-06-28" version="1.5.1">
       <description>
         <p>What's new in Progress 1.5.1</p>
