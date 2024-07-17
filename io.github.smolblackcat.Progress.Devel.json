@@ -3,7 +3,7 @@
 	"runtime": "org.gnome.Platform",
 	"sdk": "org.gnome.Sdk",
 	"runtime-version": "46",
-	"command": "progress-tracker",
+	"command": "progress-debug",
 	"finish-args": [
 		"--socket=fallback-x11",
 		"--socket=wayland",

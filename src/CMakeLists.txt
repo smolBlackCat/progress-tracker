@@ -58,9 +58,9 @@ add_custom_target(progress-resources DEPENDS resources.cpp)
 add_dependencies(progress-tracker progress-resources)
 
 if (${FLATPAK})
-    install(TARGETS progress-tracker
-            RUNTIME
-            DESTINATION /app/bin/)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
+            DESTINATION /app/bin/
+            RENAME ${EXECUTABLE_NAME})
 elseif(${WINDOWS})
     find_program(PYTHON NAMES python3 python)
     add_custom_command(TARGET progress-tracker POST_BUILD
