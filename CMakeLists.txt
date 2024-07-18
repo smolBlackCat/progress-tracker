@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ProgressTracker VERSION 1.5.1)
+project(ProgressTracker VERSION 2.0.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
