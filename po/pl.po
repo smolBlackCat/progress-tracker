@@ -1,0 +1,157 @@
+# Polish translations for adiee package.
+# Copyright (C) 2024 THE adiee'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the adiee package.
+#  <adiee5@adiee5.ct8.pl>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: adiee 5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-06-19 13:19-0300\n"
+"PO-Revision-Date: 2024-07-18 18:17+0200\n"
+"Last-Translator:  <adiee5@adiee5.ct8.pl>\n"
+"Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: src/window.cpp:43
+msgid "translator-credits"
+msgstr "Adiee5 <adiee5@adiee5.ct8.pl>"
+
+#: src/window.cpp:48
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Wszelkie prawa zastrzerzone"
+
+#: src/window.cpp:62
+msgid "Select the boards to be deleted"
+msgstr "Wybierz tablice do usunięcie"
+
+#: src/window.cpp:63
+msgid "Delete"
+msgstr "Usuń"
+
+#: src/window.cpp:64 src/dialog/board-dialog.cpp:21
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/window.cpp:181
+msgid "It was not possible to load this board"
+msgstr "Nie udało się załadować tej tablicy"
+
+#: src/dialog/board-dialog.cpp:20
+msgid "Board's name"
+msgstr "Nazwa tablicy"
+
+#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
+#: src/dialog/preferences-board-dialog.cpp:63
+msgid "Select a file"
+msgstr "Wybierz plik"
+
+#: src/dialog/board-dialog.cpp:23
+msgid "Select File"
+msgstr "Wybierz Plik"
+
+#: src/dialog/board-dialog.cpp:40
+msgid "No file selected"
+msgstr "Nie wybrano pliku"
+
+#: src/dialog/board-dialog.cpp:54
+msgid "Image Files"
+msgstr "Pliki Obrazkowe"
+
+#: src/dialog/create_board_dialog.cpp:14
+msgid "Create Board"
+msgstr "Stwórz Tablicę"
+
+#: src/dialog/create_board_dialog.cpp:18
+msgid "Create"
+msgstr "Stwórz"
+
+#: src/dialog/create_board_dialog.cpp:26
+msgid "Empty board names are not allowed"
+msgstr "Puste nazwy tablic nie są dozwolone"
+
+#: src/dialog/create_board_dialog.cpp:34
+msgid "A file must be selected"
+msgstr "Plik musi być wybrany"
+
+#: src/dialog/create_board_dialog.cpp:48
+msgid "It was not possible to create a Board with given name"
+msgstr "Nie udało się utworzyć Tablicy z wybraną nazwą"
+
+#: src/dialog/preferences-board-dialog.cpp:13
+msgid "Edit Board"
+msgstr "Edytuj Tablicę"
+
+#: src/dialog/preferences-board-dialog.cpp:14
+msgid "Save"
+msgstr "Zapisz"
+
+#: src/dialog/preferences-board-dialog.cpp:28
+#: src/dialog/preferences-board-dialog.cpp:45
+msgid "No file was selected"
+msgstr "Nie wybrano żadnego pliku"
+
+#: src/resources/ui/app-window.ui:13
+msgid "Homepage"
+msgstr "Strona Domowa"
+
+#: src/resources/ui/app-window.ui:20
+msgid "Add Board"
+msgstr "Dodaj Tablicę"
+
+#: src/resources/ui/app-window.ui:28
+msgid "Main Menu"
+msgstr "Menu Główne"
+
+#: src/resources/ui/app-window.ui:70
+msgid "Delete Boards"
+msgstr "Usuń Tablice"
+
+#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+msgid "About Progress"
+msgstr "O Progress"
+
+#: src/resources/ui/app-window.ui:82
+msgid "Preferences"
+msgstr "Ustawienia"
+
+#: src/resources/ui/create-board-dialog.ui:24
+msgid "Background"
+msgstr "Tło"
+
+#: src/resources/ui/create-board-dialog.ui:53
+msgid "As a file"
+msgstr "Jako plik"
+
+#: src/resources/ui/create-board-dialog.ui:93
+msgid "As a color"
+msgstr "Jako kolor"
+
+#: src/widgets/board-widget.cpp:21
+msgid "Add List"
+msgstr "Dodaj Listę"
+
+#: src/widgets/board-widget.cpp:53
+msgid "New CardList"
+msgstr "Nowa Lista Kart"
+
+#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
+msgid "Remove"
+msgstr "Usuń"
+
+#: src/widgets/cardlist-widget.cpp:33
+msgid "Add card"
+msgstr "Dodaj kartę"
+
+#: src/widgets/cardlist-widget.cpp:60
+msgid "New Card"
+msgstr "Nowa Karta"
+
+#: src/widgets/editable-label-header.cpp:67
+msgid "Rename"
+msgstr "Zmień Nazwę"
