@@ -3,6 +3,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -11,6 +12,7 @@
 #include "card.h"
 #include "cardlist.h"
 #include "item.h"
+#include "task.h"
 
 std::string xml_structure(Board& board) {
     auto doc = std::make_unique<tinyxml2::XMLDocument>();
@@ -27,6 +29,16 @@ std::string xml_structure(Board& board) {
         for (auto& card : cardlist->get_card_vector()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
+            for (auto& task : card->get_tasks()) {
+                tinyxml2::XMLElement* task_element = doc->NewElement("task");
+                task_element->SetAttribute("name", task->get_name().c_str());
+                task_element->SetAttribute("done", task->get_done());
+
+                card_element->InsertEndChild(task_element);
+            }
+            tinyxml2::XMLElement* notes_element = doc->NewElement("notes");
+            notes_element->SetText(card->get_notes().c_str());
+            card_element->InsertEndChild(notes_element);
             list_element->InsertEndChild(card_element);
         }
         board_element->InsertEndChild(list_element);
@@ -40,10 +52,10 @@ std::string xml_structure(Board& board) {
 
 void create_dummy_file(const char* board_name, const char* board_background,
                        const char* filename) {
-    const char* tasks1[] = {"Fix the computer", "Code project",
+    const char* cards1[] = {"Fix the computer", "Code project",
                             "Do Math Assignment"};
-    const char* tasks2[] = {"Read book", "Talk to someone", "Eat hamburger"};
-    const char* lists_names[] = {"TODO", "Done"};
+    const char* cards2[] = {"Read book", "Talk to someone", "Eat hamburger"};
+    const char* cardlists[] = {"TODO", "Done"};
     tinyxml2::XMLDocument doc;
 
     tinyxml2::XMLElement* board_element = doc.NewElement("board");
@@ -51,20 +63,24 @@ void create_dummy_file(const char* board_name, const char* board_background,
     board_element->SetAttribute("background", board_background);
     doc.InsertEndChild(board_element);
 
-    for (auto& list_name : lists_names) {
+    for (auto& cardlist : cardlists) {
         // Create list
-        tinyxml2::XMLElement* list_element = doc.NewElement("list");
-        list_element->SetAttribute("name", list_name);
+        tinyxml2::XMLElement* cardlist_element = doc.NewElement("list");
+        cardlist_element->SetAttribute("name", cardlist);
 
-        for (auto& task :
-             (std::string{list_name} == std::string{"TODO"} ? tasks1
-                                                            : tasks2)) {
+        for (auto& card :
+             (std::string{cardlist} == std::string{"TODO"} ? cards1 : cards2)) {
             // Create card
             tinyxml2::XMLElement* card_element = doc.NewElement("card");
-            card_element->SetAttribute("name", task);
-            list_element->InsertEndChild(card_element);
+            card_element->SetAttribute("name", card);
+
+            // Notes
+            tinyxml2::XMLElement* notes_element = doc.NewElement("notes");
+            notes_element->SetText("");
+            card_element->InsertEndChild(notes_element);
+            cardlist_element->InsertEndChild(card_element);
         }
-        board_element->InsertEndChild(list_element);
+        board_element->InsertEndChild(cardlist_element);
     }
 
     doc.SaveFile(filename);
@@ -476,4 +492,132 @@ TEST_CASE("Checking for board modification: No modification at all") {
     Board test_board{"test-board.xml"};
     CHECK_FALSE(test_board.get_modified());
     std::filesystem::remove("./test-board.xml");
+}
+
+TEST_CASE("Creating and interactiing with Task objects") {
+    Task task{"Write summary of the days do not end"};
+
+    REQUIRE_FALSE(task.get_done());
+    task.set_done();
+    REQUIRE(task.get_done());
+}
+
+TEST_CASE("Adding and removing Task objects from Card objects") {
+    Card card{"Hi, my name is Markiplier"};
+
+    auto hi_task = card.add_task(Task{"Hi"});
+    auto name_task = card.add_task(Task{"Name"});
+    auto mark_task = card.add_task(Task{"Markiplier"});
+
+    REQUIRE(card.get_tasks().size() == 3);
+
+    REQUIRE(card.remove_task(hi_task));
+    REQUIRE(card.remove_task(name_task));
+    REQUIRE(card.remove_task(mark_task));
+
+    REQUIRE_FALSE(card.remove_task(hi_task));
+}
+
+TEST_CASE("Getting the completion of a Card") {
+    Card card{"Design some code"};
+
+    Card card2{"Kill your desires"};
+
+    auto task1 = card.add_task(Task{"Choose Language"});
+    auto task2 = card.add_task(Task{"Define Performance Requirments"});
+    auto task3 = card.add_task(Task{"Write some Tests"});
+    auto task4 = card.add_task(Task{"Write the actual code"});
+
+    REQUIRE(card.get_completion() == 0.0);
+    REQUIRE(card2.get_completion() == 0.0);
+
+    task1->set_done();
+    task2->set_done();
+    REQUIRE(card.get_completion() == 50.0);
+
+    task3->set_done();
+    task4->set_done();
+    REQUIRE(card.get_completion());
+}
+
+TEST_CASE("Saving extra task information to cards") {
+    std::string xmlString =
+        "<board name=\"Test\" background=\"rgb(0,0,0)\">\n"
+        "    <list name=\"Cardlist 0\">\n"
+        "        <card name=\"Card 0\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 1\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 2\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "    </list>\n"
+        "    <list name=\"Cardlist 1\">\n"
+        "        <card name=\"Card 0\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 1\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 2\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "    </list>\n"
+        "    <list name=\"Cardlist 2\">\n"
+        "        <card name=\"Card 0\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 1\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "        <card name=\"Card 2\">\n"
+        "            <task name=\"Task 0\" done=\"false\"/>\n"
+        "            <task name=\"Task 1\" done=\"false\"/>\n"
+        "            <task name=\"Task 2\" done=\"false\"/>\n"
+        "            <task name=\"Task 3\" done=\"false\"/>\n"
+        "            <notes></notes>\n"
+        "        </card>\n"
+        "    </list>\n"
+        "</board>\n";
+
+    write_to("board-progress.xml", xmlString);
+
+    Board board{"board-progress.xml"};
+    board.save_as_xml(false);
+
+    REQUIRE(xml_structure(board) == xmlString);
 }

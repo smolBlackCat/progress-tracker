@@ -96,9 +96,29 @@ Board::Board(const std::string& board_file_path)
                     file_path, cur_cardlist_name, card_element->GetLineNum())};
             }
 
-            cur_cardlist.add_card(
-                Card{cur_card_name,
-                     cur_card_color ? Gdk::RGBA{cur_card_color} : NO_COLOR});
+            Card cur_card{cur_card_name, cur_card_color
+                                             ? Gdk::RGBA{cur_card_color}
+                                             : NO_COLOR};
+
+            auto task_element = card_element->FirstChildElement("task");
+            while (task_element) {
+                cur_card.add_task(Task{
+                    task_element->Attribute("name"),
+                    std::strcmp(task_element->Attribute("done"), "true") == 0
+                        ? true
+                        : false});
+                task_element = task_element->NextSiblingElement("task");
+            }
+
+            auto notes_element = card_element->FirstChildElement("notes");
+            if (notes_element) {
+                cur_card.set_notes(
+                    !notes_element->GetText() ? "" : notes_element->GetText());
+            }
+
+            cur_card.set_modified(false);
+
+            cur_cardlist.add_card(cur_card);
             card_element = card_element->NextSiblingElement("card");
         }
         cur_cardlist.set_modified(false);
@@ -224,6 +244,20 @@ bool Board::save_as_xml(bool create_dirs) {
             card_element->SetAttribute("name", card->get_name().c_str());
             card_element->SetAttribute("color",
                                        card->get_color().to_string().c_str());
+
+            // Add tasks
+            for (auto& task : card->get_tasks()) {
+                tinyxml2::XMLElement* task_element = doc->NewElement("task");
+                task_element->SetAttribute("name", task->get_name().c_str());
+                task_element->SetAttribute("done", task->get_done());
+
+                card_element->InsertEndChild(task_element);
+            }
+
+            tinyxml2::XMLElement* notes_element = doc->NewElement("notes");
+            notes_element->SetText(card->get_notes().c_str());
+            card_element->InsertEndChild(notes_element);
+
             list_element->InsertEndChild(card_element);
             card->set_modified(false);
         }
