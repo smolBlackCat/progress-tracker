@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.90.4 -->
+<interface domain="progress-tracker">
+  <!-- interface-name carddetailsdialog.ui -->
+  <!-- interface-description Describes the structure for a Dialog containing
+a Card object details. -->
+  <!-- interface-authors Gabriel de Moura -->
+  <requires lib="gtk" version="4.12"/>
+  <object class="GtkDialog" id="card-dialog">
+    <property name="child">
+      <object class="GtkBox" id="card-dialog-box">
+        <property name="margin-bottom">4</property>
+        <property name="margin-end">4</property>
+        <property name="margin-start">4</property>
+        <property name="margin-top">4</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">15</property>
+        <child>
+          <object class="GtkFrame">
+            <property name="child">
+              <object class="GtkEntry" id="task-name-entry">
+                <property name="primary-icon-name">document-edit-symbolic</property>
+              </object>
+            </property>
+            <property name="label-widget">
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Task Name</property>
+                <property name="use-markup">True</property>
+                <!-- Custom object fragments -->
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkFrame">
+            <property name="child">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox">
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="yes">Checklist</property>
+                        <property name="margin-start">2</property>
+                        <!-- Custom object fragments -->
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                        </attributes>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="halign">end</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                          <object class="GtkButton" id="checklist-add-button">
+                            <property name="has-frame">False</property>
+                            <property name="icon-name">list-add-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Add an item to the checklist</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkToggleButton" id="checklist-togglebutton">
+                            <property name="has-frame">False</property>
+                            <property name="icon-name">go-down-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Toggle the checklist</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkRevealer" id="checklist-revealer">
+                    <property name="child">
+                      <object class="GtkScrolledWindow">
+                        <property name="child">
+                          <object class="GtkBox" id="checklist-box">
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">2</property>
+                          </object>
+                        </property>
+                        <property name="has-frame">True</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkFrame">
+            <property name="child">
+              <object class="GtkScrolledWindow">
+                <property name="child">
+                  <object class="GtkTextView">
+                    <property name="buffer">
+                      <object class="GtkTextBuffer" id="notes-text-buffer"/>
+                    </property>
+                  </object>
+                </property>
+                <property name="has-frame">True</property>
+                <property name="vexpand">True</property>
+              </object>
+            </property>
+            <property name="label-widget">
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Notes</property>
+                <!-- Custom object fragments -->
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </property>
+    <property name="height-request">600</property>
+    <property name="modal">True</property>
+    <property name="resizable">False</property>
+    <property name="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="decoration-layout">close</property>
+        <property name="title-widget">
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Card Details</property>
+            <property name="use-markup">True</property>
+            <!-- Custom object fragments -->
+            <attributes>
+              <attribute name="weight" value="bold"/>
+            </attributes>
+          </object>
+        </property>
+        <property name="width-request">400</property>
+        <!-- Custom object fragments -->
+      </object>
+    </property>
+  </object>
+</interface>

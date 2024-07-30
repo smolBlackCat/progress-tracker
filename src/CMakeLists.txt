@@ -2,13 +2,11 @@ configure_file(app_info.h.in app_info.h)
 
 # Set Libraries and include directories
 add_subdirectory(core)
-add_subdirectory(dialog)
-add_subdirectory(widgets)
 
-list(APPEND APP_LIBS
-     core
-     progress-dialog
-     progress-widgets)
+file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp", "widgets/*.h")
+file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp", "dialog/*.h")
+
+list(APPEND APP_LIBS core)
 list(APPEND APP_INCLUDES
      "${PROJECT_SOURCE_DIR}/src"
      "${PROJECT_BINARY_DIR}/src")
@@ -21,6 +19,8 @@ add_executable(progress-tracker
     window.h
     utils.h
     utils.cpp
+    ${WIDGET_SOURCES}
+    ${DIALOG_SOURCES}
     ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
 if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
@@ -42,11 +42,7 @@ set(GLIB_FLAGS --target=resources.cpp)
 set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
 set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/resources/ui)
 
-list(APPEND RESOURCES resources/ui/io.github.smolblackcat.Progress.svg
-                      resources/ui/app-window.ui
-                      resources/ui/create-board-dialog.ui
-                      resources/ui/style.css
-                      resources/ui/style-dark.css)
+file(GLOB_RECURSE RESOURCES "resources/ui/*.ui" "resources/ui/*.css")
 
 add_custom_command(
     OUTPUT resources.cpp

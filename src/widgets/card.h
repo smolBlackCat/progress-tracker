@@ -3,7 +3,6 @@
 #include <gtkmm.h>
 
 #include <memory>
-#include <string>
 
 #include "../core/card.h"
 #include "cardlist-widget.h"

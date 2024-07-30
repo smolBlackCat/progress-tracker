@@ -2,9 +2,7 @@
 
 #include <glibmm/i18n.h>
 
-#include <format>
-#include <iostream>
-
+#include "../dialog/card-dialog.h"
 #include "../utils.h"
 #include "cardlist-widget.h"
 
@@ -19,6 +17,16 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     add_option_button(
         _("Remove"), "remove",
         sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
+
+    add_option_button(_("Card Details"), "card-details", [this]() {
+        auto card_details_dialog = CardDetailsDialog::create();
+        card_details_dialog->set_transient_for(
+            *(static_cast<Gtk::Window*>(get_root())));
+        card_details_dialog->set_card_widget(this);
+        card_details_dialog->set_hide_on_close(false);
+        card_details_dialog->set_modal();
+        card_details_dialog->set_visible();
+    });
 
     auto card_cover_submenu = Gio::Menu::create();
     auto card_cover_actions = Gio::SimpleActionGroup::create();
@@ -47,7 +55,7 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     if (card_refptr->is_color_set()) {
         set_color(card_refptr->get_color());
 
-        if (!is_new) {   
+        if (!is_new) {
             card_refptr->set_modified(false);
         }
     }

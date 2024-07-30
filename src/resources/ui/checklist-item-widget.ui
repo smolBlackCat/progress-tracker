@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.90.4 -->
+<interface domain="progress-tracker">
+  <!-- interface-name checlist-item-widget.ui -->
+  <!-- interface-description Describes the structure of a checklist item. Essentially
+it is very similar to a card widget in the main board view, thus it
+also uses the same CSS class. -->
+  <!-- interface-authors Gabriel de Moura -->
+  <requires lib="gtk" version="4.12"/>
+  <object class="GtkBox" id="root">
+    <property name="css-classes">card</property>
+    <property name="spacing">3</property>
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="valign">center</property>
+        <child>
+          <object class="GtkLabel" id="task-label">
+            <property name="halign">start</property>
+            <property name="label">I'm a label yay</property>
+            <property name="margin-start">5</property>
+            <property name="wrap">True</property>
+            <property name="wrap-mode">word-char</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkRevealer" id="task-entry-revealer">
+            <property name="child">
+              <object class="GtkEntry" id="task-entry"/>
+            </property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkCheckButton" id="task-checkbutton">
+        <property name="halign">end</property>
+        <property name="hexpand">True</property>
+        <property name="margin-end">5</property>
+      </object>
+    </child>
+  </object>
+</interface>
