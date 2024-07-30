@@ -15,6 +15,8 @@ int main(int argc, char *argv[]) {
     bind_textdomain_codeset("progress-tracker", "utf-8");
     textdomain("progress-tracker");
 
+    Glib::setenv("GSK_RENDERER", "opengl");
+
     auto app = ui::Application::create();
     return app->run(argc, argv);
 }
