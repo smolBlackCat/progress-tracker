@@ -31,8 +31,10 @@
 *.out
 *.app
 
-# Visual Studio Code Settings
+# IDE settings
 .vscode/
+.cache/
+.idea/
 
 # Ignore build
 build/
