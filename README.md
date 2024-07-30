@@ -27,7 +27,15 @@ A debian build is also available. The debian package can be obtained in the
 [releases][github-release] page.
 
 ```sh
-sudo apt install ./progress-tracker-1.5.deb
+sudo apt install ./progress-tracker-1.6.deb
+```
+
+### Arch Linux (AUR)
+
+Progress is available on the AUR (Arch User Repository). You can install it using the `yay` command-line application:
+
+```sh
+yay -S progress-tracker
 ```
 
 ### Windows
