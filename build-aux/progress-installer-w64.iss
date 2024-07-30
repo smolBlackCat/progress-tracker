@@ -1,5 +1,5 @@
 #define MyAppName "Progress"
-#define MyAppVersion "1.4.1"
+#define MyAppVersion "1.5.2"
 #define MyAppPublisher "smolblackcat"
 #define MyAppURL "https://github.com/smolBlackCat/progress-tracker"
 #define MyAppExeName "progress-tracker.exe"
