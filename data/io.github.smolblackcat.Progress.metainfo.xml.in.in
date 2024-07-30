@@ -53,6 +53,15 @@
   </categories>
 
   <releases>
+    <release date="2024-07-30" version="1.6.0">
+      <description>
+        <p>What's new in Progress 1.6.0</p>
+        <ul>
+          <li>Added Polish Translation</li>
+          <li>Fixed rendering artifact (Windows)</li>
+        </ul>
+      </description>
+    </release>
     <release date="2024-06-14" version="1.5.2">
       <description>
         <p>What's new in Progress 1.5.2</p>
