@@ -1,5 +1,7 @@
 #include <gtkmm.h>
 
+#include <memory>
+
 #include "../core/task.h"
 #include "../dialog/card-dialog.h"
 
@@ -8,9 +10,8 @@ class TaskWidget : public Gtk::Box {
 public:
     TaskWidget(BaseObjectType* cobject,
                const Glib::RefPtr<Gtk::Builder>& builder,
-               CardDetailsDialog& card_details_dialog, Task& task);
-
-    static TaskWidget* create(CardDetailsDialog& card_details_dialog, Task& task);
+               CardDetailsDialog& card_details_dialog,
+               std::shared_ptr<Task> task);
 
 protected:
     void on_rename();
@@ -22,7 +23,7 @@ protected:
     Gtk::CheckButton* task_checkbutton;
     Gtk::Popover popover;
 
-    Task& task;
+    std::shared_ptr<Task> task;
     CardDetailsDialog& card_details_dialog;
 };
 }  // namespace ui

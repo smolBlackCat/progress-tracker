@@ -1,11 +1,9 @@
 #include "board.h"
 
-#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
-#include <random>
 #include <regex>
 #include <string>
 

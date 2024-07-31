@@ -10,7 +10,6 @@ public:
     CardDetailsDialog(BaseObjectType* cobject,
                       const Glib::RefPtr<Gtk::Builder>& builder);
 
-    void add_task();
     void remove_task(TaskWidget& task);
     void set_card_widget(CardWidget* card_widget);
     CardWidget* get_card_widget();
@@ -20,7 +19,8 @@ public:
 protected:
     void on_add_button_click();
     void on_toggle();
-    void save();
+    bool save();
+    CardWidget* card_widget;
 
 private:
     Gtk::Entry* task_name_entry;
@@ -29,7 +29,5 @@ private:
     Gtk::Revealer* checklist_revealer;
     Gtk::Box* checklist_box;
     Glib::RefPtr<Gtk::TextBuffer> notes_textbuffer;
-    CardWidget* card_widget;
 };
-
 }  // namespace ui
