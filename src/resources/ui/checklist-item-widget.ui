@@ -27,6 +27,7 @@ also uses the same CSS class. -->
         </child>
         <child>
           <object class="GtkRevealer" id="task-entry-revealer">
+            <property name="hexpand">true</property>
             <property name="child">
               <object class="GtkEntry" id="task-entry"/>
             </property>

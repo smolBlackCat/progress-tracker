@@ -70,6 +70,8 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         }
     });
 
+    set_tooltip_text(card_refptr->get_notes());
+
     setup_drag_and_drop();
 }
 

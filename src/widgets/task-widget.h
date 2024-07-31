@@ -15,6 +15,7 @@ public:
 
 protected:
     void on_rename();
+    void off_rename();
     void on_remove();
 
     Gtk::Label* task_label;

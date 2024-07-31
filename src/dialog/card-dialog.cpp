@@ -79,6 +79,7 @@ bool CardDetailsDialog::save() {
     card->set_name(task_name_entry->get_text());
 
     card->set_notes(notes_textbuffer->get_text());
+    card_widget->set_tooltip_text(notes_textbuffer->get_text());
 
     return false;
 }
