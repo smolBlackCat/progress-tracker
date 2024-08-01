@@ -4,6 +4,8 @@
 
 #include "../core/task.h"
 #include "../dialog/card-dialog.h"
+#include "giomm/simpleactiongroup.h"
+#include "glibmm/refptr.h"
 
 namespace ui {
 class TaskWidget : public Gtk::Box {
@@ -12,6 +14,8 @@ public:
                const Glib::RefPtr<Gtk::Builder>& builder,
                CardDetailsDialog& card_details_dialog,
                std::shared_ptr<Task> task);
+
+    std::shared_ptr<Task> get_task();
 
 protected:
     void on_rename();
@@ -22,7 +26,10 @@ protected:
     Gtk::Revealer* task_entry_revealer;
     Gtk::Entry* task_entry;
     Gtk::CheckButton* task_checkbutton;
-    Gtk::Popover popover;
+
+    const Glib::RefPtr<Gio::Menu> menu_model;
+    const Glib::RefPtr<Gio::SimpleActionGroup> group;
+    Gtk::PopoverMenu popover_menu;
 
     std::shared_ptr<Task> task;
     CardDetailsDialog& card_details_dialog;

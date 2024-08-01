@@ -1,6 +1,11 @@
 #include "task-widget.h"
 
-#include "gtkmm/eventcontrollerkey.h"
+#include <glibmm/i18n.h>
+
+#include <memory>
+
+#include "dialog/card-dialog.h"
+#include "gdk/gdk.h"
 
 namespace ui {
 
@@ -8,7 +13,12 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
                        const Glib::RefPtr<Gtk::Builder>& builder,
                        CardDetailsDialog& card_details_dialog,
                        std::shared_ptr<Task> task)
-    : Gtk::Box{cobject}, card_details_dialog{card_details_dialog}, task{task} {
+    : Gtk::Box{cobject},
+      card_details_dialog{card_details_dialog},
+      task{task},
+      menu_model{Gio::Menu::create()},
+      group{Gio::SimpleActionGroup::create()},
+      popover_menu{menu_model} {
     task_label = builder->get_widget<Gtk::Label>("task-label");
     task_label->set_label(task->get_name());
     task_entry_revealer =
@@ -21,11 +31,24 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
     task_checkbutton->signal_toggled().connect(
         [this]() { this->task->set_done(task_checkbutton->get_active()); });
 
+    menu_model->append(_("Rename"), "task-widget.rename");
+    menu_model->append(_("Remove"), "task-widget.remove");
+    group->add_action("rename", sigc::mem_fun(*this, &TaskWidget::on_rename));
+    group->add_action("remove", sigc::mem_fun(*this, &TaskWidget::on_remove));
+    popover_menu.insert_action_group("task-widget", group);
+    popover_menu.set_parent(*this);
+
     auto gesture_click = Gtk::GestureClick::create();
+    gesture_click->set_button();
     gesture_click->signal_released().connect(
-        [this](int n_pressed, double x, double y) {
-            if (n_pressed >= 2) {
+        [this, gesture_click](int n_pressed, double x, double y) {
+            if (n_pressed >= 2 &&
+                gesture_click->get_current_button() == GDK_BUTTON_PRIMARY) {
                 on_rename();
+            } else if (n_pressed == 1 && gesture_click->get_current_button() ==
+                                             GDK_BUTTON_SECONDARY) {
+                // this->popover_menu.set_offset(x, y);
+                popover_menu.popup();
             }
         });
     this->add_controller(gesture_click);
@@ -51,6 +74,8 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
     task_entry->add_controller(key_controller);
 }
 
+std::shared_ptr<Task> TaskWidget::get_task() { return task; }
+
 void TaskWidget::on_rename() {
     task_entry_revealer->set_reveal_child();
     task_label->set_visible(false);
@@ -69,5 +94,5 @@ void TaskWidget::off_rename() {
     }
 }
 
-void TaskWidget::on_remove() {}
+void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
 }  // namespace ui

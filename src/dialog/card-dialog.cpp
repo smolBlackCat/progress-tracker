@@ -27,7 +27,10 @@ CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
         sigc::mem_fun(*this, &CardDetailsDialog::save), false);
 }
 
-void CardDetailsDialog::remove_task(TaskWidget& task) {}
+void CardDetailsDialog::remove_task(TaskWidget& task) {
+    checklist_box->remove(task);
+    card_widget->get_card()->remove_task(task.get_task());
+}
 
 void CardDetailsDialog::set_card_widget(CardWidget* card_widget) {
     if (card_widget) {
