@@ -4,8 +4,6 @@
 #include <filesystem>
 #include <random>
 
-#include "app_info.h"
-
 std::string locale_folder() {
 #ifdef FLATPAK
     return "/app/share/locale/";

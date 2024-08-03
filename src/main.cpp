@@ -1,8 +1,5 @@
 #include <libintl.h>
 
-#include <filesystem>
-#include <locale>
-
 #include "application.h"
 #include "utils.h"
 
