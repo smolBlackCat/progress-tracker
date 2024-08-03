@@ -28,13 +28,13 @@ find_package(Intl REQUIRED)
 find_package(Catch2 3)
 
 # Tiny XML setup
-find_library(TINYXML2_LIB libtinyxml2 tinyxml2 REQUIRED)
+find_library(TINYXML2 libtinyxml2 tinyxml2 REQUIRED)
 
 add_subdirectory(src)
 add_subdirectory(po)
 add_subdirectory(data)
 
-if(Catch2_FOUND)
+if(Catch2_FOUND AND DEBUG)
     add_subdirectory(test)
     include(CTest)
     add_test(NAME CoreTest COMMAND test/core_test)
