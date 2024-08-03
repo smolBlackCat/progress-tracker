@@ -26,7 +26,7 @@ if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
 endif()
 
 target_link_libraries(progress-tracker PUBLIC ${GTKMM_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
+target_link_libraries(progress-tracker PUBLIC ${TINYXML2_LIB})
 target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${INTL_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
