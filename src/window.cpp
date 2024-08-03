@@ -1,16 +1,14 @@
 #include "window.h"
 
+#include <app_info.h>
+#include <core/exceptions.h>
+#include <dialog/create_board_dialog.h>
+#include <dialog/preferences-board-dialog.h>
 #include <glibmm/i18n.h>
+#include <widgets/board-card-button.h>
 
 #include <filesystem>
 #include <format>
-#include <iostream>
-
-#include "app_info.h"
-#include "core/exceptions.h"
-#include "dialog/create_board_dialog.h"
-#include "dialog/preferences-board-dialog.h"
-#include "widgets/board-card-button.h"
 
 namespace ui {
 

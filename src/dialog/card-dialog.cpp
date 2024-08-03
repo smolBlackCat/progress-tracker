@@ -1,7 +1,7 @@
 #include "card-dialog.h"
 
-#include "../widgets/card.h"
-#include "../widgets/task-widget.h"
+#include <widgets/card.h>
+#include <widgets/task-widget.h>
 
 namespace ui {
 CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,

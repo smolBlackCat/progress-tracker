@@ -1,11 +1,9 @@
 #include "task-widget.h"
 
+#include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 
 #include <memory>
-
-#include "dialog/card-dialog.h"
-#include "gdk/gdk.h"
 
 namespace ui {
 

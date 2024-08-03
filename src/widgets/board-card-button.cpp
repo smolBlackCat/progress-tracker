@@ -1,11 +1,10 @@
 #include "board-card-button.h"
 
-#include <cstdint>
+#include <utils.h>
+
 #include <filesystem>
 #include <format>
 #include <string>
-
-#include "../utils.h"
 
 ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     : Button{},

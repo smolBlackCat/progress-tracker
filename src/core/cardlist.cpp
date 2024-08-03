@@ -1,6 +1,5 @@
 #include "cardlist.h"
 
-#include <iostream>
 #include <iterator>
 #include <stdexcept>
 

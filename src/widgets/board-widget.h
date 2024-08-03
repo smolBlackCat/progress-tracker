@@ -1,12 +1,10 @@
 #pragma once
 
+#include <core/board.h>
 #include <gtkmm.h>
 
-#include <memory>
 #include <vector>
 
-#include "../core/board.h"
-#include "app_info.h"
 #include "board-card-button.h"
 
 #define CSS_FORMAT \

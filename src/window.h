@@ -1,11 +1,8 @@
 #pragma once
 
+#include <adwaita.h>
 #include <gtkmm.h>
-#include <libadwaita-1/adwaita.h>
-
-#include "core/board.h"
-#include "widgets/board-card-button.h"
-#include "widgets/board-widget.h"
+#include <widgets/board-widget.h>
 
 namespace ui {
 

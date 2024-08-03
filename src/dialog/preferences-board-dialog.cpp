@@ -1,10 +1,9 @@
 #include "preferences-board-dialog.h"
 
 #include <glibmm/i18n.h>
+#include <utils.h>
 
 #include <filesystem>
-
-#include "../utils.h"
 
 namespace ui {
 

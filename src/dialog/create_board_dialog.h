@@ -1,10 +1,8 @@
 #pragma once
 
 #include <gtkmm.h>
+#include <window.h>
 
-#include <string>
-
-#include "../window.h"
 #include "board-dialog.h"
 
 namespace ui {

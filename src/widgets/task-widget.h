@@ -1,11 +1,8 @@
+#include <core/task.h>
+#include <dialog/card-dialog.h>
 #include <gtkmm.h>
 
 #include <memory>
-
-#include "../core/task.h"
-#include "../dialog/card-dialog.h"
-#include "giomm/simpleactiongroup.h"
-#include "glibmm/refptr.h"
 
 namespace ui {
 class TaskWidget : public Gtk::Box {

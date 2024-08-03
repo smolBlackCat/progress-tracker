@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../core/board.h"
-#include "../widgets/board-widget.h"
+#include <widgets/board-widget.h>
+
 #include "board-dialog.h"
 
 namespace ui {

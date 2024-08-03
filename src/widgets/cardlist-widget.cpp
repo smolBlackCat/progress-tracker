@@ -2,8 +2,6 @@
 
 #include <glibmm/i18n.h>
 
-#include <format>
-
 #include "board-widget.h"
 #include "card.h"
 

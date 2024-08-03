@@ -1,11 +1,11 @@
 #pragma once
 
+#include <core/card.h>
+#include <core/cardlist.h>
 #include <gtkmm.h>
 
 #include <memory>
 
-#include "../core/card.h"
-#include "../core/cardlist.h"
 #include "board-widget.h"
 #include "card.h"
 #include "editable-label-header.h"

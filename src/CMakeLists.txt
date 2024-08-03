@@ -1,12 +1,9 @@
 configure_file(app_info.h.in app_info.h)
 
-# Set Libraries and include directories
-add_subdirectory(core)
+file(GLOB_RECURSE CORE_SOURCES "core/*.h" "core/*.cpp")
+file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp" "widgets/*.h")
+file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp" "dialog/*.h")
 
-file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp", "widgets/*.h")
-file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp", "dialog/*.h")
-
-list(APPEND APP_LIBS core)
 list(APPEND APP_INCLUDES
      "${PROJECT_SOURCE_DIR}/src"
      "${PROJECT_BINARY_DIR}/src")
@@ -21,19 +18,26 @@ add_executable(progress-tracker
     utils.cpp
     ${WIDGET_SOURCES}
     ${DIALOG_SOURCES}
+    ${CORE_SOURCES}
     ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
 if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
 
-target_link_libraries(progress-tracker PRIVATE ${ADWAITA_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE ${INTL_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE ${APP_LIBS})
+target_link_libraries(progress-tracker PUBLIC ${GTKMM_LIBRARIES})
+target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
+target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
+target_link_libraries(progress-tracker PUBLIC ${INTL_LIBRARIES})
+target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
 
-target_include_directories(progress-tracker PRIVATE ${ADWAITA_INCLUDE_DIRS})
-target_include_directories(progress-tracker PRIVATE ${INTL_INCLUDE_DIR})
-target_include_directories(progress-tracker PRIVATE ${APP_INCLUDES})
+target_link_directories(progress-tracker PUBLIC ${GTKMM_LIBRARY_DIR})
+
+target_include_directories(progress-tracker PUBLIC ${TINYXML2_INCLUDE_DIRS})
+target_include_directories(progress-tracker PUBLIC ${GTKMM_INCLUDE_DIRS})
+target_include_directories(progress-tracker PUBLIC ${ADWAITA_INCLUDE_DIRS})
+target_include_directories(progress-tracker PUBLIC ${INTL_INCLUDE_DIRS})
+target_include_directories(progress-tracker PUBLIC ${APP_INCLUDES})
 
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 

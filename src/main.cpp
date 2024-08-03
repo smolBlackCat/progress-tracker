@@ -1,7 +1,6 @@
+#include <application.h>
 #include <libintl.h>
-
-#include "application.h"
-#include "utils.h"
+#include <utils.h>
 
 /**
  * Progress app main entry.

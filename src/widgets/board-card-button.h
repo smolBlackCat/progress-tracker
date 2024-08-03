@@ -1,10 +1,9 @@
 #pragma once
 
+#include <core/board.h>
 #include <gtkmm.h>
 
 #include <compare>
-
-#include "../core/board.h"
 
 namespace ui {
 

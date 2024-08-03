@@ -1,15 +1,11 @@
 #include "board-widget.h"
 
 #include <glibmm/i18n.h>
+#include <window.h>
 
-#include <chrono>
 #include <format>
-#include <iostream>
 
-#include "../window.h"
 #include "cardlist-widget.h"
-
-using namespace std::chrono_literals;
 
 /**
  * TODO: High memory is allocated in setting background, mainly when the

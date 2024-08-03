@@ -1,9 +1,9 @@
 #include "card.h"
 
+#include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
+#include <utils.h>
 
-#include "../dialog/card-dialog.h"
-#include "../utils.h"
 #include "cardlist-widget.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)

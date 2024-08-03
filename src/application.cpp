@@ -1,13 +1,13 @@
 #include "application.h"
 
 #include <adwaita.h>
+#include <app_info.h>
+#include <utils.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
-
-#include "utils.h"
 
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
