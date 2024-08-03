@@ -1,5 +1,6 @@
 #pragma once
 
+#include <app_info.h>
 #include <core/board.h>
 #include <gtkmm.h>
 
