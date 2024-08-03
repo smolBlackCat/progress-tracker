@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 20:38-0300\n"
+"POT-Creation-Date: 2024-08-03 15:23-0300\n"
 "PO-Revision-Date: 2024-04-28 13:17+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -130,6 +130,30 @@ msgstr "Come file"
 msgid "As a color"
 msgstr "Come colore"
 
+#: src/resources/ui/card-details-dialog.ui:27
+msgid "Task Name"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:46
+msgid "Checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:62
+msgid "Add an item to the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:69
+msgid "Toggle the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:112
+msgid "Notes"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:131 src/widgets/card.cpp:21
+msgid "Card Details"
+msgstr ""
+
 #: src/widgets/board-widget.cpp:21
 msgid "Add List"
 msgstr "Aggiungi elenco"
@@ -138,19 +162,20 @@ msgstr "Aggiungi elenco"
 msgid "New CardList"
 msgstr "Nuovo elenco di schede"
 
-#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:18 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/task-widget.cpp:35
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: src/widgets/card.cpp:26
+#: src/widgets/card.cpp:34
 msgid "Set Color"
 msgstr ""
 
-#: src/widgets/card.cpp:27
+#: src/widgets/card.cpp:35
 msgid "Clear Color Frame"
 msgstr ""
 
-#: src/widgets/card.cpp:34
+#: src/widgets/card.cpp:42
 msgid "Card Cover"
 msgstr ""
 
@@ -162,7 +187,7 @@ msgstr "Aggiungi scheda"
 msgid "New Card"
 msgstr "Nuova scheda"
 
-#: src/widgets/editable-label-header.cpp:76
+#: src/widgets/editable-label-header.cpp:76 src/widgets/task-widget.cpp:34
 msgid "Rename"
 msgstr "Rinomina"
 

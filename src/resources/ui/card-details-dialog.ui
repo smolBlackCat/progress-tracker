@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Created with Cambalache 0.90.4 -->
-<interface domain="progress-tracker">
+<interface>
   <!-- interface-name carddetailsdialog.ui -->
   <!-- interface-description Describes the structure for a Dialog containing
 a Card object details. -->
@@ -24,7 +24,7 @@ a Card object details. -->
             </property>
             <property name="label-widget">
               <object class="GtkLabel">
-                <property name="label">Task Name</property>
+                <property name="label" translatable="yes">Task Name</property>
                 <property name="use-markup">True</property>
                 <!-- Custom object fragments -->
                 <attributes>

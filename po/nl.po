@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 20:38-0300\n"
+"POT-Creation-Date: 2024-08-03 15:23-0300\n"
 "PO-Revision-Date: 2024-03-28 17:47+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -133,6 +133,30 @@ msgstr "Als bestand"
 msgid "As a color"
 msgstr "Als kleur"
 
+#: src/resources/ui/card-details-dialog.ui:27
+msgid "Task Name"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:46
+msgid "Checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:62
+msgid "Add an item to the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:69
+msgid "Toggle the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:112
+msgid "Notes"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:131 src/widgets/card.cpp:21
+msgid "Card Details"
+msgstr ""
+
 #: src/widgets/board-widget.cpp:21
 msgid "Add List"
 msgstr "Lijst toevoegen"
@@ -141,19 +165,20 @@ msgstr "Lijst toevoegen"
 msgid "New CardList"
 msgstr "Nieuwe kaartenlijst"
 
-#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:18 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/task-widget.cpp:35
 msgid "Remove"
 msgstr "Verwĳderen"
 
-#: src/widgets/card.cpp:26
+#: src/widgets/card.cpp:34
 msgid "Set Color"
 msgstr ""
 
-#: src/widgets/card.cpp:27
+#: src/widgets/card.cpp:35
 msgid "Clear Color Frame"
 msgstr ""
 
-#: src/widgets/card.cpp:34
+#: src/widgets/card.cpp:42
 msgid "Card Cover"
 msgstr ""
 
@@ -165,7 +190,7 @@ msgstr "Kaart toevoegen"
 msgid "New Card"
 msgstr "Nieuwe kaart"
 
-#: src/widgets/editable-label-header.cpp:76
+#: src/widgets/editable-label-header.cpp:76 src/widgets/task-widget.cpp:34
 msgid "Rename"
 msgstr "Naam wijzigen"
 

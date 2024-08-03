@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 20:38-0300\n"
+"POT-Creation-Date: 2024-08-03 15:23-0300\n"
 "PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -132,6 +132,30 @@ msgstr "Като файл"
 msgid "As a color"
 msgstr "Като цвят"
 
+#: src/resources/ui/card-details-dialog.ui:27
+msgid "Task Name"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:46
+msgid "Checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:62
+msgid "Add an item to the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:69
+msgid "Toggle the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:112
+msgid "Notes"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:131 src/widgets/card.cpp:21
+msgid "Card Details"
+msgstr ""
+
 #: src/widgets/board-widget.cpp:21
 msgid "Add List"
 msgstr "Добавяне на списък"
@@ -140,19 +164,20 @@ msgstr "Добавяне на списък"
 msgid "New CardList"
 msgstr "Нов списък с карти"
 
-#: src/widgets/card.cpp:20 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/card.cpp:18 src/widgets/cardlist-widget.cpp:33
+#: src/widgets/task-widget.cpp:35
 msgid "Remove"
 msgstr "Премахване"
 
-#: src/widgets/card.cpp:26
+#: src/widgets/card.cpp:34
 msgid "Set Color"
 msgstr ""
 
-#: src/widgets/card.cpp:27
+#: src/widgets/card.cpp:35
 msgid "Clear Color Frame"
 msgstr ""
 
-#: src/widgets/card.cpp:34
+#: src/widgets/card.cpp:42
 msgid "Card Cover"
 msgstr ""
 
@@ -164,7 +189,7 @@ msgstr "Добавяне на карта"
 msgid "New Card"
 msgstr "Нова карта"
 
-#: src/widgets/editable-label-header.cpp:76
+#: src/widgets/editable-label-header.cpp:76 src/widgets/task-widget.cpp:34
 msgid "Rename"
 msgstr "Преименуване"
 
