@@ -67,6 +67,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     scr_window.set_child(root);
     scr_window.set_size_request(CARDLIST_SIZE, CARDLIST_SIZE * 2);
     scr_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
+    scr_window.get_vscrollbar()->set_visible(false);
     append(scr_window);
 
     // Makes the header and the list itself non-selectable
