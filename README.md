@@ -101,7 +101,7 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 1. Install the dependencies
 
     ```sh
-    # Replace env with either 'ucrt64' or 'mingw32'
+    # Replace env with either 'ucrt-x86_64' or 'i686'
     pacman -Syu mingw-w64-env-cmake mingw-w64-env-python mingw-w64-env-gtkmm4 \
         mingw-w64-env-libadwaita mingw-w64-env-tinyxml2 \
         mingw-w64-env-gettext mingw-w64-env-catch git
