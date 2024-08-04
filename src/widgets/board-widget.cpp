@@ -1,10 +1,9 @@
-#include "board-widget.h"
-
 #include <glibmm/i18n.h>
 #include <window.h>
 
 #include <format>
 
+#include "board-widget.h"
 #include "cardlist-widget.h"
 
 /**
@@ -50,6 +49,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     add_button.set_halign(Gtk::Align::START);
     add_button.set_valign(Gtk::Align::START);
     add_button.set_hexpand();
+    add_button.add_css_class("add-cardlist-button");
 
     root.append(add_button);
 
@@ -230,3 +230,4 @@ void ui::BoardWidget::setup_auto_scrolling() {
         },
         10);
 }
+

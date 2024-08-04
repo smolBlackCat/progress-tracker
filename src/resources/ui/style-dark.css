@@ -6,6 +6,10 @@ list.rich-list {
     border-radius: 20px;
 }
 
+.add-cardlist-button {
+    background-color: #3d3846;
+}
+
 .card {
     background-color: #5e5c64;
     border-radius: 5px;
