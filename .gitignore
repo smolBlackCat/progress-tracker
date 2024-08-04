@@ -35,6 +35,7 @@
 .vscode/
 .cache/
 .idea/
+.zed/
 
 # Ignore build
 build/
