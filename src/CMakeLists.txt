@@ -26,7 +26,7 @@ if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
 endif()
 
 target_link_libraries(progress-tracker PUBLIC ${GTKMM_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${TINYXML2_LIB})
+target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
 target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${INTL_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
@@ -68,6 +68,9 @@ elseif(${WINDOWS})
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.svg share/icons/
+                       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    add_custom_command(TARGET progress-tracker POST_BUILD
+                       COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.Devel.svg share/icons/
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
 else()

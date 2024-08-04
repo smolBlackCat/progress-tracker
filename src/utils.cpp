@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <app_info.h>
+
 #include <algorithm>
 #include <filesystem>
 #include <random>
