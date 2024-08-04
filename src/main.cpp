@@ -1,5 +1,5 @@
-#include <application.h>
 #include <app_info.h>
+#include <application.h>
 #include <libintl.h>
 #include <utils.h>
 
@@ -19,3 +19,4 @@ int main(int argc, char *argv[]) {
     auto app = ui::Application::create();
     return app->run(argc, argv);
 }
+

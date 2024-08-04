@@ -81,3 +81,4 @@ protected:
     void on_cancel_changes();
 };
 }  // namespace ui
+

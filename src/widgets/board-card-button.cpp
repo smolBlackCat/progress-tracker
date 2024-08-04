@@ -1,10 +1,10 @@
-#include "board-card-button.h"
-
 #include <utils.h>
 
 #include <filesystem>
 #include <format>
 #include <string>
+
+#include "board-card-button.h"
 
 ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     : Button{},
@@ -82,3 +82,4 @@ std::strong_ordering ui::BoardCardButton::operator<=>(
 
     return this_lm_time <=> other_lm_time;
 }
+

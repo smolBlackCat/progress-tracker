@@ -32,3 +32,4 @@ protected:
     CardDetailsDialog& card_details_dialog;
 };
 }  // namespace ui
+

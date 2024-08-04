@@ -118,3 +118,4 @@ protected:
     bool on_window_close();
 };
 }  // namespace ui
+

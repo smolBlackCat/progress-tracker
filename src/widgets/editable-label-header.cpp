@@ -1,8 +1,7 @@
-#include "editable-label-header.h"
-
 #include <glibmm/i18n.h>
 
 #include "cardlist-widget.h"
+#include "editable-label-header.h"
 
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
@@ -159,3 +158,4 @@ void EditableLabelHeader::on_cancel_changes() {
     on_cancel_signal(label.get_text());
 }
 }  // namespace ui
+

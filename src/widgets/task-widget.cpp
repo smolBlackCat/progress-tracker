@@ -1,9 +1,9 @@
-#include "task-widget.h"
-
 #include <glibmm/i18n.h>
 #include <widgets/card.h>
 
 #include <memory>
+
+#include "task-widget.h"
 
 namespace ui {
 
@@ -96,3 +96,4 @@ void TaskWidget::off_rename() {
 
 void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
 }  // namespace ui
+

@@ -1,5 +1,3 @@
-#include "window.h"
-
 #include <app_info.h>
 #include <core/exceptions.h>
 #include <dialog/create_board_dialog.h>
@@ -9,6 +7,8 @@
 
 #include <filesystem>
 #include <format>
+
+#include "window.h"
 
 namespace ui {
 
@@ -265,3 +265,4 @@ bool ProgressWindow::on_window_close() {
     return true;
 }
 }  // namespace ui
+

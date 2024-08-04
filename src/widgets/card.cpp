@@ -1,9 +1,8 @@
-#include "card.h"
-
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <utils.h>
 
+#include "card.h"
 #include "cardlist-widget.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
@@ -78,7 +77,7 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         progress_bar.set_visible(false);
     }
 
-    progress_bar.set_fraction(card_refptr->get_completion()/100);
+    progress_bar.set_fraction(card_refptr->get_completion() / 100);
     append(progress_bar);
 }
 
@@ -101,7 +100,7 @@ void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
 std::shared_ptr<Card> ui::CardWidget::get_card() { return card_refptr; }
 
 void ui::CardWidget::update_completed() {
-    progress_bar.set_fraction(card_refptr->get_completion()/100);
+    progress_bar.set_fraction(card_refptr->get_completion() / 100);
 }
 
 void ui::CardWidget::hide_progress_bar(bool hide) {
@@ -195,3 +194,4 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     color_frame.set_pixbuf(color_frame_pixbuf);
     this->m_frame.set_visible();
 }
+

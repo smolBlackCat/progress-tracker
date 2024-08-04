@@ -90,3 +90,4 @@ private:
     ui::CardlistWidget* cardlist_p;
 };
 }  // namespace ui
+

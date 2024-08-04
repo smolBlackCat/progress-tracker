@@ -1,9 +1,8 @@
-#include "cardlist-widget.h"
-
 #include <glibmm/i18n.h>
 
 #include "board-widget.h"
 #include "card.h"
+#include "cardlist-widget.h"
 
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                                    std::shared_ptr<CardList> cardlist_refptr,
@@ -206,3 +205,4 @@ bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
 ui::EditableLabelHeader& ui::CardlistWidget::get_header() {
     return cardlist_header;
 }
+

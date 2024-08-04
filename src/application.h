@@ -26,3 +26,4 @@ protected:
     ProgressWindow* main_window = nullptr;
 };
 }  // namespace ui
+

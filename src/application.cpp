@@ -1,5 +1,3 @@
-#include "application.h"
-
 #include <adwaita.h>
 #include <app_info.h>
 #include <utils.h>
@@ -8,6 +6,8 @@
 #include <cstring>
 #include <filesystem>
 #include <iostream>
+
+#include "application.h"
 
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
@@ -57,3 +57,4 @@ void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
 }
+

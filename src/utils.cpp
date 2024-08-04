@@ -1,10 +1,10 @@
-#include "utils.h"
-
 #include <app_info.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <random>
+
+#include "utils.h"
 
 std::string locale_folder() {
 #ifdef FLATPAK
@@ -68,3 +68,4 @@ uint32_t rgb_to_hex(const Gdk::RGBA& color) {
 
     return (r << 24) + (g << 16) + (b << 8) + a;
 }
+
