@@ -28,8 +28,14 @@ CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
 }
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
+    auto card = card_widget->get_card();
     checklist_box->remove(task);
-    card_widget->get_card()->remove_task(task.get_task());
+    card->remove_task(task.get_task());
+    card_widget->update_completed();
+
+    if (card->get_tasks().size() == 0) {
+        card_widget->hide_progress_bar();
+    }
 }
 
 void CardDetailsDialog::set_card_widget(CardWidget* card_widget) {
@@ -69,6 +75,7 @@ void CardDetailsDialog::on_add_button_click() {
         card_widget->get_card()->add_task(Task{"New Task"}));
 
     checklist_box->append(*new_taskwidget);
+    card_widget->hide_progress_bar(false);
 }
 
 void CardDetailsDialog::on_toggle() {

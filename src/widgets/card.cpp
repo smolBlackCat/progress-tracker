@@ -73,6 +73,13 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     set_tooltip_text(card_refptr->get_notes());
 
     setup_drag_and_drop();
+
+    if (card_refptr->get_tasks().size() == 0) {
+        progress_bar.set_visible(false);
+    }
+
+    progress_bar.set_fraction(card_refptr->get_completion()/100);
+    append(progress_bar);
 }
 
 void ui::CardWidget::remove_from_parent() {
@@ -92,6 +99,14 @@ void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
 }
 
 std::shared_ptr<Card> ui::CardWidget::get_card() { return card_refptr; }
+
+void ui::CardWidget::update_completed() {
+    progress_bar.set_fraction(card_refptr->get_completion()/100);
+}
+
+void ui::CardWidget::hide_progress_bar(bool hide) {
+    progress_bar.set_visible(!hide);
+}
 
 void ui::CardWidget::setup_drag_and_drop() {
     // DragSource Settings

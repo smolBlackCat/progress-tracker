@@ -58,6 +58,20 @@ public:
      */
     std::shared_ptr<Card> get_card();
 
+    /**
+     * @brief Updates card's progress bar
+     *
+     */
+    void update_completed();
+
+    /**
+     * @brief Hides the card's progress bar
+     *
+     * @param hide bool indicating whether to hide the progress bar or not.
+     * Default is true
+     */
+    void hide_progress_bar(bool hide = true);
+
 protected:
     bool is_new;
     Gtk::Picture color_frame;
@@ -65,6 +79,7 @@ protected:
     Gtk::Button clear_colour_button;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
     Gtk::Box colour_setting_box;
+    Gtk::ProgressBar progress_bar;
 
     void setup_drag_and_drop();
     void open_color_dialog();

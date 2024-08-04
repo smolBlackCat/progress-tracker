@@ -1,7 +1,7 @@
 #include "task-widget.h"
 
-#include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
+#include <widgets/card.h>
 
 #include <memory>
 
@@ -26,8 +26,10 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
         builder->get_widget<Gtk::CheckButton>("task-checkbutton");
 
     task_checkbutton->set_active(task->get_done());
-    task_checkbutton->signal_toggled().connect(
-        [this]() { this->task->set_done(task_checkbutton->get_active()); });
+    task_checkbutton->signal_toggled().connect([this]() {
+        this->task->set_done(task_checkbutton->get_active());
+        this->card_details_dialog.get_card_widget()->update_completed();
+    });
 
     menu_model->append(_("Rename"), "task-widget.rename");
     menu_model->append(_("Remove"), "task-widget.remove");
