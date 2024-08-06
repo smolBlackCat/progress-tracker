@@ -7,20 +7,7 @@
 #include <random>
 
 std::string locale_folder() {
-#ifdef FLATPAK
-    return "/app/share/locale/";
-#elif defined(WINDOWS) && defined(PORTABLE)
-    return (std::filesystem::current_path() / "locale").string() +
-           std::string{std::filesystem::path::preferred_separator};
-#elif defined(WINDOWS)
-    return std::string{std::getenv("PROGRAMFILES")} + "\\Progress\\locale\\";
-#elif defined(DEBUG)
-    return (std::filesystem::current_path() / "locales").string() + "/";
-#elif defined(DEBUG) and defined(WINDOWS)
-    return (std::filesystem::current_path() / "locales").string() + "\\";
-#else
-    return "/usr/share/locale/";
-#endif
+    return std::filesystem::path(LOCALE_FOLDER).string();
 }
 
 std::string progress_boards_folder() {

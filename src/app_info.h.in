@@ -2,6 +2,9 @@
 #define MAJOR_VERSION ${ProgressTracker_VERSION_MAJOR}
 #define MINOR_VERSION ${ProgressTracker_VERSION_MINOR}
 #define PATCH_VERSION ${ProgressTracker_VERSION_PATCH}
+
+#cmakedefine LOCALE_FOLDER "@LOCALE_FOLDER@"
+
 #cmakedefine DEBUG
 #cmakedefine FLATPAK
 #cmakedefine WINDOWS

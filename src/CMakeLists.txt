@@ -57,7 +57,7 @@ add_custom_command(
 add_custom_target(progress-resources DEPENDS resources.cpp)
 add_dependencies(progress-tracker progress-resources)
 
-if(${WINDOWS})
+if(WIN32)
     find_program(PYTHON NAMES python3 python)
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/build-aux/fetch-win-deps.py
@@ -68,6 +68,18 @@ if(${WINDOWS})
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.Devel.svg share/icons/
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    install(TARGET progress-tracker
+    		RUNTIME
+    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/)
+
+    file(GLOB_RECURSE DLLS "*.dll")
+
+    install(FILES DLLS
+    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/share/
+    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/share/)
+    install(DIRECTORY install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
+    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/lib/))
 else()
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
             DESTINATION ${CMAKE_INSTALL_BINDIR}

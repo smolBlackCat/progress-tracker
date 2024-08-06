@@ -30,6 +30,13 @@ find_package(Catch2 3)
 # Tiny XML setup
 find_library(TINYXML2 libtinyxml2 tinyxml2 REQUIRED)
 
+if (LINUX)
+	include(GNUInstallDirs)
+	set(LOCALE_FOLDER "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/locale/")
+elseif (WIN32)
+	set(LOCALE_FOLDER "${CMAKE_INSTALL_PREFIX}/Progress/locale/")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(po)
 add_subdirectory(data)

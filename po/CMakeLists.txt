@@ -41,5 +41,5 @@ endforeach()
 
 foreach(PO_NAME IN LISTS PO_NAMES)
         install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
-                DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/${PO_NAME}/LC_MESSAGES)
+                DESTINATION ${LOCALE_FOLDER}${PO_NAME}/LC_MESSAGES)
 endforeach()
