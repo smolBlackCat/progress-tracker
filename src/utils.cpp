@@ -1,10 +1,10 @@
+#include "utils.h"
+
 #include <app_info.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <random>
-
-#include "utils.h"
 
 std::string locale_folder() {
 #ifdef FLATPAK
@@ -14,6 +14,10 @@ std::string locale_folder() {
            std::string{std::filesystem::path::preferred_separator};
 #elif defined(WINDOWS)
     return std::string{std::getenv("PROGRAMFILES")} + "\\Progress\\locale\\";
+#elif defined(DEBUG)
+    return (std::filesystem::current_path() / "locales").string() + "/";
+#elif defined(DEBUG) and defined(WINDOWS)
+    return (std::filesystem::current_path() / "locales").string() + "\";
 #else
     return "/usr/share/locale/";
 #endif
@@ -68,4 +72,3 @@ uint32_t rgb_to_hex(const Gdk::RGBA& color) {
 
     return (r << 24) + (g << 16) + (b << 8) + a;
 }
-
