@@ -50,3 +50,4 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgtkmm-4.0-0, libadwaita-1-0, libtinyxml2-10
 set(CPACK_DEBIAN_PACKAGE_SECTION "gnome")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/smolBlackCat/progress-tracker")
 include(CPack)
+include(GNUInstallDirs)

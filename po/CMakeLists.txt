@@ -1,6 +1,8 @@
 find_program(MSGMERGE msgmerge REQUIRED)
 find_program(MSGFMT msgfmt REQUIRED)
 
+include(GNUInstallDirs)
+
 set(POT_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/progress-tracker.pot)
 set(MO_FILENAME progress-tracker.mo)
 
@@ -38,11 +40,6 @@ foreach(PO_SOURCE PO_NAME IN ZIP_LISTS PO_SOURCES PO_NAMES)
 endforeach()
 
 foreach(PO_NAME IN LISTS PO_NAMES)
-    if (${FLATPAK})
         install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
-                DESTINATION /app/share/locale/${PO_NAME}/LC_MESSAGES)
-    else()
-        install(FILES ${LOCALE_DIRECTORY}/${PO_NAME}/LC_MESSAGES/${MO_FILENAME}
-                DESTINATION /usr/share/locale/${PO_NAME}/LC_MESSAGES)
-    endif()
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/${PO_NAME}/LC_MESSAGES)
 endforeach()

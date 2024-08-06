@@ -57,11 +57,7 @@ add_custom_command(
 add_custom_target(progress-resources DEPENDS resources.cpp)
 add_dependencies(progress-tracker progress-resources)
 
-if (${FLATPAK})
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
-            DESTINATION /app/bin/
-            RENAME ${EXECUTABLE_NAME})
-elseif(${WINDOWS})
+if(${WINDOWS})
     find_program(PYTHON NAMES python3 python)
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/build-aux/fetch-win-deps.py
@@ -72,9 +68,8 @@ elseif(${WINDOWS})
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.Devel.svg share/icons/
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-
 else()
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
-            DESTINATION /usr/bin/
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
             RENAME ${EXECUTABLE_NAME})
 endif()
