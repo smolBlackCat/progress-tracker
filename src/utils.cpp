@@ -17,7 +17,7 @@ std::string locale_folder() {
 #elif defined(DEBUG)
     return (std::filesystem::current_path() / "locales").string() + "/";
 #elif defined(DEBUG) and defined(WINDOWS)
-    return (std::filesystem::current_path() / "locales").string() + "\";
+    return (std::filesystem::current_path() / "locales").string() + "\\";
 #else
     return "/usr/share/locale/";
 #endif
