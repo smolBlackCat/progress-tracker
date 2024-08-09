@@ -1,6 +1,5 @@
 #pragma once
 
-#include <app_info.h>
 #include <core/board.h>
 #include <gtkmm.h>
 
@@ -131,7 +130,7 @@ public:
     bool on_drag;
 
 private:
-#ifdef WINDOWS
+#ifdef WIN32
     Gtk::Overlay overlay;
     Gtk::Picture picture;
     Gtk::ScrolledWindow scr;

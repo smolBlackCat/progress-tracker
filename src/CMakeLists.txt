@@ -21,7 +21,7 @@ add_executable(progress-tracker
     ${CORE_SOURCES}
     ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
-if ((WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release"))
+if ((WIN32 AND (NOT DEVELOPMENT)))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
 
@@ -68,18 +68,19 @@ if(WIN32)
     add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.Devel.svg share/icons/
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    install(TARGET progress-tracker
+
+    install(TARGETS progress-tracker
     		RUNTIME
-    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/)
-
-    file(GLOB_RECURSE DLLS "*.dll")
-
-    install(FILES DLLS
-    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/)
+    		DESTINATION ".")
+    install(PROGRAMS ${PROJECT_BINARY_DIR}/gdbus.exe
+            DESTINATION ".")
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/DLLS/
+    		DESTINATION "."
+            FILES_MATCHING PATTERN "*.dll")
     install(DIRECTORY ${PROJECT_BINARY_DIR}/share/
-    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/share/)
-    install(DIRECTORY install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
-    		DESTINATION ${CMAKE_INSTALL_PREFIX}/Progress/lib/))
+    		DESTINATION share)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
+    		DESTINATION lib)
 else()
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
             DESTINATION ${CMAKE_INSTALL_BINDIR}

@@ -33,7 +33,7 @@ Progress is available to download at [Flathub](https://flathub.org/apps/io.githu
 A debian build is also available. The debian package can be obtained in the [releases](https://github.com/smolBlackCat/progress-tracker/releases) page.
 
 ```sh
-sudo apt install ./progress-tracker-1.4.deb
+sudo apt install ./progress-tracker-2.0.deb
 ```
 
 ### Windows
@@ -80,8 +80,8 @@ For contributing to Progress source code, building from source might be the bett
     ```sh
     cd progress-tracker/
 
-    # Use DCMAKE_BUILD_TYPE=Debug to build the application in development mode
-    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release
+    # Use -DDEVELOPMENT=ON to build the application in development mode
+    cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX=/usr
     cmake --build build/
     ```
 
@@ -104,7 +104,7 @@ the project build settings support only two environments: UCRT64 and MINGW32.
     # Replace env with either 'ucrt-x86_64' or 'i686'
     pacman -Syu mingw-w64-env-cmake mingw-w64-env-python mingw-w64-env-gtkmm4 \
         mingw-w64-env-libadwaita mingw-w64-env-tinyxml2 \
-        mingw-w64-env-gettext mingw-w64-env-catch git
+        mingw-w64-env-gettext mingw-w64-env-catch mingw-w64-env-makensis git
     ```
 
 2. Clone the project's repository
@@ -117,9 +117,16 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 
     ```sh
     cd progress-tracker/
-    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release -DWINDOWS=True
+    cmake -S . -B build/
     cmake --build build/
     ```
 
-4. Build installer using
-[Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
+4. Build the Progress installer
+
+    ```sh
+    cd build/
+
+    # This will generate both an installer and a .zip file with the
+    # application's files
+    cpack
+    ```

@@ -13,7 +13,7 @@ std::string locale_folder() {
 std::string progress_boards_folder() {
 #ifdef FLATPAK
     return std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards/";
-#elif defined(WINDOWS)
+#elif WIN32
     return std::string{std::getenv("APPDATA")} + "\\Progress\\Boards\\";
 #else
     return std::string{std::getenv("HOME")} + "/.config/progress/boards/";

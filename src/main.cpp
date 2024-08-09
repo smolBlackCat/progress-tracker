@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     bind_textdomain_codeset("progress-tracker", "utf-8");
     textdomain("progress-tracker");
 
-#if defined(WINDOWS)
+#if WIN32
     Glib::setenv("GSK_RENDERER", "opengl");
 #endif
 

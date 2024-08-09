@@ -22,7 +22,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       app_window{app_window},
       on_drag{false} {
 
-#ifdef WINDOWS
+#ifdef WIN32
     set_child(overlay);
     picture.set_keep_aspect_ratio(false);
     overlay.set_child(picture);

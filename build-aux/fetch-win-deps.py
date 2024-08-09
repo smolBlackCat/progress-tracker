@@ -58,6 +58,7 @@ def main():
     try:
         os.mkdir("share")
         os.mkdir("lib")
+        os.mkdir("DLLS")
     except FileExistsError as err:
         print("directories still exist. Continuing...")
 
@@ -66,13 +67,15 @@ def main():
     subprocess.run(["cp", "-r", f"{ROOT}/lib/gdk-pixbuf-2.0/", "lib"])
 
     dlls = get_dlls(MSYSTEM)
-
     for dll in dlls:
-        subprocess.run(["cp", f"{ROOT}/bin/{dll}", "."])
+        subprocess.run(["cp", f"{ROOT}/bin/{dll}", "DLLS"])
 
     if MSYSTEM == "UCRT64":
         # Necessary for older 64 bit operating systems
-        subprocess.run("cp /c/Windows/System32/ucrtbase.dll .".split())
+        subprocess.run("cp /c/Windows/System32/ucrtbase.dll DLLS".split())
+
+    # Helper executable
+    subprocess.run(f"cp {ROOT}/bin/gdbus.exe .".split())
 
 
 if __name__ == "__main__":
