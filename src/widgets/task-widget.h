@@ -5,13 +5,32 @@
 #include <memory>
 
 namespace ui {
+/**
+ * @brief Class implementing controlling facilities of Task widget
+ */
 class TaskWidget : public Gtk::Box {
 public:
+    /**
+     * @brief CardDetailsDialog constructor
+     *
+     * @details Despite being public, this constructor should not be used
+     * directly, since the object is meant to be created using
+     * Gtk::Builder::get_widget_derived(...) function
+     *
+     * @param cobject GtkBox gobject pointer
+     * @param builder Gtk::Builder object used to create this widget
+     * @param card_details_dialog CardDetailsDialog object reference from where
+     * this widget belongs
+     * @param task Task object smart pointer
+     */
     TaskWidget(BaseObjectType* cobject,
                const Glib::RefPtr<Gtk::Builder>& builder,
                CardDetailsDialog& card_details_dialog,
                std::shared_ptr<Task> task);
 
+    /**
+     * @brief Returns the Task object smart pointer associated with this widget
+     */
     std::shared_ptr<Task> get_task();
 
 protected:
@@ -32,4 +51,3 @@ protected:
     CardDetailsDialog& card_details_dialog;
 };
 }  // namespace ui
-
