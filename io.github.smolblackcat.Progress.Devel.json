@@ -135,7 +135,7 @@
 			"buildsystem": "cmake-ninja",
 			"builddir": true,
 			"config-opts": [
-				"-DCMAKE_BUILD_TYPE=Debug",
+				"-DDEVELOPMENT=ON",
 				"-DCMAKE_INSTALL_PREFIX=/app"
 			],
 			"sources": [
