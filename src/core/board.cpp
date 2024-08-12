@@ -11,7 +11,7 @@
 
 const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
-Board::Board() : Item{""} {}
+Board::Board() : Item{""}, background{BACKGROUND_DEFAULT} {}
 
 Board::Board(const std::string& name, const std::string& background)
     : Item{name} {
@@ -150,15 +150,23 @@ std::string Board::get_background() const { return background; }
 bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
     std::filesystem::path p{file_path};
 
-    if (std::filesystem::exists(p.parent_path())) {
-        if (!std::filesystem::exists(p)) {
-            this->file_path = file_path;
-            return true;
+    if (p.has_parent_path()) {
+        if (std::filesystem::exists(p.parent_path())) {
+            if (!std::filesystem::exists(p)) {
+                this->file_path = file_path;
+                return true;
+            }
+        } else {
+            if (create_dirs) {
+                std::filesystem::create_directories(p.parent_path());
+                this->file_path = file_path;
+                return true;
+            }
         }
     } else {
-        if (create_dirs) {
-            std::filesystem::create_directories(p.parent_path());
-            this->file_path = file_path;
+        if (file_path.length() != 0) {
+            this->file_path =
+                (std::filesystem::current_path() / file_path).string();
             return true;
         }
     }

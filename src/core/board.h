@@ -101,7 +101,8 @@ public:
      * @brief Saves the board information as a file.
      *
      * @param create_dirs Flag indicating whether filepath's parent directory
-     * can be created if it does not exist
+     * can be created if it does not exist. This flag will be ignored if the
+     * filepath does not specify any parents in the directory hierarchy
      *
      * @details This method will create a new file based on the board's name. It
      *          will start numbering the files in case there are boards with the
