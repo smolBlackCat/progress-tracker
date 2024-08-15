@@ -118,6 +118,8 @@ public:
 
     const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
 
+    void set_modified(bool modified) override;
+
     /**
      * @brief Returns true if the board was modified in some way, otherwise
      * False.

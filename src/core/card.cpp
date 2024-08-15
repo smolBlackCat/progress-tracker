@@ -16,6 +16,23 @@ bool Card::is_color_set() { return color != NO_COLOR; }
 
 const std::string& Card::get_notes() const { return notes; }
 
+void Card::set_modified(bool modified) {
+    Item::set_modified(modified);
+    for (auto& task : tasks) {
+        task->set_modified(modified);
+    }
+}
+
+bool Card::get_modified() {
+    for (auto& task : tasks) {
+        if (task->get_modified()) {
+            return true;
+        }
+    }
+
+    return modified;
+}
+
 void Card::set_notes(const std::string& notes) {
     this->notes = notes;
     modified = true;
@@ -38,6 +55,8 @@ double Card::get_completion() const {
 std::shared_ptr<Task> Card::add_task(const Task& task) {
     std::shared_ptr<Task> new_task = std::make_shared<Task>(task);
     tasks.push_back(new_task);
+
+    modified = true;
 
     return new_task;
 }

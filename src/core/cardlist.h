@@ -37,6 +37,8 @@ public:
      */
     bool remove_card(const Card& card);
 
+    void set_modified(bool modified) override;
+
     bool get_modified() override;
 
     const std::vector<std::shared_ptr<Card>>& get_card_vector();

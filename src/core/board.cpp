@@ -15,7 +15,7 @@ Board::Board() : Item{""}, background{BACKGROUND_DEFAULT} {}
 
 Board::Board(const std::string& name, const std::string& background)
     : Item{name} {
-    set_background(background);
+    set_background(background, false);
 }
 
 Board::Board(const std::string& board_file_path)
@@ -147,6 +147,7 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
 
 std::string Board::get_background() const { return background; }
 
+// TODO: This can be even better
 bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
     std::filesystem::path p{file_path};
 
@@ -286,6 +287,14 @@ std::string Board::get_filepath() const { return file_path; }
 
 const std::vector<std::shared_ptr<CardList>>& Board::get_cardlist_vector() {
     return cardlist_vector;
+}
+
+void Board::set_modified(bool modified) {
+    Item::set_modified(modified);
+
+    for (auto& cardlist : cardlist_vector) {
+        cardlist->set_modified(modified);
+    }
 }
 
 bool Board::get_modified() {

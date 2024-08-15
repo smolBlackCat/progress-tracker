@@ -25,6 +25,14 @@ bool CardList::remove_card(const Card& card) {
     return false;
 }
 
+void CardList::set_modified(bool modified) {
+    Item::set_modified(modified);
+
+    for (auto& card : card_vector) {
+        card->set_modified(modified);
+    }
+}
+
 bool CardList::cards_modified() {
     for (auto& card : card_vector) {
         if (card->get_modified()) {
