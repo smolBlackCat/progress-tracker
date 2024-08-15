@@ -14,7 +14,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
       add_button{_("Add List")},
-#ifdef WINDOWS
+#ifdef WIN32
       picture{},
       scr{},
       overlay{},
@@ -139,13 +139,13 @@ void ui::BoardWidget::set_background(const std::string& background,
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
-#ifdef WINDOWS
+#ifdef WIN32
             picture.set_visible(false);
 #endif
             break;
         }
         case BackgroundType::IMAGE: {
-#ifdef WINDOWS
+#ifdef WIN32
             picture.set_filename(background);
             picture.set_visible(true);
             break;
@@ -158,7 +158,7 @@ void ui::BoardWidget::set_background(const std::string& background,
         case BackgroundType::INVALID: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
-#ifdef WINDOWS
+#ifdef WIN32
             picture.set_visible(false);
 #endif
             break;
@@ -198,14 +198,14 @@ void ui::BoardWidget::setup_auto_scrolling() {
             this->x = x;
             this->y = y;
         });
-#ifdef WINDOWS
+#ifdef WIN32
     scr.add_controller(drop_controller_motion_c);
 #else
     add_controller(drop_controller_motion_c);
 #endif
     Glib::signal_timeout().connect(
         [this]() {
-#ifdef WINDOWS
+#ifdef WIN32
             double cur_max_width = scr.get_width();
             auto hadjustment = scr.get_hadjustment();
 #else
