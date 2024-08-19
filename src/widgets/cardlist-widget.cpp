@@ -96,21 +96,21 @@ void ui::CardlistWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
-            this->board.on_drag = true;
+            this->board.set_on_scroll();
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag,
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
-            this->board.on_drag = false;
+            this->board.set_on_scroll(false);
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
-            this->board.on_drag = true;
+            this->board.set_on_scroll(false);
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     cardlist_header.add_controller(drag_source_c);
@@ -119,7 +119,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         Glib::Value<ui::CardlistWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_cardlist->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->board.on_drag = false;
+            this->board.set_on_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardlistWidget*>::value_type())) {
                 Glib::Value<ui::CardlistWidget*> dropped_value;
@@ -144,7 +144,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_card->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->board.on_drag = false;
+            this->board.set_on_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;

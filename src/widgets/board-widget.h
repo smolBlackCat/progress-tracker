@@ -29,6 +29,8 @@ class CardlistWidget;
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
     static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
+    static constexpr int SCROLL_SPEED_FACTOR = 6;
+
     BoardWidget(ProgressWindow& app_window);
 
     ~BoardWidget() override;
@@ -127,14 +129,30 @@ public:
      */
     std::string get_filepath();
 
-    bool on_drag;
+    /**
+     * @brief Returns true if the board is set up to horizontally scroll
+     */
+    bool get_on_scroll() const;
+
+    /**
+     * @brief Describes whether the board should be able to scroll horizontally
+     */
+    void set_on_scroll(bool scroll = true);
 
 private:
+    /**
+     * @brief Sets up automatic scrolling for every time the users drags either
+     * cards or cardlists across the screen the BoardWidget will scroll as
+     * needed.
+     */
+    void setup_auto_scrolling();
+
 #ifdef WIN32
     Gtk::Overlay overlay;
     Gtk::Picture picture;
     Gtk::ScrolledWindow scr;
 #endif
+
     Gtk::Box root;
     Gtk::Button add_button;
     Board* board = nullptr;
@@ -142,14 +160,7 @@ private:
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
     ProgressWindow& app_window;
-    double x, y;
-
-    /**
-     * @brief Sets up automatic scrolling for every time the users drags either
-     * cards or cardlists across the screen the BoardWidget will scroll as
-     * needed.
-     */
-    void setup_auto_scrolling();
+    double x, y; // Cursor Position
+    bool on_scroll = false;
 };
 }  // namespace ui
-

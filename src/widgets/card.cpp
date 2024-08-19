@@ -1,8 +1,9 @@
+#include "card.h"
+
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <utils.h>
 
-#include "card.h"
 #include "cardlist-widget.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
@@ -40,9 +41,9 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     menu->append_submenu(_("Card Cover"), card_cover_submenu);
 
     color_frame.set_content_fit(Gtk::ContentFit::FILL);
-    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, FRAME_HEIGHT);
+    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, COLOR_FRAME_HEIGHT);
 
-    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, FRAME_HEIGHT);
+    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, COLOR_FRAME_HEIGHT);
     m_frame.set_margin_bottom(4);
     m_frame.set_child(color_frame);
     m_frame.set_visible(false);
@@ -122,16 +123,20 @@ void ui::CardWidget::setup_drag_and_drop() {
         false);
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
-            this->cardlist_p->board.on_drag = true;
+            this->cardlist_p->board.set_on_scroll();
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
-            this->cardlist_p->board.on_drag = false;
+            this->cardlist_p->board.set_on_scroll(false);
             return true;
         },
         false);
+    drag_source_c->signal_drag_end().connect(
+        [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
+            this->cardlist_p->board.set_on_scroll(false);
+        });
     add_controller(drag_source_c);
 
     // DropTarget Settings
@@ -139,7 +144,7 @@ void ui::CardWidget::setup_drag_and_drop() {
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->cardlist_p->board.on_drag = false;
+            this->cardlist_p->board.set_on_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;
@@ -193,4 +198,3 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     color_frame.set_pixbuf(color_frame_pixbuf);
     this->m_frame.set_visible();
 }
-

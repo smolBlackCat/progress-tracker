@@ -1,9 +1,10 @@
+#include "board-widget.h"
+
 #include <glibmm/i18n.h>
 #include <window.h>
 
 #include <format>
 
-#include "board-widget.h"
 #include "cardlist-widget.h"
 
 /**
@@ -19,8 +20,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
       scr{},
       overlay{},
 #endif
-      app_window{app_window},
-      on_drag{false} {
+      app_window{app_window} {
 
 #ifdef WIN32
     set_child(overlay);
@@ -191,8 +191,13 @@ std::string ui::BoardWidget::get_filepath() {
     return board ? board->get_filepath() : "";
 }
 
+bool ui::BoardWidget::get_on_scroll() const { return on_scroll; }
+
+void ui::BoardWidget::set_on_scroll(bool scroll) { on_scroll = scroll; }
+
 void ui::BoardWidget::setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
+
     drop_controller_motion_c->signal_motion().connect(
         [this](double x, double y) {
             this->x = x;
@@ -215,13 +220,15 @@ void ui::BoardWidget::setup_auto_scrolling() {
             double lower = hadjustment->get_lower();
             double upper = hadjustment->get_upper();
 
-            if (on_drag) {
+            if (on_scroll) {
                 if (x >= (cur_max_width * 0.8)) {
-                    double new_value = hadjustment->get_value() + 3;
+                    double new_value =
+                        hadjustment->get_value() + SCROLL_SPEED_FACTOR;
                     hadjustment->set_value(new_value >= upper ? upper
                                                               : new_value);
                 } else if (x <= (cur_max_width * 0.2)) {
-                    double new_value = hadjustment->get_value() - 3;
+                    double new_value =
+                        hadjustment->get_value() - SCROLL_SPEED_FACTOR;
                     hadjustment->set_value(new_value <= lower ? lower
                                                               : new_value);
                 }
@@ -230,4 +237,3 @@ void ui::BoardWidget::setup_auto_scrolling() {
         },
         10);
 }
-

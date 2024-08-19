@@ -17,7 +17,7 @@ class CardlistWidget;
  */
 class CardWidget : public EditableLabelHeader {
 public:
-    static constexpr int FRAME_HEIGHT = 30;
+    static constexpr int COLOR_FRAME_HEIGHT = 30;
 
     /**
      * @brief CardWidget constructor
