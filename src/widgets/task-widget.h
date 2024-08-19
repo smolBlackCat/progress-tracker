@@ -28,8 +28,11 @@ public:
                CardDetailsDialog& card_details_dialog,
                std::shared_ptr<Task> task);
 
+    ~TaskWidget() override;
+
     /**
-     * @brief Returns the Task object smart pointer associated with this widget
+     * @brief Returns the Task object smart pointer associated with this
+     * widget
      */
     std::shared_ptr<Task> get_task();
 

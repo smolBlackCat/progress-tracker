@@ -18,10 +18,9 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
 
     add_option_button(_("Card Details"), "card-details", [this]() {
-        auto card_details_dialog = CardDetailsDialog::create();
+        auto card_details_dialog = CardDetailsDialog::create(*this);
         card_details_dialog->set_transient_for(
             *(static_cast<Gtk::Window*>(get_root())));
-        card_details_dialog->set_card_widget(this);
         card_details_dialog->set_hide_on_close(false);
         card_details_dialog->set_modal();
         card_details_dialog->set_visible();

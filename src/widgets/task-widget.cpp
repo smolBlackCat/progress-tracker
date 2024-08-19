@@ -28,7 +28,7 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
     task_checkbutton->set_active(task->get_done());
     task_checkbutton->signal_toggled().connect([this]() {
         this->task->set_done(task_checkbutton->get_active());
-        this->card_details_dialog.get_card_widget()->update_completed();
+        this->card_details_dialog.get_card_widget().update_completed();
     });
 
     menu_model->append(_("Rename"), "task-widget.rename");
@@ -73,6 +73,8 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
         false);
     task_entry->add_controller(key_controller);
 }
+
+TaskWidget::~TaskWidget() {}
 
 std::shared_ptr<Task> TaskWidget::get_task() { return task; }
 

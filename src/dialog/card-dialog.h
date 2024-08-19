@@ -1,4 +1,5 @@
 #pragma once
+#include <core/task.h>
 #include <gtkmm.h>
 
 namespace ui {
@@ -25,7 +26,10 @@ public:
      * @param builder Gtk::Builder object used to create this dialog window
      */
     CardDetailsDialog(BaseObjectType* cobject,
-                      const Glib::RefPtr<Gtk::Builder>& builder);
+                      const Glib::RefPtr<Gtk::Builder>& builder,
+                      CardWidget& card_widget);
+
+    ~CardDetailsDialog() override;
 
     /**
      * @brief Removes a TaskWidget from the checklist area of the dialog
@@ -35,17 +39,9 @@ public:
     void remove_task(TaskWidget& task);
 
     /**
-     * @brief Sets the CardWidget object from where the Card object is loaded
-     * and modified.
-     *
-     * @param card_widget CardWidget object pointer
-     */
-    void set_card_widget(CardWidget* card_widget);
-
-    /**
      * @brief Returns the CardWidget object pointer
      */
-    CardWidget* get_card_widget();
+    CardWidget& get_card_widget();
 
     /**
      * @brief Creates an instance of this Dialog object. Ownership is given to
@@ -53,15 +49,17 @@ public:
      *
      * @return CardDetailsDialog object pointer to the new instance
      */
-    static CardDetailsDialog* create();
+    static CardDetailsDialog* create(CardWidget& card_widget);
 
 protected:
     void on_add_button_click();
     void on_toggle();
     bool save();
-    CardWidget* card_widget;
+    CardWidget& card_widget;
 
 private:
+    void _add_task(const std::shared_ptr<Task> task);
+
     Gtk::Entry* task_name_entry;
     Gtk::Button* checklist_add_button;
     Gtk::ToggleButton* checklist_togglebutton;
