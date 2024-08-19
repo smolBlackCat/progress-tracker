@@ -140,34 +140,28 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
         } break;
     }
 
-    modified = modify ? true : modified;
+    modified = modify ? modify : modified;
 
     return bg_type;
 }
 
 std::string Board::get_background() const { return background; }
 
-// TODO: This can be even better
 bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
     std::filesystem::path p{file_path};
 
     if (p.has_parent_path()) {
-        if (std::filesystem::exists(p.parent_path())) {
+        if (std::filesystem::exists(p.parent_path()) ||
+            (create_dirs &&
+             std::filesystem::create_directories(p.parent_path()))) {
             if (!std::filesystem::exists(p)) {
-                this->file_path = file_path;
-                return true;
-            }
-        } else {
-            if (create_dirs) {
-                std::filesystem::create_directories(p.parent_path());
                 this->file_path = file_path;
                 return true;
             }
         }
     } else {
-        if (file_path.length() != 0) {
-            this->file_path =
-                (std::filesystem::current_path() / file_path).string();
+        if (!file_path.empty()) {
+            this->file_path = (std::filesystem::absolute(p)).string();
             return true;
         }
     }
@@ -176,13 +170,15 @@ bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
 }
 
 std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
-    std::shared_ptr<CardList> new_cardlist =
-        std::make_shared<CardList>(cardlist);
-    if (new_cardlist) {
+    try {
+        std::shared_ptr<CardList> new_cardlist =
+            std::make_shared<CardList>(cardlist);
         cardlist_vector.push_back(new_cardlist);
         modified = true;
+        return new_cardlist;
+    } catch (std::bad_alloc& err) {
+        return nullptr;
     }
-    return new_cardlist;
 }
 
 bool Board::remove_cardlist(const CardList& cardlist) {
@@ -300,7 +296,8 @@ void Board::set_modified(bool modified) {
 bool Board::get_modified() {
     for (auto& cardlist : cardlist_vector) {
         if (cardlist->get_modified()) {
-            return true;
+            modified = true;
+            break;
         }
     }
     return modified;
