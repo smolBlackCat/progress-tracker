@@ -65,6 +65,12 @@ if (LINUX)
 elseif(WIN32)
     set(CPACK_GENERATOR "NSIS64" "ZIP")
 
+    if (DEVELOPMENT)
+        set(APP_WINDOWS_ICON io.github.smolblackcat.Progress.Devel.ico)
+    else()
+        set(APP_WINDOWS_ICON io.github.smolblackcat.Progress.ico)
+    endif()
+
     include(InstallRequiredSystemLibraries)
     set(CPACK_PACKAGE_NAME "Progress")
     set(CPACK_PACKAGE_VENDOR "smolblackcat")
@@ -81,9 +87,9 @@ elseif(WIN32)
     set(CPACK_NSIS_CONTACT "smolblackcat@proton.me")
     set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
     set(CPACK_NSIS_MODIFY_PATH OFF)
-    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "WriteRegStr HKLM 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\Progress' 'DisplayIcon' '$INSTDIR\\\\io.github.smolblackcat.Progress.ico'")
+    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "WriteRegStr HKLM 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\Progress' 'DisplayIcon' '$INSTDIR\\\\${APP_WINDOWS_ICON}'")
     set(CPACK_NSIS_CREATE_ICONS_EXTRA "\
-  CreateShortCut '$SMPROGRAMS\\\\Progress.lnk' '$INSTDIR\\\\progress-tracker.exe' '' '$INSTDIR\\\\io.github.smolblackcat.Progress.ico' 0 '' '' 'Progress' SW_SHOWNORMAL
+  CreateShortCut '$SMPROGRAMS\\\\Progress.lnk' '$INSTDIR\\\\progress-tracker.exe' '' '$INSTDIR\\\\${APP_WINDOWS_ICON}' 0 '' '' 'Progress' SW_SHOWNORMAL
 ")
     set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\Progress.lnk'")
     set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.ico")

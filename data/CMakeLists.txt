@@ -1,4 +1,8 @@
-set(APP_WINDOWS_ICON io.github.smolblackcat.Progress.ico)
+if (DEVELOPMENT)
+    set(APP_WINDOWS_ICON io.github.smolblackcat.Progress.Devel.ico)
+else()
+    set(APP_WINDOWS_ICON io.github.smolblackcat.Progress.ico)
+endif()
 
 configure_file(io.github.smolblackcat.Progress.desktop.in ${APPLICATION_ID}.desktop)
 set(APP_DESKTOP_ENTRY ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_ID}.desktop)
