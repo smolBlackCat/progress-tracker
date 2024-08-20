@@ -20,7 +20,7 @@ class CardWidget;
  */
 class CardlistWidget : public Gtk::ListBox {
 public:
-    static constexpr int CARDLIST_SIZE = 240;
+    static constexpr int CARDLIST_MAX_WIDTH = 240;
 
     /**
      * @brief CardlistWidget's constructor
@@ -97,4 +97,3 @@ private:
     std::vector<ui::CardWidget*> cards_tracker;
 };
 }  // namespace ui
-

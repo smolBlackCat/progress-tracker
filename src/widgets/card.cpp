@@ -41,9 +41,9 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     menu->append_submenu(_("Card Cover"), card_cover_submenu);
 
     color_frame.set_content_fit(Gtk::ContentFit::FILL);
-    color_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, COLOR_FRAME_HEIGHT);
+    color_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH, COLOR_FRAME_HEIGHT);
 
-    m_frame.set_size_request(CardlistWidget::CARDLIST_SIZE, COLOR_FRAME_HEIGHT);
+    m_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH, COLOR_FRAME_HEIGHT);
     m_frame.set_margin_bottom(4);
     m_frame.set_child(color_frame);
     m_frame.set_visible(false);
@@ -59,11 +59,11 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         }
     }
 
-    signal_confirm().connect([this](const std::string& label) {
+    signal_on_confirm().connect([this](const std::string& label) {
         this->card_refptr->set_name(label);
         this->is_new = false;
     });
-    signal_cancel().connect([this](const std::string& label) {
+    signal_on_cancel().connect([this](const std::string& label) {
         if (this->is_new) {
             this->remove_from_parent();
         }
@@ -192,7 +192,7 @@ void ui::CardWidget::clear_color() {
 
 void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
-        Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_SIZE, 30);
+        Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
     color_frame_pixbuf->fill(rgb_to_hex(color));
     card_refptr->set_color(color);
     color_frame.set_pixbuf(color_frame_pixbuf);

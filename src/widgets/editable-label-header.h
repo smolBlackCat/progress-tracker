@@ -21,12 +21,13 @@ namespace ui {
  */
 class EditableLabelHeader : public Gtk::Box {
 public:
+    static constexpr int BOX_SPACING = 4;
     EditableLabelHeader();
     EditableLabelHeader(const std::string& label,
                         const std::string& label_css_class = "",
                         const std::string& entry_css_class = "");
 
-    std::string get_text();
+    std::string get_text() const;
 
     virtual void set_label(const std::string& new_label);
 
@@ -47,9 +48,11 @@ public:
      */
     void exit_editing_mode();
 
-    sigc::signal_with_accumulator<void, void, std::string>& signal_confirm();
+    sigc::signal_with_accumulator<void, void, const std::string&>&
+    signal_on_confirm();
 
-    sigc::signal_with_accumulator<void, void, std::string>& signal_cancel();
+    sigc::signal_with_accumulator<void, void, const std::string&>&
+    signal_on_cancel();
 
 protected:
     Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
@@ -67,8 +70,8 @@ protected:
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
-    sigc::signal_with_accumulator<void, void, std::string> on_confirm_signal;
-    sigc::signal_with_accumulator<void, void, std::string> on_cancel_signal;
+    sigc::signal_with_accumulator<void, void, const std::string&> on_confirm_signal;
+    sigc::signal_with_accumulator<void, void, const std::string&> on_cancel_signal;
 
     /**
      * @brief Updates the label
@@ -79,6 +82,9 @@ protected:
      * @brief Cancels the changes made to this label
      */
     void on_cancel_changes();
+
+    void on_key_released(guint keyval, guint keycode, Gdk::ModifierType state);
+
+    void on_mouse_button_released(int n_press, double x, double y);
 };
 }  // namespace ui
-

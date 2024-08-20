@@ -20,7 +20,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     set_valign(Gtk::Align::START);
     set_vexpand(true);
     set_halign(Gtk::Align::START);
-    set_size_request(CARDLIST_SIZE, CARDLIST_SIZE * 2);
+    set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH * 2);
     set_selection_mode(Gtk::SelectionMode::NONE);
     setup_drag_and_drop();
 
@@ -30,11 +30,11 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     cardlist_header.add_option_button(_("Remove"), "remove", [this]() {
         this->board.remove_cardlist(*this);
     });
-    cardlist_header.signal_confirm().connect([this](std::string label) {
+    cardlist_header.signal_on_confirm().connect([this](const std::string& label) {
         this->cardlist_refptr->set_name(label);
         this->is_new = false;
     });
-    cardlist_header.signal_cancel().connect([this](std::string label) {
+    cardlist_header.signal_on_cancel().connect([this](const std::string& label) {
         if (this->is_new) {
             this->board.remove_cardlist(*this);
         }
@@ -56,7 +56,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
         root.reorder_child_after(add_card_button, *cardwidget);
     }
 
-    root.set_size_request(CARDLIST_SIZE, CARDLIST_SIZE);
+    root.set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH);
     root.set_valign(Gtk::Align::FILL);
     root.set_vexpand();
     root.set_spacing(15);
@@ -64,7 +64,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 
     Gtk::ScrolledWindow scr_window{};
     scr_window.set_child(root);
-    scr_window.set_size_request(CARDLIST_SIZE, CARDLIST_SIZE * 2);
+    scr_window.set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH * 2);
     scr_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
     scr_window.get_vscrollbar()->set_visible(false);
     append(scr_window);
