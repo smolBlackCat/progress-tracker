@@ -1,8 +1,9 @@
+#include "cardlist-widget.h"
+
 #include <glibmm/i18n.h>
 
 #include "board-widget.h"
 #include "card.h"
-#include "cardlist-widget.h"
 
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                                    std::shared_ptr<CardList> cardlist_refptr,
@@ -30,15 +31,17 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     cardlist_header.add_option_button(_("Remove"), "remove", [this]() {
         this->board.remove_cardlist(*this);
     });
-    cardlist_header.signal_on_confirm().connect([this](const std::string& label) {
-        this->cardlist_refptr->set_name(label);
-        this->is_new = false;
-    });
-    cardlist_header.signal_on_cancel().connect([this](const std::string& label) {
-        if (this->is_new) {
-            this->board.remove_cardlist(*this);
-        }
-    });
+    cardlist_header.signal_on_confirm().connect(
+        [this](const std::string& label) {
+            this->cardlist_refptr->set_name(label);
+            this->is_new = false;
+        });
+    cardlist_header.signal_on_cancel().connect(
+        [this](const std::string& label) {
+            if (this->is_new) {
+                this->board.remove_cardlist(*this);
+            }
+        });
 
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_halign(Gtk::Align::START);
@@ -73,6 +76,8 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     get_row_at_index(0)->set_activatable(false);
     get_row_at_index(1)->set_activatable(false);
 }
+
+ui::CardlistWidget::~CardlistWidget() {}
 
 void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
                                             ui::CardWidget& sibling) {
@@ -202,7 +207,6 @@ bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
     return false;
 }
 
-ui::EditableLabelHeader& ui::CardlistWidget::get_header() {
-    return cardlist_header;
-}
-
+// ui::EditableLabelHeader& ui::CardlistWidget::get_header() {
+//     return cardlist_header;
+// }

@@ -35,7 +35,7 @@ public:
      *
      * @returns String as the name of the object.
      */
-    virtual std::string get_name() const;
+    virtual const std::string& get_name() const;
 
     /**
      * @brief Produces true if the Item object was modified.

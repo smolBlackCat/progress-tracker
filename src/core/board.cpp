@@ -145,7 +145,7 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
     return bg_type;
 }
 
-std::string Board::get_background() const { return background; }
+const std::string& Board::get_background() const { return background; }
 
 bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
     std::filesystem::path p{file_path};
@@ -279,7 +279,7 @@ bool Board::save_as_xml(bool create_dirs) {
     return doc->SaveFile(file_path.c_str()) == tinyxml2::XML_SUCCESS;
 }
 
-std::string Board::get_filepath() const { return file_path; }
+const std::string& Board::get_filepath() const { return file_path; }
 
 const std::vector<std::shared_ptr<CardList>>& Board::get_cardlist_vector() {
     return cardlist_vector;

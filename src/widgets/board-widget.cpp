@@ -166,8 +166,8 @@ void ui::BoardWidget::set_background(const std::string& background,
     }
 }
 
-std::string ui::BoardWidget::get_background() {
-    return board ? board->get_background() : "";
+const std::string& ui::BoardWidget::get_background() const {
+    return board->get_background();
 }
 
 void ui::BoardWidget::set_board_name(const std::string& board_name) {
@@ -177,8 +177,8 @@ void ui::BoardWidget::set_board_name(const std::string& board_name) {
     }
 }
 
-std::string ui::BoardWidget::get_board_name() {
-    return board ? board->get_name() : "";
+const std::string& ui::BoardWidget::get_board_name() const {
+    return board->get_name();
 }
 
 void ui::BoardWidget::set_filepath(const std::string& board_filepath) {
@@ -187,8 +187,8 @@ void ui::BoardWidget::set_filepath(const std::string& board_filepath) {
     }
 }
 
-std::string ui::BoardWidget::get_filepath() {
-    return board ? board->get_filepath() : "";
+const std::string& ui::BoardWidget::get_filepath() const {
+    return board->get_filepath();
 }
 
 bool ui::BoardWidget::get_on_scroll() const { return on_scroll; }

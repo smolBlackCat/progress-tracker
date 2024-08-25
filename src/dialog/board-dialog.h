@@ -34,5 +34,8 @@ protected:
     Gtk::Button* p_left_button;
     Gtk::Button* p_right_button;
     Gtk::Button* p_select_file_button;
+
+    static constexpr const char* BOARD_RESOURCE =
+        "/io/github/smolblackcat/Progress/create-board-dialog.ui";
 };
 }  // namespace ui

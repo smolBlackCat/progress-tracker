@@ -101,7 +101,7 @@ public:
     /**
      * @brief Retrieves the background string
      */
-    std::string get_background();
+    const std::string& get_background() const;
 
     /**
      * @brief Updates board's name, reflecting those changes to the application
@@ -114,7 +114,7 @@ public:
     /**
      * @brief Retrieves the board's name
      */
-    std::string get_board_name();
+    const std::string& get_board_name() const;
 
     /**
      * @brief Sets a new filepath from where the current board object will be
@@ -127,7 +127,7 @@ public:
     /**
      * @brief Retrieves the current board file path
      */
-    std::string get_filepath();
+    const std::string& get_filepath() const;
 
     /**
      * @brief Returns true if the board is set up to horizontally scroll

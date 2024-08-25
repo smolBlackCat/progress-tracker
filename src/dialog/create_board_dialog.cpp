@@ -6,15 +6,27 @@
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(
     BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder,
-    ProgressWindow& app_window)
-    : BoardDialog{cobject, ref_builder}, app_window{app_window} {
+    ProgressWindow& board_creator)
+    : BoardDialog{cobject, ref_builder}, board_creator{board_creator} {
     set_title(_("Create Board"));
     p_left_button->add_css_class("destructive-action");
     p_right_button->add_css_class("suggested-action");
 
     p_right_button->set_label(_("Create"));
+
+    /**
+     * TODO: Create a helper class BoardManager. There is no need for having
+     * CreateBoardDialog connected to the parent window
+     */
     p_right_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CreateBoardDialog::create_board));
+}
+
+CreateBoardDialog* CreateBoardDialog::create(ProgressWindow& board_creator) {
+    auto builder = Gtk::Builder::create_from_resource(BOARD_RESOURCE);
+
+    return Gtk::Builder::get_widget_derived<CreateBoardDialog>(
+        builder, "create-board", board_creator);
 }
 
 void CreateBoardDialog::create_board() {
@@ -46,7 +58,7 @@ void CreateBoardDialog::create_board() {
         message_dialog->show(*this);
     } else {
         board.save_as_xml();
-        app_window.add_board(new_file_path);
+        board_creator.add_board(new_file_path);
         close_window();
     }
 }

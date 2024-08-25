@@ -57,7 +57,7 @@ public:
      *
      * @returns The background value
      */
-    std::string get_background() const;
+    const std::string& get_background() const;
 
     /**
      * @brief Sets a file path to where the board will be saved.
@@ -114,7 +114,7 @@ public:
      */
     bool save_as_xml(bool create_dirs = true);
 
-    std::string get_filepath() const;
+    const std::string& get_filepath() const;
 
     const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
 

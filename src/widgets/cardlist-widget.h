@@ -34,6 +34,8 @@ public:
     CardlistWidget(BoardWidget& board,
                    std::shared_ptr<CardList> cardlist_refptr,
                    bool is_new = false);
+    
+    ~CardlistWidget() override;
 
     /**
      * @brief Adds a CardWidget object based on the given Card
@@ -71,15 +73,6 @@ public:
      */
     bool is_child(ui::CardWidget* card);
 
-    /**
-     * @brief Returns CardListHeader object associated with this CardlistWidget
-     *        instance.
-     *
-     * @return Reference to the CardListHeader object.
-     */
-    EditableLabelHeader& get_header();
-
-    bool is_new;
     BoardWidget& board;
 
     void reorder_cardwidget(ui::CardWidget& next, ui::CardWidget& sibling);
@@ -95,5 +88,7 @@ private:
     // Data
     std::shared_ptr<CardList> cardlist_refptr;
     std::vector<ui::CardWidget*> cards_tracker;
+
+    bool is_new;
 };
 }  // namespace ui

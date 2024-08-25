@@ -18,7 +18,7 @@ void Item::set_name(const std::string& other) {
 
 void Item::set_modified(bool modified) { this->modified = modified; }
 
-std::string Item::get_name() const { return name; }
+const std::string& Item::get_name() const { return name; }
 
 bool Item::get_modified() { return modified; }
 

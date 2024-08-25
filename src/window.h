@@ -12,23 +12,12 @@ class PreferencesBoardDialog;
 class ProgressWindow;
 
 /**
- * Progress app about dialog.
+ * @brief AdwAboutDialog describing "Progress"
  */
-class ProgressAboutDialog {
+class ProgressAboutDialog : public Gtk::Window {
 public:
-    ProgressAboutDialog(Gtk::Window& parent);
-    ~ProgressAboutDialog();
-
-    /**
-     * @brief Presents the about dialog on screen
-     */
-    void show();
-
-protected:
-    void setup();
-
-    AdwDialog* about_dialogp;
-    Gtk::Widget& parent;
+    ProgressAboutDialog(const Gtk::Window& parent);
+    ~ProgressAboutDialog() override;
 };
 
 /**
@@ -42,8 +31,6 @@ private:
     Gtk::Box root;
     Gtk::Label bar_text;
     Gtk::Button bar_button_delete, bar_button_cancel;
-
-    ui::ProgressWindow& app_window;
 };
 
 /**
@@ -63,11 +50,6 @@ public:
     ~ProgressWindow() override;
 
     void add_board(const std::string& board_filepath);
-
-    /**
-     * @brief Presents dialog for creating boards
-     */
-    void show_create_board_dialog();
 
     /**
      * @brief Enters deletion mode, where the user will select all boards to
@@ -118,4 +100,3 @@ protected:
     bool on_window_close();
 };
 }  // namespace ui
-

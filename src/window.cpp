@@ -1,3 +1,5 @@
+#include "window.h"
+
 #include <app_info.h>
 #include <core/exceptions.h>
 #include <dialog/create_board_dialog.h>
@@ -8,59 +10,51 @@
 #include <filesystem>
 #include <format>
 
-#include "window.h"
-
 namespace ui {
 
-ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
-    : parent{parent} {}
+ProgressAboutDialog::ProgressAboutDialog(const Gtk::Window& parent)
+    : Gtk::Window{(GtkWindow*)adw_about_window_new()} {
+    set_transient_for(const_cast<Gtk::Window&>(parent));
+    set_hide_on_close();
 
-ProgressAboutDialog::~ProgressAboutDialog() { g_object_unref(about_dialogp); }
-
-void ProgressAboutDialog::show() {
-    setup();
-    adw_dialog_present(ADW_DIALOG(about_dialogp), parent.gobj());
-}
-
-void ProgressAboutDialog::setup() {
-    about_dialogp = adw_about_dialog_new();
-
-    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
+    auto about_window_p = (AdwAboutWindow*)gobj();
+    adw_about_window_set_application_name(ADW_ABOUT_WINDOW(about_window_p),
                                           "Progress");
-    adw_about_dialog_set_version(
-        ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_version(
+        ADW_ABOUT_WINDOW(about_window_p),
         std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
             .c_str());
-    adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_developer_name(ADW_ABOUT_WINDOW(about_window_p),
                                         "Gabriel de Moura");
 
-    adw_about_dialog_set_translator_credits(
-        ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_translator_credits(
+        ADW_ABOUT_WINDOW(about_window_p),
         // Translators: Replace "translator-credits" with your names, one name
         // per line
         _("translator-credits"));
 
-    adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_license_type(ADW_ABOUT_WINDOW(about_window_p),
                                       GTK_LICENSE_MIT_X11);
-    adw_about_dialog_set_copyright(ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_copyright(ADW_ABOUT_WINDOW(about_window_p),
                                    _("De Moura © All rights reserved"));
-    adw_about_dialog_set_issue_url(
-        ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_issue_url(
+        ADW_ABOUT_WINDOW(about_window_p),
         "https://github.com/smolBlackCat/progress-tracker/issues");
-    adw_about_dialog_set_website(
-        ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_website(
+        ADW_ABOUT_WINDOW(about_window_p),
         "https://github.com/smolBlackCat/progress-tracker");
-    adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(about_dialogp),
+    adw_about_window_set_application_icon(ADW_ABOUT_WINDOW(about_window_p),
                                           APPLICATION_ID);
 }
+
+ProgressAboutDialog::~ProgressAboutDialog() {}
 
 DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
     : Gtk::Revealer{},
       root{Gtk::Orientation::HORIZONTAL},
       bar_text{_("Select the boards to be deleted")},
       bar_button_delete{_("Delete")},
-      bar_button_cancel{_("Cancel")},
-      app_window{app_window} {
+      bar_button_cancel{_("Cancel")} {
     set_child(root);
     add_css_class("delete-board-infobar");
     bar_text.add_css_class("delete-board-infobar-text");
@@ -99,18 +93,11 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       app_menu_button_p{b->get_widget<Gtk::MenuButton>("app-menu-button")},
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
-      css_provider{Gtk::CssProvider::create()} {
+      css_provider{Gtk::CssProvider::create()},
+      create_board_dialog{CreateBoardDialog::create(*this)},
+      preferences_board_dialog{PreferencesBoardDialog::create(board_widget)} {
     signal_close_request().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
-
-    auto cbd_builder = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
-    auto cbd_builder1 = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
-    create_board_dialog =
-        Gtk::Builder::get_widget_derived<ui::CreateBoardDialog>(
-            cbd_builder, "create-board", *this);
-    preferences_board_dialog =
-        Gtk::Builder::get_widget_derived<ui::PreferencesBoardDialog>(
-            cbd_builder1, "create-board", board_widget);
 
     create_board_dialog->set_transient_for(*this);
     preferences_board_dialog->set_transient_for(*this);
@@ -191,10 +178,6 @@ void ProgressWindow::add_board(const std::string& board_filepath) {
         });
 }
 
-void ProgressWindow::show_create_board_dialog() {
-    create_board_dialog->open_window();
-}
-
 void ProgressWindow::on_delete_board_mode() {
     on_delete_mode = true;
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
@@ -238,8 +221,8 @@ void ProgressWindow::delete_selected_boards() {
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
-    action_group->add_action(
-        "about", sigc::mem_fun(about_dialog, &ProgressAboutDialog::show));
+    action_group->add_action("about",
+                             [this]() { this->about_dialog.set_visible(); });
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
     action_group->add_action(
@@ -265,4 +248,3 @@ bool ProgressWindow::on_window_close() {
     return true;
 }
 }  // namespace ui
-

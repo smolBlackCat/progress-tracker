@@ -15,6 +15,10 @@ Glib::RefPtr<ui::Application> ui::Application::create() {
 
 ui::Application::Application() : Gtk::Application{APPLICATION_ID} {}
 
+ui::Application::~Application() {
+    delete main_window;
+}
+
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
     adw_init();

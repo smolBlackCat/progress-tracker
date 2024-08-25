@@ -17,6 +17,8 @@ public:
 
     static Glib::RefPtr<ui::Application> create();
 
+    ~Application() override;
+
 protected:
     Application();
 
