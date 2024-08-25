@@ -8,17 +8,18 @@ namespace ui {
 CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
                                      const Glib::RefPtr<Gtk::Builder>& builder,
                                      CardWidget& card_widget)
-    : Gtk::Dialog{cobject}, card_widget{card_widget} {
-    task_name_entry = builder->get_widget<Gtk::Entry>("task-name-entry");
-    checklist_add_button =
-        builder->get_widget<Gtk::Button>("checklist-add-button");
-    checklist_togglebutton =
-        builder->get_widget<Gtk::ToggleButton>("checklist-togglebutton");
-    checklist_revealer =
-        builder->get_widget<Gtk::Revealer>("checklist-revealer");
-    checklist_box = builder->get_widget<Gtk::Box>("checklist-box");
-    notes_textbuffer =
-        builder->get_object<Gtk::TextBuffer>("notes-text-buffer");
+    : Gtk::Dialog{cobject},
+      card_widget{card_widget},
+      task_name_entry{builder->get_widget<Gtk::Entry>("task-name-entry")},
+      checklist_add_button{
+          builder->get_widget<Gtk::Button>("checklist-add-button")},
+      checklist_togglebutton{
+          builder->get_widget<Gtk::ToggleButton>("checklist-togglebutton")},
+      checklist_revealer{
+          builder->get_widget<Gtk::Revealer>("checklist-revealer")},
+      checklist_box{builder->get_widget<Gtk::Box>("checklist-box")},
+      notes_textbuffer{
+          builder->get_object<Gtk::TextBuffer>("notes-text-buffer")} {
 
     checklist_add_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_add_button_click));
