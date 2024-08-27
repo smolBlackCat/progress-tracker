@@ -192,8 +192,8 @@ bool Board::remove_cardlist(const CardList& cardlist) {
     return false;
 }
 
-void Board::reorder_cardlist(std::shared_ptr<CardList> next,
-                             std::shared_ptr<CardList> sibling) {
+void Board::reorder_cardlist(const std::shared_ptr<CardList>& next,
+                             const std::shared_ptr<CardList>& sibling) {
     size_t next_i = -1;
     size_t sibling_i = -1;
 

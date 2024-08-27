@@ -13,8 +13,8 @@ class PreferencesBoardDialog : public BoardDialog {
 public:
     PreferencesBoardDialog(BaseObjectType* cobject,
                            const Glib::RefPtr<Gtk::Builder>& builder,
-                           BoardWidget& board_widget);
-    
+                           Gtk::Window& parent, BoardWidget& board_widget);
+
     ~PreferencesBoardDialog() override;
 
     /**
@@ -29,10 +29,12 @@ public:
      *
      * @return an object pointer to a PreferencesBoardDialog instance
      */
-    static PreferencesBoardDialog* create(BoardWidget& board_widget);
+    static PreferencesBoardDialog* create(Gtk::Window& parent,
+                                          BoardWidget& board_widget);
 
 protected:
     BoardWidget& board_widget;
+    Gtk::Window& parent;
     void load_board();
     void on_save_changes();
 };

@@ -31,10 +31,9 @@ public:
      * @param is_new Indicates whether it's completely new, therefore giving the
      *        user the chance to cancel creation
      */
-    CardlistWidget(BoardWidget& board,
-                   std::shared_ptr<CardList> cardlist_refptr,
+    CardlistWidget(BoardWidget& board, std::shared_ptr<CardList> cardlist,
                    bool is_new = false);
-    
+
     ~CardlistWidget() override;
 
     /**
@@ -60,7 +59,7 @@ public:
      *
      * @return Reference to the CardList smart pointer.
      */
-    std::shared_ptr<CardList>& get_cardlist_refptr();
+    const std::shared_ptr<CardList>& get_cardlist();
 
     /**
      * @brief Determines whether a given CardWidget object belongs to this
@@ -86,7 +85,7 @@ private:
     Gtk::Box root;
 
     // Data
-    std::shared_ptr<CardList> cardlist_refptr;
+    std::shared_ptr<CardList> cardlist;
     std::vector<ui::CardWidget*> cards_tracker;
 
     bool is_new;

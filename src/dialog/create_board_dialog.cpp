@@ -14,6 +14,10 @@ CreateBoardDialog::CreateBoardDialog(
 
     p_right_button->set_label(_("Create"));
 
+    // variable name is weird. But in this context board_creator is still a
+    // window
+    set_transient_for(board_creator);
+
     /**
      * TODO: Create a helper class BoardManager. There is no need for having
      * CreateBoardDialog connected to the parent window

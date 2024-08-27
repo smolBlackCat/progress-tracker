@@ -13,7 +13,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
       root{Gtk::Orientation::VERTICAL},
       cards_tracker{},
       board{board},
-      cardlist_refptr{cardlist_refptr},
+      cardlist{cardlist_refptr},
       is_new{is_new},
       cardlist_header{cardlist_refptr->get_name(), "cardlist-title",
                       "cardlist-title"} {
@@ -33,7 +33,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     });
     cardlist_header.signal_on_confirm().connect(
         [this](const std::string& label) {
-            this->cardlist_refptr->set_name(label);
+            this->cardlist->set_name(label);
             this->is_new = false;
         });
     cardlist_header.signal_on_cancel().connect(
@@ -82,7 +82,7 @@ ui::CardlistWidget::~CardlistWidget() {}
 void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
                                             ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
-    cardlist_refptr->reorder_card(next.get_card(), sibling.get_card());
+    cardlist->reorder_card(next.get_card(), sibling.get_card());
 }
 
 void ui::CardlistWidget::setup_drag_and_drop() {
@@ -171,7 +171,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
 void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     root.remove(*card);
-    cardlist_refptr->remove_card(*card->get_card());
+    cardlist->remove_card(*card->get_card());
 
     for (size_t i = 0; i < cards_tracker.size(); i++) {
         if (cards_tracker[i] == card) {
@@ -182,8 +182,8 @@ void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
 
 ui::CardWidget* ui::CardlistWidget::add_card(const Card& card,
                                              bool editing_mode) {
-    auto new_card = Gtk::make_managed<ui::CardWidget>(
-        cardlist_refptr->add_card(card), editing_mode);
+    auto new_card = Gtk::make_managed<ui::CardWidget>(cardlist->add_card(card),
+                                                      editing_mode);
     new_card->set_cardlist(this);
 
     if (editing_mode) {
@@ -196,8 +196,8 @@ ui::CardWidget* ui::CardlistWidget::add_card(const Card& card,
     return new_card;
 }
 
-std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist_refptr() {
-    return cardlist_refptr;
+const std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist() {
+    return cardlist;
 }
 
 bool ui::CardlistWidget::is_child(ui::CardWidget* card) {

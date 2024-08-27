@@ -97,6 +97,6 @@ protected:
 
     void setup_menu_button();
     void load_appropriate_style();
-    bool on_window_close();
+    bool on_close_request() override;
 };
 }  // namespace ui

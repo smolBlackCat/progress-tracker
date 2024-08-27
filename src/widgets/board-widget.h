@@ -31,7 +31,7 @@ public:
     static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
-    BoardWidget(ProgressWindow& app_window);
+    BoardWidget();
 
     ~BoardWidget() override;
 
@@ -109,12 +109,12 @@ public:
      *
      * @param board_name new name for the board
      */
-    void set_board_name(const std::string& board_name);
+    void set_name(const std::string& board_name);
 
     /**
      * @brief Retrieves the board's name
      */
-    const std::string& get_board_name() const;
+    const std::string& get_name() const;
 
     /**
      * @brief Sets a new filepath from where the current board object will be
@@ -159,8 +159,7 @@ private:
     BoardCardButton* board_card_button = nullptr;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;
-    ProgressWindow& app_window;
-    double x, y; // Cursor Position
+    double x, y;  // Cursor Position
     bool on_scroll = false;
 };
 }  // namespace ui

@@ -11,16 +11,15 @@
  * TODO: High memory is allocated in setting background, mainly when the
  * background image is high. Should I try to compress it?
  */
-ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
+ui::BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
-      add_button{_("Add List")},
 #ifdef WIN32
       picture{},
       scr{},
       overlay{},
 #endif
-      app_window{app_window} {
+      add_button{_("Add List")} {
 
 #ifdef WIN32
     set_child(overlay);
@@ -32,7 +31,7 @@ ui::BoardWidget::BoardWidget(ui::ProgressWindow& app_window)
 #else
     set_child(root);
 #endif
-    set_name("board-root");
+    Gtk::Widget::set_name("board-root");
 
     setup_auto_scrolling();
 
@@ -68,7 +67,6 @@ ui::BoardWidget::~BoardWidget() {}
 
 void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
     if (board && board_card_button) {
-        clear();
         this->board = board;
         this->board_card_button = board_card_button;
 
@@ -102,6 +100,7 @@ bool ui::BoardWidget::save(bool free) {
     if (free) {
         delete board;
         board = nullptr;
+        clear();
     }
     return success;
 }
@@ -121,19 +120,20 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
-    board->remove_cardlist(*cardlist.get_cardlist_refptr());
+    board->remove_cardlist(*cardlist.get_cardlist());
     return true;
 }
 
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
-    board->reorder_cardlist(next.get_cardlist_refptr(),
-                            sibling.get_cardlist_refptr());
+    board->reorder_cardlist(next.get_cardlist(), sibling.get_cardlist());
     root.reorder_child_after(next, sibling);
 }
 
 void ui::BoardWidget::set_background(const std::string& background,
                                      bool modify) {
+    // Reseting background is the approach to ensure that a background is set
+    // even when background turns invalid for whatever reason
     BackgroundType bg_type = board->set_background(background, modify);
     switch (bg_type) {
         case BackgroundType::COLOR: {
@@ -170,14 +170,13 @@ const std::string& ui::BoardWidget::get_background() const {
     return board->get_background();
 }
 
-void ui::BoardWidget::set_board_name(const std::string& board_name) {
+void ui::BoardWidget::set_name(const std::string& board_name) {
     if (board) {
-        app_window.set_title(board_name);
         board->set_name(board_name);
     }
 }
 
-const std::string& ui::BoardWidget::get_board_name() const {
+const std::string& ui::BoardWidget::get_name() const {
     return board->get_name();
 }
 

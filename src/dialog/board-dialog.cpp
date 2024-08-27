@@ -38,7 +38,7 @@ void BoardDialog::close_window() {
     // Cleanup any inserted data
     p_board_name_entry->set_text("");
     p_select_file_label->set_text(_("No file selected"));
-    p_file_image->property_file().set_value("");
+    p_file_image->clear();
     p_colour_button->set_rgba(Gdk::RGBA("#FFFFFF"));
     file_selected = false;
 }

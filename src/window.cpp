@@ -81,7 +81,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                const Glib::RefPtr<Gtk::Builder>& b)
     : Gtk::ApplicationWindow{cobject},
       about_dialog{*this},
-      board_widget{*this},
+      board_widget{},
       delete_boards_bar{*this},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
@@ -95,13 +95,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
       create_board_dialog{CreateBoardDialog::create(*this)},
-      preferences_board_dialog{PreferencesBoardDialog::create(board_widget)} {
-    signal_close_request().connect(
-        sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
-
-    create_board_dialog->set_transient_for(*this);
-    preferences_board_dialog->set_transient_for(*this);
-
+      preferences_board_dialog{
+          PreferencesBoardDialog::create(*this, board_widget)} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
     load_appropriate_style();
@@ -240,7 +235,7 @@ void ProgressWindow::load_appropriate_style() {
     }
 }
 
-bool ProgressWindow::on_window_close() {
+bool ProgressWindow::on_close_request() {
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
