@@ -13,11 +13,11 @@
 namespace ui {
 
 ProgressAboutDialog::ProgressAboutDialog(const Gtk::Window& parent)
-    : Gtk::Window{(GtkWindow*)adw_about_window_new()} {
+    : Gtk::Window{reinterpret_cast<GtkWindow*>(adw_about_window_new())} {
     set_transient_for(const_cast<Gtk::Window&>(parent));
     set_hide_on_close();
 
-    auto about_window_p = (AdwAboutWindow*)gobj();
+    auto about_window_p = reinterpret_cast<AdwAboutWindow*>(gobj());
     adw_about_window_set_application_name(ADW_ABOUT_WINDOW(about_window_p),
                                           "Progress");
     adw_about_window_set_version(
