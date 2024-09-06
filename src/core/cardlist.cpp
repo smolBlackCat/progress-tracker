@@ -48,16 +48,15 @@ const std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
     return card_vector;
 }
 
-void CardList::reorder_card(std::shared_ptr<Card> next,
-                            std::shared_ptr<Card> sibling) {
+void CardList::reorder_card(const Card& next, const Card& sibling) {
     size_t next_i = -1;
     size_t sibling_i = -1;
 
     for (size_t i = 0; i < card_vector.size(); i++) {
-        if (*card_vector[i] == *next) {
+        if (*card_vector[i] == next) {
             next_i = i;
         }
-        if (*card_vector[i] == *sibling) {
+        if (*card_vector[i] == sibling) {
             sibling_i = i;
         }
     }

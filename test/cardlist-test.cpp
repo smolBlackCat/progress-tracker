@@ -3,7 +3,6 @@
 #include "cardlist.h"
 
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 
 TEST_CASE("CardList operations", "[CardList]") {
     CardList cardList("MyCardList");
@@ -44,7 +43,7 @@ TEST_CASE("CardList operations", "[CardList]") {
         REQUIRE(cardList.get_card_vector().at(1) == cardPtr2);
         REQUIRE(cardList.get_card_vector().at(2) == cardPtr3);
 
-        cardList.reorder_card(cardPtr3, cardPtr1);  // Move card3 after card1
+        cardList.reorder_card(card3, card1);  // Move card3 after card1
 
         REQUIRE(cardList.get_card_vector().at(0) == cardPtr1);
         REQUIRE(cardList.get_card_vector().at(1) == cardPtr3);
@@ -59,12 +58,10 @@ TEST_CASE("CardList operations", "[CardList]") {
 
         auto cardPtr1 = cardList.add_card(card1);
 
-        REQUIRE_THROWS_AS(
-            cardList.reorder_card(cardPtr1, std::make_shared<Card>(card2)),
-            std::invalid_argument);
-        REQUIRE_THROWS_AS(
-            cardList.reorder_card(std::make_shared<Card>(card2), cardPtr1),
-            std::invalid_argument);
+        REQUIRE_THROWS_AS(cardList.reorder_card(card1, card2),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(cardList.reorder_card(card2, card1),
+                          std::invalid_argument);
     }
 
     SECTION("Modified flag with internal card modification") {

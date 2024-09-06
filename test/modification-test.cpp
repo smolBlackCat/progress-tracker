@@ -1,7 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch_test_macros.hpp>
-#include <filesystem>
 
 #include "board.h"
 #include "card.h"
@@ -56,8 +55,7 @@ TEST_CASE("Board reorder cardlists marks modified", "[Board]") {
     board.add_cardlist(cardlist2);
     board.set_modified(false);
     REQUIRE_FALSE(board.get_modified());
-    board.reorder_cardlist(board.get_cardlist_vector()[0],
-                           board.get_cardlist_vector()[1]);
+    board.reorder_cardlist(cardlist1, cardlist2);
     REQUIRE(board.get_modified());
 }
 
@@ -129,11 +127,11 @@ TEST_CASE("CardList reorder cards marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card1("card1", NO_COLOR);
     Card card2("card2", NO_COLOR);
-    auto scard1 = cardlist.add_card(card1);
-    auto scard2 = cardlist.add_card(card2);
+    cardlist.add_card(card1);
+    cardlist.add_card(card2);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.reorder_card(scard1, scard2);
+    cardlist.reorder_card(card1, card2);
     REQUIRE(cardlist.get_modified());
 }
 

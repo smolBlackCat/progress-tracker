@@ -134,6 +134,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_margin_bottom(10);
     app_overlay_p->add_overlay(delete_boards_bar);
     app_stack_p->add(board_widget, "board-page");
+
+    set_default_size(1024, 750);
 }
 
 ProgressWindow::~ProgressWindow() {

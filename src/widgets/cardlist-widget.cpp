@@ -82,7 +82,7 @@ ui::CardlistWidget::~CardlistWidget() {}
 void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
                                             ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
-    cardlist->reorder_card(next.get_card(), sibling.get_card());
+    cardlist->reorder_card(*next.get_card(), *sibling.get_card());
 }
 
 void ui::CardlistWidget::setup_drag_and_drop() {

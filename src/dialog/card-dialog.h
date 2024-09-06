@@ -55,10 +55,6 @@ protected:
     void on_add_button_click();
     void on_toggle();
     bool save();
-    CardWidget& card_widget;
-
-private:
-    void _add_task(const std::shared_ptr<Task> task);
 
     Gtk::Entry* task_name_entry;
     Gtk::Button* checklist_add_button;
@@ -66,5 +62,9 @@ private:
     Gtk::Revealer* checklist_revealer;
     Gtk::Box* checklist_box;
     Glib::RefPtr<Gtk::TextBuffer> notes_textbuffer;
+    CardWidget& card_widget;
+
+private:
+    void _add_task(const std::shared_ptr<Task> task);
 };
 }  // namespace ui

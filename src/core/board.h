@@ -94,8 +94,7 @@ public:
     /**
      * @brief Reorders the next card after sibling
      */
-    void reorder_cardlist(const std::shared_ptr<CardList>& next,
-                          const std::shared_ptr<CardList>& sibling);
+    void reorder_cardlist(const CardList& next, const CardList& sibling);
 
     /**
      * @brief Saves the board information as a file.

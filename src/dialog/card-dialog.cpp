@@ -20,7 +20,6 @@ CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
       checklist_box{builder->get_widget<Gtk::Box>("checklist-box")},
       notes_textbuffer{
           builder->get_object<Gtk::TextBuffer>("notes-text-buffer")} {
-
     checklist_add_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_add_button_click));
     checklist_togglebutton->signal_toggled().connect(
@@ -35,6 +34,9 @@ CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
     // Load tasks into checklist box
     for (auto& task : card_ptr->get_tasks()) {
         _add_task(task);
+    }
+    if (card_ptr->get_tasks().size() != 0) {
+        checklist_togglebutton->set_active();
     }
     notes_textbuffer->set_text(card_ptr->get_notes());
 }
@@ -64,6 +66,7 @@ CardDetailsDialog* CardDetailsDialog::create(CardWidget& card_widget) {
 
 void CardDetailsDialog::on_add_button_click() {
     _add_task(card_widget.get_card()->add_task(Task{_("New Task")}));
+    checklist_togglebutton->set_active();
     card_widget.hide_progress_bar(false);
 }
 

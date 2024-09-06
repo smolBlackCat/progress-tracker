@@ -126,7 +126,7 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
-    board->reorder_cardlist(next.get_cardlist(), sibling.get_cardlist());
+    board->reorder_cardlist(*next.get_cardlist(), *sibling.get_cardlist());
     root.reorder_child_after(next, sibling);
 }
 

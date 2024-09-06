@@ -52,8 +52,7 @@ public:
      * @throws std::invalid_argument if either next or sibling are not children
      * of this cardlist
      */
-    void reorder_card(std::shared_ptr<Card> next,
-                      std::shared_ptr<Card> sibling);
+    void reorder_card(const Card& next, const Card& sibling);
 
 private:
     bool cards_modified();
