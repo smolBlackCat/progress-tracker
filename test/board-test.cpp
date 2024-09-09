@@ -1,3 +1,4 @@
+#include "cardlist.h"
 #define CATCH_CONFIG_MAIN
 #include "board.h"
 
@@ -210,4 +211,26 @@ TEST_CASE("Board get background type", "[Board]") {
     img_file.close();
     REQUIRE(Board::get_background_type(img_path) == BackgroundType::IMAGE);
     std::filesystem::remove(img_path);
+}
+
+TEST_CASE("Reordering Cardlists within a Board", "[Board]") {
+    Board board{"Board", "rgb(1,1,1)"};
+
+    CardList cardlist1{"TODO"};
+    CardList cardlist2{"DOING"};
+    CardList cardlist3{"DONE"};
+
+    board.add_cardlist(cardlist1);
+    board.add_cardlist(cardlist2);
+    board.add_cardlist(cardlist3);
+
+    REQUIRE(*board.get_cardlist_vector().at(0) == cardlist1);
+    REQUIRE(*board.get_cardlist_vector().at(1) == cardlist2);
+    REQUIRE(*board.get_cardlist_vector().at(2) == cardlist3);
+
+    board.reorder_cardlist(cardlist1, cardlist3);
+
+    REQUIRE(*board.get_cardlist_vector().at(2) == cardlist1);
+    REQUIRE(*board.get_cardlist_vector().at(0) == cardlist2);
+    REQUIRE(*board.get_cardlist_vector().at(1) == cardlist3);
 }

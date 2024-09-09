@@ -39,15 +39,15 @@ TEST_CASE("CardList operations", "[CardList]") {
         auto cardPtr2 = cardList.add_card(card2);
         auto cardPtr3 = cardList.add_card(card3);
 
-        REQUIRE(cardList.get_card_vector().at(0) == cardPtr1);
-        REQUIRE(cardList.get_card_vector().at(1) == cardPtr2);
-        REQUIRE(cardList.get_card_vector().at(2) == cardPtr3);
+        REQUIRE(*cardList.get_card_vector().at(0) == card1);
+        REQUIRE(*cardList.get_card_vector().at(1) == card2);
+        REQUIRE(*cardList.get_card_vector().at(2) == card3);
 
         cardList.reorder_card(card3, card1);  // Move card3 after card1
 
-        REQUIRE(cardList.get_card_vector().at(0) == cardPtr1);
-        REQUIRE(cardList.get_card_vector().at(1) == cardPtr3);
-        REQUIRE(cardList.get_card_vector().at(2) == cardPtr2);
+        REQUIRE(*cardList.get_card_vector().at(0) == card1);
+        REQUIRE(*cardList.get_card_vector().at(1) == card3);
+        REQUIRE(*cardList.get_card_vector().at(2) == card2);
 
         REQUIRE(cardList.get_modified() == true);
     }

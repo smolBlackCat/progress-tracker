@@ -38,6 +38,8 @@ public:
      */
     void remove_task(TaskWidget& task);
 
+    void reorder_task_widget(TaskWidget& next, TaskWidget& sibling);
+
     /**
      * @brief Returns the CardWidget object pointer
      */
@@ -65,6 +67,6 @@ protected:
     CardWidget& card_widget;
 
 private:
-    void _add_task(const std::shared_ptr<Task> task);
+    void _add_task(const std::shared_ptr<Task> task, bool is_new = false);
 };
 }  // namespace ui

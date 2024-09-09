@@ -39,7 +39,7 @@ void Card::set_notes(const std::string& notes) {
 }
 
 double Card::get_completion() const {
-    if (tasks.size() == 0) {
+    if (tasks.empty()) {
         return 0;
     }
 
@@ -72,3 +72,39 @@ bool Card::remove_task(std::shared_ptr<Task> task) {
 }
 
 std::vector<std::shared_ptr<Task>> const& Card::get_tasks() { return tasks; }
+
+void Card::reorder_task(const Task& next, const Task& sibling) {
+    size_t next_i = -1;
+    size_t sibling_i = -1;
+
+    for (size_t i = 0; i < tasks.size(); i++) {
+        if (*tasks[i] == next) {
+            next_i = i;
+        }
+        if (*tasks[i] == sibling) {
+            sibling_i = i;
+        }
+    }
+
+    if (next_i == -1 || sibling_i == -1) {
+        throw std::invalid_argument{
+            "Either next or sibling are not children of this cardlist"};
+    }
+
+    auto next_it = std::next(tasks.begin(), next_i);
+    std::shared_ptr<Task> temp_v = tasks[next_i];
+    tasks.erase(next_it);
+
+    // Support for right to left drags and drops
+    if (next_i < sibling_i) {
+        sibling_i -= 1;
+    }
+
+    if (sibling_i == tasks.size() - 1) {
+        tasks.push_back(temp_v);
+    } else {
+        auto sibling_it = std::next(tasks.begin(), sibling_i + 1);
+        tasks.insert(sibling_it, temp_v);
+    }
+    modified = true;
+}

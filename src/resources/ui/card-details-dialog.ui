@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- Created with Cambalache 0.90.4 -->
+<!-- Created with Cambalache 0.91.3 -->
 <interface>
   <!-- interface-name carddetailsdialog.ui -->
   <!-- interface-description Describes the structure for a Dialog containing
@@ -19,12 +19,15 @@ a Card object details. -->
           <object class="GtkFrame">
             <property name="child">
               <object class="GtkEntry" id="task-name-entry">
+                <property name="margin-bottom">3</property>
+                <property name="margin-end">3</property>
+                <property name="margin-start">3</property>
                 <property name="primary-icon-name">document-edit-symbolic</property>
               </object>
             </property>
             <property name="label-widget">
               <object class="GtkLabel">
-                <property name="label" translatable="yes">Task Name</property>
+                <property name="label" translatable="yes">Card Name</property>
                 <property name="use-markup">True</property>
                 <!-- Custom object fragments -->
                 <attributes>
@@ -41,6 +44,10 @@ a Card object details. -->
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkBox">
+                    <property name="margin-bottom">3</property>
+                    <property name="margin-end">3</property>
+                    <property name="margin-start">3</property>
+                    <property name="margin-top">3</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="label" translatable="yes">Checklist</property>
@@ -48,6 +55,7 @@ a Card object details. -->
                         <!-- Custom object fragments -->
                         <attributes>
                           <attribute name="weight" value="bold"/>
+                          <attribute end="0" name="size" value="16"/>
                         </attributes>
                       </object>
                     </child>
@@ -79,11 +87,15 @@ a Card object details. -->
                       <object class="GtkScrolledWindow">
                         <property name="child">
                           <object class="GtkBox" id="checklist-box">
+                            <property name="margin-top">5</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">2</property>
+                            <property name="spacing">6</property>
                           </object>
                         </property>
-                        <property name="height-request">170</property>
+                        <property name="height-request">290</property>
+                        <property name="margin-bottom">5</property>
+                        <property name="margin-end">3</property>
+                        <property name="margin-start">3</property>
                       </object>
                     </property>
                   </object>
@@ -101,6 +113,7 @@ a Card object details. -->
                     <property name="buffer">
                       <object class="GtkTextBuffer" id="notes-text-buffer"/>
                     </property>
+                    <property name="wrap-mode">word-char</property>
                   </object>
                 </property>
                 <property name="has-frame">True</property>
@@ -137,7 +150,6 @@ a Card object details. -->
           </object>
         </property>
         <property name="width-request">400</property>
-        <!-- Custom object fragments -->
       </object>
     </property>
   </object>

@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace ui {
+
 /**
  * @brief Class implementing controlling facilities of Task widget
  */
@@ -25,8 +26,8 @@ public:
      */
     TaskWidget(BaseObjectType* cobject,
                const Glib::RefPtr<Gtk::Builder>& builder,
-               CardDetailsDialog& card_details_dialog,
-               std::shared_ptr<Task> task);
+               CardDetailsDialog& card_details_dialog, CardWidget& card_widget,
+               std::shared_ptr<Task> task, bool is_new = false);
 
     ~TaskWidget() override;
 
@@ -40,6 +41,9 @@ protected:
     void on_rename();
     void off_rename();
     void on_remove();
+    void on_checkbox();
+    void on_convert(CardWidget& parent);
+    void setup_drag_and_drop();
 
     Gtk::Label* task_label;
     Gtk::Revealer* task_entry_revealer;
@@ -52,5 +56,7 @@ protected:
 
     std::shared_ptr<Task> task;
     CardDetailsDialog& card_details_dialog;
+
+    bool is_new;
 };
 }  // namespace ui

@@ -1,4 +1,5 @@
 src/window.cpp
+src/dialog/card-dialog.cpp
 src/dialog/board-dialog.cpp
 src/dialog/create_board_dialog.cpp
 src/dialog/preferences-board-dialog.cpp

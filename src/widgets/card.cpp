@@ -4,7 +4,10 @@
 #include <glibmm/i18n.h>
 #include <utils.h>
 
+#include <sstream>
+
 #include "cardlist-widget.h"
+#include "glibmm/ustring.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     : ui::EditableLabelHeader{card_refptr->get_name()},
@@ -41,9 +44,11 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     menu->append_submenu(_("Card Cover"), card_cover_submenu);
 
     color_frame.set_content_fit(Gtk::ContentFit::FILL);
-    color_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH, COLOR_FRAME_HEIGHT);
+    color_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH,
+                                 COLOR_FRAME_HEIGHT);
 
-    m_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH, COLOR_FRAME_HEIGHT);
+    m_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH,
+                             COLOR_FRAME_HEIGHT);
     m_frame.set_margin_bottom(4);
     m_frame.set_child(color_frame);
     m_frame.set_visible(false);
@@ -69,7 +74,7 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         }
     });
 
-    set_tooltip_text(card_refptr->get_notes());
+    set_tooltip_text(create_details_text());
 
     setup_drag_and_drop();
 
@@ -98,6 +103,10 @@ void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
 }
 
 std::shared_ptr<Card> ui::CardWidget::get_card() { return card_refptr; }
+
+ui::CardlistWidget const* ui::CardWidget::get_cardlist_widget() const {
+    return cardlist_p;
+}
 
 void ui::CardWidget::update_completed() {
     progress_bar.set_fraction(card_refptr->get_completion() / 100);
@@ -197,4 +206,28 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     card_refptr->set_color(color);
     color_frame.set_pixbuf(color_frame_pixbuf);
     this->m_frame.set_visible();
+}
+
+std::string ui::CardWidget::create_details_text() const {
+    std::ostringstream details_text;
+
+    if (!card_refptr->get_tasks().empty()) {
+        details_text << Glib::ustring::compose(_("%1%% complete"),
+                                               card_refptr->get_completion())
+                     << "\n\n";
+    }
+
+    if (!card_refptr->get_notes().empty()) {
+        details_text << Glib::ustring::compose(_("Notes:\n%1"),
+                                               card_refptr->get_notes())
+                     << "\n\n";
+    }
+
+    std::string final_text = details_text.str();
+
+    if (!final_text.empty()) {
+        final_text = final_text.substr(0, final_text.size() - 2);
+    }
+
+    return final_text;
 }

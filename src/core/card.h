@@ -74,6 +74,8 @@ public:
      */
     std::vector<std::shared_ptr<Task>> const& get_tasks();
 
+    void reorder_task(const Task& next, const Task& sibling);
+
 protected:
     Gdk::RGBA color = NO_COLOR;
     std::string notes;

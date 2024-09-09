@@ -4,6 +4,8 @@
 #include <widgets/card.h>
 #include <widgets/task-widget.h>
 
+#include "glibmm/ustring.h"
+
 namespace ui {
 CardDetailsDialog::CardDetailsDialog(BaseObjectType* cobject,
                                      const Glib::RefPtr<Gtk::Builder>& builder,
@@ -49,9 +51,16 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     card->remove_task(task.get_task());
     card_widget.update_completed();
 
-    if (card->get_tasks().size() == 0) {
+    if (card->get_tasks().empty()) {
         card_widget.hide_progress_bar();
+        checklist_togglebutton->set_active(false);
     }
+}
+
+void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
+                                            TaskWidget& sibling) {
+    checklist_box->reorder_child_after(next, sibling);
+    card_widget.get_card()->reorder_task(*next.get_task(), *sibling.get_task());
 }
 
 CardWidget& CardDetailsDialog::get_card_widget() { return card_widget; }
@@ -65,9 +74,10 @@ CardDetailsDialog* CardDetailsDialog::create(CardWidget& card_widget) {
 }
 
 void CardDetailsDialog::on_add_button_click() {
-    _add_task(card_widget.get_card()->add_task(Task{_("New Task")}));
+    _add_task(card_widget.get_card()->add_task(Task{_("New Task")}), true);
     checklist_togglebutton->set_active();
     card_widget.hide_progress_bar(false);
+    card_widget.update_completed();
 }
 
 void CardDetailsDialog::on_toggle() {
@@ -76,21 +86,29 @@ void CardDetailsDialog::on_toggle() {
 
 bool CardDetailsDialog::save() {
     auto card = card_widget.get_card();
+    std::string new_card_name = task_name_entry->get_text();
+    std::string new_notes = notes_textbuffer->get_text();
 
-    card_widget.set_label(task_name_entry->get_text());
-    card->set_name(task_name_entry->get_text());
+    if (card->get_name() != new_card_name) {
+        card_widget.set_label(new_card_name);
+        card->set_name(new_card_name);
+    }
 
-    card->set_notes(notes_textbuffer->get_text());
-    card_widget.set_tooltip_text(notes_textbuffer->get_text());
+    if (card->get_notes() != new_notes) {
+        card->set_notes(new_notes);
+    }
+
+    card_widget.set_tooltip_text(card_widget.create_details_text());
 
     return false;
 }
 
-void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task) {
+void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
+                                  bool is_new) {
     auto builder = Gtk::Builder::create_from_resource(
         "/io/github/smolblackcat/Progress/checklist-item-widget.ui");
     auto task_widget = Gtk::manage(Gtk::Builder::get_widget_derived<TaskWidget>(
-        builder, "task-widget", *this, task));
+        builder, "task-widget", *this, card_widget, task, is_new));
     checklist_box->append(*task_widget);
 }
 }  // namespace ui

@@ -1,3 +1,4 @@
+#include <iostream>
 #define CATCH_CONFIG_MAIN
 
 #include "card.h"
@@ -78,4 +79,28 @@ TEST_CASE("Card operations", "[Card]") {
         REQUIRE(completion ==
                 66.0);  // 2 out of 3 tasks are done, so ~66% completion
     }
+}
+
+TEST_CASE("Task reordering", "[Card]") {
+    Card card1{"Operating Systems"};
+
+    Task task1{"Windows"};
+    Task task2{"MacOS"};
+    Task task3{"Debian"};
+
+    card1.add_task(task1);
+    card1.add_task(task2);
+    card1.add_task(task3);
+
+    auto& card1_tasks = card1.get_tasks();
+
+    REQUIRE(task1 == *card1_tasks[0]);
+    REQUIRE(task2 == *card1_tasks[1]);
+    REQUIRE(task3 == *card1_tasks[2]);
+
+    card1.reorder_task(task1, task3); // Moves "Windows" task after "Debian"
+
+    CHECK(task1 == *card1_tasks[2]);
+    CHECK(task2 == *card1_tasks[0]);
+    CHECK(task3 == *card1_tasks[1]);
 }

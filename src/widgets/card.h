@@ -58,6 +58,8 @@ public:
      */
     std::shared_ptr<Card> get_card();
 
+    CardlistWidget const* get_cardlist_widget() const;
+
     /**
      * @brief Updates card's progress bar
      *
@@ -72,6 +74,8 @@ public:
      */
     void hide_progress_bar(bool hide = true);
 
+    std::string create_details_text() const;
+
 protected:
     bool is_new;
     Gtk::Picture color_frame;
@@ -81,13 +85,12 @@ protected:
     Gtk::Box colour_setting_box;
     Gtk::ProgressBar progress_bar;
 
+    ui::CardlistWidget* cardlist_p;
+    std::shared_ptr<Card> card_refptr;
+
     void setup_drag_and_drop();
     void open_color_dialog();
     void clear_color();
-
-private:
-    std::shared_ptr<Card> card_refptr;
-    ui::CardlistWidget* cardlist_p;
 };
 }  // namespace ui
 
