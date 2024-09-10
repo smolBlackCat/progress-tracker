@@ -226,7 +226,7 @@ std::string ui::CardWidget::create_details_text() const {
     std::string final_text = details_text.str();
 
     if (!final_text.empty()) {
-        final_text = final_text.substr(0, final_text.size() - 2);
+        final_text.resize(final_text.size() - 2);
     }
 
     return final_text;
