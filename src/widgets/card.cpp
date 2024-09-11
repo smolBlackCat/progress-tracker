@@ -218,9 +218,8 @@ std::string ui::CardWidget::create_details_text() const {
     }
 
     if (!card_refptr->get_notes().empty()) {
-        details_text << Glib::ustring::compose(_("Notes:\n%1"),
-                                               card_refptr->get_notes())
-                     << "\n\n";
+        details_text << _("Notes") << ":\n"
+                     << card_refptr->get_notes() << "\n\n";
     }
 
     std::string final_text = details_text.str();
