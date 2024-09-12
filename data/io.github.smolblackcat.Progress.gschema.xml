@@ -1,0 +1,13 @@
+<schemalist>
+    <schema path="/io/github/smolblackcat/Progress/" id="io.github.smolblackcat.Progress">
+        <key type="i" name="window-width">
+            <default>1024</default>
+        </key>
+        <key type="i" name="window-height">
+            <default>750</default>
+        </key>
+        <key type="b" name="window-maximized">
+            <default>false</default>
+        </key>
+    </schema>
+</schemalist>

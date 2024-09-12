@@ -26,6 +26,7 @@ protected:
     void on_activate() override;
 
     ProgressWindow* main_window = nullptr;
+    Glib::RefPtr<Gio::Settings> progress_settings;
 };
 }  // namespace ui
 

@@ -11,6 +11,7 @@ configure_file(io.github.smolblackcat.Progress.metainfo.xml.in ${APPLICATION_ID}
 set(APP_METAINFO ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_ID}.metainfo.xml)
 
 set(SYMBOLIC_ICON io.github.smolblackcat.Progress-symbolic.svg)
+set(GSCHEMA io.github.smolblackcat.Progress.gschema.xml)
 
 if (LINUX)
     install(FILES ${APP_DESKTOP_ENTRY}
@@ -22,6 +23,9 @@ if (LINUX)
     install(FILES ${SYMBOLIC_ICON}
             DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/symbolic/apps/
             RENAME ${APPLICATION_ID}-symbolic.svg)
+    install(FILES ${GSCHEMA}
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/glib-2.0/schemas/)
+    install(CODE "execute_process(COMMAND ${GLIB_SCHEMA_COMPILER} ${CMAKE_INSTALL_DATAROOTDIR}/glib-2.0/schemas/)")
 elseif(WIN32)
     install(FILES ${APP_DESKTOP_ENTRY}
             DESTINATION share/applications/)

@@ -78,7 +78,8 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
 }
 
 ProgressWindow::ProgressWindow(BaseObjectType* cobject,
-                               const Glib::RefPtr<Gtk::Builder>& b)
+                               const Glib::RefPtr<Gtk::Builder>& b,
+                               Glib::RefPtr<Gio::Settings>& progress_settings)
     : Gtk::ApplicationWindow{cobject},
       about_dialog{*this},
       board_widget{},
@@ -96,7 +97,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       css_provider{Gtk::CssProvider::create()},
       create_board_dialog{CreateBoardDialog::create(*this)},
       preferences_board_dialog{
-          PreferencesBoardDialog::create(*this, board_widget)} {
+          PreferencesBoardDialog::create(*this, board_widget)},
+      progress_settings{progress_settings} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
     load_appropriate_style();
@@ -107,6 +109,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
             reinterpret_cast<ProgressWindow*>(data)->load_appropriate_style();
         }),
         this);
+
+#if defined(DEVELOPMENT)
+    add_css_class("devel");
+#endif
 
     home_button_p->signal_clicked().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
@@ -134,8 +140,6 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     delete_boards_bar.set_margin_bottom(10);
     app_overlay_p->add_overlay(delete_boards_bar);
     app_stack_p->add(board_widget, "board-page");
-
-    set_default_size(1024, 750);
 }
 
 ProgressWindow::~ProgressWindow() {
@@ -241,6 +245,10 @@ bool ProgressWindow::on_close_request() {
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
+
+    progress_settings->set_boolean("window-maximized", is_maximized());
+    progress_settings->set_int("window-height", get_height());
+    progress_settings->set_int("window-width", get_width());
     set_visible(false);
     return true;
 }

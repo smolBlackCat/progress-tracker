@@ -1,3 +1,5 @@
+#include "application.h"
+
 #include <adwaita.h>
 #include <app_info.h>
 #include <utils.h>
@@ -7,17 +9,16 @@
 #include <filesystem>
 #include <iostream>
 
-#include "application.h"
-
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
 
-ui::Application::Application() : Gtk::Application{APPLICATION_ID} {}
+ui::Application::Application()
+    : Gtk::Application{APPLICATION_ID},
+      progress_settings{
+          Gio::Settings::create("io.github.smolblackcat.Progress")} {}
 
-ui::Application::~Application() {
-    delete main_window;
-}
+ui::Application::~Application() { delete main_window; }
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
@@ -25,9 +26,17 @@ void ui::Application::on_startup() {
 
     auto window_builder = Gtk::Builder::create_from_resource(PROGRESS_WINDOW);
     main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
-        window_builder, "app-window");
+        window_builder, "app-window", progress_settings);
     if (!main_window) {
         exit(1);
+    }
+
+    if (progress_settings->get_boolean("window-maximized")) {
+        main_window->maximize();
+    } else {
+        main_window->set_default_size(
+            progress_settings->get_int("window-width"),
+            progress_settings->get_int("window-height"));
     }
 
     std::string app_dir = progress_boards_folder();
@@ -61,4 +70,3 @@ void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
 }
-
