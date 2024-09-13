@@ -25,7 +25,6 @@ if (LINUX)
             RENAME ${APPLICATION_ID}-symbolic.svg)
     install(FILES ${GSCHEMA}
             DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/glib-2.0/schemas/)
-    install(CODE "execute_process(COMMAND ${GLIB_SCHEMA_COMPILER} ${CMAKE_INSTALL_DATAROOTDIR}/glib-2.0/schemas/)")
 elseif(WIN32)
     install(FILES ${APP_DESKTOP_ENTRY}
             DESTINATION share/applications/)
