@@ -130,3 +130,10 @@ the project build settings support only two environments: UCRT64 and MINGW32.
     # application's files
     cpack
     ```
+
+## Support
+
+If you like what I do and want me to keep doing it, please consider
+supporting me through [PayPal][paypal-link]
+
+[paypal-link]: https://www.paypal.com/donate/?hosted_button_id=9E5ELM2GFRU7U
