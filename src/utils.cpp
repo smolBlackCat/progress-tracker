@@ -4,7 +4,16 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <format>
 #include <random>
+
+#ifdef DEVELOPMENT
+constexpr const char* BOARDS_FOLDER = "/progress-debug/boards/";
+constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress Debug\\Boards";
+#else
+constexpr const char* BOARDS_FOLDER = "/progress/boards/";
+constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress\\Boards";
+#endif
 
 std::string locale_folder() {
     return std::filesystem::path(LOCALE_FOLDER).string();
@@ -12,11 +21,12 @@ std::string locale_folder() {
 
 std::string progress_boards_folder() {
 #ifdef FLATPAK
-    return std::string{std::getenv("XDG_CONFIG_HOME")} + "/progress/boards/";
+    return std::string{std::getenv("XDG_CONFIG_HOME")} + BOARDS_FOLDER;
 #elif WIN32
-    return std::string{std::getenv("APPDATA")} + "\\Progress\\Boards\\";
+    return std::string{std::getenv("APPDATA")} + BOARDS_FOLDER_WIN32;
 #else
-    return std::string{std::getenv("HOME")} + "/.config/progress/boards/";
+    return std::string{std::getenv("HOME")} +
+           std::format("/.config{}", BOARDS_FOLDER);
 #endif
 }
 
