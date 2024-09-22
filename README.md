@@ -89,7 +89,15 @@ For contributing to Progress source code, building from source might be the bett
 
     ```sh
     sudo ninja install -C build/
+    sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
     ```
+
+##### Packaging for Linux
+
+You are also able to create packages to be installed on Linux systems.
+Everything you have to do is to issue `cpack` in the build directory so a Debian
+package and a tarball will be generated. Note that installing from the tarball
+would still require the user to update the schemas manually.
 
 #### Building on Windows
 
