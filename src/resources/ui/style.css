@@ -10,6 +10,26 @@ list.rich-list {
     background-color: #c0bfbc;
 }
 
+.incomplete-task {
+    transition-property: background-color;
+    transition-property: background-color;
+    transition-duration: 1s;
+    background-color: #deddda;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px #9a9996;
+}
+
+.complete-task {
+    transition-property: background-color;
+    transition-property: background-color;
+    transition-duration: 1s;
+    background-color: #c0bfbc;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px #9a9996;
+}
+
 .card {
     background-color: #deddda;
     border-radius: 5px;

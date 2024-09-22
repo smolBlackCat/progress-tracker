@@ -8,6 +8,7 @@
 
 #include "dialog/card-dialog.h"
 #include "gdk/gdkkeysyms.h"
+#include "gdkmm/rectangle.h"
 #include "glibmm/ustring.h"
 #include "sigc++/functors/mem_fun.h"
 
@@ -25,6 +26,12 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
       group{Gio::SimpleActionGroup::create()},
       popover_menu{menu_model},
       is_new{is_new} {
+    if (task->get_done()) {
+        add_css_class("complete-task");
+    } else {
+        add_css_class("incomplete-task");
+    }
+
     task_label = builder->get_widget<Gtk::Label>("task-label");
     task_label->set_label(task->get_name());
     task_entry_revealer =
@@ -52,12 +59,12 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
     gesture_click->set_button();
     gesture_click->signal_released().connect(
         [this, gesture_click](int n_pressed, double x, double y) {
-            if (n_pressed >= 2 &&
+            if (n_pressed >= 1 &&
                 gesture_click->get_current_button() == GDK_BUTTON_PRIMARY) {
                 on_rename();
             } else if (n_pressed == 1 && gesture_click->get_current_button() ==
                                              GDK_BUTTON_SECONDARY) {
-                // this->popover_menu.set_offset(x, y);
+                this->popover_menu.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
                 popover_menu.popup();
             }
         });
@@ -126,8 +133,12 @@ void TaskWidget::on_checkbox() {
     if (task_checkbutton->get_active()) {
         task_label->set_markup(
             Glib::ustring::compose("<s>%1</s>", task->get_name()));
+        add_css_class("complete-task");
+        remove_css_class("incomplete-task");
     } else {
         task_label->set_markup(task->get_name());
+        add_css_class("incomplete-task");
+        remove_css_class("complete-task");
     }
 }
 

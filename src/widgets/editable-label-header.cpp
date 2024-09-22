@@ -159,7 +159,7 @@ void EditableLabelHeader::on_key_released(guint keyval, guint keycode,
 
 void EditableLabelHeader::on_mouse_button_released(int n_press, double x,
                                                    double y) {
-    if (n_press >= 2 && (!revealer.get_child_revealed())) {
+    if (n_press >= 1 && (!revealer.get_child_revealed())) {
         to_editing_mode();
     }
 }

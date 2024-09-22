@@ -89,7 +89,7 @@ a Card object details. -->
                           <object class="GtkBox" id="checklist-box">
                             <property name="margin-top">5</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
+                            <property name="spacing">16</property>
                           </object>
                         </property>
                         <property name="height-request">290</property>

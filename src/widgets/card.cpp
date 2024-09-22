@@ -17,10 +17,6 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
       color_dialog{Gtk::ColorDialog::create()} {
     add_css_class("card");
 
-    add_option_button(
-        _("Remove"), "remove",
-        sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
-
     add_option_button(_("Card Details"), "card-details", [this]() {
         auto card_details_dialog = CardDetailsDialog::create(*this);
         card_details_dialog->set_transient_for(
@@ -42,6 +38,10 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
         "clear-color", sigc::mem_fun(*this, &CardWidget::clear_color));
     menu_button.insert_action_group("cover", card_cover_actions);
     menu->append_submenu(_("Card Cover"), card_cover_submenu);
+
+    add_option_button(
+        _("Remove"), "remove",
+        sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
 
     color_frame.set_content_fit(Gtk::ContentFit::FILL);
     color_frame.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH,
