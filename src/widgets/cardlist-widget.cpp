@@ -44,8 +44,8 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
         });
 
     add_card_button.set_valign(Gtk::Align::CENTER);
-    add_card_button.set_halign(Gtk::Align::START);
-    add_card_button.set_hexpand(false);
+    add_card_button.set_halign(Gtk::Align::FILL);
+    add_card_button.set_hexpand(true);
     add_card_button.signal_clicked().connect(
         [this]() { this->add_card(Card{_("New Card")}, true); });
     root.append(add_card_button);
