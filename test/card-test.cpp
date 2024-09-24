@@ -3,14 +3,11 @@
 
 #include "card.h"
 
-#include <gdkmm/rgba.h>
-
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Card operations", "[Card]") {
     // Creating a dummy color for testing
-    Gdk::RGBA red;
-    red.set_rgba(1.0, 0.0, 0.0, 1.0);  // Solid red color
+    Color red{255, 0, 0, 1};  // Solid red color
 
     Card card("MyCard");
 
@@ -21,8 +18,7 @@ TEST_CASE("Card operations", "[Card]") {
         REQUIRE(card.get_color() == red);
         REQUIRE(card.is_color_set() == true);
 
-        Gdk::RGBA no_color;
-        card.set_color(no_color);
+        card.set_color(NO_COLOR);
         REQUIRE(card.is_color_set() == false);
     }
 

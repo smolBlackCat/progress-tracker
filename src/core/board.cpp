@@ -95,7 +95,7 @@ Board::Board(const std::string& board_file_path)
             }
 
             Card cur_card{cur_card_name, cur_card_color
-                                             ? Gdk::RGBA{cur_card_color}
+                                             ? string_to_color(cur_card_color)
                                              : NO_COLOR};
 
             auto task_element = card_element->FirstChildElement("task");
@@ -244,8 +244,8 @@ bool Board::save_as_xml(bool create_dirs) {
         for (auto& card : cardlist->get_card_vector()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
-            card_element->SetAttribute("color",
-                                       card->get_color().to_string().c_str());
+            card_element->SetAttribute(
+                "color", color_to_string(card->get_color()).c_str());
 
             // Add tasks
             for (auto& task : card->get_tasks()) {

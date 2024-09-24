@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "colorable.h"
 #include "item.h"
 #include "task.h"
@@ -16,13 +19,9 @@ public:
      *
      * @param name The card's title.
      */
-    Card(const std::string& name, const Gdk::RGBA& color = NO_COLOR);
+    Card(const std::string& name, const Color& color = NO_COLOR);
 
-    void set_color(const Gdk::RGBA& color) override;
-
-    Gdk::RGBA get_color() const override;
-
-    bool is_color_set() override;
+    void set_color(const Color& rgb) override;
 
     /**
      * @brief Return the notes associated with this card
@@ -77,7 +76,6 @@ public:
     void reorder_task(const Task& next, const Task& sibling);
 
 protected:
-    Gdk::RGBA color = NO_COLOR;
     std::string notes;
     std::vector<std::shared_ptr<Task>> tasks;
 };

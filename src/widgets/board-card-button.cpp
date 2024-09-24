@@ -1,10 +1,8 @@
-#include <utils.h>
+#include "board-card-button.h"
 
 #include <filesystem>
 #include <format>
 #include <string>
-
-#include "board-card-button.h"
 
 ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     : Button{},
@@ -53,7 +51,7 @@ void ui::BoardCardButton::set_background(const std::string& background) {
         case BackgroundType::COLOR: {
             auto solid_colour =
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-            Gdk::RGBA colour{background};
+            Color colour = string_to_color(background);
             solid_colour->fill(rgb_to_hex(colour));
             board_thumbnail.set(solid_colour);
             break;
@@ -67,7 +65,7 @@ void ui::BoardCardButton::set_background(const std::string& background) {
         case BackgroundType::INVALID: {
             auto solid_colour =
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-            Gdk::RGBA colour{0, 0, 0, 1};
+            Color colour{0, 0, 0, 1};
             solid_colour->fill(rgb_to_hex(colour));
             board_thumbnail.set(solid_colour);
             break;
@@ -82,4 +80,3 @@ std::strong_ordering ui::BoardCardButton::operator<=>(
 
     return this_lm_time <=> other_lm_time;
 }
-

@@ -51,6 +51,7 @@ if(Catch2_FOUND AND DEVELOPMENT)
     add_test(NAME TestCardlist COMMAND test/cardlist-test)
     add_test(NAME TestCard COMMAND test/card-test)
     add_test(NAME TestModification COMMAND test/modification-test)
+    add_test(NAME TestColorable COMMAND test/colorable-test)
 endif()
 
 if (LINUX)

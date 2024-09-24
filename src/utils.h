@@ -1,4 +1,4 @@
-#include <gdkmm/rgba.h>
+#include <core/colorable.h>
 
 #include <cstdint>
 #include <string>
@@ -18,6 +18,3 @@ std::string progress_boards_folder();
  * filename's availability
  */
 std::string gen_unique_filename(const std::string& base);
-
-uint32_t rgb_to_hex(const Gdk::RGBA& color);
-

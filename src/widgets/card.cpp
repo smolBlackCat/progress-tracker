@@ -4,10 +4,7 @@
 #include <glibmm/i18n.h>
 #include <utils.h>
 
-#include <sstream>
-
 #include "cardlist-widget.h"
-#include "glibmm/ustring.h"
 
 ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     : ui::EditableLabelHeader{card_refptr->get_name()},
@@ -57,7 +54,12 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
     reorder_child_at_start(m_frame);
 
     if (card_refptr->is_color_set()) {
-        set_color(card_refptr->get_color());
+        Color card_color = card_refptr->get_color();
+
+        // FIXME: We're making this slow on purpose but the real solution is to
+        // use the appropriate integer types so casting won't fuck up the card's
+        // colour
+        set_color(Gdk::RGBA{color_to_string(card_color)});
 
         if (!is_new) {
             card_refptr->set_modified(false);
@@ -202,8 +204,9 @@ void ui::CardWidget::clear_color() {
 void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
-    color_frame_pixbuf->fill(rgb_to_hex(color));
-    card_refptr->set_color(color);
+    card_refptr->set_color(Color{color.get_red() * 255, color.get_green() * 255,
+                                 color.get_blue() * 255, 1.0});
+    color_frame_pixbuf->fill(rgb_to_hex(card_refptr->get_color()));
     color_frame.set_pixbuf(color_frame_pixbuf);
     this->m_frame.set_visible();
 }

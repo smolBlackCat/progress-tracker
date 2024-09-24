@@ -2,17 +2,15 @@
 
 #include <numeric>
 
-Card::Card(const std::string& name, const Gdk::RGBA& color)
-    : Item{name}, color{color} {}
+Card::Card(const std::string& name, const Color& color) : Item{name} {
+    set_color(color);
+    modified = false;
+}
 
-void Card::set_color(const Gdk::RGBA& color) {
+void Card::set_color(const Color& color) {
     this->color = color;
     modified = true;
 }
-
-Gdk::RGBA Card::get_color() const { return color; }
-
-bool Card::is_color_set() { return color != NO_COLOR; }
 
 const std::string& Card::get_notes() const { return notes; }
 

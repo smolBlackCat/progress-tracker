@@ -1,10 +1,10 @@
 #include "cardlist.h"
 #define CATCH_CONFIG_MAIN
-#include "board.h"
-
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
+
+#include "board.h"
 
 TEST_CASE("Board default constructor", "[Board]") {
     Board board;
@@ -95,7 +95,7 @@ TEST_CASE("Board save as XML", "[Board]") {
     board.set_filepath(file_path);
 
     CardList cardlist("To Do");
-    Card card("Task 1", Gdk::RGBA{"rgba(0,0,255,1)"});
+    Card card("Task 1", Color{0, 0, 255, 1});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
 
@@ -119,7 +119,8 @@ TEST_CASE("Board save as XML", "[Board]") {
     auto card_element = list_element->FirstChildElement("card");
     REQUIRE(card_element != nullptr);
     REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
-    REQUIRE(card_element->Attribute("color") == std::string("rgb(0,0,255)"));
+    auto color = card_element->Attribute("color");
+    REQUIRE(color == std::string("rgb(0,0,255)"));
 
     // Clean up
     std::filesystem::remove(file_path);
@@ -132,7 +133,7 @@ TEST_CASE("Board save as XML (2)", "[Board]") {
     board.set_filepath(file_path);
 
     CardList cardlist("To Do");
-    Card card("Task 1", Gdk::RGBA{"rgba(0,0,255,1)"});
+    Card card("Task 1", Color{0, 0, 255, 1});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
 
@@ -168,7 +169,7 @@ TEST_CASE("Board save as XML (3)", "[Board]") {
     board.set_filepath(file_path);
 
     CardList cardlist("To Do");
-    Card card("Task 1", Gdk::RGBA{"rgba(0,0,255,1)"});
+    Card card("Task 1", Color{0, 0, 255, 1});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
 
