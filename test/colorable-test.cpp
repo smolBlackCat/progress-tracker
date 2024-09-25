@@ -4,7 +4,7 @@
 #include <core/colorable.h>
 
 TEST_CASE("Converting RGBA to HEX", "[rgb_to_hex]") {
-    SECTION("Black") {
+    SECTION("Opaque Black") {
         Color color{0, 0, 0, 1};
         CHECK(rgb_to_hex(color) == 0x000000FF);
     }

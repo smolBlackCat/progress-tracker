@@ -55,11 +55,10 @@ ui::CardWidget::CardWidget(std::shared_ptr<Card> card_refptr, bool is_new)
 
     if (card_refptr->is_color_set()) {
         Color card_color = card_refptr->get_color();
-
-        // FIXME: We're making this slow on purpose but the real solution is to
-        // use the appropriate integer types so casting won't fuck up the card's
-        // colour
-        set_color(Gdk::RGBA{color_to_string(card_color)});
+        set_color(Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
+                            static_cast<float>(std::get<1>(card_color)) / 255,
+                            static_cast<float>(std::get<2>(card_color)) / 255,
+                            std::get<3>(card_color)});
 
         if (!is_new) {
             card_refptr->set_modified(false);

@@ -9,12 +9,11 @@ std::string color_to_string(const Color& color) {
     return oss.str();
 }
 
-// !!!
 uint32_t rgb_to_hex(const Color& color) {
     uint8_t r = std::get<0>(color);
     uint8_t g = std::get<1>(color);
     uint8_t b = std::get<2>(color);
-    uint8_t a = static_cast<uint8_t>(std::get<3>(color));
+    uint8_t a = (uint8_t)std::get<3>(color) * 255;
 
     return (r << 24) | (g << 16) | (b << 8) | a;
 }
