@@ -2,7 +2,7 @@
   "id": "io.github.smolblackcat.Progress.Devel",
   "runtime": "org.gnome.Platform",
   "sdk": "org.gnome.Sdk",
-  "runtime-version": "46",
+  "runtime-version": "47",
   "command": "progress-debug",
   "finish-args": [
     "--socket=fallback-x11",
@@ -33,8 +33,8 @@
       "sources": [
         {
           "type": "archive",
-          "url": "https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz",
-          "sha256": "e1b109771557ecc53cba915a80b6ede827ffdbd0049c62fdf8bd7fa79afcc6eb"
+          "url": "https://download.gnome.org/sources/gtkmm/4.16/gtkmm-4.16.0.tar.xz",
+          "sha256": "3b23fd3abf8fb223b00e9983b6010af2db80e38c89ab6994b8b6230aa85d60f9"
         }
       ],
       "modules": [
@@ -63,12 +63,12 @@
             "-Dbuild-examples=false",
             "-Dbuild-tests=false"
           ],
-          "cleanup": ["/lib/cairomm-1.16"],
+          "cleanup": ["/lib/cairomm-1.18"],
           "sources": [
             {
               "type": "archive",
-              "url": "https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz",
-              "sha512": "61dc639eabe8502e1262c53c92fe57c5647e5ab9931f86ed51e657df1b7d0e3e58c2571910a05236cc0dca8d52f1f693aed99a553430f14d0fb87be1832a6b62"
+              "url": "https://www.cairographics.org/releases/cairomm-1.18.0.tar.xz",
+              "sha512": "d358a765136e244773b4a0fdcb2d9c81dd0b76f7a27c7108f94df9765f2d790f5f50b5645c09c292efce3e012528f85114d51916450c5fe6fa87d09f5a405d4c"
             }
           ]
         },
@@ -86,8 +86,8 @@
           "sources": [
             {
               "type": "archive",
-              "url": "https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.2.tar.xz",
-              "sha256": "91e0a8618f7b82db4aaf2648932ea2bcfe626ad030068c18fa2d106fd838d8ad"
+              "url": "https://download.gnome.org/sources/glibmm/2.82/glibmm-2.82.0.tar.xz",
+              "sha256": "38684cff317273615c67b8fa9806f16299d51e5506d9b909bae15b589fa99cb6"
             }
           ]
         },
@@ -97,8 +97,8 @@
           "sources": [
             {
               "type": "archive",
-              "url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.2.tar.xz",
-              "sha256": "1bc5ab4ea3280442580d68318226dab36ceedfc3288f9d83711cf7cfab50a9fb"
+              "url": "https://download.gnome.org/sources/pangomm/2.54/pangomm-2.54.0.tar.xz",
+              "sha256": "4a5b1fd1b7c47a1af45277ea82b5abeaca8e08fb10a27daa6394cf88d74e7acf"
             }
           ],
           "cleanup": [
