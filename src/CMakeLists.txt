@@ -28,7 +28,7 @@ endif()
 target_link_libraries(progress-tracker PUBLIC ${GTKMM_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
 target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${INTL_LIBRARIES})
+target_link_libraries(progress-tracker PUBLIC ${Intl_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
 
 target_link_directories(progress-tracker PUBLIC ${GTKMM_LIBRARY_DIR})
@@ -36,7 +36,7 @@ target_link_directories(progress-tracker PUBLIC ${GTKMM_LIBRARY_DIR})
 target_include_directories(progress-tracker PUBLIC ${TINYXML2_INCLUDE_DIRS})
 target_include_directories(progress-tracker PUBLIC ${GTKMM_INCLUDE_DIRS})
 target_include_directories(progress-tracker PUBLIC ${ADWAITA_INCLUDE_DIRS})
-target_include_directories(progress-tracker PUBLIC ${INTL_INCLUDE_DIRS})
+target_include_directories(progress-tracker PUBLIC ${Intl_INCLUDE_DIRS})
 target_include_directories(progress-tracker PUBLIC ${APP_INCLUDES})
 
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
@@ -70,17 +70,17 @@ if(WIN32)
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
     install(TARGETS progress-tracker
-    		RUNTIME
-    		DESTINATION ".")
+      RUNTIME
+      DESTINATION ".")
     install(PROGRAMS ${PROJECT_BINARY_DIR}/gdbus.exe
             DESTINATION ".")
     install(DIRECTORY ${PROJECT_BINARY_DIR}/DLLS/
-    		DESTINATION "."
+      DESTINATION "."
             FILES_MATCHING PATTERN "*.dll")
     install(DIRECTORY ${PROJECT_BINARY_DIR}/share/
-    		DESTINATION share)
+      DESTINATION share)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
-    		DESTINATION lib)
+      DESTINATION lib)
 else()
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/progress-tracker
             DESTINATION ${CMAKE_INSTALL_BINDIR}
