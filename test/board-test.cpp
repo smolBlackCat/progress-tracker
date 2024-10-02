@@ -30,7 +30,7 @@ TEST_CASE("Board XML constructor", "[Board]") {
     std::string xml_content =
         "<board name=\"Test Board\" background=\"rgba(255,0,0,1)\">"
         "<list name=\"To Do\">"
-        "<card name=\"Task 1\" color=\"rgba(0,0,255,1)\">"
+        "<card name=\"Task 1\" color=\"rgba(0,0,255,1)\" due=\"2012-01-01\">"
         "<task name=\"Subtask 1\" done=\"false\" />"
         "<notes>Some notes</notes>"
         "</card>"
@@ -47,6 +47,10 @@ TEST_CASE("Board XML constructor", "[Board]") {
     REQUIRE(board.get_background() == "rgba(255,0,0,1)");
     REQUIRE(board.get_cardlist_vector().size() == 1);
     REQUIRE(board.get_cardlist_vector()[0]->get_name() == "To Do");
+    Card card = *board.get_cardlist_vector()[0]->get_card_vector()[0];
+    REQUIRE(card.get_due_date() == Date{std::chrono::year{2012},
+                                        std::chrono::month{01},
+                                        std::chrono::day{1}});
 
     // Clean up
     std::filesystem::remove(xml_path);
@@ -96,6 +100,8 @@ TEST_CASE("Board save as XML", "[Board]") {
 
     CardList cardlist("To Do");
     Card card("Task 1", Color{0, 0, 255, 1});
+    card.set_due_date(Date{std::chrono::year{2013}, std::chrono::month{12},
+                           std::chrono::day{2}});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
 
@@ -119,6 +125,8 @@ TEST_CASE("Board save as XML", "[Board]") {
     auto card_element = list_element->FirstChildElement("card");
     REQUIRE(card_element != nullptr);
     REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
+    REQUIRE(card_element->Attribute("due"));
+    REQUIRE(card_element->Attribute("due") == std::string("2013-12-02"));
     auto color = card_element->Attribute("color");
     REQUIRE(color == std::string("rgb(0,0,255)"));
 
@@ -134,6 +142,7 @@ TEST_CASE("Board save as XML (2)", "[Board]") {
 
     CardList cardlist("To Do");
     Card card("Task 1", Color{0, 0, 255, 1});
+    card.set_due_date(Date{});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
 
@@ -156,6 +165,7 @@ TEST_CASE("Board save as XML (2)", "[Board]") {
 
     auto card_element = list_element->FirstChildElement("card");
     REQUIRE(card_element != nullptr);
+    REQUIRE(!card_element->Attribute("due"));
     REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
     REQUIRE(card_element->Attribute("color") == std::string("rgb(0,0,255)"));
 

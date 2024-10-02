@@ -106,3 +106,18 @@ void Card::reorder_task(const Task& next, const Task& sibling) {
     }
     modified = true;
 }
+
+bool Card::past_due_date() {
+    using namespace std::chrono;
+
+    Date current_date =
+        year_month_day{std::chrono::floor<days>(system_clock::now())};
+    return current_date > due_date && (due_date.ok());
+};
+
+void Card::set_due_date(const Date& date) {
+    due_date = date;
+    modified = true;
+};
+
+Date Card::get_due_date() const { return due_date; };

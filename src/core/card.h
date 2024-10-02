@@ -1,11 +1,14 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <vector>
 
 #include "colorable.h"
 #include "item.h"
 #include "task.h"
+
+typedef std::chrono::year_month_day Date;
 
 /**
  * @class Card
@@ -75,7 +78,14 @@ public:
 
     void reorder_task(const Task& next, const Task& sibling);
 
+    bool past_due_date();
+
+    void set_due_date(const Date& date);
+
+    Date get_due_date() const;
+
 protected:
     std::string notes;
     std::vector<std::shared_ptr<Task>> tasks;
+    Date due_date;
 };

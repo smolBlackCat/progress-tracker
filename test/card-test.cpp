@@ -1,4 +1,3 @@
-#include <iostream>
 #define CATCH_CONFIG_MAIN
 
 #include "card.h"
@@ -75,6 +74,28 @@ TEST_CASE("Card operations", "[Card]") {
         REQUIRE(completion ==
                 66.0);  // 2 out of 3 tasks are done, so ~66% completion
     }
+
+    SECTION("Setting Due dates to Card objects") {
+        Card card_with_due_date{"Uni assignment"};
+        Date date_now = std::chrono::floor<std::chrono::days>(
+            std::chrono::system_clock::now());
+        Date past_due_date = date_now - std::chrono::months(2);
+        card_with_due_date.set_due_date(
+            past_due_date);  // Regardless of today's date, this card is always
+                             // past the due date
+
+        CHECK(card_with_due_date.get_modified());
+        REQUIRE(card_with_due_date.past_due_date());
+
+        Date in_time_due_date = date_now + std::chrono::months(5);
+        card_with_due_date.set_due_date(in_time_due_date);
+        REQUIRE(!card_with_due_date.past_due_date());
+
+        card_with_due_date.set_due_date(Date{});
+        // When the date is invalid it simply
+        // means that no date was set
+        REQUIRE(!card_with_due_date.past_due_date());
+    }
 }
 
 TEST_CASE("Task reordering", "[Card]") {
@@ -94,7 +115,7 @@ TEST_CASE("Task reordering", "[Card]") {
     REQUIRE(task2 == *card1_tasks[1]);
     REQUIRE(task3 == *card1_tasks[2]);
 
-    card1.reorder_task(task1, task3); // Moves "Windows" task after "Debian"
+    card1.reorder_task(task1, task3);  // Moves "Windows" task after "Debian"
 
     CHECK(task1 == *card1_tasks[2]);
     CHECK(task2 == *card1_tasks[0]);

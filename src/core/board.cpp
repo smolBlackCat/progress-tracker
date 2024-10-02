@@ -1,6 +1,7 @@
 #include "board.h"
 
 #include <cctype>
+#include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
@@ -85,6 +86,7 @@ Board::Board(const std::string& board_file_path)
         while (card_element) {
             auto cur_card_name = card_element->Attribute("name");
             auto cur_card_color = card_element->Attribute("color");
+            auto cur_card_due_date = card_element->Attribute("due");
 
             if (!cur_card_name) {
                 throw board_parse_error{std::format(
@@ -97,6 +99,15 @@ Board::Board(const std::string& board_file_path)
             Card cur_card{cur_card_name, cur_card_color
                                              ? string_to_color(cur_card_color)
                                              : NO_COLOR};
+
+            if (cur_card_due_date) {
+                std::chrono::sys_seconds secs;
+
+                std::istringstream{std::string{cur_card_due_date}} >>
+                    std::chrono::parse("%F", secs);
+                Date date{std::chrono::floor<std::chrono::days>(secs)};
+                cur_card.set_due_date(date);
+            }
 
             auto task_element = card_element->FirstChildElement("task");
             while (task_element) {
@@ -246,6 +257,10 @@ bool Board::save_as_xml(bool create_dirs) {
             card_element->SetAttribute("name", card->get_name().c_str());
             card_element->SetAttribute(
                 "color", color_to_string(card->get_color()).c_str());
+            auto date = card->get_due_date();
+            if (date.ok())
+                card_element->SetAttribute("due",
+                                           std::format("{}", date).c_str());
 
             // Add tasks
             for (auto& task : card->get_tasks()) {
