@@ -31,6 +31,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
       popover_menu{},
       key_controller{Gtk::EventControllerKey::create()},
       card_label_click_controller{Gtk::GestureClick::create()},
+      focus_controller{Gtk::EventControllerFocus::create()},
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
       color_dialog{Gtk::ColorDialog::create()} {
@@ -95,7 +96,13 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
             }
         });
 
+    focus_controller->signal_leave().connect([this]() {
+        this->on_confirm_changes();
+        this->off_rename();
+    });
+
     card_entry->add_controller(key_controller);
+    card_entry->add_controller(focus_controller);
     card_label->add_controller(card_label_click_controller);
     add_controller(click_controller);
 

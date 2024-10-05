@@ -80,7 +80,9 @@ protected:
     Gtk::PopoverMenu popover_menu;
 
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
-    Glib::RefPtr<Gtk::GestureClick> card_label_click_controller, click_controller;
+    Glib::RefPtr<Gtk::GestureClick> card_label_click_controller,
+        click_controller;
+    Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
     Glib::RefPtr<Gio::MenuModel> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
