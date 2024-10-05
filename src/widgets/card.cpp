@@ -268,8 +268,7 @@ void ui::CardWidget::clear_color() {
 }
 
 void ui::CardWidget::on_confirm_changes() {
-    // FIXME: Use Glib::ustring::compare here
-    if (card_entry->get_text() != card_label->get_label()) {
+    if (card_entry->get_text().compare(card_label->get_label()) != 0) {
         card_refptr->set_name(card_entry->get_text());
         card_label->set_label(card_entry->get_text());
     }
