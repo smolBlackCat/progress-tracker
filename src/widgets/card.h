@@ -77,9 +77,10 @@ protected:
     Gtk::Label *card_label, *complete_tasks_label, *due_date_label;
     Gtk::Entry* card_entry;
     Gtk::MenuButton* card_menu_button;
+    Gtk::PopoverMenu popover_menu;
 
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
-    Glib::RefPtr<Gtk::GestureClick> click_controller;
+    Glib::RefPtr<Gtk::GestureClick> card_label_click_controller, click_controller;
     Glib::RefPtr<Gio::MenuModel> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 

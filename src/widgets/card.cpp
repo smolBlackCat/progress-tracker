@@ -28,7 +28,9 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
       card_entry{builder->get_widget<Gtk::Entry>("card-entry")},
       card_menu_button{
           builder->get_widget<Gtk::MenuButton>("card-menu-button")},
+      popover_menu{},
       key_controller{Gtk::EventControllerKey::create()},
+      card_label_click_controller{Gtk::GestureClick::create()},
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
       color_dialog{Gtk::ColorDialog::create()} {
@@ -52,6 +54,10 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
         "remove", sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
     card_menu_button->insert_action_group("card", card_actions);
 
+    popover_menu.set_parent(*this);
+    popover_menu.set_menu_model(card_menu_model);
+    popover_menu.insert_action_group("card", card_actions);
+
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (card_entry_revealer->get_child_revealed()) {
@@ -70,15 +76,28 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
             }
         });
 
-    click_controller->signal_released().connect(
+    card_label_click_controller->signal_released().connect(
         [this](int n_pressed, double x, double y) {
-            if (n_pressed >= 1 && !card_entry_revealer->get_child_revealed()) {
+            if (n_pressed >= 1 && !card_entry_revealer->get_child_revealed() &&
+                this->card_label_click_controller->get_current_button() ==
+                    GDK_BUTTON_PRIMARY) {
                 this->on_rename();
             }
         });
 
+    click_controller->set_button(GDK_BUTTON_SECONDARY);
+    click_controller->signal_released().connect(
+        [this](int n_pressed, double x, double y) {
+            auto clicked = this->click_controller->get_current_button();
+            if (clicked == GDK_BUTTON_SECONDARY && n_pressed >= 1) {
+                this->popover_menu.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
+                this->popover_menu.popup();
+            }
+        });
+
     card_entry->add_controller(key_controller);
-    card_label->add_controller(click_controller);
+    card_label->add_controller(card_label_click_controller);
+    add_controller(click_controller);
 
     if (card_refptr->is_color_set()) {
         Color card_color = card_refptr->get_color();
