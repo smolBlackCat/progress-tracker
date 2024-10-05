@@ -6,6 +6,7 @@
         <file>style.css</file>
         <file>style-dark.css</file>
         <file>create-board-dialog.ui</file>
+        <file>card-widget.ui</file>
         <file>app-window.ui</file>
     </gresource>
 </gresources>

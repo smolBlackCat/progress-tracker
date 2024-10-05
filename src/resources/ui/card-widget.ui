@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.92.0 -->
+<interface>
+  <!-- interface-name card-widget.ui -->
+  <!-- interface-description Describes the structure of a Card Widget of
+Progress -->
+  <!-- interface-authors Gabriel de Moura -->
+  <requires lib="gio" version="2.44"/>
+  <requires lib="gtk" version="4.12"/>
+  <object class="GtkBox" id="card-root">
+    <property name="css-classes">card</property>
+    <property name="orientation">vertical</property>
+    <property name="spacing">4</property>
+    <property name="width-request">240</property>
+    <child>
+      <object class="GtkRevealer" id="card-cover-revealer">
+        <property name="child">
+          <object class="GtkPicture" id="card-cover-picture">
+            <property name="content-fit">cover</property>
+            <property name="css-classes">frame</property>
+            <property name="height-request">50</property>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="spacing">4</property>
+            <property name="valign">center</property>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="card-label">
+                    <property name="halign">start</property>
+                    <property name="hexpand">True</property>
+                    <property name="label" translatable="yes">New Card</property>
+                    <property name="natural-wrap-mode">word</property>
+                    <property name="valign">center</property>
+                    <property name="wrap">True</property>
+                    <property name="wrap-mode">word-char</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkRevealer" id="card-entry-revealer">
+                    <property name="child">
+                      <object class="GtkEntry" id="card-entry">
+                        <property name="hexpand">True</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="card-info-box">
+                <property name="spacing">15</property>
+                <child>
+                  <object class="GtkLabel" id="complete-tasks-label">
+                    <property name="css-classes">complete-tasks-indicator</property>
+                    <property name="label">...</property>
+                    <property name="visible">False</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="due-date-label">
+                    <property name="label">...</property>
+                    <property name="visible">False</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuButton" id="card-menu-button">
+            <property name="halign">center</property>
+            <property name="has-frame">False</property>
+            <property name="icon-name">view-more-horizontal-symbolic</property>
+            <property name="menu-model">card-menu-model</property>
+            <property name="tooltip-text">Card Options</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <menu id="card-menu-model">
+    <item>
+      <attribute name="action">card.rename</attribute>
+      <attribute name="label" translatable="yes">Rename</attribute>
+    </item>
+    <item>
+      <attribute name="action">card.details</attribute>
+      <attribute name="label" translatable="yes">Card Details</attribute>
+    </item>
+    <submenu>
+      <attribute name="label">Card Cover</attribute>
+      <item>
+        <attribute name="action">card.set-color</attribute>
+        <attribute name="label" translatable="yes">Set Color</attribute>
+      </item>
+      <item>
+        <attribute name="action">card.unset-color</attribute>
+        <attribute name="label" translatable="yes">Unset Color</attribute>
+      </item>
+    </submenu>
+    <item>
+      <attribute name="action">card.remove</attribute>
+      <attribute name="label" translatable="yes">Remove</attribute>
+    </item>
+  </menu>
+</interface>

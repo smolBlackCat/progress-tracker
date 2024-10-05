@@ -49,12 +49,12 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = card_widget.get_card();
     checklist_box->remove(task);
     card->remove_task(task.get_task());
-    card_widget.update_completed();
 
     if (card->get_tasks().empty()) {
-        card_widget.hide_progress_bar();
         checklist_togglebutton->set_active(false);
     }
+
+    card_widget.update_completed();
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
@@ -76,7 +76,6 @@ CardDetailsDialog* CardDetailsDialog::create(CardWidget& card_widget) {
 void CardDetailsDialog::on_add_button_click() {
     _add_task(card_widget.get_card()->add_task(Task{_("New Task")}), true);
     checklist_togglebutton->set_active();
-    card_widget.hide_progress_bar(false);
     card_widget.update_completed();
 }
 

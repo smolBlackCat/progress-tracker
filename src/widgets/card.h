@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "cardlist-widget.h"
-#include "editable-label-header.h"
 
 namespace ui {
 
@@ -15,10 +14,8 @@ class CardlistWidget;
 /**
  * @brief Card widget
  */
-class CardWidget : public EditableLabelHeader {
+class CardWidget : public Gtk::Box {
 public:
-    static constexpr int COLOR_FRAME_HEIGHT = 30;
-
     /**
      * @brief CardWidget constructor
      *
@@ -27,7 +24,13 @@ public:
      * scratch rather than being loaded from a Progress board file. True means
      * the Card did not come from a file otherwise False
      */
-    CardWidget(std::shared_ptr<Card> card_refptr, bool is_new = false);
+    CardWidget(BaseObjectType* cobject,
+               const Glib::RefPtr<Gtk::Builder>& builder,
+               std::shared_ptr<Card> card_refptr, bool is_new = false);
+
+    void set_label(const std::string& label);
+
+    std::string get_text() const;
 
     /**
      * @brief Removes itself from the associated CardlistWidget object.
@@ -65,32 +68,33 @@ public:
      *
      */
     void update_completed();
-
-    /**
-     * @brief Hides the card's progress bar
-     *
-     * @param hide bool indicating whether to hide the progress bar or not.
-     * Default is true
-     */
-    void hide_progress_bar(bool hide = true);
-
     std::string create_details_text() const;
 
 protected:
     bool is_new;
-    Gtk::Picture color_frame;
-    Gtk::Frame m_frame;
-    Gtk::Button clear_colour_button;
+    Gtk::Revealer *card_cover_revealer, *card_entry_revealer;
+    Gtk::Picture* card_cover_picture;
+    Gtk::Label *card_label, *complete_tasks_label, *due_date_label;
+    Gtk::Entry* card_entry;
+    Gtk::MenuButton* card_menu_button;
+
+    Glib::RefPtr<Gtk::EventControllerKey> key_controller;
+    Glib::RefPtr<Gtk::GestureClick> click_controller;
+    Glib::RefPtr<Gio::MenuModel> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
-    Gtk::Box colour_setting_box;
-    Gtk::ProgressBar progress_bar;
 
     ui::CardlistWidget* cardlist_p;
     std::shared_ptr<Card> card_refptr;
 
+    std::string last_complete_tasks_label_css_class = "";
+
     void setup_drag_and_drop();
     void open_color_dialog();
+    void open_card_details_dialog();
+    void on_rename();
+    void off_rename();
+    void on_confirm_changes();
+    void on_cancel_changes();
     void clear_color();
 };
 }  // namespace ui
-

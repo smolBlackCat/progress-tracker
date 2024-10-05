@@ -54,3 +54,24 @@ list.rich-list {
     font-weight: bold;
     font-size: medium;
 }
+
+.complete-tasks-indicator-complete {
+    background-color: #26a269;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.complete-tasks-indicator-almost {
+    background-color: #e5a50a;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.complete-tasks-indicator-incomplete {
+    background-color: #a51d2d;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+}
