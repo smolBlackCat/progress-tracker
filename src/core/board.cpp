@@ -255,8 +255,9 @@ bool Board::save_as_xml(bool create_dirs) {
         for (auto& card : cardlist->get_card_vector()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
-            card_element->SetAttribute(
-                "color", color_to_string(card->get_color()).c_str());
+            if (card->is_color_set())
+                card_element->SetAttribute(
+                    "color", color_to_string(card->get_color()).c_str());
             auto date = card->get_due_date();
             if (date.ok())
                 card_element->SetAttribute("due",
