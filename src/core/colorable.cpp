@@ -26,10 +26,10 @@ Color string_to_color(const std::string& str) {
     auto color_code_end = std::sregex_iterator();
 
     if (std::distance(color_code_begin, color_code_end) == 3) {
-        u_int8_t r = std::stoi(std::smatch{*color_code_begin}.str());
-        u_int8_t g =
+        uint8_t r = std::stoi(std::smatch{*color_code_begin}.str());
+        uint8_t g =
             std::stoi(std::smatch{*(std::next(color_code_begin, 1))}.str());
-        u_int8_t b =
+        uint8_t b =
             std::stoi(std::smatch{*(std::next(color_code_begin, 2))}.str());
         return {r, g, b, 1.0};
     } else {
