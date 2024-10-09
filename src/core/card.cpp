@@ -63,6 +63,7 @@ bool Card::remove_task(std::shared_ptr<Task> task) {
     for (size_t i = 0; i < tasks.size(); i++) {
         if (tasks[i] == task) {
             tasks.erase(tasks.begin() + i);
+            modified = true;
             return true;
         }
     }

@@ -17,7 +17,7 @@ Progress -->
         <property name="child">
           <object class="GtkPicture" id="card-cover-picture">
             <property name="content-fit">cover</property>
-            <property name="css-classes">frame</property>
+            <property name="css-classes">card</property>
             <property name="height-request">50</property>
           </object>
         </property>
@@ -25,6 +25,10 @@ Progress -->
     </child>
     <child>
       <object class="GtkBox">
+        <property name="margin-bottom">4</property>
+        <property name="margin-end">4</property>
+        <property name="margin-start">4</property>
+        <property name="margin-top">4</property>
         <property name="spacing">10</property>
         <child>
           <object class="GtkBox">
@@ -61,13 +65,13 @@ Progress -->
                 <property name="spacing">15</property>
                 <child>
                   <object class="GtkLabel" id="complete-tasks-label">
-                    <property name="css-classes">complete-tasks-indicator</property>
                     <property name="label">...</property>
                     <property name="visible">False</property>
                   </object>
                 </child>
                 <child>
                   <object class="GtkLabel" id="due-date-label">
+                    <property name="css-classes">card</property>
                     <property name="label">...</property>
                     <property name="visible">False</property>
                   </object>
@@ -99,7 +103,7 @@ Progress -->
       <attribute name="label" translatable="yes">Card Details</attribute>
     </item>
     <submenu>
-      <attribute name="label">Card Cover</attribute>
+      <attribute name="label" translatable="yes">Card Cover</attribute>
       <item>
         <attribute name="action">card.set-color</attribute>
         <attribute name="label" translatable="yes">Set Color</attribute>

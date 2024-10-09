@@ -103,7 +103,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
     load_appropriate_style();
     g_signal_connect_after(
-        G_OBJECT(adw_style_manager), "notify::dark",
+        adw_style_manager, "notify::dark",
         G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,
                        gpointer data) {
             reinterpret_cast<ProgressWindow*>(data)->load_appropriate_style();

@@ -63,11 +63,9 @@ public:
 
     CardlistWidget const* get_cardlist_widget() const;
 
-    /**
-     * @brief Updates card's progress bar
-     *
-     */
     void update_completed();
+    void update_due_date();
+
     std::string create_details_text() const;
 
 protected:

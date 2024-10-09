@@ -55,6 +55,12 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
         "remove", sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
     card_menu_button->insert_action_group("card", card_actions);
 
+    card_entry_revealer->property_reveal_child().signal_changed().connect(
+        [this]() {
+            if (!card_entry_revealer->get_reveal_child())
+                this->card_cover_picture->set_paintable(nullptr);
+        });
+
     popover_menu.set_parent(*this);
     popover_menu.set_menu_model(card_menu_model);
     popover_menu.insert_action_group("card", card_actions);
@@ -118,13 +124,11 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
         }
     }
 
+    update_due_date();
+    update_completed();
+
     set_tooltip_text(create_details_text());
     setup_drag_and_drop();
-
-    if (!card_refptr->get_tasks().empty()) {
-        complete_tasks_label->set_visible();
-        update_completed();
-    }
 }
 
 void ui::CardWidget::set_label(const std::string& label) {
@@ -138,10 +142,6 @@ void ui::CardWidget::remove_from_parent() {
     if (cardlist_p) {
         cardlist_p->remove_card(this);
     }
-
-    // The pixbuf in color_frame is invalid on drag and drops events.
-    // Thus it is important to clean whatever existent instances.
-    // color_frame.set_pixbuf(nullptr);
 }
 
 void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
@@ -175,19 +175,35 @@ void ui::CardWidget::update_completed() {
             complete_tasks_label->remove_css_class(
                 last_complete_tasks_label_css_class);
 
-        if (n_complete_tasks < card_refptr->get_tasks().size() / 2 ||
-            card_refptr->get_tasks().size() == 1) {
-            last_complete_tasks_label_css_class =
-                "complete-tasks-indicator-incomplete";
-        } else if (n_complete_tasks == card_refptr->get_tasks().size()) {
+        if (n_complete_tasks == card_refptr->get_tasks().size()) {
             last_complete_tasks_label_css_class =
                 "complete-tasks-indicator-complete";
+        } else if (n_complete_tasks < card_refptr->get_tasks().size() / 2 ||
+                   card_refptr->get_tasks().size() == 1) {
+            last_complete_tasks_label_css_class =
+                "complete-tasks-indicator-incomplete";
         } else if (n_complete_tasks >= card_refptr->get_tasks().size() / 2) {
             last_complete_tasks_label_css_class =
                 "complete-tasks-indicator-almost";
         }
         complete_tasks_label->add_css_class(
             last_complete_tasks_label_css_class);
+    }
+}
+
+void ui::CardWidget::update_due_date() {
+    if (card_refptr->get_due_date().ok()) {
+        due_date_label->set_visible();
+        auto sys_days = std::chrono::sys_days(card_refptr->get_due_date());
+        std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
+
+        std::stringstream ss;
+        ss << _("Due: ") << std::put_time(std::localtime(&time), "%d %b, %Y");
+        auto date_label = ss.str();
+        due_date_label->set_label(date_label);
+        due_date_label->add_css_class("card");
+    } else {
+        due_date_label->set_visible(false);
     }
 }
 
@@ -270,12 +286,9 @@ void ui::CardWidget::open_color_dialog() {
 }
 
 void ui::CardWidget::open_card_details_dialog() {
+    auto& parent_window = *(static_cast<Gtk::Window*>(get_root()));
     auto card_details_dialog = CardDetailsDialog::create(*this);
-    card_details_dialog->set_transient_for(
-        *(static_cast<Gtk::Window*>(get_root())));
-    card_details_dialog->set_hide_on_close(false);
-    card_details_dialog->set_modal();
-    card_details_dialog->set_visible();
+    card_details_dialog->open(parent_window);
 }
 
 void ui::CardWidget::on_rename() {
@@ -313,6 +326,9 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     card_refptr->set_color(Color{color.get_red() * 255, color.get_green() * 255,
                                  color.get_blue() * 255, 1.0});
     color_frame_pixbuf->fill(rgb_to_hex(card_refptr->get_color()));
+    if (card_cover_picture->get_paintable()) {
+        card_cover_picture->set_paintable(nullptr);
+    }
     card_cover_picture->set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     card_cover_revealer->set_reveal_child(true);

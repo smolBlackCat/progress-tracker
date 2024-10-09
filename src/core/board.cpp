@@ -107,6 +107,9 @@ Board::Board(const std::string& board_file_path)
                     std::chrono::parse("%F", secs);
                 Date date{std::chrono::floor<std::chrono::days>(secs)};
                 cur_card.set_due_date(date);
+            } else {
+                // This is bad.
+                cur_card.set_due_date(Date{});
             }
 
             auto task_element = card_element->FirstChildElement("task");
