@@ -178,11 +178,11 @@ void ui::CardWidget::update_completed() {
         if (n_complete_tasks == card_refptr->get_tasks().size()) {
             last_complete_tasks_label_css_class =
                 "complete-tasks-indicator-complete";
-        } else if (n_complete_tasks < card_refptr->get_tasks().size() / 2 ||
+        } else if (n_complete_tasks < card_refptr->get_tasks().size() / 2.0F ||
                    card_refptr->get_tasks().size() == 1) {
             last_complete_tasks_label_css_class =
                 "complete-tasks-indicator-incomplete";
-        } else if (n_complete_tasks >= card_refptr->get_tasks().size() / 2) {
+        } else if (n_complete_tasks >= card_refptr->get_tasks().size() / 2.0F) {
             last_complete_tasks_label_css_class =
                 "complete-tasks-indicator-almost";
         }

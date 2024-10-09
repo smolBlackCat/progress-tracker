@@ -18,9 +18,11 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
           builder->get_widget<Gtk::Button>("unset-due-date-button")},
       card_delete_button{
           builder->get_widget<Gtk::Button>("delete-card-button")},
+      date_menubutton{builder->get_widget<Gtk::MenuButton>("date-menubutton")},
       calendar{builder->get_widget<Gtk::Calendar>("calendar")},
       checkbutton_revealer{
           builder->get_widget<Gtk::Revealer>("checkbutton-revealer")},
+      checkbutton{builder->get_widget<Gtk::CheckButton>("checkbutton")},
       tasks_box{builder->get_widget<Gtk::Box>("tasks-box")},
       notes_textbuffer{
           builder->get_object<Gtk::TextBuffer>("notes-textbuffer")},
@@ -28,8 +30,31 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
     checklist_add_button.signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_add_task));
 
+    auto card_ptr = this->card_widget.get_card();
+
     card_delete_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_delete_card));
+
+    if (card_ptr->get_due_date().ok()) {
+        auto sys_days = std::chrono::sys_days(card_ptr->get_due_date());
+        std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&time), "%F");
+        date_menubutton->set_label(ss.str());
+        checkbutton_revealer->set_reveal_child(true);
+        checkbutton->set_active(card_ptr->get_complete());
+    }
+
+    checkbutton->signal_toggled().connect([this]() {
+        this->card_widget.get_card()->set_complete(
+            this->checkbutton->get_active());
+    });
+
+    calendar->signal_day_selected().connect(
+        sigc::mem_fun(*this, &CardDetailsDialog::on_set_due_date));
+
+    unset_due_date_button->signal_clicked().connect(
+        sigc::mem_fun(*this, &CardDetailsDialog::on_unset_due_date));
 
     g_signal_connect(dialog->gobj(), "close-attempt",
                      G_CALLBACK(+[](AdwDialog* self, gpointer data) {
@@ -39,8 +64,6 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
                      this);
 
     tasks_box->append(checklist_add_button);
-
-    auto card_ptr = this->card_widget.get_card();
 
     card_title_entry->set_text(card_ptr->get_name());
     for (auto& task : card_ptr->get_tasks()) {
@@ -106,6 +129,33 @@ void CardDetailsDialog::on_save() {
 void CardDetailsDialog::on_delete_card() {
     card_widget.remove_from_parent();
     close();
+}
+
+void CardDetailsDialog::on_unset_due_date() {
+    auto card_ptr = card_widget.get_card();
+
+    date_menubutton->set_label(_("Set Due Date"));
+    card_ptr->set_due_date(Date{});
+    checkbutton_revealer->set_reveal_child(false);
+    card_widget.update_due_date();
+}
+
+void CardDetailsDialog::on_set_due_date() {
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+
+    auto card_ptr = card_widget.get_card();
+
+    card_ptr->set_due_date(Date{year{calendar->get_year()},
+                                month(calendar->get_month()),
+                                day(calendar->get_day())});
+    auto sys_days = std::chrono::sys_days(card_ptr->get_due_date());
+    std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time), "%F");
+    date_menubutton->set_label(ss.str());
+    checkbutton_revealer->set_reveal_child(true);
+    card_widget.update_due_date();
 }
 
 void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,

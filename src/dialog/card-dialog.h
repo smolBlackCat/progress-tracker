@@ -47,6 +47,8 @@ protected:
 
     void on_add_task();
     void on_delete_card();
+    void on_unset_due_date();
+    void on_set_due_date();
 
     Glib::RefPtr<Gtk::Builder> builder;
 
@@ -54,8 +56,10 @@ protected:
     Gtk::Entry* card_title_entry;
     Gtk::Button checklist_add_button;
     Gtk::Button *unset_due_date_button, *card_delete_button;
+    Gtk::MenuButton* date_menubutton;
     Gtk::Calendar* calendar;
     Gtk::Revealer* checkbutton_revealer;
+    Gtk::CheckButton* checkbutton;
     Gtk::Box* tasks_box;
     Glib::RefPtr<Gtk::TextBuffer> notes_textbuffer;
 

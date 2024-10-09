@@ -87,6 +87,7 @@ Board::Board(const std::string& board_file_path)
             auto cur_card_name = card_element->Attribute("name");
             auto cur_card_color = card_element->Attribute("color");
             auto cur_card_due_date = card_element->Attribute("due");
+            auto cur_card_complete = card_element->BoolAttribute("complete");
 
             if (!cur_card_name) {
                 throw board_parse_error{std::format(
@@ -96,9 +97,10 @@ Board::Board(const std::string& board_file_path)
                     file_path, cur_cardlist_name, card_element->GetLineNum())};
             }
 
-            Card cur_card{cur_card_name, cur_card_color
-                                             ? string_to_color(cur_card_color)
-                                             : NO_COLOR};
+            Card cur_card{
+                cur_card_name,
+                cur_card_color ? string_to_color(cur_card_color) : NO_COLOR,
+                cur_card_complete};
 
             if (cur_card_due_date) {
                 std::chrono::sys_seconds secs;
@@ -262,9 +264,11 @@ bool Board::save_as_xml(bool create_dirs) {
                 card_element->SetAttribute(
                     "color", color_to_string(card->get_color()).c_str());
             auto date = card->get_due_date();
-            if (date.ok())
+            if (date.ok()) {
                 card_element->SetAttribute("due",
                                            std::format("{}", date).c_str());
+                card_element->SetAttribute("complete", card->get_complete());
+            }
 
             // Add tasks
             for (auto& task : card->get_tasks()) {

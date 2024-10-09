@@ -22,7 +22,7 @@ public:
      *
      * @param name The card's title.
      */
-    Card(const std::string& name, const Color& color = NO_COLOR);
+    Card(const std::string& name, const Color& color = NO_COLOR, bool complete = false);
 
     void set_color(const Color& rgb) override;
 
@@ -84,8 +84,13 @@ public:
 
     Date get_due_date() const;
 
+    bool get_complete() const;
+
+    void set_complete(bool complete);
+
 protected:
     std::string notes;
     std::vector<std::shared_ptr<Task>> tasks;
     Date due_date;
+    bool complete;
 };

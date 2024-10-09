@@ -46,7 +46,7 @@ a Card object details. -->
               <object class="GtkBox">
                 <property name="spacing">4</property>
                 <child>
-                  <object class="GtkMenuButton">
+                  <object class="GtkMenuButton" id="date-menubutton">
                     <property name="label">Set Due Date</property>
                     <property name="popover">
                       <object class="GtkPopover">

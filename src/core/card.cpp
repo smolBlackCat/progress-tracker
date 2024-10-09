@@ -2,7 +2,8 @@
 
 #include <numeric>
 
-Card::Card(const std::string& name, const Color& color) : Item{name} {
+Card::Card(const std::string& name, const Color& color, bool complete)
+    : Item{name}, complete{complete} {
     set_color(color);
     modified = false;
 }
@@ -122,3 +123,20 @@ void Card::set_due_date(const Date& date) {
 };
 
 Date Card::get_due_date() const { return due_date; };
+
+bool Card::get_complete() const {
+    if (due_date.ok()) {
+        return complete;
+    }
+
+    return true;
+}
+
+void Card::set_complete(bool complete) {
+    if (due_date.ok())
+        this->complete = complete;
+    else
+        this->complete = true;
+
+    modified = true;
+}
