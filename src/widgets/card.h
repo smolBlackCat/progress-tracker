@@ -65,6 +65,7 @@ public:
 
     void update_completed();
     void update_due_date();
+    void update_due_date_label_style();
 
     std::string create_details_text() const;
 
@@ -88,6 +89,7 @@ protected:
     std::shared_ptr<Card> card_refptr;
 
     std::string last_complete_tasks_label_css_class = "";
+    std::string last_due_date_label_css_class = "due-date";
 
     void setup_drag_and_drop();
     void open_color_dialog();

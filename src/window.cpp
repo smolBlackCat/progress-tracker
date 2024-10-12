@@ -101,7 +101,9 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       progress_settings{progress_settings} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
     load_appropriate_style();
+
     g_signal_connect_after(
         adw_style_manager, "notify::dark",
         G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,

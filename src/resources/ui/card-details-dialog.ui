@@ -24,7 +24,7 @@ a Card object details. -->
               <object class="GtkLabel">
                 <property name="css-classes">title-4</property>
                 <property name="halign">start</property>
-                <property name="label">Card Title</property>
+                <property name="label" translatable="yes">Card Title</property>
               </object>
             </child>
             <child>
@@ -39,7 +39,7 @@ a Card object details. -->
               <object class="GtkLabel">
                 <property name="css-classes">title-4</property>
                 <property name="halign">start</property>
-                <property name="label">Deadline</property>
+                <property name="label" translatable="yes">Deadline</property>
               </object>
             </child>
             <child>
@@ -91,7 +91,7 @@ a Card object details. -->
               <object class="GtkLabel">
                 <property name="css-classes">title-4</property>
                 <property name="halign">start</property>
-                <property name="label">Checklist</property>
+                <property name="label" translatable="yes">Checklist</property>
               </object>
             </child>
             <child>
@@ -121,7 +121,7 @@ a Card object details. -->
               <object class="GtkLabel">
                 <property name="css-classes">title-4</property>
                 <property name="halign">start</property>
-                <property name="label">Notes</property>
+                <property name="label" translatable="yes">Notes</property>
               </object>
             </child>
             <child>
@@ -131,6 +131,7 @@ a Card object details. -->
                     <property name="buffer">
                       <object class="GtkTextBuffer" id="notes-textbuffer"/>
                     </property>
+                    <property name="css-classes">frame</property>
                     <property name="wrap-mode">word-char</property>
                   </object>
                 </property>
@@ -144,7 +145,7 @@ a Card object details. -->
           <object class="GtkButton" id="delete-card-button">
             <property name="css-classes">destructive-action</property>
             <property name="has-frame">False</property>
-            <property name="label">Delete Card</property>
+            <property name="label" translatable="yes">Delete Card</property>
             <property name="margin-bottom">8</property>
           </object>
         </child>
@@ -153,6 +154,6 @@ a Card object details. -->
     <property name="content-height">650</property>
     <property name="content-width">430</property>
     <property name="presentation-mode">floating</property>
-    <property name="title">Card Details</property>
+    <property name="title" translatable="yes">Card Details</property>
   </object>
 </interface>

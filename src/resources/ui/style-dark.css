@@ -74,3 +74,27 @@ list.rich-list {
     border-radius: 4px;
     padding: 4px;
 }
+
+.due-date {
+    background-color: #5e5c64;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px #000000;
+}
+
+.past-due-date {
+    background-color: #a51d2d;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px #000000;
+}
+
+.due-date-complete {
+    background-color: #26a269;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px #000000;
+}

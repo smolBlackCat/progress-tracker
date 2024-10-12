@@ -71,7 +71,7 @@ Progress -->
                 </child>
                 <child>
                   <object class="GtkLabel" id="due-date-label">
-                    <property name="css-classes">card</property>
+                    <property name="css-classes">due-date</property>
                     <property name="label">...</property>
                     <property name="visible">False</property>
                   </object>
@@ -86,7 +86,7 @@ Progress -->
             <property name="has-frame">False</property>
             <property name="icon-name">view-more-horizontal-symbolic</property>
             <property name="menu-model">card-menu-model</property>
-            <property name="tooltip-text">Card Options</property>
+            <property name="tooltip-text" translatable="yes">Card Options</property>
             <property name="valign">center</property>
           </object>
         </child>

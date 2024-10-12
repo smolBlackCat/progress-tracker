@@ -37,6 +37,7 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
 
     if (card_ptr->get_due_date().ok()) {
         auto sys_days = std::chrono::sys_days(card_ptr->get_due_date());
+        sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
         std::stringstream ss;
         ss << std::put_time(std::localtime(&time), "%F");
@@ -48,6 +49,7 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
     checkbutton->signal_toggled().connect([this]() {
         this->card_widget.get_card()->set_complete(
             this->checkbutton->get_active());
+        this->card_widget.update_due_date_label_style();
     });
 
     calendar->signal_day_selected().connect(
@@ -146,10 +148,13 @@ void CardDetailsDialog::on_set_due_date() {
 
     auto card_ptr = card_widget.get_card();
 
-    card_ptr->set_due_date(Date{year{calendar->get_year()},
-                                month(calendar->get_month()),
-                                day(calendar->get_day())});
-    auto sys_days = std::chrono::sys_days(card_ptr->get_due_date());
+    int y, m, d;
+    calendar->get_date().get_ymd(y, m, d);
+    auto new_date = Date{year{y}, month{static_cast<unsigned int>(m)},
+                         day{static_cast<unsigned int>(d)}};
+    card_ptr->set_due_date(new_date);
+    auto sys_days = std::chrono::sys_days(new_date);
+    sys_days++;
     std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
     std::stringstream ss;
     ss << std::put_time(std::localtime(&time), "%F");

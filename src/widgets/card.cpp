@@ -1,9 +1,11 @@
 #include "card.h"
 
+#include <bits/chrono.h>
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <utils.h>
 
+#include <chrono>
 #include <numeric>
 
 #include "cardlist-widget.h"
@@ -55,9 +57,9 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
         "remove", sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
     card_menu_button->insert_action_group("card", card_actions);
 
-    card_entry_revealer->property_reveal_child().signal_changed().connect(
+    card_cover_revealer->property_child_revealed().signal_changed().connect(
         [this]() {
-            if (!card_entry_revealer->get_reveal_child())
+            if (!card_cover_revealer->get_child_revealed())
                 this->card_cover_picture->set_paintable(nullptr);
         });
 
@@ -195,16 +197,35 @@ void ui::CardWidget::update_due_date() {
     if (card_refptr->get_due_date().ok()) {
         due_date_label->set_visible();
         auto sys_days = std::chrono::sys_days(card_refptr->get_due_date());
+        sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
 
         std::stringstream ss;
         ss << _("Due: ") << std::put_time(std::localtime(&time), "%d %b, %Y");
         auto date_label = ss.str();
         due_date_label->set_label(date_label);
-        due_date_label->add_css_class("card");
+
+        update_due_date_label_style();
     } else {
         due_date_label->set_visible(false);
     }
+}
+
+void ui::CardWidget::update_due_date_label_style() {
+    auto date_now = Date{std::chrono::floor<std::chrono::days>(
+        std::chrono::system_clock::now())};
+    auto date_in_card = card_refptr->get_due_date();
+    due_date_label->remove_css_class(last_due_date_label_css_class);
+
+    if (card_refptr->get_complete()) {
+        last_due_date_label_css_class = "due-date-complete";
+    } else if (date_in_card < date_now) {
+        last_due_date_label_css_class = "past-due-date";
+    } else {
+        last_due_date_label_css_class = "due-date";
+    }
+
+    due_date_label->add_css_class(last_due_date_label_css_class);
 }
 
 void ui::CardWidget::setup_drag_and_drop() {

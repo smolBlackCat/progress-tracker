@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 07:40-0300\n"
+"POT-Creation-Date: 2024-10-12 11:54-0300\n"
 "PO-Revision-Date: 2024-07-10 11:11-0300\n"
 "Last-Translator: Gabriel de Moura <smolblackcat@proton.me>\n"
 "Language-Team: English\n"
@@ -37,12 +37,20 @@ msgstr "Delete"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/window.cpp:159
+#: src/window.cpp:165
 msgid "It was not possible to load this board"
 msgstr "It was not possible to load this board"
 
-#: src/dialog/card-dialog.cpp:71
+#: src/dialog/card-dialog.cpp:13
+msgid "Add Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:109
 msgid "New Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:138
+msgid "Set Due Date"
 msgstr ""
 
 #: src/dialog/board-dialog.cpp:20
@@ -135,29 +143,68 @@ msgstr "As a file"
 msgid "As a color"
 msgstr "As a color"
 
-#: src/resources/ui/card-details-dialog.ui:30
-msgid "Card Name"
+#: src/resources/ui/card-details-dialog.ui:27
+msgid "Card Title"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:53
+#: src/resources/ui/card-details-dialog.ui:42
+msgid "Deadline"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:59
+msgid "Unset Due Date"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:78
+msgid "Mark this card complete"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:94
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:70
-msgid "Add an item to the checklist"
-msgstr ""
-
-#: src/resources/ui/card-details-dialog.ui:77
-msgid "Toggle the checklist"
-msgstr ""
-
-#: src/resources/ui/card-details-dialog.ui:122
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:366
 msgid "Notes"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:141 src/widgets/card.cpp:24
+#: src/resources/ui/card-details-dialog.ui:148
+msgid "Delete Card"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:157
+#: src/resources/ui/card-widget.ui:103
 msgid "Card Details"
 msgstr ""
+
+#: src/resources/ui/card-widget.ui:45 src/widgets/cardlist-widget.cpp:50
+msgid "New Card"
+msgstr "New Card"
+
+#: src/resources/ui/card-widget.ui:89
+msgid "Card Options"
+msgstr ""
+
+#: src/resources/ui/card-widget.ui:99 src/widgets/editable-label-header.cpp:76
+#: src/widgets/task-widget.cpp:47
+msgid "Rename"
+msgstr "Rename"
+
+#: src/resources/ui/card-widget.ui:106
+msgid "Card Cover"
+msgstr "Card Cover"
+
+#: src/resources/ui/card-widget.ui:109
+msgid "Set Color"
+msgstr "Set Color"
+
+#: src/resources/ui/card-widget.ui:113
+msgid "Unset Color"
+msgstr ""
+
+#: src/resources/ui/card-widget.ui:118 src/widgets/cardlist-widget.cpp:31
+#: src/widgets/task-widget.cpp:48
+msgid "Remove"
+msgstr "Remove"
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -167,45 +214,21 @@ msgstr "Add List"
 msgid "New CardList"
 msgstr "New CardList"
 
-#: src/widgets/card.cpp:21 src/widgets/cardlist-widget.cpp:31
-#: src/widgets/task-widget.cpp:38
-msgid "Remove"
-msgstr "Remove"
-
-#: src/widgets/card.cpp:36
-msgid "Set Color"
-msgstr "Set Color"
-
-#: src/widgets/card.cpp:37
-msgid "Clear Color Frame"
-msgstr "Clear Color Frame"
-
-#: src/widgets/card.cpp:44
-msgid "Card Cover"
-msgstr "Card Cover"
-
-#: src/widgets/card.cpp:215
-msgid "%1%% complete"
+#: src/widgets/card.cpp:204
+msgid "Due: "
 msgstr ""
 
-#: src/widgets/card.cpp:221
-msgid ""
-"Notes:\n"
-"%1"
+#: src/widgets/card.cpp:360
+msgid "%1%% complete"
 msgstr ""
 
 #: src/widgets/cardlist-widget.cpp:12
 msgid "Add card"
 msgstr "Add card"
 
-#: src/widgets/cardlist-widget.cpp:50
-msgid "New Card"
-msgstr "New Card"
-
-#: src/widgets/editable-label-header.cpp:76 src/widgets/task-widget.cpp:37
-msgid "Rename"
-msgstr "Rename"
-
-#: src/widgets/task-widget.cpp:39
+#: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Clear Color Frame"
+#~ msgstr "Clear Color Frame"
