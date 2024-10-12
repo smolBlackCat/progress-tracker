@@ -10,7 +10,11 @@
  */
 int main(int argc, char *argv[]) {
     auto sys_locale = std::setlocale(LC_ALL, "");
-    auto cur_loc = std::locale::global(std::locale{sys_locale});
+    try {
+        auto cur_loc = std::locale::global(std::locale{sys_locale});
+    } catch (...) {
+        auto cur_loc = std::locale::global(std::locale::classic());
+    }
 
     bindtextdomain("progress-tracker", locale_folder().c_str());
     bind_textdomain_codeset("progress-tracker", "utf-8");

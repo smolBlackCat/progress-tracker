@@ -10,10 +10,10 @@
 
 #ifdef DEVELOPMENT
 constexpr const char* BOARDS_FOLDER = "/progress-debug/boards/";
-constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress Debug\\Boards";
+constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress Debug\\Boards\\";
 #else
 constexpr const char* BOARDS_FOLDER = "/progress/boards/";
-constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress\\Boards";
+constexpr const char* BOARDS_FOLDER_WIN32 = "\\Progress\\Boards\\";
 #endif
 
 std::string locale_folder() {
