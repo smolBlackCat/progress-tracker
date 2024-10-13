@@ -85,7 +85,7 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = card_widget.get_card();
     card->remove_task(task.get_task());
     tasks_box->remove(task);
-    card_widget.update_completed();
+    card_widget.update_complete_tasks();
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
@@ -108,7 +108,7 @@ CardWidget& CardDetailsDialog::get_card_widget() { return card_widget; }
 
 void CardDetailsDialog::on_add_task() {
     _add_task(card_widget.get_card()->add_task(Task{_("New Task")}), true);
-    card_widget.update_completed();
+    card_widget.update_complete_tasks();
 }
 
 void CardDetailsDialog::on_save() {

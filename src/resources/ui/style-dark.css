@@ -56,6 +56,8 @@ list.rich-list {
 
 .complete-tasks-indicator-complete {
     background-color: #26a269;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
@@ -63,6 +65,8 @@ list.rich-list {
 
 .complete-tasks-indicator-almost {
     background-color: #e5a50a;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
@@ -70,6 +74,8 @@ list.rich-list {
 
 .complete-tasks-indicator-incomplete {
     background-color: #a51d2d;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
@@ -77,6 +83,8 @@ list.rich-list {
 
 .due-date {
     background-color: #5e5c64;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
@@ -85,6 +93,8 @@ list.rich-list {
 
 .past-due-date {
     background-color: #a51d2d;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
@@ -93,6 +103,8 @@ list.rich-list {
 
 .due-date-complete {
     background-color: #26a269;
+    transition-property: background-color;
+    transition-duration: 0.5s;
     border-style: solid;
     border-radius: 4px;
     padding: 4px;

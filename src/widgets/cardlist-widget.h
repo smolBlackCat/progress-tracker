@@ -76,6 +76,8 @@ public:
 
     void reorder_cardwidget(ui::CardWidget& next, ui::CardWidget& sibling);
 
+    const std::vector<ui::CardWidget*>& get_cardwidget_vector();
+
 private:
     void setup_drag_and_drop();
 

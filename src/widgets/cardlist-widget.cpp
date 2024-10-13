@@ -89,6 +89,11 @@ void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
     cardlist->reorder_card(*next.get_card(), *sibling.get_card());
 }
 
+const std::vector<ui::CardWidget*>&
+ui::CardlistWidget::get_cardwidget_vector() {
+    return cards_tracker;
+}
+
 void ui::CardlistWidget::setup_drag_and_drop() {
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->signal_prepare().connect(

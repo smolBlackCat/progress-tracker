@@ -127,7 +127,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
     }
 
     update_due_date();
-    update_completed();
+    update_complete_tasks();
 
     set_tooltip_text(create_details_text());
     setup_drag_and_drop();
@@ -158,7 +158,7 @@ ui::CardlistWidget const* ui::CardWidget::get_cardlist_widget() const {
     return cardlist_p;
 }
 
-void ui::CardWidget::update_completed() {
+void ui::CardWidget::update_complete_tasks() {
     if (card_refptr->get_tasks().empty()) {
         complete_tasks_label->set_label("");
         complete_tasks_label->set_visible(false);

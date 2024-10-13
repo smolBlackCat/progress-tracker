@@ -63,7 +63,7 @@ public:
 
     CardlistWidget const* get_cardlist_widget() const;
 
-    void update_completed();
+    void update_complete_tasks();
     void update_due_date();
     void update_due_date_label_style();
 

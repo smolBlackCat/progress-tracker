@@ -60,6 +60,20 @@ ui::BoardWidget::BoardWidget()
             return true;
         },
         BoardWidget::SAVE_INTERVAL);
+
+    // Update due date labels of every card in the board every minute
+    Glib::signal_timeout().connect(
+        [this]() {
+            if (this->board) {
+                for (auto& cardlist : this->cardlist_vector) {
+                    for (auto& card : cardlist->get_cardwidget_vector()) {
+                        card->update_due_date_label_style();
+                    }
+                }
+            }
+            return true;
+        },
+        BoardWidget::SAVE_INTERVAL * 6);
 }
 
 ui::BoardWidget::~BoardWidget() {}
