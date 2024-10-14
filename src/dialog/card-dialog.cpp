@@ -40,7 +40,7 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
         sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
         std::stringstream ss;
-        ss << std::put_time(std::localtime(&time), "%F");
+        ss << std::put_time(std::localtime(&time), "%x");
         date_menubutton->set_label(ss.str());
         checkbutton_revealer->set_reveal_child(true);
         checkbutton->set_active(card_ptr->get_complete());

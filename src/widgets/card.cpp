@@ -1,6 +1,5 @@
 #include "card.h"
 
-#include <bits/chrono.h>
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <utils.h>
@@ -12,9 +11,9 @@
 
 ui::CardWidget::CardWidget(BaseObjectType* cobject,
                            const Glib::RefPtr<Gtk::Builder>& builder,
-                           std::shared_ptr<Card> card_refptr, bool is_new)
+                           std::shared_ptr<Card> card, bool is_new)
     : Gtk::Box{cobject},
-      card_refptr{card_refptr},
+      card{card},
       cardlist_p{nullptr},
       is_new{is_new},
       card_cover_revealer{
@@ -37,7 +36,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
       color_dialog{Gtk::ColorDialog::create()} {
-    set_label(card_refptr->get_name());
+    set_label(card->get_name());
     if (is_new) {
         on_rename();  // Open card on rename mode by default whenever a new card
                       // is created
@@ -114,15 +113,15 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
     card_label->add_controller(card_label_click_controller);
     add_controller(click_controller);
 
-    if (card_refptr->is_color_set()) {
-        Color card_color = card_refptr->get_color();
+    if (card->is_color_set()) {
+        Color card_color = card->get_color();
         set_color(Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
                             static_cast<float>(std::get<1>(card_color)) / 255,
                             static_cast<float>(std::get<2>(card_color)) / 255,
                             std::get<3>(card_color)});
 
         if (!is_new) {
-            card_refptr->set_modified(false);
+            card->set_modified(false);
         }
     }
 
@@ -152,51 +151,35 @@ void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
     }
 }
 
-std::shared_ptr<Card> ui::CardWidget::get_card() { return card_refptr; }
+std::shared_ptr<Card> ui::CardWidget::get_card() { return card; }
 
 ui::CardlistWidget const* ui::CardWidget::get_cardlist_widget() const {
     return cardlist_p;
 }
 
 void ui::CardWidget::update_complete_tasks() {
-    if (card_refptr->get_tasks().empty()) {
+    if (card->get_tasks().empty()) {
         complete_tasks_label->set_label("");
         complete_tasks_label->set_visible(false);
     } else {
         complete_tasks_label->set_visible();
-        float n_complete_tasks = std::accumulate(
-            card_refptr->get_tasks().begin(), card_refptr->get_tasks().end(), 0,
-            [](int acc, const std::shared_ptr<Task>& task) {
-                return task->get_done() ? ++acc : acc;
-            });
-        complete_tasks_label->set_label(std::format(
-            "{}/{}", n_complete_tasks, card_refptr->get_tasks().size()));
+        float n_complete_tasks =
+            std::accumulate(card->get_tasks().begin(), card->get_tasks().end(),
+                            0, [](int acc, const std::shared_ptr<Task>& task) {
+                                return task->get_done() ? ++acc : acc;
+                            });
+        complete_tasks_label->set_label(
+            std::format("{}/{}", n_complete_tasks, card->get_tasks().size()));
 
         // Silences warning about deleting empty css classes
-        if (!last_complete_tasks_label_css_class.empty())
-            complete_tasks_label->remove_css_class(
-                last_complete_tasks_label_css_class);
-
-        if (n_complete_tasks == card_refptr->get_tasks().size()) {
-            last_complete_tasks_label_css_class =
-                "complete-tasks-indicator-complete";
-        } else if (n_complete_tasks < card_refptr->get_tasks().size() / 2.0F ||
-                   card_refptr->get_tasks().size() == 1) {
-            last_complete_tasks_label_css_class =
-                "complete-tasks-indicator-incomplete";
-        } else if (n_complete_tasks >= card_refptr->get_tasks().size() / 2.0F) {
-            last_complete_tasks_label_css_class =
-                "complete-tasks-indicator-almost";
-        }
-        complete_tasks_label->add_css_class(
-            last_complete_tasks_label_css_class);
+        update_complete_tasks_style(n_complete_tasks);
     }
 }
 
 void ui::CardWidget::update_due_date() {
-    if (card_refptr->get_due_date().ok()) {
+    if (card->get_due_date().ok()) {
         due_date_label->set_visible();
-        auto sys_days = std::chrono::sys_days(card_refptr->get_due_date());
+        auto sys_days = std::chrono::sys_days(card->get_due_date());
         sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
 
@@ -214,10 +197,10 @@ void ui::CardWidget::update_due_date() {
 void ui::CardWidget::update_due_date_label_style() {
     auto date_now = Date{std::chrono::floor<std::chrono::days>(
         std::chrono::system_clock::now())};
-    auto date_in_card = card_refptr->get_due_date();
+    auto date_in_card = card->get_due_date();
     due_date_label->remove_css_class(last_due_date_label_css_class);
 
-    if (card_refptr->get_complete()) {
+    if (card->get_complete()) {
         last_due_date_label_css_class = "due-date-complete";
     } else if (date_in_card < date_now) {
         last_due_date_label_css_class = "past-due-date";
@@ -226,6 +209,25 @@ void ui::CardWidget::update_due_date_label_style() {
     }
 
     due_date_label->add_css_class(last_due_date_label_css_class);
+}
+
+void ui::CardWidget::update_complete_tasks_style(
+    unsigned long n_complete_tasks) {
+    if (!last_complete_tasks_label_css_class.empty())
+        complete_tasks_label->remove_css_class(
+            last_complete_tasks_label_css_class);
+
+    if (n_complete_tasks == card->get_tasks().size()) {
+        last_complete_tasks_label_css_class =
+            "complete-tasks-indicator-complete";
+    } else if (n_complete_tasks < card->get_tasks().size() / 2.0F ||
+               card->get_tasks().size() == 1) {
+        last_complete_tasks_label_css_class =
+            "complete-tasks-indicator-incomplete";
+    } else if (n_complete_tasks >= card->get_tasks().size() / 2.0F) {
+        last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
+    }
+    complete_tasks_label->add_css_class(last_complete_tasks_label_css_class);
 }
 
 void ui::CardWidget::setup_drag_and_drop() {
@@ -324,12 +326,12 @@ void ui::CardWidget::off_rename() {
 
 void ui::CardWidget::clear_color() {
     card_cover_revealer->set_reveal_child(false);
-    card_refptr->set_color(NO_COLOR);
+    card->set_color(NO_COLOR);
 }
 
 void ui::CardWidget::on_confirm_changes() {
     if (card_entry->get_text().compare(card_label->get_label()) != 0) {
-        card_refptr->set_name(card_entry->get_text());
+        card->set_name(card_entry->get_text());
         card_label->set_label(card_entry->get_text());
     }
     is_new = false;
@@ -344,9 +346,9 @@ void ui::CardWidget::on_cancel_changes() {
 void ui::CardWidget::set_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
-    card_refptr->set_color(Color{color.get_red() * 255, color.get_green() * 255,
-                                 color.get_blue() * 255, 1.0});
-    color_frame_pixbuf->fill(rgb_to_hex(card_refptr->get_color()));
+    card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
+                          color.get_blue() * 255, 1.0});
+    color_frame_pixbuf->fill(rgb_to_hex(card->get_color()));
     if (card_cover_picture->get_paintable()) {
         card_cover_picture->set_paintable(nullptr);
     }
@@ -358,15 +360,46 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
 std::string ui::CardWidget::create_details_text() const {
     std::ostringstream details_text;
 
-    if (!card_refptr->get_tasks().empty()) {
+    if (!card->get_tasks().empty()) {
         details_text << Glib::ustring::compose(_("%1%% complete"),
-                                               card_refptr->get_completion())
+                                               card->get_completion())
                      << "\n\n";
     }
 
-    if (!card_refptr->get_notes().empty()) {
-        details_text << _("Notes") << ":\n"
-                     << card_refptr->get_notes() << "\n\n";
+    auto card_due_date = card->get_due_date();
+    if (card_due_date.ok()) {
+        auto sys_clock_now =
+            std::chrono::sys_days(std::chrono::floor<std::chrono::days>(
+                std::chrono::system_clock::now()));
+        Date cur_date = Date{sys_clock_now};
+        if (card->get_complete()) {
+            details_text << _("This card is complete") << "\n\n";
+        } else if (card_due_date > cur_date) {
+            auto due_date_tm = std::chrono::system_clock::to_time_t(
+                ++std::chrono::sys_days(card_due_date));
+            details_text << std::put_time(std::localtime(&due_date_tm),
+                                          _("This card is due %x"))
+                         << "\n\n";
+        } else if (card_due_date == cur_date) {
+            details_text << _("The card is due today") << "\n\n";
+        } else {
+            auto now =
+                std::chrono::sys_days(std::chrono::floor<std::chrono::days>(
+                    std::chrono::system_clock::now()));
+            auto days = std::chrono::sys_days(card_due_date);
+            auto delta_days = -(days - now).count();
+            details_text << Glib::ustring::compose(
+                                ngettext(
+                                    "This card is past due date %1 day ago",
+                                    "This card is past due date %1 days ago",
+                                    delta_days),
+                                delta_days)
+                         << "\n\n";
+        }
+    }
+
+    if (!card->get_notes().empty()) {
+        details_text << _("Notes") << ":\n" << card->get_notes() << "\n\n";
     }
 
     std::string final_text = details_text.str();

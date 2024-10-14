@@ -66,6 +66,7 @@ public:
     void update_complete_tasks();
     void update_due_date();
     void update_due_date_label_style();
+    void update_complete_tasks_style(unsigned long n_complete_tasks);
 
     std::string create_details_text() const;
 
@@ -86,7 +87,7 @@ protected:
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
     ui::CardlistWidget* cardlist_p;
-    std::shared_ptr<Card> card_refptr;
+    std::shared_ptr<Card> card;
 
     std::string last_complete_tasks_label_css_class = "";
     std::string last_due_date_label_css_class = "due-date";
