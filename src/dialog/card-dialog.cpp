@@ -4,6 +4,8 @@
 #include <widgets/card.h>
 #include <widgets/task-widget.h>
 
+#include <ctime>
+
 #include "glibmm/ustring.h"
 
 namespace ui {
@@ -36,12 +38,7 @@ CardDetailsDialog::CardDetailsDialog(CardWidget& card_widget)
         sigc::mem_fun(*this, &CardDetailsDialog::on_delete_card));
 
     if (card_ptr->get_due_date().ok()) {
-        auto sys_days = std::chrono::sys_days(card_ptr->get_due_date());
-        sys_days++;
-        std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&time), "%x");
-        date_menubutton->set_label(ss.str());
+        update_due_date_label();
         checkbutton_revealer->set_reveal_child(true);
         checkbutton->set_active(card_ptr->get_complete());
     }
@@ -104,6 +101,16 @@ void CardDetailsDialog::close() {
     delete this;  // Suicide
 }
 
+void CardDetailsDialog::update_due_date_label() {
+    auto sys_days =
+        std::chrono::sys_days(card_widget.get_card()->get_due_date());
+    sys_days++;
+    std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
+    char date_str[255];
+    strftime(date_str, 255, "%x", std::localtime(&time));
+    date_menubutton->set_label(Glib::ustring{date_str});
+}
+
 CardWidget& CardDetailsDialog::get_card_widget() { return card_widget; }
 
 void CardDetailsDialog::on_add_task() {
@@ -153,14 +160,9 @@ void CardDetailsDialog::on_set_due_date() {
     auto new_date = Date{year{y}, month{static_cast<unsigned int>(m)},
                          day{static_cast<unsigned int>(d)}};
     card_ptr->set_due_date(new_date);
-    auto sys_days = std::chrono::sys_days(new_date);
-    sys_days++;
-    std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time), "%F");
-    date_menubutton->set_label(ss.str());
     checkbutton_revealer->set_reveal_child(true);
     card_widget.update_due_date();
+    update_due_date_label();
 }
 
 void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,

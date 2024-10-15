@@ -37,6 +37,8 @@ public:
 
     void close();
 
+    void update_due_date_label();
+
     /**
      * @brief Returns the CardWidget object pointer
      */

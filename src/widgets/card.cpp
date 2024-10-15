@@ -183,10 +183,9 @@ void ui::CardWidget::update_due_date() {
         sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
 
-        std::stringstream ss;
-        ss << _("Due: ") << std::put_time(std::localtime(&time), "%d %b, %Y");
-        auto date_label = ss.str();
-        due_date_label->set_label(date_label);
+        char date_str[255];
+        strftime(date_str, 255, "%d %b, %Y", std::localtime(&time));
+        due_date_label->set_label(Glib::ustring{date_str});
 
         update_due_date_label_style();
     } else {
