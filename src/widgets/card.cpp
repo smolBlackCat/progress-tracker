@@ -185,7 +185,7 @@ void ui::CardWidget::update_due_date() {
 
         char date_str[255];
         strftime(date_str, 255, "%d %b, %Y", std::localtime(&time));
-        due_date_label->set_label(Glib::ustring{date_str});
+        due_date_label->set_label(_("Due: ") + Glib::ustring{date_str});
 
         update_due_date_label_style();
     } else {
@@ -357,6 +357,8 @@ void ui::CardWidget::set_color(const Gdk::RGBA& color) {
 }
 
 std::string ui::CardWidget::create_details_text() const {
+    using namespace std::chrono;
+
     std::ostringstream details_text;
 
     if (!card->get_tasks().empty()) {
@@ -367,33 +369,52 @@ std::string ui::CardWidget::create_details_text() const {
 
     auto card_due_date = card->get_due_date();
     if (card_due_date.ok()) {
-        auto sys_clock_now =
-            std::chrono::sys_days(std::chrono::floor<std::chrono::days>(
-                std::chrono::system_clock::now()));
+        auto sys_clock_now = sys_days(floor<days>(system_clock::now()));
         Date cur_date = Date{sys_clock_now};
         if (card->get_complete()) {
             details_text << _("This card is complete") << "\n\n";
         } else if (card_due_date > cur_date) {
-            auto due_date_tm = std::chrono::system_clock::to_time_t(
-                ++std::chrono::sys_days(card_due_date));
-            details_text << std::put_time(std::localtime(&due_date_tm),
-                                          _("This card is due %x"))
-                         << "\n\n";
+            auto due_date_tm =
+                system_clock::to_time_t(++sys_days(card_due_date));
+            char date_info[100];
+            strftime(date_info, 100, _("This card is due %x"),
+                     std::localtime(&due_date_tm));
+            details_text << std::string{date_info} << "\n\n";
         } else if (card_due_date == cur_date) {
             details_text << _("The card is due today") << "\n\n";
         } else {
-            auto now =
-                std::chrono::sys_days(std::chrono::floor<std::chrono::days>(
-                    std::chrono::system_clock::now()));
-            auto days = std::chrono::sys_days(card_due_date);
+            auto now = sys_days(floor<days>(system_clock::now()));
+            auto days = sys_days(card_due_date);
             auto delta_days = -(days - now).count();
-            details_text << Glib::ustring::compose(
-                                ngettext(
-                                    "This card is past due date %1 day ago",
+
+            if (delta_days < 30) {
+                details_text
+                    << Glib::ustring::compose(
+                           ngettext("This card is past due date %1 day ago",
                                     "This card is past due date %1 days ago",
                                     delta_days),
-                                delta_days)
-                         << "\n\n";
+                           delta_days)
+                    << "\n\n";
+            } else if (delta_days > 30 && delta_days < 365) {
+                long months_from_delta =
+                    delta_days / 30;  // Assume every month has 30 days
+                details_text
+                    << Glib::ustring::compose(
+                           ngettext("This card is past due date %1 month ago",
+                                    "This card is past due date %1 months ago",
+                                    months_from_delta),
+                           months_from_delta)
+                    << "\n\n";
+            } else if (delta_days >= 365) {
+                long years_from_delta = delta_days / 365;  // Ignore leap years
+                details_text
+                    << Glib::ustring::compose(
+                           ngettext("This card is past due date %1 year ago",
+                                    "This card is past due date %1 years ago",
+                                    years_from_delta),
+                           years_from_delta)
+                    << "\n\n";
+            }
         }
     }
 

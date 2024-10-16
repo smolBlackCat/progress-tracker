@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-12 11:54-0300\n"
+"POT-Creation-Date: 2024-10-16 13:51-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: src/window.cpp:34
 msgid "translator-credits"
@@ -41,15 +42,15 @@ msgstr ""
 msgid "It was not possible to load this board"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:13
+#: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:109
+#: src/dialog/card-dialog.cpp:117
 msgid "New Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:138
+#: src/dialog/card-dialog.cpp:146
 msgid "Set Due Date"
 msgstr ""
 
@@ -163,7 +164,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:366
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:423
 msgid "Notes"
 msgstr ""
 
@@ -214,13 +215,44 @@ msgstr ""
 msgid "New CardList"
 msgstr ""
 
-#: src/widgets/card.cpp:204
+#: src/widgets/card.cpp:188
 msgid "Due: "
 msgstr ""
 
-#: src/widgets/card.cpp:360
+#: src/widgets/card.cpp:365
 msgid "%1%% complete"
 msgstr ""
+
+#: src/widgets/card.cpp:375
+msgid "This card is complete"
+msgstr ""
+
+#: src/widgets/card.cpp:381
+#, c-format
+msgid "This card is due %x"
+msgstr ""
+
+#: src/widgets/card.cpp:385
+msgid "The card is due today"
+msgstr ""
+
+#: src/widgets/card.cpp:394
+msgid "This card is past due date %1 day ago"
+msgid_plural "This card is past due date %1 days ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card.cpp:404
+msgid "This card is past due date %1 month ago"
+msgid_plural "This card is past due date %1 months ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card.cpp:413
+msgid "This card is past due date %1 year ago"
+msgid_plural "This card is past due date %1 years ago"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/widgets/cardlist-widget.cpp:12
 msgid "Add card"

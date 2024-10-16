@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-12 11:54-0300\n"
+"POT-Creation-Date: 2024-10-16 13:51-0300\n"
 "PO-Revision-Date: 2024-02-10 12:25-0300\n"
 "Last-Translator: Gabriel de Moura <moura@moura>\n"
 "Language-Team: Brazilian Portuguese <ldpbr-translation@lists.sourceforge."
@@ -42,15 +42,15 @@ msgstr "Cancelar"
 msgid "It was not possible to load this board"
 msgstr "Não foi possível carregar este quadro"
 
-#: src/dialog/card-dialog.cpp:13
+#: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
 msgstr "Adicionar Tarefa"
 
-#: src/dialog/card-dialog.cpp:109
+#: src/dialog/card-dialog.cpp:117
 msgid "New Task"
 msgstr "Nova Tarefa"
 
-#: src/dialog/card-dialog.cpp:138
+#: src/dialog/card-dialog.cpp:146
 msgid "Set Due Date"
 msgstr "Marcar Prazo"
 
@@ -164,7 +164,7 @@ msgstr "Marcar cartão como concluído"
 msgid "Checklist"
 msgstr "Lista de Tarefas"
 
-#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:366
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:423
 msgid "Notes"
 msgstr "Anotações"
 
@@ -215,13 +215,44 @@ msgstr "Adicionar Lista"
 msgid "New CardList"
 msgstr "Nova lista de cartões"
 
-#: src/widgets/card.cpp:204
+#: src/widgets/card.cpp:188
 msgid "Due: "
 msgstr "Prazo: "
 
-#: src/widgets/card.cpp:360
+#: src/widgets/card.cpp:365
 msgid "%1%% complete"
 msgstr "%1%% completo"
+
+#: src/widgets/card.cpp:375
+msgid "This card is complete"
+msgstr "Este cartão está concluído"
+
+#: src/widgets/card.cpp:381
+#, c-format
+msgid "This card is due %x"
+msgstr "O prazo para este cartão é %x"
+
+#: src/widgets/card.cpp:385
+msgid "The card is due today"
+msgstr "O cartão é para hoje"
+
+#: src/widgets/card.cpp:394
+msgid "This card is past due date %1 day ago"
+msgid_plural "This card is past due date %1 days ago"
+msgstr[0] "Este cartão passou do prazo a %1 dia atrás"
+msgstr[1] "Este cartão passou do prazo a %1 dias atrás"
+
+#: src/widgets/card.cpp:404
+msgid "This card is past due date %1 month ago"
+msgid_plural "This card is past due date %1 months ago"
+msgstr[0] "Este cartão passou do prazo a %1 mês atrás"
+msgstr[1] "Este cartão passou do prazo a %1 meses atrás"
+
+#: src/widgets/card.cpp:413
+msgid "This card is past due date %1 year ago"
+msgid_plural "This card is past due date %1 years ago"
+msgstr[0] "Este cartão passou do prazo a %1 ano atrás"
+msgstr[1] "Este cartão passou do prazo a %1 anos atrás"
 
 #: src/widgets/cardlist-widget.cpp:12
 msgid "Add card"
