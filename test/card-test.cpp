@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "card.h"
+#include "core/card.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -96,6 +96,29 @@ TEST_CASE("Card operations", "[Card]") {
         // means that no date was set
         REQUIRE(!card_with_due_date.past_due_date());
     }
+
+    SECTION("Marking Cards as complete only if a Card has a due date") {
+        Card rouxls_kard{"Worms"};
+
+        REQUIRE(rouxls_kard
+                    .get_complete());  // Because no date was set, assume this
+                                       // card is in an already complete state
+
+        Date now_date = std::chrono::floor<std::chrono::days>(
+            std::chrono::system_clock::now());
+        rouxls_kard.set_due_date(now_date);
+        REQUIRE(rouxls_kard.get_modified());
+
+        rouxls_kard.set_modified(false);
+
+        // Since a due date was set, it means that card expects to be completed
+        // before the due date arrives
+        REQUIRE(!rouxls_kard.get_complete());
+        REQUIRE(!rouxls_kard.get_modified());
+        rouxls_kard.set_complete(true);
+        REQUIRE(rouxls_kard.get_modified());
+        REQUIRE(rouxls_kard.get_complete());
+    }
 }
 
 TEST_CASE("Task reordering", "[Card]") {
@@ -109,6 +132,8 @@ TEST_CASE("Task reordering", "[Card]") {
     card1.add_task(task2);
     card1.add_task(task3);
 
+    card1.set_modified(false);
+
     auto& card1_tasks = card1.get_tasks();
 
     REQUIRE(task1 == *card1_tasks[0]);
@@ -120,4 +145,6 @@ TEST_CASE("Task reordering", "[Card]") {
     CHECK(task1 == *card1_tasks[2]);
     CHECK(task2 == *card1_tasks[0]);
     CHECK(task3 == *card1_tasks[1]);
+
+    REQUIRE(card1.get_modified());
 }

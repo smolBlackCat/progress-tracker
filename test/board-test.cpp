@@ -1,10 +1,12 @@
-#include "cardlist.h"
 #define CATCH_CONFIG_MAIN
+
+#include "core/board.h"
+
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
 
-#include "board.h"
+#include "core/cardlist.h"
 
 TEST_CASE("Board default constructor", "[Board]") {
     Board board;
@@ -48,8 +50,9 @@ TEST_CASE("Board XML constructor", "[Board]") {
     REQUIRE(board.get_cardlist_vector().size() == 1);
     REQUIRE(board.get_cardlist_vector()[0]->get_name() == "To Do");
     Card card = *board.get_cardlist_vector()[0]->get_card_vector()[0];
+    REQUIRE(!card.get_complete());
     REQUIRE(card.get_due_date() == Date{std::chrono::year{2012},
-                                        std::chrono::month{01},
+                                        std::chrono::month{1},
                                         std::chrono::day{1}});
 
     // Clean up
@@ -104,8 +107,9 @@ TEST_CASE("Board save as XML", "[Board]") {
                            std::chrono::day{2}});
     cardlist.add_card(card);
     board.add_cardlist(cardlist);
-
+    REQUIRE(board.get_modified());
     REQUIRE(board.save_as_xml());
+    REQUIRE(!board.get_modified());
     REQUIRE(std::filesystem::exists(file_path));
 
     // Load the saved file and verify its contents
@@ -127,6 +131,7 @@ TEST_CASE("Board save as XML", "[Board]") {
     REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
     REQUIRE(card_element->Attribute("due"));
     REQUIRE(card_element->Attribute("due") == std::string("2013-12-02"));
+    REQUIRE(!card_element->BoolAttribute("done"));
     auto color = card_element->Attribute("color");
     REQUIRE(color == std::string("rgb(0,0,255)"));
 
@@ -136,8 +141,7 @@ TEST_CASE("Board save as XML", "[Board]") {
 
 TEST_CASE("Board save as XML (2)", "[Board]") {
     Board board("Test Board", "rgba(255,0,0,1)");
-    std::string file_path =
-        (std::filesystem::current_path() / "test_save_board.xml").string();
+    std::string file_path = "test_save_board.xml";
     board.set_filepath(file_path);
 
     CardList cardlist("To Do");
