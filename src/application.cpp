@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include "core/board.h"
+
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
@@ -53,7 +55,10 @@ void ui::Application::on_startup() {
             std::string board_filename = dir_entry.path().string();
             if (board_filename.ends_with(".xml")) {
                 try {
-                    main_window->add_board(board_filename);
+                    BoardBackend backend{BackendType::LOCAL,
+                                         std::map<std::string, std::string>{
+                                             {"filepath", board_filename}}};
+                    main_window->add_local_board(backend);
                 } catch (std::invalid_argument& err) {
                     // TODO: Add code keeping track of how many failures to
                     // load boards

@@ -54,15 +54,21 @@ void CreateBoardDialog::create_board() {
     std::string background = background_type == "as-file"
                                  ? p_select_file_label->get_text()
                                  : p_colour_button->get_rgba().to_string();
-    Board board = Board{p_board_name_entry->get_text(), background};
-    std::string new_file_path = gen_unique_filename(board.get_name());
-    if (!board.set_filepath(new_file_path)) {
+    BoardBackend board_backend{BackendType::LOCAL};
+    std::string new_file_path =
+        gen_unique_filename(p_board_name_entry->get_text());
+
+    if (!board_backend.set_attribute("filepath", new_file_path)) {
         auto message_dialog = Gtk::AlertDialog::create(
             _("It was not possible to create a Board with given name"));
         message_dialog->show(*this);
     } else {
-        board.save_as_xml();
-        board_creator.add_board(new_file_path);
+        Board board =
+            board_backend.create(p_board_name_entry->get_text(), background);
+        board.save();  // Write to file
+
+        // Add entry button to grid page
+        board_creator.add_local_board(board_backend);
         close_window();
     }
 }

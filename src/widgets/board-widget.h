@@ -117,19 +117,6 @@ public:
     const std::string& get_name() const;
 
     /**
-     * @brief Sets a new filepath from where the current board object will be
-     * loaded from
-     *
-     * @param board_filepath path to a board file
-     */
-    void set_filepath(const std::string& board_filepath);
-
-    /**
-     * @brief Retrieves the current board file path
-     */
-    const std::string& get_filepath() const;
-
-    /**
      * @brief Returns true if the board is set up to horizontally scroll
      */
     bool get_on_scroll() const;
@@ -138,6 +125,8 @@ public:
      * @brief Describes whether the board should be able to scroll horizontally
      */
     void set_on_scroll(bool scroll = true);
+
+    Board* get_board() const;
 
 private:
     /**

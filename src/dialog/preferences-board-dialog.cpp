@@ -89,9 +89,14 @@ void PreferencesBoardDialog::on_save_changes() {
     if (previous_name != new_name) {
         board_widget.set_name(new_name);
         parent.set_title(new_name);
-        std::string previous_filepath = board_widget.get_filepath();
-        board_widget.set_filepath(gen_unique_filename(new_name));
-        std::filesystem::remove(previous_filepath);
+        auto& board_backend = board_widget.get_board()->backend;
+        if (board_backend.get_type() == BackendType::LOCAL) {
+            std::string previous_filepath =
+                board_backend.get_attribute("filepath");
+            board_backend.set_attribute("filepath",
+                                        gen_unique_filename(new_name));
+            std::filesystem::remove(previous_filepath);
+        }
     }
 
     board_widget.save(false);

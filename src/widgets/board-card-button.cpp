@@ -1,24 +1,24 @@
 #include "board-card-button.h"
 
 #include <filesystem>
-#include <format>
 #include <string>
 
-ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
+ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
     : Button{},
       root_box{Gtk::Orientation::VERTICAL},
       board_thumbnail{},
       board_name{},
-      board_filepath{board_filepath} {
-    Board board{board_filepath};
+      last_modified{},
+      board_backend{boardbackend} {
+    auto board = boardbackend.load();
 
+    set_name_(board.get_name());
     set_valign(Gtk::Align::CENTER);
     set_halign(Gtk::Align::CENTER);
     set_has_frame(false);
 
     set_expand(false);
 
-    set_name_(board.get_name());
     board_name.set_valign(Gtk::Align::CENTER);
     board_name.set_vexpand(false);
 
@@ -26,18 +26,20 @@ ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     board_thumbnail.set_size_request(256, 256);
     board_thumbnail.set_margin_top(10);
 
+    last_modified = board.get_last_modified();
+
     root_box.set_spacing(4);
     root_box.append(board_thumbnail);
     root_box.append(board_name);
     set_child(root_box);
 }
 
-std::string ui::BoardCardButton::get_filepath() const { return board_filepath; }
+Date ui::BoardCardButton::get_last_modified() const { return last_modified; }
 
-void ui::BoardCardButton::update(Board* board) {
-    board_filepath = board->get_filepath();
-    set_name_(board->get_name());
-    set_background(board->get_background());
+void ui::BoardCardButton::update(Board& board) {
+    last_modified = board.get_last_modified();
+    set_name_(board.get_name());
+    set_background(board.get_background());
 }
 
 void ui::BoardCardButton::set_name_(const std::string& name) {
@@ -73,10 +75,9 @@ void ui::BoardCardButton::set_background(const std::string& background) {
     }
 }
 
+BoardBackend ui::BoardCardButton::get_backend() const { return board_backend; }
+
 std::strong_ordering ui::BoardCardButton::operator<=>(
     const BoardCardButton& other) const {
-    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
-    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
-
-    return this_lm_time <=> other_lm_time;
+    return last_modified <=> other.get_last_modified();
 }

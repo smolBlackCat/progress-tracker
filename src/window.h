@@ -12,15 +12,6 @@ class PreferencesBoardDialog;
 class ProgressWindow;
 
 /**
- * @brief AdwAboutDialog describing "Progress"
- */
-class ProgressAboutDialog : public Gtk::Window {
-public:
-    ProgressAboutDialog(const Gtk::Window& parent);
-    ~ProgressAboutDialog() override;
-};
-
-/**
  * @brief Bar widget that asks user confirmation to delete selected boards.
  */
 class DeleteBoardsBar : public Gtk::Revealer {
@@ -49,7 +40,7 @@ public:
                    Glib::RefPtr<Gio::Settings>& progress_settings);
     ~ProgressWindow() override;
 
-    void add_board(const std::string& board_filepath);
+    void add_local_board(BoardBackend board_backend);
 
     /**
      * @brief Enters deletion mode, where the user will select all boards to
@@ -84,7 +75,6 @@ protected:
 
     bool on_delete_mode = false;
 
-    ui::ProgressAboutDialog about_dialog;
     ui::CreateBoardDialog* create_board_dialog;
     ui::PreferencesBoardDialog* preferences_board_dialog;
     ui::DeleteBoardsBar delete_boards_bar;

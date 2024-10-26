@@ -12,43 +12,6 @@
 
 namespace ui {
 
-ProgressAboutDialog::ProgressAboutDialog(const Gtk::Window& parent)
-    : Gtk::Window{reinterpret_cast<GtkWindow*>(adw_about_window_new())} {
-    set_transient_for(const_cast<Gtk::Window&>(parent));
-    set_hide_on_close();
-
-    auto about_window_p = reinterpret_cast<AdwAboutWindow*>(gobj());
-    adw_about_window_set_application_name(ADW_ABOUT_WINDOW(about_window_p),
-                                          "Progress");
-    adw_about_window_set_version(
-        ADW_ABOUT_WINDOW(about_window_p),
-        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
-            .c_str());
-    adw_about_window_set_developer_name(ADW_ABOUT_WINDOW(about_window_p),
-                                        "Gabriel de Moura");
-
-    adw_about_window_set_translator_credits(
-        ADW_ABOUT_WINDOW(about_window_p),
-        // Translators: Replace "translator-credits" with your names, one name
-        // per line
-        _("translator-credits"));
-
-    adw_about_window_set_license_type(ADW_ABOUT_WINDOW(about_window_p),
-                                      GTK_LICENSE_MIT_X11);
-    adw_about_window_set_copyright(ADW_ABOUT_WINDOW(about_window_p),
-                                   _("De Moura © All rights reserved"));
-    adw_about_window_set_issue_url(
-        ADW_ABOUT_WINDOW(about_window_p),
-        "https://github.com/smolBlackCat/progress-tracker/issues");
-    adw_about_window_set_website(
-        ADW_ABOUT_WINDOW(about_window_p),
-        "https://github.com/smolBlackCat/progress-tracker");
-    adw_about_window_set_application_icon(ADW_ABOUT_WINDOW(about_window_p),
-                                          APPLICATION_ID);
-}
-
-ProgressAboutDialog::~ProgressAboutDialog() {}
-
 DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
     : Gtk::Revealer{},
       root{Gtk::Orientation::HORIZONTAL},
@@ -81,7 +44,6 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                const Glib::RefPtr<Gtk::Builder>& b,
                                Glib::RefPtr<Gio::Settings>& progress_settings)
     : Gtk::ApplicationWindow{cobject},
-      about_dialog{*this},
       board_widget{},
       delete_boards_bar{*this},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
@@ -149,8 +111,8 @@ ProgressWindow::~ProgressWindow() {
     delete preferences_board_dialog;
 }
 
-void ProgressWindow::add_board(const std::string& board_filepath) {
-    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_filepath);
+void ProgressWindow::add_local_board(BoardBackend board_backend) {
+    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
     auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
     fb_child_p->set_child(*board_card_button);
     boards_grid_p->append(*fb_child_p);
@@ -159,7 +121,8 @@ void ProgressWindow::add_board(const std::string& board_filepath) {
             if (!this->on_delete_mode) {
                 Board* board;
                 try {
-                    board = new Board{board_card_button->get_filepath()};
+                    board = new Board{
+                        board_card_button->get_backend().load()};
                 } catch (std::invalid_argument& err) {
                     Gtk::AlertDialog::create(
                         _("It was not possible to load this board"))
@@ -215,7 +178,8 @@ void ProgressWindow::delete_selected_boards() {
     for (auto& child : selected_children) {
         ui::BoardCardButton* cur_child =
             (ui::BoardCardButton*)child->get_child();
-        std::filesystem::remove(cur_child->get_filepath());
+        std::filesystem::remove(
+            cur_child->get_backend().get_attribute("filepath"));
         boards_grid_p->remove(*cur_child);
     }
 
@@ -224,8 +188,19 @@ void ProgressWindow::delete_selected_boards() {
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
-    action_group->add_action("about",
-                             [this]() { this->about_dialog.set_visible(); });
+    action_group->add_action("about", [this]() {
+        adw_show_about_dialog(
+            (GtkWidget*)this->gobj(), "application-name", "Progress",
+            "application-icon", APPLICATION_ID, "version",
+            std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
+                .c_str(),
+            "copyright", _("De Moura © All rights reserved"), "license-type",
+            GTK_LICENSE_MIT_X11, "developer-name", "Gabriel de Moura",
+            "translator-credits", _("translator-credits"), "issue-url",
+            "https://github.com/smolBlackCat/progress-tracker/issues",
+            "website", "https://github.com/smolBlackCat/progress-tracker",
+            NULL);
+    });
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
     action_group->add_action(

@@ -22,20 +22,20 @@ public:
      *
      * @throws std::invalid_argument when the file given does not exist
      */
-    BoardCardButton(const std::string& board_filepath);
+    BoardCardButton(BoardBackend& boardbackend);
 
     /**
      * @brief Returns the filepath pointing to the Board object to be allocated
      *        when clicking this button.
      */
-    std::string get_filepath() const;
+    Date get_last_modified() const;
 
     /**
      * @brief Updates the Button settings
      *
      * @param board Board object pointer to load the settings from
      */
-    void update(Board* board);
+    void update(Board& board);
 
     /**
      * @brief Updates the button's title
@@ -47,14 +47,15 @@ public:
      */
     void set_background(const std::string& background);
 
+    BoardBackend get_backend() const;
+
     std::strong_ordering operator<=>(const BoardCardButton& other) const;
 
 private:
     Gtk::Box root_box;
     Gtk::Image board_thumbnail;
     Gtk::Label board_name;
-
-    std::string board_filepath;
+    Date last_modified;
+    BoardBackend board_backend;
 };
 }  // namespace ui
-

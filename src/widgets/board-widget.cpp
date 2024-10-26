@@ -107,9 +107,9 @@ void ui::BoardWidget::clear() {
 bool ui::BoardWidget::save(bool free) {
     bool success;
     if (board->get_modified()) {
-        success = board->save_as_xml();
+        success = board->save();
     }
-    board_card_button->update(board);
+    board_card_button->update(*board);
     if (free) {
         delete board;
         board = nullptr;
@@ -193,19 +193,13 @@ const std::string& ui::BoardWidget::get_name() const {
     return board->get_name();
 }
 
-void ui::BoardWidget::set_filepath(const std::string& board_filepath) {
-    if (board) {
-        board->set_filepath(board_filepath);
-    }
-}
-
-const std::string& ui::BoardWidget::get_filepath() const {
-    return board->get_filepath();
-}
-
 bool ui::BoardWidget::get_on_scroll() const { return on_scroll; }
 
 void ui::BoardWidget::set_on_scroll(bool scroll) { on_scroll = scroll; }
+
+Board* ui::BoardWidget::get_board() const {
+    return board;
+}
 
 void ui::BoardWidget::setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();

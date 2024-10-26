@@ -2,12 +2,68 @@
 
 #include <tinyxml2.h>
 
+#include <map>
+#include <string>
 #include <vector>
 
 #include "cardlist.h"
 #include "item.h"
 
 enum class BackgroundType { COLOR, IMAGE, INVALID };
+
+enum class BackendType { LOCAL, CALDAV, NEXTCLOUD };
+
+class Board;
+
+/**
+ * @brief Helper class for dealing with multiple ways of storing and creating
+ * Board objects
+ */
+class BoardBackend {
+public:
+    BoardBackend(BackendType backend_type,
+                 const std::map<std::string, std::string>& settings = {});
+
+    BoardBackend() = delete;
+
+    /**
+     * @brief Loads a board object using this backend. This method call
+     * assumes the backend has the appropriate settings to load a Board object
+     */
+    Board load();
+
+    /**
+     * @brief Creates a new Board object using this backend
+     */
+    Board create(const std::string& name, const std::string& background);
+
+    /**
+     * @brief Returns the attribute key. May be empty if the key is not
+     * available for the current backend type.
+     */
+    std::string get_attribute(const std::string& key) const;
+
+    /**
+     * @brief Assigns a value to a key. Nothing is done if the key to be set
+     * does not correspond to the keys available to current backend type
+     */
+    bool set_attribute(const std::string& key, const std::string& value);
+
+    /**
+     * @brief Save board depending on the type
+     */
+    bool save(Board& board);
+
+    BackendType get_type() const noexcept;
+
+protected:
+    bool save_xml(Board& board);
+    bool save_caldav(Board& board);
+    bool save_nextcloud(Board& board);
+
+    BackendType type;
+    std::map<std::string, std::string> settings;
+};
 
 /**
  * @class Board
@@ -16,28 +72,9 @@ enum class BackgroundType { COLOR, IMAGE, INVALID };
  */
 class Board : public Item {
 public:
-    Board();
+    Board(BoardBackend& backend);
 
-    /**
-     * @brief Board constructor.
-     *
-     * @param name The board's name.
-     * @param background The board's background. It can be either a path to an
-     *                   image or a solid colour RGBA representation.
-     */
-    Board(const std::string& name, const std::string& background);
-
-    /**
-     * @brief Constructs a Board object from a filepath
-     *
-     * @param board_file_path valid path name pointing to a valid board xml file
-     *
-     * @details It's completely necessary for the filepath given to be valid,
-     * that is, the file exists and the syntax of Progress Boards checks out.
-     *
-     * @throws std::domain_error if the board_file_path is not valid at all
-     */
-    Board(const std::string& board_file_path);
+    friend BoardBackend;
 
     /**
      * @brief Changes the background information of the board. If the given
@@ -58,18 +95,6 @@ public:
      * @returns The background value
      */
     const std::string& get_background() const;
-
-    /**
-     * @brief Sets a file path to where the board will be saved.
-     *
-     * @param filepath absolute path where the board will be saved
-     *
-     * @param create_dirs Flag indicating whether filepath's parent directory
-     * can be created if it does not exist
-     *
-     * @returns true if the path was set successfully, otherwise false.
-     */
-    bool set_filepath(const std::string& file_path, bool create_dirs = true);
 
     /**
      * @brief Adds a CardList object to the board by moving the contents to a
@@ -97,27 +122,15 @@ public:
     void reorder_cardlist(const CardList& next, const CardList& sibling);
 
     /**
-     * @brief Saves the board information as a file.
-     *
-     * @param create_dirs Flag indicating whether filepath's parent directory
-     * can be created if it does not exist. This flag will be ignored if the
-     * filepath does not specify any parents in the directory hierarchy
-     *
-     * @details This method will create a new file based on the board's name. It
-     *          will start numbering the files in case there are boards with the
-     *          same name.
-     *
-     * @returns True if the file was created sucessfully. False may be returned
-     * when the board's filepath is invalid (e.g parent directory does not
-     * exist and create_dirs is false or an OS error).
+     * @brief Saves the board using the backend functionality
      */
-    bool save_as_xml(bool create_dirs = true);
-
-    const std::string& get_filepath() const;
+    bool save();
 
     const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
 
     void set_modified(bool modified) override;
+
+    Date get_last_modified() const;
 
     /**
      * @brief Returns true if the board was modified in some way, otherwise
@@ -136,7 +149,10 @@ public:
 
     static const std::string BACKGROUND_DEFAULT;
 
-private:
+    BoardBackend backend;
+
+protected:
     std::string background, file_path;
     std::vector<std::shared_ptr<CardList>> cardlist_vector;
+    Date last_modified;
 };

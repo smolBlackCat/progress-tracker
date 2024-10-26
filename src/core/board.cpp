@@ -1,147 +1,295 @@
 #include "board.h"
 
+#include <bits/chrono.h>
+
 #include <cctype>
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
 #include <regex>
+#include <set>
+#include <stdexcept>
 #include <string>
 
 #include "exceptions.h"
 
-const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
-
-Board::Board() : Item{""}, background{BACKGROUND_DEFAULT} {}
-
-Board::Board(const std::string& name, const std::string& background)
-    : Item{name} {
-    set_background(background, false);
+BoardBackend::BoardBackend(BackendType backend_type,
+                           const std::map<std::string, std::string>& settings)
+    : type{backend_type} {
+    switch (backend_type) {
+        case BackendType::LOCAL: {
+            if (settings.contains("filepath")) {
+                this->settings["filepath"] = settings.at("filepath");
+            } else {
+                this->settings["filepath"] = "";
+            }
+            break;
+        }
+        case BackendType::CALDAV:
+        case BackendType::NEXTCLOUD:
+            throw std::invalid_argument{"Not implemented"};
+    }
 }
 
-Board::Board(const std::string& board_file_path)
-    : Item{""}, file_path{board_file_path} {
-    if (!std::filesystem::exists(file_path))
-        throw std::invalid_argument{std::format(
-            "Progress Board XML file given does not exist: {}", file_path)};
+Board BoardBackend::load() {
+    switch (type) {
+        case BackendType::LOCAL: {
+            if (!std::filesystem::exists(settings["filepath"]))
+                throw std::invalid_argument{std::format(
+                    "Progress Board XML file given does not exist: {}",
+                    settings["filepath"])};
 
-    tinyxml2::XMLDocument doc;
+            tinyxml2::XMLDocument doc;
 
-    auto error_code = doc.LoadFile(file_path.c_str());
-    if (error_code != 0) {
-        throw std::invalid_argument{
-            std::format("Failed to load Progress Board XML file given: {}\n"
-                        "Error code: {}",
-                        file_path, (int)error_code)};
-    }
+            auto error_code = doc.LoadFile(settings["filepath"].c_str());
+            if (error_code != 0) {
+                throw std::invalid_argument{std::format(
+                    "Failed to load Progress Board XML file given: {}\n"
+                    "Error code: {}",
+                    settings["filepath"], (int)error_code)};
+            }
 
-    auto board_element = doc.FirstChildElement("board");
+            auto board_element = doc.FirstChildElement("board");
 
-    if (!board_element) {
-        throw board_parse_error{
-            std::format("Failed to parse given Progress Board XML file: {}\n"
-                        "\"board\" element was could not be found",
-                        file_path)};
-    }
-
-    auto board_element_name = board_element->FindAttribute("name");
-    auto board_element_background = board_element->FindAttribute("background");
-
-    if (!(board_element_name && board_element_background)) {
-        std::string missing_attr = board_element_name ? "background" : "name";
-        throw board_parse_error{
-            std::format("Failed to parse given Progress Board XML file: {}\n"
-                        "\"{}\" attribute could not be found",
-                        missing_attr, file_path)};
-    }
-
-    name = board_element_name->Value();
-
-    // TODO: It'd be good practise to log a warning message informing it was
-    // not possible to set a background, and the default one is going to be set
-    set_background(board_element_background->Value());
-
-    if (name.empty()) {
-        throw board_parse_error{
-            std::format("Failed to parse given Progress Board XML file: {}\n"
-                        "Boards with empty names are not allowed",
-                        file_path)};
-    }
-
-    auto list_element = board_element->FirstChildElement("list");
-
-    while (list_element) {
-        auto cur_cardlist_name = list_element->Attribute("name");
-
-        if (!cur_cardlist_name) {
-            throw board_parse_error{std::format(
-                "Failed to parse given Progress Board XML file: {}\n"
-                "A \"list\" element on line {} failed to parsed.",
-                file_path, list_element->GetLineNum())};
-        }
-
-        CardList cur_cardlist{cur_cardlist_name};
-        auto card_element = list_element->FirstChildElement("card");
-
-        while (card_element) {
-            auto cur_card_name = card_element->Attribute("name");
-            auto cur_card_color = card_element->Attribute("color");
-            auto cur_card_due_date = card_element->Attribute("due");
-            auto cur_card_complete = card_element->BoolAttribute("complete");
-
-            if (!cur_card_name) {
+            if (!board_element) {
                 throw board_parse_error{std::format(
                     "Failed to parse given Progress Board XML file: {}\n"
-                    "Failed to load {} \"list\" element\n"
-                    "\"card\" element on line {} has no name attribute",
-                    file_path, cur_cardlist_name, card_element->GetLineNum())};
+                    "\"board\" element was could not be found",
+                    settings["filepath"])};
             }
 
-            Card cur_card{
-                cur_card_name,
-                cur_card_color ? string_to_color(cur_card_color) : NO_COLOR,
-                cur_card_complete};
+            auto board_element_name = board_element->FindAttribute("name");
+            auto board_element_background =
+                board_element->FindAttribute("background");
 
-            if (cur_card_due_date) {
-                std::chrono::sys_seconds secs;
-
-                std::istringstream{std::string{cur_card_due_date}} >>
-                    std::chrono::parse("%F", secs);
-                Date date{std::chrono::floor<std::chrono::days>(secs)};
-                cur_card.set_due_date(date);
-            } else {
-                // This is bad.
-                cur_card.set_due_date(Date{});
+            if (!(board_element_name && board_element_background)) {
+                std::string missing_attr =
+                    board_element_name ? "background" : "name";
+                throw board_parse_error{std::format(
+                    "Failed to parse given Progress Board XML file: {}\n"
+                    "\"{}\" attribute could not be found",
+                    missing_attr, settings["filepath"])};
             }
 
-            auto task_element = card_element->FirstChildElement("task");
-            while (task_element) {
-                cur_card.add_task(Task{
-                    task_element->Attribute("name"),
-                    std::strcmp(task_element->Attribute("done"), "true") == 0
-                        ? true
-                        : false});
-                task_element = task_element->NextSiblingElement("task");
+            std::string name = board_element_name->Value();
+            std::string background = board_element_background->Value();
+
+            if (name.empty()) {
+                throw board_parse_error{std::format(
+                    "Failed to parse given Progress Board XML file: {}\n"
+                    "Boards with empty names are not allowed",
+                    settings["filepath"])};
             }
 
-            auto notes_element = card_element->FirstChildElement("notes");
-            if (notes_element) {
-                cur_card.set_notes(
-                    !notes_element->GetText() ? "" : notes_element->GetText());
+            Board board{*this};
+            board.set_name(name);
+            board.set_background(background);
+            auto lm_filepath =
+                std::chrono::clock_cast<std::chrono::system_clock,
+                                        std::chrono::file_clock>(
+                    std::filesystem::last_write_time(settings["filepath"]));
+            board.last_modified =
+                Date{std::chrono::floor<std::chrono::days>(lm_filepath)};
+
+            auto list_element = board_element->FirstChildElement("list");
+
+            while (list_element) {
+                auto cur_cardlist_name = list_element->Attribute("name");
+
+                if (!cur_cardlist_name) {
+                    throw board_parse_error{std::format(
+                        "Failed to parse given Progress Board XML file: {}\n"
+                        "A \"list\" element on line {} failed to parsed.",
+                        settings["filepath"], list_element->GetLineNum())};
+                }
+
+                CardList cur_cardlist{cur_cardlist_name};
+                auto card_element = list_element->FirstChildElement("card");
+
+                while (card_element) {
+                    auto cur_card_name = card_element->Attribute("name");
+                    auto cur_card_color = card_element->Attribute("color");
+                    auto cur_card_due_date = card_element->Attribute("due");
+                    auto cur_card_complete =
+                        card_element->BoolAttribute("complete");
+
+                    if (!cur_card_name) {
+                        throw board_parse_error{std::format(
+                            "Failed to parse given Progress Board XML file: "
+                            "{}\n"
+                            "Failed to load {} \"list\" element\n"
+                            "\"card\" element on line {} has no name attribute",
+                            settings["filepath"], cur_cardlist_name,
+                            card_element->GetLineNum())};
+                    }
+
+                    Card cur_card{cur_card_name,
+                                  cur_card_color
+                                      ? string_to_color(cur_card_color)
+                                      : NO_COLOR,
+                                  cur_card_complete};
+
+                    if (cur_card_due_date) {
+                        std::chrono::sys_seconds secs;
+
+                        std::istringstream{std::string{cur_card_due_date}} >>
+                            std::chrono::parse("%F", secs);
+                        Date date{std::chrono::floor<std::chrono::days>(secs)};
+                        cur_card.set_due_date(date);
+                    } else {
+                        // This is bad.
+                        cur_card.set_due_date(Date{});
+                    }
+
+                    auto task_element = card_element->FirstChildElement("task");
+                    while (task_element) {
+                        cur_card.add_task(
+                            Task{task_element->Attribute("name"),
+                                 std::strcmp(task_element->Attribute("done"),
+                                             "true") == 0
+                                     ? true
+                                     : false});
+                        task_element = task_element->NextSiblingElement("task");
+                    }
+
+                    auto notes_element =
+                        card_element->FirstChildElement("notes");
+                    if (notes_element) {
+                        cur_card.set_notes(!notes_element->GetText()
+                                               ? ""
+                                               : notes_element->GetText());
+                    }
+
+                    cur_card.set_modified(false);
+
+                    cur_cardlist.add_card(cur_card);
+                    card_element = card_element->NextSiblingElement("card");
+                }
+                cur_cardlist.set_modified(false);
+                board.add_cardlist(cur_cardlist);
+
+                list_element = list_element->NextSiblingElement("list");
             }
-
-            cur_card.set_modified(false);
-
-            cur_cardlist.add_card(cur_card);
-            card_element = card_element->NextSiblingElement("card");
+            board.set_modified(false);
+            return board;
         }
-        cur_cardlist.set_modified(false);
-        add_cardlist(cur_cardlist);
-
-        list_element = list_element->NextSiblingElement("list");
+        case BackendType::CALDAV:
+        case BackendType::NEXTCLOUD:
+            throw std::invalid_argument{"Not implemented"};
     }
-    modified = false;
 }
+
+Board BoardBackend::create(const std::string& name,
+                           const std::string& background) {
+    Board board{*this};
+    board.set_name(name);
+    board.set_background(background);
+
+    // Add filepath validation
+    return board;
+}
+
+std::string BoardBackend::get_attribute(const std::string& key) const {
+    if (settings.contains(key)) {
+        return settings.at(key);
+    } else {
+        return "";
+    }
+}
+
+bool BoardBackend::set_attribute(const std::string& key,
+                                 const std::string& value) {
+    switch (type) {
+        case BackendType::LOCAL: {
+            const std::set<std::string> local_attributes = {"filepath"};
+            if (local_attributes.contains(key) && !value.empty()) {
+                settings[key] = value;
+            }
+            return true;
+        }
+        case BackendType::CALDAV:
+        case BackendType::NEXTCLOUD:
+            return false;
+    }
+}
+
+bool BoardBackend::save(Board& board) {
+    switch (type) {
+        case BackendType::LOCAL: {
+            auto doc = std::make_unique<tinyxml2::XMLDocument>();
+
+            tinyxml2::XMLElement* board_element = doc->NewElement("board");
+            board_element->SetAttribute("name", board.get_name().c_str());
+            board_element->SetAttribute("background",
+                                        board.get_background().c_str());
+            doc->InsertEndChild(board_element);
+
+            for (auto& cardlist : board.get_cardlist_vector()) {
+                tinyxml2::XMLElement* list_element = doc->NewElement("list");
+                list_element->SetAttribute("name",
+                                           cardlist->get_name().c_str());
+                cardlist->set_modified(false);
+
+                for (auto& card : cardlist->get_card_vector()) {
+                    tinyxml2::XMLElement* card_element =
+                        doc->NewElement("card");
+                    card_element->SetAttribute("name",
+                                               card->get_name().c_str());
+                    if (card->is_color_set())
+                        card_element->SetAttribute(
+                            "color",
+                            color_to_string(card->get_color()).c_str());
+                    auto date = card->get_due_date();
+                    if (date.ok()) {
+                        card_element->SetAttribute(
+                            "due", std::format("{}", date).c_str());
+                        card_element->SetAttribute("complete",
+                                                   card->get_complete());
+                    }
+
+                    // Add tasks
+                    for (auto& task : card->get_tasks()) {
+                        tinyxml2::XMLElement* task_element =
+                            doc->NewElement("task");
+                        task_element->SetAttribute("name",
+                                                   task->get_name().c_str());
+                        task_element->SetAttribute("done", task->get_done());
+
+                        card_element->InsertEndChild(task_element);
+                    }
+
+                    tinyxml2::XMLElement* notes_element =
+                        doc->NewElement("notes");
+                    notes_element->SetText(card->get_notes().c_str());
+                    card_element->InsertEndChild(notes_element);
+
+                    list_element->InsertEndChild(card_element);
+                    card->set_modified(false);
+                }
+                board_element->InsertEndChild(list_element);
+            }
+            board.set_modified(false);
+
+            std::filesystem::path p{settings["filepath"]};
+            if (!std::filesystem::exists(p.parent_path())) {
+                std::filesystem::create_directories(p.parent_path());
+            }
+
+            return doc->SaveFile(settings["filepath"].c_str()) ==
+                   tinyxml2::XML_SUCCESS;
+        }
+        case BackendType::CALDAV:
+        case BackendType::NEXTCLOUD:
+            return false;
+    }
+}
+
+BackendType BoardBackend::get_type() const noexcept { return type; }
+
+const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
+
+Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
 
 BackgroundType Board::set_background(const std::string& other, bool modify) {
     BackgroundType bg_type = Board::get_background_type(other);
@@ -162,28 +310,6 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
 }
 
 const std::string& Board::get_background() const { return background; }
-
-bool Board::set_filepath(const std::string& file_path, bool create_dirs) {
-    std::filesystem::path p{file_path};
-
-    if (p.has_parent_path()) {
-        if (std::filesystem::exists(p.parent_path()) ||
-            (create_dirs &&
-             std::filesystem::create_directories(p.parent_path()))) {
-            if (!std::filesystem::exists(p)) {
-                this->file_path = file_path;
-                return true;
-            }
-        }
-    } else {
-        if (!file_path.empty()) {
-            this->file_path = (std::filesystem::absolute(p)).string();
-            return true;
-        }
-    }
-
-    return false;
-}
 
 std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
     try {
@@ -244,64 +370,7 @@ void Board::reorder_cardlist(const CardList& next, const CardList& sibling) {
     modified = true;
 }
 
-bool Board::save_as_xml(bool create_dirs) {
-    auto doc = std::make_unique<tinyxml2::XMLDocument>();
-
-    tinyxml2::XMLElement* board_element = doc->NewElement("board");
-    board_element->SetAttribute("name", name.c_str());
-    board_element->SetAttribute("background", background.c_str());
-    doc->InsertEndChild(board_element);
-
-    for (auto& cardlist : cardlist_vector) {
-        tinyxml2::XMLElement* list_element = doc->NewElement("list");
-        list_element->SetAttribute("name", cardlist->get_name().c_str());
-        cardlist->set_modified(false);
-
-        for (auto& card : cardlist->get_card_vector()) {
-            tinyxml2::XMLElement* card_element = doc->NewElement("card");
-            card_element->SetAttribute("name", card->get_name().c_str());
-            if (card->is_color_set())
-                card_element->SetAttribute(
-                    "color", color_to_string(card->get_color()).c_str());
-            auto date = card->get_due_date();
-            if (date.ok()) {
-                card_element->SetAttribute("due",
-                                           std::format("{}", date).c_str());
-                card_element->SetAttribute("complete", card->get_complete());
-            }
-
-            // Add tasks
-            for (auto& task : card->get_tasks()) {
-                tinyxml2::XMLElement* task_element = doc->NewElement("task");
-                task_element->SetAttribute("name", task->get_name().c_str());
-                task_element->SetAttribute("done", task->get_done());
-
-                card_element->InsertEndChild(task_element);
-            }
-
-            tinyxml2::XMLElement* notes_element = doc->NewElement("notes");
-            notes_element->SetText(card->get_notes().c_str());
-            card_element->InsertEndChild(notes_element);
-
-            list_element->InsertEndChild(card_element);
-            card->set_modified(false);
-        }
-        board_element->InsertEndChild(list_element);
-    }
-    set_modified(false);
-
-    std::filesystem::path p{file_path};
-    if (!std::filesystem::exists(p.parent_path())) {
-        if (create_dirs)
-            std::filesystem::create_directories(p.parent_path());
-        else
-            return false;
-    }
-
-    return doc->SaveFile(file_path.c_str()) == tinyxml2::XML_SUCCESS;
-}
-
-const std::string& Board::get_filepath() const { return file_path; }
+bool Board::save() { return backend.save(*this); }
 
 const std::vector<std::shared_ptr<CardList>>& Board::get_cardlist_vector() {
     return cardlist_vector;
@@ -314,6 +383,8 @@ void Board::set_modified(bool modified) {
         cardlist->set_modified(modified);
     }
 }
+
+Date Board::get_last_modified() const { return last_modified; }
 
 bool Board::get_modified() {
     for (auto& cardlist : cardlist_vector) {
