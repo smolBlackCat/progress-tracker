@@ -34,9 +34,15 @@ ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
     set_child(root_box);
 }
 
-Date ui::BoardCardButton::get_last_modified() const { return last_modified; }
+time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
+    const {
+    return last_modified;
+}
 
-void ui::BoardCardButton::update(Board& board) {
+void ui::BoardCardButton::update(BoardBackend& board_backend) {
+    this->board_backend = board_backend;
+    Board board = board_backend.load();
+
     last_modified = board.get_last_modified();
     set_name_(board.get_name());
     set_background(board.get_background());

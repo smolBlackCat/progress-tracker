@@ -78,7 +78,8 @@ ui::BoardWidget::BoardWidget()
 
 ui::BoardWidget::~BoardWidget() {}
 
-void ui::BoardWidget::set(Board* board, BoardCardButton* board_card_button) {
+void ui::BoardWidget::set(std::shared_ptr<Board>& board,
+                          BoardCardButton* board_card_button) {
     if (board && board_card_button) {
         this->board = board;
         this->board_card_button = board_card_button;
@@ -109,10 +110,8 @@ bool ui::BoardWidget::save(bool free) {
     if (board->get_modified()) {
         success = board->save();
     }
-    board_card_button->update(*board);
+    board_card_button->update(board->backend);
     if (free) {
-        delete board;
-        board = nullptr;
         clear();
     }
     return success;
@@ -197,9 +196,7 @@ bool ui::BoardWidget::get_on_scroll() const { return on_scroll; }
 
 void ui::BoardWidget::set_on_scroll(bool scroll) { on_scroll = scroll; }
 
-Board* ui::BoardWidget::get_board() const {
-    return board;
-}
+std::shared_ptr<Board> ui::BoardWidget::get_board() const { return board; }
 
 void ui::BoardWidget::setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();

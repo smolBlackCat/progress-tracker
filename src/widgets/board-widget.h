@@ -3,6 +3,7 @@
 #include <core/board.h>
 #include <gtkmm.h>
 
+#include <memory>
 #include <vector>
 
 #include "board-card-button.h"
@@ -47,7 +48,7 @@ public:
      *          setting a new board to the widget. It also dynamically sets
      *          every aspect of the board: background and its cards and lists.
      */
-    void set(Board* board, BoardCardButton* board_card_button);
+    void set(std::shared_ptr<Board>& board, BoardCardButton* board_card_button);
 
     /**
      * @brief Cleans the BoardWidget to an empty state, that is, there will be
@@ -126,7 +127,7 @@ public:
      */
     void set_on_scroll(bool scroll = true);
 
-    Board* get_board() const;
+    std::shared_ptr<Board> get_board() const;
 
 private:
     /**
@@ -144,7 +145,7 @@ private:
 
     Gtk::Box root;
     Gtk::Button add_button;
-    Board* board = nullptr;
+    std::shared_ptr<Board> board = nullptr;
     BoardCardButton* board_card_button = nullptr;
     Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
     std::vector<ui::CardlistWidget*> cardlist_vector;

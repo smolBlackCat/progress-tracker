@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <format>
+#include <iostream>
 #include <regex>
 #include <set>
 #include <stdexcept>
@@ -19,11 +20,8 @@ BoardBackend::BoardBackend(BackendType backend_type,
     : type{backend_type} {
     switch (backend_type) {
         case BackendType::LOCAL: {
-            if (settings.contains("filepath")) {
-                this->settings["filepath"] = settings.at("filepath");
-            } else {
-                this->settings["filepath"] = "";
-            }
+            this->settings["filepath"] =
+                settings.contains("filepath") ? settings.at("filepath") : "";
             break;
         }
         case BackendType::CALDAV:
@@ -90,7 +88,7 @@ Board BoardBackend::load() {
                                         std::chrono::file_clock>(
                     std::filesystem::last_write_time(settings["filepath"]));
             board.last_modified =
-                Date{std::chrono::floor<std::chrono::days>(lm_filepath)};
+                std::chrono::floor<std::chrono::seconds>(lm_filepath);
 
             auto list_element = board_element->FirstChildElement("list");
 
@@ -216,80 +214,80 @@ bool BoardBackend::set_attribute(const std::string& key,
 
 bool BoardBackend::save(Board& board) {
     switch (type) {
-        case BackendType::LOCAL: {
-            auto doc = std::make_unique<tinyxml2::XMLDocument>();
-
-            tinyxml2::XMLElement* board_element = doc->NewElement("board");
-            board_element->SetAttribute("name", board.get_name().c_str());
-            board_element->SetAttribute("background",
-                                        board.get_background().c_str());
-            doc->InsertEndChild(board_element);
-
-            for (auto& cardlist : board.get_cardlist_vector()) {
-                tinyxml2::XMLElement* list_element = doc->NewElement("list");
-                list_element->SetAttribute("name",
-                                           cardlist->get_name().c_str());
-                cardlist->set_modified(false);
-
-                for (auto& card : cardlist->get_card_vector()) {
-                    tinyxml2::XMLElement* card_element =
-                        doc->NewElement("card");
-                    card_element->SetAttribute("name",
-                                               card->get_name().c_str());
-                    if (card->is_color_set())
-                        card_element->SetAttribute(
-                            "color",
-                            color_to_string(card->get_color()).c_str());
-                    auto date = card->get_due_date();
-                    if (date.ok()) {
-                        card_element->SetAttribute(
-                            "due", std::format("{}", date).c_str());
-                        card_element->SetAttribute("complete",
-                                                   card->get_complete());
-                    }
-
-                    // Add tasks
-                    for (auto& task : card->get_tasks()) {
-                        tinyxml2::XMLElement* task_element =
-                            doc->NewElement("task");
-                        task_element->SetAttribute("name",
-                                                   task->get_name().c_str());
-                        task_element->SetAttribute("done", task->get_done());
-
-                        card_element->InsertEndChild(task_element);
-                    }
-
-                    tinyxml2::XMLElement* notes_element =
-                        doc->NewElement("notes");
-                    notes_element->SetText(card->get_notes().c_str());
-                    card_element->InsertEndChild(notes_element);
-
-                    list_element->InsertEndChild(card_element);
-                    card->set_modified(false);
-                }
-                board_element->InsertEndChild(list_element);
-            }
-            board.set_modified(false);
-
-            std::filesystem::path p{settings["filepath"]};
-            if (!std::filesystem::exists(p.parent_path())) {
-                std::filesystem::create_directories(p.parent_path());
-            }
-
-            return doc->SaveFile(settings["filepath"].c_str()) ==
-                   tinyxml2::XML_SUCCESS;
-        }
+        case BackendType::LOCAL:
+            return save_xml(board);
         case BackendType::CALDAV:
+            return save_caldav(board);
         case BackendType::NEXTCLOUD:
-            return false;
+            return save_nextcloud(board);
     }
 }
 
 BackendType BoardBackend::get_type() const noexcept { return type; }
 
+bool BoardBackend::save_xml(Board& board) {
+    auto doc = std::make_unique<tinyxml2::XMLDocument>();
+
+    tinyxml2::XMLElement* board_element = doc->NewElement("board");
+    board_element->SetAttribute("name", board.get_name().c_str());
+    board_element->SetAttribute("background", board.get_background().c_str());
+    doc->InsertEndChild(board_element);
+
+    for (auto& cardlist : board.get_cardlist_vector()) {
+        tinyxml2::XMLElement* list_element = doc->NewElement("list");
+        list_element->SetAttribute("name", cardlist->get_name().c_str());
+        cardlist->set_modified(false);
+
+        for (auto& card : cardlist->get_card_vector()) {
+            tinyxml2::XMLElement* card_element = doc->NewElement("card");
+            card_element->SetAttribute("name", card->get_name().c_str());
+            if (card->is_color_set())
+                card_element->SetAttribute(
+                    "color", color_to_string(card->get_color()).c_str());
+            auto date = card->get_due_date();
+            if (date.ok()) {
+                card_element->SetAttribute("due",
+                                           std::format("{}", date).c_str());
+                card_element->SetAttribute("complete", card->get_complete());
+            }
+
+            // Add tasks
+            for (auto& task : card->get_tasks()) {
+                tinyxml2::XMLElement* task_element = doc->NewElement("task");
+                task_element->SetAttribute("name", task->get_name().c_str());
+                task_element->SetAttribute("done", task->get_done());
+
+                card_element->InsertEndChild(task_element);
+            }
+
+            tinyxml2::XMLElement* notes_element = doc->NewElement("notes");
+            notes_element->SetText(card->get_notes().c_str());
+            card_element->InsertEndChild(notes_element);
+
+            list_element->InsertEndChild(card_element);
+            card->set_modified(false);
+        }
+        board_element->InsertEndChild(list_element);
+    }
+    board.set_modified(false);
+
+    std::filesystem::path p{settings["filepath"]};
+    if (!std::filesystem::exists(p.parent_path())) {
+        std::filesystem::create_directories(p.parent_path());
+    }
+
+    return doc->SaveFile(settings["filepath"].c_str()) == tinyxml2::XML_SUCCESS;
+}
+
+bool BoardBackend::save_caldav(Board& board) { return false; }
+
+bool BoardBackend::save_nextcloud(Board& board) { return false; }
+
 const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
 Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
+
+Board::~Board() { std::cout << name << " has been destroyed" << '\n'; }
 
 BackgroundType Board::set_background(const std::string& other, bool modify) {
     BackgroundType bg_type = Board::get_background_type(other);
@@ -384,7 +382,9 @@ void Board::set_modified(bool modified) {
     }
 }
 
-Date Board::get_last_modified() const { return last_modified; }
+time_point<system_clock, seconds> Board::get_last_modified() const {
+    return last_modified;
+}
 
 bool Board::get_modified() {
     for (auto& cardlist : cardlist_vector) {

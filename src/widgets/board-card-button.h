@@ -3,9 +3,12 @@
 #include <core/board.h>
 #include <gtkmm.h>
 
+#include <chrono>
 #include <compare>
 
 namespace ui {
+
+using namespace std::chrono;
 
 /**
  * @brief Custom Gtk::Button implementation that allocates a Board object and
@@ -28,14 +31,9 @@ public:
      * @brief Returns the filepath pointing to the Board object to be allocated
      *        when clicking this button.
      */
-    Date get_last_modified() const;
+    time_point<system_clock, seconds> get_last_modified() const;
 
-    /**
-     * @brief Updates the Button settings
-     *
-     * @param board Board object pointer to load the settings from
-     */
-    void update(Board& board);
+    void update(BoardBackend& board_backend);
 
     /**
      * @brief Updates the button's title
@@ -55,7 +53,7 @@ private:
     Gtk::Box root_box;
     Gtk::Image board_thumbnail;
     Gtk::Label board_name;
-    Date last_modified;
+    time_point<system_clock, seconds> last_modified;
     BoardBackend board_backend;
 };
 }  // namespace ui

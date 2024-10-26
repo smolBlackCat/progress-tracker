@@ -15,12 +15,20 @@ enum class BackendType { LOCAL, CALDAV, NEXTCLOUD };
 
 class Board;
 
+using namespace std::chrono;
+
 /**
  * @brief Helper class for dealing with multiple ways of storing and creating
  * Board objects
  */
 class BoardBackend {
 public:
+    /**
+     * @brief BoardBackend constructor
+     *
+     * @param backend_type backend to use for saving and storing
+     * @param settings backend settings. The settings used are backend type
+     * reliant*/
     BoardBackend(BackendType backend_type,
                  const std::map<std::string, std::string>& settings = {});
 
@@ -73,6 +81,8 @@ protected:
 class Board : public Item {
 public:
     Board(BoardBackend& backend);
+
+    ~Board();
 
     friend BoardBackend;
 
@@ -130,7 +140,7 @@ public:
 
     void set_modified(bool modified) override;
 
-    Date get_last_modified() const;
+    time_point<system_clock, seconds> get_last_modified() const;
 
     /**
      * @brief Returns true if the board was modified in some way, otherwise
@@ -152,7 +162,7 @@ public:
     BoardBackend backend;
 
 protected:
-    std::string background, file_path;
+    std::string background;
     std::vector<std::shared_ptr<CardList>> cardlist_vector;
-    Date last_modified;
+    time_point<system_clock, seconds> last_modified;
 };

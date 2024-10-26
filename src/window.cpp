@@ -119,10 +119,10 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
     board_card_button->signal_clicked().connect(
         [this, board_card_button, fb_child_p]() {
             if (!this->on_delete_mode) {
-                Board* board;
+                std::shared_ptr<Board> board;
                 try {
-                    board = new Board{
-                        board_card_button->get_backend().load()};
+                    board = std::make_shared<Board>(
+                        board_card_button->get_backend().load());
                 } catch (std::invalid_argument& err) {
                     Gtk::AlertDialog::create(
                         _("It was not possible to load this board"))
