@@ -39,15 +39,17 @@ TEST_CASE("Card operations", "[Card]") {
         auto taskPtr2 = card.add_task(task2);
         auto taskPtr3 = card.add_task(task3);
 
+        REQUIRE(!card.add_task(task1));
+
         REQUIRE(card.get_tasks().size() == 3);
         REQUIRE(*taskPtr1 == task1);
         REQUIRE(*taskPtr2 == task2);
         REQUIRE(*taskPtr3 == task3);
 
-        REQUIRE(card.remove_task(taskPtr2) == true);
+        REQUIRE(card.remove_task(task2) == true);
         REQUIRE(card.get_tasks().size() == 2);
 
-        REQUIRE(card.remove_task(taskPtr2) ==
+        REQUIRE(card.remove_task(task2) ==
                 false);  // Removing again should return false
     }
 
@@ -71,8 +73,8 @@ TEST_CASE("Card operations", "[Card]") {
         card.add_task(task3);
 
         completion = card.get_completion();
-        REQUIRE(completion ==
-                66.0);  // 2 out of 3 tasks are done, so ~66% completion
+        REQUIRE(int(completion) ==
+                66);  // 2 out of 3 tasks are done, so ~66% completion
     }
 
     SECTION("Setting Due dates to Card objects") {

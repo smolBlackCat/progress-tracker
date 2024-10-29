@@ -84,7 +84,7 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
         this->board = board;
         this->board_card_button = board_card_button;
 
-        for (auto& cardlist : board->get_cardlist_vector()) {
+        for (auto& cardlist : board->get_cardlists()) {
             auto new_cardlist =
                 Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
             cardlist_vector.push_back(new_cardlist);

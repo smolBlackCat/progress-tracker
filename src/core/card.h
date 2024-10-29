@@ -11,19 +11,27 @@
 typedef std::chrono::year_month_day Date;
 
 /**
- * @class Card
- *
- * @brief A class representing a single card within a \ref CardList object.
+ * @brief Represents a kanban card that may or may not be contained within a
+ * CardList object
  */
 class Card : public Colorable, public Item {
 public:
     /**
-     * @brief Card constructor.
-     *
-     * @param name The card's title.
+     * @brief Card constructor
      */
-    Card(const std::string& name, const Color& color = NO_COLOR, bool complete = false);
+    Card(const std::string& name, const Date& date, bool complete = false,
+         const Color& color = NO_COLOR);
 
+    /**
+     * @brief Card constructor
+     */
+    Card(const std::string& name, const Color& color = NO_COLOR);
+
+    /**
+     * @brief Sets the card's cover color
+     *
+     * @param rgb Color (std::tuple) object representing the rgb code
+     */
     void set_color(const Color& rgb) override;
 
     /**
@@ -47,7 +55,7 @@ public:
      * tasks
      *
      * @return An approximate percentage value of completion. 0 is returned
-     * either when the card does not have any tasks added or no tasks was
+     * either when the card does not have any tasks added or no tasks were
      * completed at all
      */
     double get_completion() const;
@@ -57,35 +65,62 @@ public:
      *
      * @param task Task object to be added
      *
-     * @return a smart pointer to the the added Task object
+     * @return a smart pointer to the the added Task object. nullptr will may be
+     * returned if the caller is trying to add a Task that is already in the
+     * Card
      */
     std::shared_ptr<Task> add_task(const Task& task);
 
     /**
      * @brief Removes a Task object
      *
-     * @param task pointer to the task object to be removed
+     * @param task Reference to an identical task object in tasks
      *
-     * @return True when the object was removed. False when the Task object to
-     * be removed was not even in the list
+     * @return True when the object is removed. False is returned if task is not
+     * in tasks
      */
-    bool remove_task(std::shared_ptr<Task> task);
+    bool remove_task(const Task& task);
 
     /**
      * @brief Access the underlying Task collection
      */
     std::vector<std::shared_ptr<Task>> const& get_tasks();
 
+    /**
+     * @brief Put task "next" after task "sibling"
+     */
     void reorder_task(const Task& next, const Task& sibling);
 
+    /**
+     * @brief Returns true if this card is past due date and the date is valid,
+     * else false is returned
+     */
     bool past_due_date();
 
+    /**
+     * @brief Sets a new due date to this card. This method will not modify due
+     * date if the given date is not valid
+     */
     void set_due_date(const Date& date);
 
+    /**
+     * @brief Returns card's due date
+     */
     Date get_due_date() const;
 
+    /**
+     * @brief Return true if the card is complete or an invalid due date is set.
+     * False is then returned if the due date set is valid but it is not
+     * complete
+     */
     bool get_complete() const;
 
+    /**
+     * @brief Sets the complete state of this card. This method does nothing
+     * whenever the due date set is not valid
+     *
+     * @param complete bool value
+     */
     void set_complete(bool complete);
 
 protected:

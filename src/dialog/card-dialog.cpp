@@ -80,7 +80,7 @@ CardDetailsDialog::~CardDetailsDialog() {}
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = card_widget.get_card();
-    card->remove_task(task.get_task());
+    card->remove_task(*task.get_task());
     tasks_box->remove(task);
     card_widget.update_complete_tasks();
 }

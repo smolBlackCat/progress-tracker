@@ -2,11 +2,14 @@
 
 #include <numeric>
 
-Card::Card(const std::string& name, const Color& color, bool complete)
-    : Item{name}, complete{complete} {
-    set_color(color);
-    modified = false;
+Card::Card(const std::string& name, const Date& date, bool complete,
+           const Color& color)
+    : Item{name}, complete{complete}, due_date{date} {
+    this->color = color;
 }
+
+Card::Card(const std::string& name, const Color& color)
+    : Card{name, Date{}, false, color} {}
 
 void Card::set_color(const Color& color) {
     this->color = color;
@@ -38,13 +41,9 @@ void Card::set_notes(const std::string& notes) {
 }
 
 double Card::get_completion() const {
-    if (tasks.empty()) {
-        return 0;
-    }
-
-    auto tasks_completed_n =
+    double tasks_completed_n =
         std::accumulate(tasks.begin(), tasks.end(), 0,
-                        [](int acc, std::shared_ptr<Task> value) {
+                        [](double acc, std::shared_ptr<Task> value) {
                             return value->get_done() ? acc + 1 : acc;
                         });
 
@@ -52,6 +51,10 @@ double Card::get_completion() const {
 }
 
 std::shared_ptr<Task> Card::add_task(const Task& task) {
+    for (auto& ctask : tasks) {
+        if (task == *ctask) return nullptr;
+    }
+
     std::shared_ptr<Task> new_task = std::make_shared<Task>(task);
     tasks.push_back(new_task);
 
@@ -60,9 +63,9 @@ std::shared_ptr<Task> Card::add_task(const Task& task) {
     return new_task;
 }
 
-bool Card::remove_task(std::shared_ptr<Task> task) {
+bool Card::remove_task(const Task& task) {
     for (size_t i = 0; i < tasks.size(); i++) {
-        if (tasks[i] == task) {
+        if (*tasks[i] == task) {
             tasks.erase(tasks.begin() + i);
             modified = true;
             return true;
@@ -114,31 +117,24 @@ void Card::reorder_task(const Task& next, const Task& sibling) {
 bool Card::past_due_date() {
     using namespace std::chrono;
 
-    Date current_date =
-        year_month_day{std::chrono::floor<days>(system_clock::now())};
-    return current_date > due_date && (due_date.ok());
+    Date today = year_month_day{std::chrono::floor<days>(system_clock::now())};
+    return (due_date.ok()) && today > due_date;
 };
 
 void Card::set_due_date(const Date& date) {
-    due_date = date;
-    modified = true;
+    if (date.ok()) {
+        due_date = date;
+        modified = true;
+    }
 };
 
 Date Card::get_due_date() const { return due_date; };
 
-bool Card::get_complete() const {
-    if (due_date.ok()) {
-        return complete;
-    }
-
-    return true;
-}
+bool Card::get_complete() const { return due_date.ok() ? complete : true; }
 
 void Card::set_complete(bool complete) {
-    if (due_date.ok())
+    if (due_date.ok()) {
         this->complete = complete;
-    else
-        this->complete = true;
-
-    modified = true;
+        modified = true;
+    }
 }

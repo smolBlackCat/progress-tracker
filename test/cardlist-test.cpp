@@ -13,7 +13,7 @@ TEST_CASE("CardList operations", "[CardList]") {
 
         REQUIRE(addedCard1 != nullptr);
         REQUIRE(*addedCard1 == card1);
-        REQUIRE(cardList.get_card_vector().size() == 1);
+        REQUIRE(cardList.get_cards().size() == 1);
         REQUIRE(cardList.get_modified() == true);
     }
 
@@ -24,7 +24,7 @@ TEST_CASE("CardList operations", "[CardList]") {
         cardList.add_card(card2);
 
         REQUIRE(cardList.remove_card(card1) == true);
-        REQUIRE(cardList.get_card_vector().size() == 1);
+        REQUIRE(cardList.get_cards().size() == 1);
         REQUIRE(cardList.remove_card(card1) ==
                 false);  // Removing the same card should return false
         REQUIRE(cardList.get_modified() == true);
@@ -39,15 +39,15 @@ TEST_CASE("CardList operations", "[CardList]") {
         auto cardPtr2 = cardList.add_card(card2);
         auto cardPtr3 = cardList.add_card(card3);
 
-        REQUIRE(*cardList.get_card_vector().at(0) == card1);
-        REQUIRE(*cardList.get_card_vector().at(1) == card2);
-        REQUIRE(*cardList.get_card_vector().at(2) == card3);
+        REQUIRE(*cardList.get_cards().at(0) == card1);
+        REQUIRE(*cardList.get_cards().at(1) == card2);
+        REQUIRE(*cardList.get_cards().at(2) == card3);
 
         cardList.reorder_card(card3, card1);  // Move card3 after card1
 
-        REQUIRE(*cardList.get_card_vector().at(0) == card1);
-        REQUIRE(*cardList.get_card_vector().at(1) == card3);
-        REQUIRE(*cardList.get_card_vector().at(2) == card2);
+        REQUIRE(*cardList.get_cards().at(0) == card1);
+        REQUIRE(*cardList.get_cards().at(1) == card3);
+        REQUIRE(*cardList.get_cards().at(2) == card2);
 
         REQUIRE(cardList.get_modified() == true);
     }

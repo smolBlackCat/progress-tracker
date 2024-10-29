@@ -122,30 +122,30 @@ Board BoardBackend::load() {
                             card_element->GetLineNum())};
                     }
 
-                    Card cur_card{cur_card_name,
-                                  cur_card_color
-                                      ? string_to_color(cur_card_color)
-                                      : NO_COLOR,
-                                  cur_card_complete};
+                    Date date{};
 
                     if (cur_card_due_date) {
                         const std::regex date_r{"\\d\\d\\d\\d-\\d\\d-\\d\\d"};
 
                         if (!std::regex_match(cur_card_due_date, date_r)) {
-                            throw board_parse_error{
-                                std::format("Invalid due date at Card {}",
-                                            cur_card.get_name())};
+                            throw board_parse_error{std::format(
+                                "Invalid due date at Card {}", cur_card_name)};
                         }
                         std::chrono::sys_seconds secs;
 
                         std::istringstream{std::string{cur_card_due_date}} >>
                             std::chrono::parse("%F", secs);
                         Date date{std::chrono::floor<std::chrono::days>(secs)};
-                        cur_card.set_due_date(date);
-                    } else {
-                        // This is bad.
-                        cur_card.set_due_date(Date{});
+                        date = date;
                     }
+
+                    Card cur_card{
+                        cur_card_name,
+                        date,
+                        cur_card_complete,
+                        cur_card_color ? string_to_color(cur_card_color)
+                                       : NO_COLOR,
+                    };
 
                     auto task_element = card_element->FirstChildElement("task");
                     while (task_element) {
@@ -237,12 +237,12 @@ bool BoardBackend::save_xml(Board& board) {
     board_element->SetAttribute("background", board.get_background().c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto& cardlist : board.get_cardlist_vector()) {
+    for (auto& cardlist : board.get_cardlists()) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
         cardlist->set_modified(false);
 
-        for (auto& card : cardlist->get_card_vector()) {
+        for (auto& card : cardlist->get_cards()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
             if (card->is_color_set())
@@ -314,7 +314,7 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
 const std::string& Board::get_background() const { return background; }
 
 std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
-    for (auto& ccardlist : cardlist_vector) {
+    for (auto& ccardlist : cardlists) {
         if (*ccardlist == cardlist) {
             return nullptr;
         }
@@ -323,7 +323,7 @@ std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
     try {
         std::shared_ptr<CardList> new_cardlist =
             std::make_shared<CardList>(cardlist);
-        cardlist_vector.push_back(new_cardlist);
+        cardlists.push_back(new_cardlist);
         modified = true;
         return new_cardlist;
     } catch (std::bad_alloc& err) {
@@ -332,9 +332,9 @@ std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
 }
 
 bool Board::remove_cardlist(const CardList& cardlist) {
-    for (size_t i = 0; i < cardlist_vector.size(); i++) {
-        if (cardlist == (*cardlist_vector.at(i))) {
-            cardlist_vector.erase(cardlist_vector.begin() + i);
+    for (size_t i = 0; i < cardlists.size(); i++) {
+        if (cardlist == (*cardlists.at(i))) {
+            cardlists.erase(cardlists.begin() + i);
             modified = true;
             return true;
         }
@@ -346,10 +346,10 @@ void Board::reorder_cardlist(const CardList& next, const CardList& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 
-    for (ssize_t i = 0; i < cardlist_vector.size(); i++) {
-        if (*cardlist_vector[i] == next) {
+    for (ssize_t i = 0; i < cardlists.size(); i++) {
+        if (*cardlists[i] == next) {
             next_i = i;
-        } else if (*cardlist_vector[i] == sibling) {
+        } else if (*cardlists[i] == sibling) {
             sibling_i = i;
         }
     }
@@ -361,34 +361,34 @@ void Board::reorder_cardlist(const CardList& next, const CardList& sibling) {
         return;
     }
 
-    auto next_it = std::next(cardlist_vector.begin(), next_i);
-    std::shared_ptr<CardList> temp_v = cardlist_vector[next_i];
-    cardlist_vector.erase(next_it);
+    auto next_it = std::next(cardlists.begin(), next_i);
+    std::shared_ptr<CardList> temp_v = cardlists[next_i];
+    cardlists.erase(next_it);
 
     // Support for right to left drags and drops
     if (next_i < sibling_i) {
         sibling_i -= 1;
     }
 
-    if (sibling_i == cardlist_vector.size() - 1) {
-        cardlist_vector.push_back(temp_v);
+    if (sibling_i == cardlists.size() - 1) {
+        cardlists.push_back(temp_v);
     } else {
-        auto sibling_it = std::next(cardlist_vector.begin(), sibling_i + 1);
-        cardlist_vector.insert(sibling_it, temp_v);
+        auto sibling_it = std::next(cardlists.begin(), sibling_i + 1);
+        cardlists.insert(sibling_it, temp_v);
     }
     modified = true;
 }
 
 bool Board::save() { return backend.save(*this); }
 
-const std::vector<std::shared_ptr<CardList>>& Board::get_cardlist_vector() {
-    return cardlist_vector;
+const std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
+    return cardlists;
 }
 
 void Board::set_modified(bool modified) {
     Item::set_modified(modified);
 
-    for (auto& cardlist : cardlist_vector) {
+    for (auto& cardlist : cardlists) {
         cardlist->set_modified(modified);
     }
 }
@@ -398,7 +398,7 @@ time_point<system_clock, seconds> Board::get_last_modified() const {
 }
 
 bool Board::get_modified() {
-    for (auto& cardlist : cardlist_vector) {
+    for (auto& cardlist : cardlists) {
         if (cardlist->get_modified()) {
             modified = true;
             break;

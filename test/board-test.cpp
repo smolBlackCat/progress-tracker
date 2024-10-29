@@ -254,9 +254,9 @@ TEST_CASE("Adding Cardlists to a Board", "[Board]") {
     CHECK(!board.add_cardlist(cardlist1));
 
     CHECK(board.get_modified());
-    CHECK(board.get_cardlist_vector().size() == 2);
-    CHECK(*board.get_cardlist_vector()[0] == cardlist1);
-    CHECK(*board.get_cardlist_vector()[1] == cardlist2);
+    CHECK(board.get_cardlists().size() == 2);
+    CHECK(*board.get_cardlists()[0] == cardlist1);
+    CHECK(*board.get_cardlists()[1] == cardlist2);
 }
 
 TEST_CASE("Removing cardlists of a Board", "[Board]") {
@@ -285,7 +285,7 @@ TEST_CASE("Reordering Cardlists", "Board") {
     auto cardlist2 = board.add_cardlist(CardList{"CardList 2"});
     auto cardlist3 = board.add_cardlist(CardList{"CardList 3"});
 
-    auto& cardlists = board.get_cardlist_vector();
+    auto& cardlists = board.get_cardlists();
 
     board.set_modified(false);
 

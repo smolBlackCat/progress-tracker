@@ -74,9 +74,7 @@ protected:
 };
 
 /**
- * @class Board
- *
- * @brief A class representing the kanban-style board of the application,
+ * @brief Kanban Board
  */
 class Board : public Item {
 public:
@@ -113,7 +111,8 @@ public:
      *
      * @param cardlist CardList object
      *
-     * @returns a CardList pointer to the newly allocated object.
+     * @returns a CardList pointer to the newly allocated object. nullptr may be
+     * returned if the cardlist to be added is already in cardlists
      */
     std::shared_ptr<CardList> add_cardlist(const CardList& cardlist);
 
@@ -128,7 +127,7 @@ public:
     bool remove_cardlist(const CardList& cardlist);
 
     /**
-     * @brief Reorders the next card after sibling
+     * @brief Reorders cardlist "next" after cardlist "sibling"
      */
     void reorder_cardlist(const CardList& next, const CardList& sibling);
 
@@ -137,7 +136,10 @@ public:
      */
     bool save();
 
-    const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
+    /**
+     * @brief Access the underlying cardlists collection
+     */
+    const std::vector<std::shared_ptr<CardList>>& get_cardlists();
 
     void set_modified(bool modified) override;
 
@@ -164,6 +166,6 @@ public:
 
 protected:
     std::string background;
-    std::vector<std::shared_ptr<CardList>> cardlist_vector;
+    std::vector<std::shared_ptr<CardList>> cardlists;
     time_point<system_clock, seconds> last_modified;
 };

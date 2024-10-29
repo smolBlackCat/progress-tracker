@@ -51,7 +51,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     root.append(add_card_button);
 
     append(cardlist_header);
-    for (auto& card : cardlist_refptr->get_card_vector()) {
+    for (auto& card : cardlist_refptr->get_cards()) {
         auto cur_builder = Gtk::Builder::create_from_resource(
             "/io/github/smolblackcat/Progress/card-widget.ui");
         auto cardwidget =

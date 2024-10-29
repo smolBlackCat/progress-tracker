@@ -7,9 +7,7 @@
 #include "item.h"
 
 /**
- * @class CardList
- *
- * @brief A class representing a single list of cards inside a board.
+ * @brief Represents a list of cards within a kanban board
  */
 class CardList : public Item {
 public:
@@ -19,10 +17,11 @@ public:
     CardList(const std::string& name);
 
     /**
-     * @brief Adds a Card object to the cardlist by moving the Card object
+     * @brief Adds a Card object to the cardlist by copying the Card object
      * into a newly allocated space.
      *
-     * @returns A pointer to the allocated object. It may be nullptr
+     * @returns A pointer to the allocated object. It may be nullptr if the card
+     * being added is already in the cardlist
      */
     std::shared_ptr<Card> add_card(const Card& card);
 
@@ -31,7 +30,7 @@ public:
      *
      * @param card Card instance.
      *
-     * @returns True if the card was successfully removed from the cardlist.
+     * @returns True if the card was removed from the cardlist.
      *          False may be returned when the requested Card to be removed is
      *          not present in the cardlist.
      */
@@ -41,16 +40,13 @@ public:
 
     bool get_modified() override;
 
-    const std::vector<std::shared_ptr<Card>>& get_card_vector();
+    /**
+     * @brief Access the underlying cards collection
+     */
+    const std::vector<std::shared_ptr<Card>>& get_cards();
 
     /**
-     * @brief Reorders the cards in a way that next is put after sibling.
-     *
-     * @param next Card to be put after sibling
-     * @param sibling Card where next will be put after
-     *
-     * @throws std::invalid_argument if either next or sibling are not children
-     * of this cardlist
+     * @brief Reorders card "next" after card "sibling"
      */
     void reorder_card(const Card& next, const Card& sibling);
 
@@ -58,5 +54,5 @@ private:
     bool cards_modified();
 
 protected:
-    std::vector<std::shared_ptr<Card>> card_vector;
+    std::vector<std::shared_ptr<Card>> cards;
 };

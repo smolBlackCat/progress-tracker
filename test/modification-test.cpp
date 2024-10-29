@@ -65,7 +65,7 @@ TEST_CASE("CardList modify card marks cardlist modified", "[CardList]") {
     cardlist.add_card(card);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.get_card_vector().at(0)->set_name("new card name");
+    cardlist.get_cards().at(0)->set_name("new card name");
     REQUIRE(cardlist.get_modified());
 }
 
