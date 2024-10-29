@@ -74,10 +74,10 @@ bool Card::remove_task(std::shared_ptr<Task> task) {
 std::vector<std::shared_ptr<Task>> const& Card::get_tasks() { return tasks; }
 
 void Card::reorder_task(const Task& next, const Task& sibling) {
-    size_t next_i = -1;
-    size_t sibling_i = -1;
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
 
-    for (size_t i = 0; i < tasks.size(); i++) {
+    for (ssize_t i = 0; i < tasks.size(); i++) {
         if (*tasks[i] == next) {
             next_i = i;
         }
@@ -86,9 +86,11 @@ void Card::reorder_task(const Task& next, const Task& sibling) {
         }
     }
 
-    if (next_i == -1 || sibling_i == -1) {
-        throw std::invalid_argument{
-            "Either next or sibling are not children of this cardlist"};
+    bool any_absent_item = next_i + sibling_i < 0;
+    bool is_same_item = next_i == sibling_i;
+    bool already_in_order = next_i - sibling_i == 1;
+    if (any_absent_item || is_same_item || already_in_order) {
+        return;
     }
 
     auto next_it = std::next(tasks.begin(), next_i);

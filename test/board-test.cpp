@@ -1,251 +1,391 @@
 #define CATCH_CONFIG_MAIN
 
-#include "core/board.h"
+#include <core/board.h>
+#include <core/cardlist.h>
+#include <core/exceptions.h>
+#include <tinyxml2.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
+#include <format>
 #include <fstream>
 
-#include "core/cardlist.h"
+TEST_CASE("Parsing valid XML Progress boards 1", "[Board]") {
+    using namespace tinyxml2;
+    using namespace std;
 
-TEST_CASE("Board default constructor", "[Board]") {
-    Board board;
-    REQUIRE(board.get_name() == "");
-    REQUIRE(board.get_background() == Board::BACKGROUND_DEFAULT);
-    REQUIRE(board.get_filepath() == "");
-    REQUIRE(board.get_cardlist_vector().empty());
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgb(1,1,1)");
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    REQUIRE(backend.set_attribute("filepath", "test-board.xml"));
+    Board board = backend.load();
+
+    CHECK(board.get_name() == "Progress Board");
+    CHECK(board.get_background() == "rgb(1,1,1)");
+    CHECK(!board.get_modified());
+
+    filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Parsing valid XML Progress boards 2", "[Board]") {
+    using namespace tinyxml2;
+    using namespace std;
+
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgb(1,1,1)");
+
+    // Adding Valid Cardlists
+    for (int i = 0; i < 10; i++) {
+        XMLElement* list_element = board_element->InsertNewChildElement("list");
+        list_element->SetAttribute("name",
+                                   std::format("Cardlist {}", i).c_str());
+        // Adding valid cards
+        for (int j = 0; j < 10; j++) {
+            XMLElement* card_element =
+                list_element->InsertNewChildElement("card");
+            card_element->SetAttribute("name",
+                                       std::format("Card {}", j).c_str());
+            card_element->SetAttribute("color", "rgb(23,12,45)");
+            card_element->SetAttribute("due", "1969-01-01");
+            card_element->SetAttribute("complete", false);
+
+            // Adding valid tasks to the current card
+            for (int k = 0; k < 10; k++) {
+                XMLElement* task_element =
+                    card_element->InsertNewChildElement("task");
+                task_element->SetAttribute("name",
+                                           std::format("Task {}", k).c_str());
+                task_element->SetAttribute("done", true);
+            }
+
+            XMLElement* notes_element =
+                card_element->InsertNewChildElement("notes");
+            notes_element->SetText("I'm pretty loaded really yay");
+        }
+    }
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    REQUIRE(backend.set_attribute("filepath", "test-board.xml"));
+    Board board = backend.load();
+
+    CHECK(board.get_name() == "Progress Board");
+    CHECK(board.get_background() == "rgb(1,1,1)");
+    CHECK(!board.get_modified());
+
+    filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Invalid XML Board: missing file path", "[Board]") {
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "nonexistent-file.xml");
+    CHECK_THROWS_AS(backend.load(), std::invalid_argument);
+}
+
+TEST_CASE("Invalid XML Board: file fails to load", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    // Creating an invalid file that cannot be parsed
+    std::ofstream outFile("corrupt-file.xml");
+    outFile << "invalid XML content";
+    outFile.close();
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "corrupt-file.xml");
+    CHECK_THROWS_AS(backend.load(), std::invalid_argument);
+
+    std::filesystem::remove("corrupt-file.xml");
+}
+
+TEST_CASE("Invalid XML Board: missing <board> element", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());
+
+    std::filesystem::remove("test-board.xml");
+}
+
+TEST_CASE(
+    "Invalid XML Board: missing 'name' or 'background' attribute in <board>",
+    "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    // Background attribute is missing
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());
+
+    std::filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Invalid XML Board: missing 'name' attribute in <list>", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgba(255,0,0,1)");
+
+    XMLElement* list_element = board_element->InsertNewChildElement("list");
+    // Name attribute for <list> is missing
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());
+
+    std::filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Invalid XML Board: missing 'name' attribute in <card>", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgba(255,0,0,1)");
+
+    XMLElement* list_element = board_element->InsertNewChildElement("list");
+    list_element->SetAttribute("name", "List 1");
+
+    XMLElement* card_element = list_element->InsertNewChildElement("card");
+    card_element->SetAttribute("color", "rgb(23,12,45)");
+    // Name attribute for <card> is missing
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());
+
+    std::filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Invalid XML Board: malformed due date in <card>", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgba(255,0,0,1)");
+
+    XMLElement* list_element = board_element->InsertNewChildElement("list");
+    list_element->SetAttribute("name", "List 1");
+
+    XMLElement* card_element = list_element->InsertNewChildElement("card");
+    card_element->SetAttribute("name", "Card 1");
+    card_element->SetAttribute("due", "invalid-date");  // Malformed date
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());  // Assuming load handles date parsing exception
+
+    std::filesystem::remove("test-board.xml");
+}
+
+TEST_CASE("Invalid XML Board: missing 'name' attribute in <task>", "[Board]") {
+    using namespace tinyxml2;
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgba(255,0,0,1)");
+
+    XMLElement* list_element = board_element->InsertNewChildElement("list");
+    list_element->SetAttribute("name", "List 1");
+
+    XMLElement* card_element = list_element->InsertNewChildElement("card");
+    card_element->SetAttribute("name", "Card 1");
+
+    XMLElement* task_element = card_element->InsertNewChildElement("task");
+    task_element->SetAttribute("done", true);  // Missing 'name' attribute
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    backend.set_attribute("filepath", "test-board.xml");
+    CHECK_THROWS(backend.load());
+
+    std::filesystem::remove("test-board.xml");
+}
+
+// TODO: Exhaust Board XML syntax tests
+
+TEST_CASE("Adding Cardlists to a Board", "[Board]") {
+    BoardBackend backend{BackendType::LOCAL};
+    Board board = backend.create("Progress Board", "rgb(1,2,3)");
+
     REQUIRE(!board.get_modified());
-}
 
-TEST_CASE("Board parameterized constructor", "[Board]") {
-    std::string name = "Test Board";
-    std::string background = "rgba(255,0,0,1)";
-    Board board(name, background);
-    REQUIRE(board.get_name() == name);
-    REQUIRE(board.get_background() == background);
-    REQUIRE(board.get_cardlist_vector().empty());
-    REQUIRE_FALSE(board.get_modified());
-}
-
-TEST_CASE("Board XML constructor", "[Board]") {
-    std::string xml_path = "test_board.xml";
-    std::string xml_content =
-        "<board name=\"Test Board\" background=\"rgba(255,0,0,1)\">"
-        "<list name=\"To Do\">"
-        "<card name=\"Task 1\" color=\"rgba(0,0,255,1)\" due=\"2012-01-01\">"
-        "<task name=\"Subtask 1\" done=\"false\" />"
-        "<notes>Some notes</notes>"
-        "</card>"
-        "</list>"
-        "</board>";
-
-    // Write XML content to a file
-    std::ofstream file(xml_path);
-    file << xml_content;
-    file.close();
-
-    Board board(xml_path);
-    REQUIRE(board.get_name() == "Test Board");
-    REQUIRE(board.get_background() == "rgba(255,0,0,1)");
-    REQUIRE(board.get_cardlist_vector().size() == 1);
-    REQUIRE(board.get_cardlist_vector()[0]->get_name() == "To Do");
-    Card card = *board.get_cardlist_vector()[0]->get_card_vector()[0];
-    REQUIRE(!card.get_complete());
-    REQUIRE(card.get_due_date() == Date{std::chrono::year{2012},
-                                        std::chrono::month{1},
-                                        std::chrono::day{1}});
-
-    // Clean up
-    std::filesystem::remove(xml_path);
-}
-
-TEST_CASE("Board set and get background", "[Board]") {
-    Board board;
-    REQUIRE(board.get_background() == Board::BACKGROUND_DEFAULT);
-
-    board.set_background("rgba(255,255,255,1)");
-    REQUIRE(board.get_background() == "rgba(255,255,255,1)");
-    REQUIRE(board.get_modified());
-
-    board.set_background("invalid_background");
-    REQUIRE(board.get_background() == Board::BACKGROUND_DEFAULT);
-    REQUIRE(board.get_modified());
-}
-
-TEST_CASE("Board set and get filepath", "[Board]") {
-    Board board;
-    std::string file_path = "./test_board.xml";
-    REQUIRE(board.set_filepath(file_path));
-    REQUIRE(board.get_filepath() == file_path);
-
-    REQUIRE(board.set_filepath("invalid_path/test_board.xml", false) == false);
-    REQUIRE(board.get_filepath() == file_path);
-}
-
-TEST_CASE("Board add and remove cardlist", "[Board]") {
-    Board board;
-    CardList cardlist("To Do");
-
-    auto added_cardlist = board.add_cardlist(cardlist);
-    REQUIRE(added_cardlist->get_name() == "To Do");
-    REQUIRE(board.get_cardlist_vector().size() == 1);
-    REQUIRE(board.get_modified());
-
-    REQUIRE(board.remove_cardlist(cardlist) == true);
-    REQUIRE(board.get_cardlist_vector().empty());
-    REQUIRE(board.get_modified());
-}
-
-TEST_CASE("Board save as XML", "[Board]") {
-    Board board("Test Board", "rgba(255,0,0,1)");
-    std::string file_path = "test_save_board.xml";
-    board.set_filepath(file_path);
-
-    CardList cardlist("To Do");
-    Card card("Task 1", Color{0, 0, 255, 1});
-    card.set_due_date(Date{std::chrono::year{2013}, std::chrono::month{12},
-                           std::chrono::day{2}});
-    cardlist.add_card(card);
-    board.add_cardlist(cardlist);
-    REQUIRE(board.get_modified());
-    REQUIRE(board.save_as_xml());
-    REQUIRE(!board.get_modified());
-    REQUIRE(std::filesystem::exists(file_path));
-
-    // Load the saved file and verify its contents
-    tinyxml2::XMLDocument doc;
-    REQUIRE(doc.LoadFile(file_path.c_str()) == tinyxml2::XML_SUCCESS);
-
-    auto board_element = doc.FirstChildElement("board");
-    REQUIRE(board_element != nullptr);
-    REQUIRE(board_element->Attribute("name") == std::string("Test Board"));
-    REQUIRE(board_element->Attribute("background") ==
-            std::string("rgba(255,0,0,1)"));
-
-    auto list_element = board_element->FirstChildElement("list");
-    REQUIRE(list_element != nullptr);
-    REQUIRE(list_element->Attribute("name") == std::string("To Do"));
-
-    auto card_element = list_element->FirstChildElement("card");
-    REQUIRE(card_element != nullptr);
-    REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
-    REQUIRE(card_element->Attribute("due"));
-    REQUIRE(card_element->Attribute("due") == std::string("2013-12-02"));
-    REQUIRE(!card_element->BoolAttribute("done"));
-    auto color = card_element->Attribute("color");
-    REQUIRE(color == std::string("rgb(0,0,255)"));
-
-    // Clean up
-    std::filesystem::remove(file_path);
-}
-
-TEST_CASE("Board save as XML (2)", "[Board]") {
-    Board board("Test Board", "rgba(255,0,0,1)");
-    std::string file_path = "test_save_board.xml";
-    board.set_filepath(file_path);
-
-    CardList cardlist("To Do");
-    Card card("Task 1", Color{0, 0, 255, 1});
-    card.set_due_date(Date{});
-    cardlist.add_card(card);
-    board.add_cardlist(cardlist);
-
-    REQUIRE(board.save_as_xml());
-    REQUIRE(std::filesystem::exists(file_path));
-
-    // Load the saved file and verify its contents
-    tinyxml2::XMLDocument doc;
-    REQUIRE(doc.LoadFile(file_path.c_str()) == tinyxml2::XML_SUCCESS);
-
-    auto board_element = doc.FirstChildElement("board");
-    REQUIRE(board_element != nullptr);
-    REQUIRE(board_element->Attribute("name") == std::string("Test Board"));
-    REQUIRE(board_element->Attribute("background") ==
-            std::string("rgba(255,0,0,1)"));
-
-    auto list_element = board_element->FirstChildElement("list");
-    REQUIRE(list_element != nullptr);
-    REQUIRE(list_element->Attribute("name") == std::string("To Do"));
-
-    auto card_element = list_element->FirstChildElement("card");
-    REQUIRE(card_element != nullptr);
-    REQUIRE(!card_element->Attribute("due"));
-    REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
-    REQUIRE(card_element->Attribute("color") == std::string("rgb(0,0,255)"));
-
-    // Clean up
-    std::filesystem::remove(file_path);
-}
-
-TEST_CASE("Board save as XML (3)", "[Board]") {
-    Board board("Test Board", "rgba(255,0,0,1)");
-    std::string file_path = "folder/test_board.xml";
-    board.set_filepath(file_path);
-
-    CardList cardlist("To Do");
-    Card card("Task 1", Color{0, 0, 255, 1});
-    cardlist.add_card(card);
-    board.add_cardlist(cardlist);
-
-    REQUIRE(board.save_as_xml());
-    REQUIRE(std::filesystem::exists(file_path));
-
-    // Load the saved file and verify its contents
-    tinyxml2::XMLDocument doc;
-    REQUIRE(doc.LoadFile(file_path.c_str()) == tinyxml2::XML_SUCCESS);
-
-    auto board_element = doc.FirstChildElement("board");
-    REQUIRE(board_element != nullptr);
-    REQUIRE(board_element->Attribute("name") == std::string("Test Board"));
-    REQUIRE(board_element->Attribute("background") ==
-            std::string("rgba(255,0,0,1)"));
-
-    auto list_element = board_element->FirstChildElement("list");
-    REQUIRE(list_element != nullptr);
-    REQUIRE(list_element->Attribute("name") == std::string("To Do"));
-
-    auto card_element = list_element->FirstChildElement("card");
-    REQUIRE(card_element != nullptr);
-    REQUIRE(card_element->Attribute("name") == std::string("Task 1"));
-    REQUIRE(card_element->Attribute("color") == std::string("rgb(0,0,255)"));
-
-    // Clean up
-    std::filesystem::remove(file_path);
-}
-
-TEST_CASE("Board get background type", "[Board]") {
-    REQUIRE(Board::get_background_type("rgba(255,0,0,1)") ==
-            BackgroundType::COLOR);
-    REQUIRE(Board::get_background_type("rgb(255,0,0)") ==
-            BackgroundType::COLOR);
-    REQUIRE(Board::get_background_type("invalid_background") ==
-            BackgroundType::INVALID);
-
-    std::string img_path = "test_image.png";
-    std::ofstream img_file{img_path};
-    img_file.close();
-    REQUIRE(Board::get_background_type(img_path) == BackgroundType::IMAGE);
-    std::filesystem::remove(img_path);
-}
-
-TEST_CASE("Reordering Cardlists within a Board", "[Board]") {
-    Board board{"Board", "rgb(1,1,1)"};
-
+    // Cardlists can be superficially the same, but there must be no repeated
+    // ids
     CardList cardlist1{"TODO"};
-    CardList cardlist2{"DOING"};
-    CardList cardlist3{"DONE"};
+    CardList cardlist2{"TODO"};
+
+    auto added_cardlist = board.add_cardlist(cardlist1);
+    auto added_cardlist2 = board.add_cardlist(cardlist2);
+
+    REQUIRE(added_cardlist);
+    REQUIRE(added_cardlist2);
+
+    // We're trying to add the exact same cardlist again. Don't and return
+    // nullptr
+    CHECK(!board.add_cardlist(cardlist1));
+
+    CHECK(board.get_modified());
+    CHECK(board.get_cardlist_vector().size() == 2);
+    CHECK(*board.get_cardlist_vector()[0] == cardlist1);
+    CHECK(*board.get_cardlist_vector()[1] == cardlist2);
+}
+
+TEST_CASE("Removing cardlists of a Board", "[Board]") {
+    BoardBackend backend{BackendType::LOCAL};
+    Board board = backend.create("Progress Board", "rgb(1,2,3)");
+
+    CardList cardlist1{"Something else to be done"};
 
     board.add_cardlist(cardlist1);
-    board.add_cardlist(cardlist2);
-    board.add_cardlist(cardlist3);
+    board.set_modified(false);
 
-    REQUIRE(*board.get_cardlist_vector().at(0) == cardlist1);
-    REQUIRE(*board.get_cardlist_vector().at(1) == cardlist2);
-    REQUIRE(*board.get_cardlist_vector().at(2) == cardlist3);
+    CHECK(board.remove_cardlist(cardlist1));
+    CHECK(board.get_modified());
 
-    board.reorder_cardlist(cardlist1, cardlist3);
+    board.set_modified(false);
 
-    REQUIRE(*board.get_cardlist_vector().at(2) == cardlist1);
-    REQUIRE(*board.get_cardlist_vector().at(0) == cardlist2);
-    REQUIRE(*board.get_cardlist_vector().at(1) == cardlist3);
+    CHECK(!board.remove_cardlist(cardlist1));
+    CHECK(!board.get_modified());
+}
+
+TEST_CASE("Reordering Cardlists", "Board") {
+    Board board =
+        BoardBackend{BackendType::LOCAL}.create("Progress", "file.png");
+
+    auto cardlist1 = board.add_cardlist(CardList{"CardList 1"});
+    auto cardlist2 = board.add_cardlist(CardList{"CardList 2"});
+    auto cardlist3 = board.add_cardlist(CardList{"CardList 3"});
+
+    auto& cardlists = board.get_cardlist_vector();
+
+    board.set_modified(false);
+
+    SECTION("Reordering using the same object references") {
+        board.reorder_cardlist(*cardlist1, *cardlist1);
+
+        // Because we're trying to reorder the same thing, no reordering is
+        // done, thus no modification either
+        CHECK(*cardlists[0] == *cardlist1);
+        CHECK(*cardlists[1] == *cardlist2);
+        CHECK(*cardlists[2] == *cardlist3);
+        CHECK(!board.get_modified());
+    }
+
+    board.set_modified(false);
+
+    SECTION("Reordering with one absent cardlist") {
+        board.reorder_cardlist(*cardlist1, CardList{"nobody here"});
+
+        // Trying to reorder a cardlist with an absent one does nothing exactly
+        // since there's no other card to complete the operation
+        CHECK(*cardlists[0] == *cardlist1);
+        CHECK(*cardlists[1] == *cardlist2);
+        CHECK(*cardlists[2] == *cardlist3);
+        CHECK(!board.get_modified());
+    }
+
+    board.set_modified(false);
+
+    SECTION("Reordering where sibling and next are already sibling and next") {
+        board.reorder_cardlist(*cardlist3, *cardlist2);
+
+        // Because cardlist3 is already next to cardlist2, nothing should be
+        // done, therefore no modification whatsoeever
+        CHECK(*cardlists[0] == *cardlist1);
+        CHECK(*cardlists[1] == *cardlist2);
+        CHECK(*cardlists[2] == *cardlist3);
+        CHECK(!board.get_modified());
+    }
+
+    board.set_modified(false);
+
+    SECTION("Reordering case 1") {
+        board.reorder_cardlist(*cardlist1, *cardlist3);
+
+        // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
+        // last element and a modification is registered
+        CHECK(cardlists[0] == cardlist2);
+        CHECK(cardlists[1] == cardlist3);
+        CHECK(cardlists[2] == cardlist1);
+        CHECK(board.get_modified());
+    }
+
+    board.set_modified(false);
+
+    SECTION("Reordering case 2") {
+        board.reorder_cardlist(*cardlist3, *cardlist1);
+
+        // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
+        // last element and a modification is registered
+        CHECK(*cardlists[0] == *cardlist1);
+        CHECK(*cardlists[1] == *cardlist3);
+        CHECK(*cardlists[2] == *cardlist2);
+        CHECK(board.get_modified());
+    }
+}
+
+TEST_CASE("Saving new boards") {
+    using namespace tinyxml2;
+    Board board =
+        BoardBackend{BackendType::LOCAL}.create("Progress", "file.png");
+    board.backend.set_attribute("filepath", "new-board.xml");
+
+    CardList cardlist{"Things to do"};
+    Card card{"Computer Science", Color{123, 456, 123, 1}};
+    cardlist.add_card(card);
+    board.add_cardlist(cardlist);
+
+    board.save();
+
+    REQUIRE(!board.get_modified());
+
+    XMLDocument doc;
+    doc.LoadFile("new-board.xml");
+
+    XMLElement* board_element = doc.FirstChildElement("board");
+    CHECK(std::string{board_element->FindAttribute("name")->Value()} ==
+          "Progress");
+
+    // file.png does not exist. So the default one is set
+    CHECK(std::string{board_element->FindAttribute("background")->Value()} ==
+          Board::BACKGROUND_DEFAULT);
+
+    XMLElement* list_element = board_element->FirstChildElement("list");
+    CHECK(list_element->FindAttribute("name")->Value() ==
+          std::string{"Things to do"});
+
+    XMLElement* card_element = list_element->FirstChildElement("card");
+    CHECK(card_element->FindAttribute("name")->Value() ==
+          std::string{"Computer Science"});
+
+    std::filesystem::remove("new-board.xml");
 }

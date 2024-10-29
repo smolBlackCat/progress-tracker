@@ -80,6 +80,7 @@ protected:
  */
 class Board : public Item {
 public:
+    Board() = delete;
     Board(BoardBackend& backend);
 
     ~Board();
@@ -107,8 +108,8 @@ public:
     const std::string& get_background() const;
 
     /**
-     * @brief Adds a CardList object to the board by moving the contents to a
-     * dynamic allocated space.
+     * @brief Adds a CardList object to the board by copying the contents to a
+     * dynamic allocated space. Repeated exact same Cardlists are not allowed
      *
      * @param cardlist CardList object
      *

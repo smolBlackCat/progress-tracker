@@ -49,10 +49,10 @@ const std::vector<std::shared_ptr<Card>>& CardList::get_card_vector() {
 }
 
 void CardList::reorder_card(const Card& next, const Card& sibling) {
-    size_t next_i = -1;
-    size_t sibling_i = -1;
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
 
-    for (size_t i = 0; i < card_vector.size(); i++) {
+    for (ssize_t i = 0; i < card_vector.size(); i++) {
         if (*card_vector[i] == next) {
             next_i = i;
         }
@@ -61,9 +61,11 @@ void CardList::reorder_card(const Card& next, const Card& sibling) {
         }
     }
 
-    if (next_i == -1 || sibling_i == -1) {
-        throw std::invalid_argument{
-            "Either next or sibling are not children of this cardlist"};
+    bool any_absent_item = next_i + sibling_i < 0;
+    bool is_same_item = next_i == sibling_i;
+    bool already_in_order = next_i - sibling_i == 1;
+    if (any_absent_item || is_same_item || already_in_order) {
+        return;
     }
 
     auto next_it = std::next(card_vector.begin(), next_i);

@@ -57,11 +57,11 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card2("Card2");
 
         auto cardPtr1 = cardList.add_card(card1);
+        cardList.set_modified(false);
 
-        REQUIRE_THROWS_AS(cardList.reorder_card(card1, card2),
-                          std::invalid_argument);
-        REQUIRE_THROWS_AS(cardList.reorder_card(card2, card1),
-                          std::invalid_argument);
+        cardList.reorder_card(card1, card2);
+
+        REQUIRE(!cardList.get_modified());
     }
 
     SECTION("Modified flag with internal card modification") {

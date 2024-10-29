@@ -129,6 +129,13 @@ Board BoardBackend::load() {
                                   cur_card_complete};
 
                     if (cur_card_due_date) {
+                        const std::regex date_r{"\\d\\d\\d\\d-\\d\\d-\\d\\d"};
+
+                        if (!std::regex_match(cur_card_due_date, date_r)) {
+                            throw board_parse_error{
+                                std::format("Invalid due date at Card {}",
+                                            cur_card.get_name())};
+                        }
                         std::chrono::sys_seconds secs;
 
                         std::istringstream{std::string{cur_card_due_date}} >>
@@ -144,10 +151,7 @@ Board BoardBackend::load() {
                     while (task_element) {
                         cur_card.add_task(
                             Task{task_element->Attribute("name"),
-                                 std::strcmp(task_element->Attribute("done"),
-                                             "true") == 0
-                                     ? true
-                                     : false});
+                                 task_element->BoolAttribute("done")});
                         task_element = task_element->NextSiblingElement("task");
                     }
 
@@ -184,7 +188,7 @@ Board BoardBackend::create(const std::string& name,
     board.set_name(name);
     board.set_background(background);
 
-    // Add filepath validation
+    board.set_modified(false);
     return board;
 }
 
@@ -272,7 +276,7 @@ bool BoardBackend::save_xml(Board& board) {
     board.set_modified(false);
 
     std::filesystem::path p{settings["filepath"]};
-    if (!std::filesystem::exists(p.parent_path())) {
+    if (p.has_parent_path() && !std::filesystem::exists(p.parent_path())) {
         std::filesystem::create_directories(p.parent_path());
     }
 
@@ -310,6 +314,12 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
 const std::string& Board::get_background() const { return background; }
 
 std::shared_ptr<CardList> Board::add_cardlist(const CardList& cardlist) {
+    for (auto& ccardlist : cardlist_vector) {
+        if (*ccardlist == cardlist) {
+            return nullptr;
+        }
+    }
+
     try {
         std::shared_ptr<CardList> new_cardlist =
             std::make_shared<CardList>(cardlist);
@@ -333,21 +343,22 @@ bool Board::remove_cardlist(const CardList& cardlist) {
 }
 
 void Board::reorder_cardlist(const CardList& next, const CardList& sibling) {
-    size_t next_i = -1;
-    size_t sibling_i = -1;
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
 
-    for (size_t i = 0; i < cardlist_vector.size(); i++) {
+    for (ssize_t i = 0; i < cardlist_vector.size(); i++) {
         if (*cardlist_vector[i] == next) {
             next_i = i;
-        }
-        if (*cardlist_vector[i] == sibling) {
+        } else if (*cardlist_vector[i] == sibling) {
             sibling_i = i;
         }
     }
 
-    if (next_i == -1 || sibling_i == -1) {
-        throw std::invalid_argument{
-            "Either next or sibling are not children of this cardlist"};
+    bool any_absent_item = next_i + sibling_i < 0;
+    bool is_same_item = next_i == sibling_i;
+    bool already_in_order = next_i - sibling_i == 1;
+    if (any_absent_item || is_same_item || already_in_order) {
+        return;
     }
 
     auto next_it = std::next(cardlist_vector.begin(), next_i);
