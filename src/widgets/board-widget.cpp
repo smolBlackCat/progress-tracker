@@ -84,6 +84,8 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
         this->board = board;
         this->board_card_button = board_card_button;
 
+        board->load();
+
         for (auto& cardlist : board->get_cardlists()) {
             auto new_cardlist =
                 Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
@@ -120,7 +122,7 @@ bool ui::BoardWidget::save(bool free) {
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
                                                   bool editing_mode) {
     auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
-        *this, board->add_cardlist(cardlist), editing_mode);
+        *this, board->add(cardlist), editing_mode);
     cardlist_vector.push_back(new_cardlist);
 
     root.append(*new_cardlist);
@@ -132,13 +134,13 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
-    board->remove_cardlist(*cardlist.get_cardlist());
+    board->remove(*cardlist.get_cardlist());
     return true;
 }
 
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
-    board->reorder_cardlist(*next.get_cardlist(), *sibling.get_cardlist());
+    board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
     root.reorder_child_after(next, sibling);
 }
 

@@ -5,7 +5,7 @@
 
 CardList::CardList(const std::string& name) : Item{name}, cards{} {}
 
-std::shared_ptr<Card> CardList::add_card(const Card& card) {
+std::shared_ptr<Card> CardList::add(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
     if (new_card) {
         cards.push_back(new_card);
@@ -14,7 +14,7 @@ std::shared_ptr<Card> CardList::add_card(const Card& card) {
     return new_card;
 }
 
-bool CardList::remove_card(const Card& card) {
+bool CardList::remove(const Card& card) {
     for (size_t i = 0; i < cards.size(); i++) {
         if (card == *cards.at(i)) {
             cards.erase(cards.begin() + i);
@@ -48,7 +48,7 @@ const std::vector<std::shared_ptr<Card>>& CardList::get_cards() {
     return cards;
 }
 
-void CardList::reorder_card(const Card& next, const Card& sibling) {
+void CardList::reorder(const Card& next, const Card& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 

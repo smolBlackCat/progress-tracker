@@ -33,17 +33,17 @@ TEST_CASE("CardList add card marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     REQUIRE_FALSE(cardlist.get_modified());
     Card card("initial card", NO_COLOR);
-    cardlist.add_card(card);
+    cardlist.add(card);
     REQUIRE(cardlist.get_modified());
 }
 
 TEST_CASE("CardList remove card marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card("initial card", NO_COLOR);
-    cardlist.add_card(card);
+    cardlist.add(card);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.remove_card(card);
+    cardlist.remove(card);
     REQUIRE(cardlist.get_modified());
 }
 
@@ -51,18 +51,18 @@ TEST_CASE("CardList reorder cards marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card1("card1", NO_COLOR);
     Card card2("card2", NO_COLOR);
-    cardlist.add_card(card1);
-    cardlist.add_card(card2);
+    cardlist.add(card1);
+    cardlist.add(card2);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.reorder_card(card1, card2);
+    cardlist.reorder(card1, card2);
     REQUIRE(cardlist.get_modified());
 }
 
 TEST_CASE("CardList modify card marks cardlist modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card("initial card", NO_COLOR);
-    cardlist.add_card(card);
+    cardlist.add(card);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
     cardlist.get_cards().at(0)->set_name("new card name");
@@ -78,7 +78,7 @@ TEST_CASE("Card add task marks modified", "[Card]") {
     Card card("initial card", NO_COLOR);
     REQUIRE_FALSE(card.get_modified());
     Task task("initial task");
-    card.add_task(task);
+    card.add(task);
     REQUIRE(card.get_modified());
 }
 
@@ -99,7 +99,7 @@ TEST_CASE("Card set notes marks modified", "[Card]") {
 TEST_CASE("Card modify task marks card modified", "[Card]") {
     Card card("initial card", NO_COLOR);
     Task task("initial task");
-    card.add_task(task);
+    card.add(task);
     card.set_modified(false);
     REQUIRE_FALSE(card.get_modified());
     card.get_tasks().at(0)->set_done(true);

@@ -50,7 +50,7 @@ double Card::get_completion() const {
     return (tasks_completed_n * 100) / tasks.size();
 }
 
-std::shared_ptr<Task> Card::add_task(const Task& task) {
+std::shared_ptr<Task> Card::add(const Task& task) {
     for (auto& ctask : tasks) {
         if (task == *ctask) return nullptr;
     }
@@ -63,7 +63,7 @@ std::shared_ptr<Task> Card::add_task(const Task& task) {
     return new_task;
 }
 
-bool Card::remove_task(const Task& task) {
+bool Card::remove(const Task& task) {
     for (size_t i = 0; i < tasks.size(); i++) {
         if (*tasks[i] == task) {
             tasks.erase(tasks.begin() + i);
@@ -76,7 +76,7 @@ bool Card::remove_task(const Task& task) {
 
 std::vector<std::shared_ptr<Task>> const& Card::get_tasks() { return tasks; }
 
-void Card::reorder_task(const Task& next, const Task& sibling) {
+void Card::reorder(const Task& next, const Task& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 

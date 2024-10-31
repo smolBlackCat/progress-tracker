@@ -80,7 +80,7 @@ CardDetailsDialog::~CardDetailsDialog() {}
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = card_widget.get_card();
-    card->remove_task(*task.get_task());
+    card->remove(*task.get_task());
     tasks_box->remove(task);
     card_widget.update_complete_tasks();
 }
@@ -88,7 +88,7 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
     tasks_box->reorder_child_after(next, sibling);
-    card_widget.get_card()->reorder_task(*next.get_task(), *sibling.get_task());
+    card_widget.get_card()->reorder(*next.get_task(), *sibling.get_task());
 }
 
 void CardDetailsDialog::open(Gtk::Window& parent) {
@@ -114,7 +114,7 @@ void CardDetailsDialog::update_due_date_label() {
 CardWidget& CardDetailsDialog::get_card_widget() { return card_widget; }
 
 void CardDetailsDialog::on_add_task() {
-    _add_task(card_widget.get_card()->add_task(Task{_("New Task")}), true);
+    _add_task(card_widget.get_card()->add(Task{_("New Task")}), true);
     card_widget.update_complete_tasks();
 }
 

@@ -23,7 +23,7 @@ public:
      * @returns A pointer to the allocated object. It may be nullptr if the card
      * being added is already in the cardlist
      */
-    std::shared_ptr<Card> add_card(const Card& card);
+    std::shared_ptr<Card> add(const Card& card);
 
     /**
      * @brief Removes a Card object from the cardlist.
@@ -34,7 +34,7 @@ public:
      *          False may be returned when the requested Card to be removed is
      *          not present in the cardlist.
      */
-    bool remove_card(const Card& card);
+    bool remove(const Card& card);
 
     void set_modified(bool modified) override;
 
@@ -48,7 +48,7 @@ public:
     /**
      * @brief Reorders card "next" after card "sibling"
      */
-    void reorder_card(const Card& next, const Card& sibling);
+    void reorder(const Card& next, const Card& sibling);
 
 private:
     bool cards_modified();

@@ -86,7 +86,7 @@ ui::CardlistWidget::~CardlistWidget() {}
 void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
                                             ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
-    cardlist->reorder_card(*next.get_card(), *sibling.get_card());
+    cardlist->reorder(*next.get_card(), *sibling.get_card());
 }
 
 const std::vector<ui::CardWidget*>&
@@ -180,7 +180,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
 void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
     root.remove(*card);
-    cardlist->remove_card(*card->get_card());
+    cardlist->remove(*card->get_card());
 
     for (size_t i = 0; i < cards_tracker.size(); i++) {
         if (cards_tracker[i] == card) {
@@ -194,7 +194,7 @@ ui::CardWidget* ui::CardlistWidget::add_card(const Card& card,
     auto card_builder = Gtk::Builder::create_from_resource(
         "/io/github/smolblackcat/Progress/card-widget.ui");
     auto new_card = Gtk::manage(Gtk::Builder::get_widget_derived<CardWidget>(
-        card_builder, "card-root", cardlist->add_card(card), editing_mode));
+        card_builder, "card-root", cardlist->add(card), editing_mode));
     new_card->set_cardlist(this);
 
     cards_tracker.push_back(new_card);

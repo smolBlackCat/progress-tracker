@@ -2,9 +2,9 @@
 
 #include <tinyxml2.h>
 
+#include <list>
 #include <map>
 #include <string>
-#include <vector>
 
 #include "cardlist.h"
 #include "item.h"
@@ -62,6 +62,12 @@ public:
      */
     bool save(Board& board);
 
+    /**
+     * @brief Load cardlists into board. The second call to this function won't
+     * do anything since it is expected that the board is fully loaded
+     */
+    void load_cardlists(Board& board);
+
     BackendType get_type() const noexcept;
 
 protected:
@@ -114,7 +120,7 @@ public:
      * @returns a CardList pointer to the newly allocated object. nullptr may be
      * returned if the cardlist to be added is already in cardlists
      */
-    std::shared_ptr<CardList> add_cardlist(const CardList& cardlist);
+    std::shared_ptr<CardList> add(const CardList& cardlist);
 
     /**
      * @brief Removes a CardList object from the board and free the allocated
@@ -124,17 +130,22 @@ public:
      *          False is returned if the CardList object requested to be
      *          removed isn't in the board.
      */
-    bool remove_cardlist(const CardList& cardlist);
+    bool remove(const CardList& cardlist);
 
     /**
      * @brief Reorders cardlist "next" after cardlist "sibling"
      */
-    void reorder_cardlist(const CardList& next, const CardList& sibling);
+    void reorder(const CardList& next, const CardList& sibling);
 
     /**
      * @brief Saves the board using the backend functionality
      */
     bool save();
+
+    /**
+     * @brief Load the remaining data (cardlists)
+     */
+    void load();
 
     /**
      * @brief Access the underlying cardlists collection
@@ -154,6 +165,11 @@ public:
     bool get_modified() override;
 
     /**
+     * @brief Returns true if the cardlists are loaded, otherwise false.
+     */
+    bool is_loaded();
+
+    /**
      * @brief Returns the type of a given background
      *
      * @returns a BackgroundType enum informing the background's type
@@ -168,4 +184,6 @@ protected:
     std::string background;
     std::vector<std::shared_ptr<CardList>> cardlists;
     time_point<system_clock, seconds> last_modified;
+
+    bool fully_loaded = false;
 };

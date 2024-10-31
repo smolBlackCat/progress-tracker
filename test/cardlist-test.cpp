@@ -9,7 +9,7 @@ TEST_CASE("CardList operations", "[CardList]") {
 
     SECTION("Add Card") {
         Card card1("Card1");
-        auto addedCard1 = cardList.add_card(card1);
+        auto addedCard1 = cardList.add(card1);
 
         REQUIRE(addedCard1 != nullptr);
         REQUIRE(*addedCard1 == card1);
@@ -20,12 +20,12 @@ TEST_CASE("CardList operations", "[CardList]") {
     SECTION("Remove Card") {
         Card card1("Card1");
         Card card2("Card2");
-        cardList.add_card(card1);
-        cardList.add_card(card2);
+        cardList.add(card1);
+        cardList.add(card2);
 
-        REQUIRE(cardList.remove_card(card1) == true);
+        REQUIRE(cardList.remove(card1) == true);
         REQUIRE(cardList.get_cards().size() == 1);
-        REQUIRE(cardList.remove_card(card1) ==
+        REQUIRE(cardList.remove(card1) ==
                 false);  // Removing the same card should return false
         REQUIRE(cardList.get_modified() == true);
     }
@@ -35,15 +35,15 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card2("Card2");
         Card card3("Card3");
 
-        auto cardPtr1 = cardList.add_card(card1);
-        auto cardPtr2 = cardList.add_card(card2);
-        auto cardPtr3 = cardList.add_card(card3);
+        auto cardPtr1 = cardList.add(card1);
+        auto cardPtr2 = cardList.add(card2);
+        auto cardPtr3 = cardList.add(card3);
 
         REQUIRE(*cardList.get_cards().at(0) == card1);
         REQUIRE(*cardList.get_cards().at(1) == card2);
         REQUIRE(*cardList.get_cards().at(2) == card3);
 
-        cardList.reorder_card(card3, card1);  // Move card3 after card1
+        cardList.reorder(card3, card1);  // Move card3 after card1
 
         REQUIRE(*cardList.get_cards().at(0) == card1);
         REQUIRE(*cardList.get_cards().at(1) == card3);
@@ -56,10 +56,10 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card1("Card1");
         Card card2("Card2");
 
-        auto cardPtr1 = cardList.add_card(card1);
+        auto cardPtr1 = cardList.add(card1);
         cardList.set_modified(false);
 
-        cardList.reorder_card(card1, card2);
+        cardList.reorder(card1, card2);
 
         REQUIRE(!cardList.get_modified());
     }
@@ -67,7 +67,7 @@ TEST_CASE("CardList operations", "[CardList]") {
     SECTION("Modified flag with internal card modification") {
         Card card1("Card1");
 
-        auto cardPtr1 = cardList.add_card(card1);
+        auto cardPtr1 = cardList.add(card1);
         REQUIRE(cardList.get_modified() == true);
 
         cardList.get_modified();  // Reset the flag

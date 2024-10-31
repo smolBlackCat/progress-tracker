@@ -35,21 +35,21 @@ TEST_CASE("Card operations", "[Card]") {
         Task task2("Task2", true);
         Task task3("Task3");
 
-        auto taskPtr1 = card.add_task(task1);
-        auto taskPtr2 = card.add_task(task2);
-        auto taskPtr3 = card.add_task(task3);
+        auto taskPtr1 = card.add(task1);
+        auto taskPtr2 = card.add(task2);
+        auto taskPtr3 = card.add(task3);
 
-        REQUIRE(!card.add_task(task1));
+        REQUIRE(!card.add(task1));
 
         REQUIRE(card.get_tasks().size() == 3);
         REQUIRE(*taskPtr1 == task1);
         REQUIRE(*taskPtr2 == task2);
         REQUIRE(*taskPtr3 == task3);
 
-        REQUIRE(card.remove_task(task2) == true);
+        REQUIRE(card.remove(task2) == true);
         REQUIRE(card.get_tasks().size() == 2);
 
-        REQUIRE(card.remove_task(task2) ==
+        REQUIRE(card.remove(task2) ==
                 false);  // Removing again should return false
     }
 
@@ -57,8 +57,8 @@ TEST_CASE("Card operations", "[Card]") {
         Task task1("Task1", true);   // Completed task
         Task task2("Task2", false);  // Incomplete task
 
-        card.add_task(task1);
-        auto task2_sptr = card.add_task(task2);
+        card.add(task1);
+        auto task2_sptr = card.add(task2);
 
         double completion = card.get_completion();
         REQUIRE(completion ==
@@ -70,7 +70,7 @@ TEST_CASE("Card operations", "[Card]") {
                 100.0);  // Both tasks are now done, so 100% completion
 
         Task task3("Task3", false);  // New incomplete task
-        card.add_task(task3);
+        card.add(task3);
 
         completion = card.get_completion();
         REQUIRE(int(completion) ==
@@ -130,9 +130,9 @@ TEST_CASE("Task reordering", "[Card]") {
     Task task2{"MacOS"};
     Task task3{"Debian"};
 
-    card1.add_task(task1);
-    card1.add_task(task2);
-    card1.add_task(task3);
+    card1.add(task1);
+    card1.add(task2);
+    card1.add(task3);
 
     card1.set_modified(false);
 
@@ -142,7 +142,7 @@ TEST_CASE("Task reordering", "[Card]") {
     REQUIRE(task2 == *card1_tasks[1]);
     REQUIRE(task3 == *card1_tasks[2]);
 
-    card1.reorder_task(task1, task3);  // Moves "Windows" task after "Debian"
+    card1.reorder(task1, task3);  // Moves "Windows" task after "Debian"
 
     CHECK(task1 == *card1_tasks[2]);
     CHECK(task2 == *card1_tasks[0]);

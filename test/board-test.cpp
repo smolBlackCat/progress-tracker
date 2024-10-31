@@ -151,7 +151,8 @@ TEST_CASE("Invalid XML Board: missing 'name' attribute in <list>", "[Board]") {
 
     BoardBackend backend{BackendType::LOCAL};
     backend.set_attribute("filepath", "test-board.xml");
-    CHECK_THROWS(backend.load());
+    Board board = backend.load();
+    CHECK_THROWS(board.load());
 
     std::filesystem::remove("test-board.xml");
 }
@@ -175,7 +176,8 @@ TEST_CASE("Invalid XML Board: missing 'name' attribute in <card>", "[Board]") {
 
     BoardBackend backend{BackendType::LOCAL};
     backend.set_attribute("filepath", "test-board.xml");
-    CHECK_THROWS(backend.load());
+    Board board = backend.load();
+    CHECK_THROWS(board.load());
 
     std::filesystem::remove("test-board.xml");
 }
@@ -199,7 +201,9 @@ TEST_CASE("Invalid XML Board: malformed due date in <card>", "[Board]") {
 
     BoardBackend backend{BackendType::LOCAL};
     backend.set_attribute("filepath", "test-board.xml");
-    CHECK_THROWS(backend.load());  // Assuming load handles date parsing exception
+
+    Board board = backend.load();
+    CHECK_THROWS(board.load());
 
     std::filesystem::remove("test-board.xml");
 }
@@ -225,12 +229,73 @@ TEST_CASE("Invalid XML Board: missing 'name' attribute in <task>", "[Board]") {
 
     BoardBackend backend{BackendType::LOCAL};
     backend.set_attribute("filepath", "test-board.xml");
-    CHECK_THROWS(backend.load());
+    Board board = backend.load();
+    CHECK_THROWS(board.load());
 
     std::filesystem::remove("test-board.xml");
 }
 
-// TODO: Exhaust Board XML syntax tests
+TEST_CASE("Board late loading", "[Board]") {
+    using namespace tinyxml2;
+    using namespace std;
+
+    XMLDocument doc;
+    XMLElement* board_element = doc.NewElement("board");
+    board_element->SetAttribute("name", "Progress Board");
+    board_element->SetAttribute("background", "rgb(1,1,1)");
+
+    // Adding Valid Cardlists
+    for (int i = 0; i < 10; i++) {
+        XMLElement* list_element = board_element->InsertNewChildElement("list");
+        list_element->SetAttribute("name",
+                                   std::format("Cardlist {}", i).c_str());
+        // Adding valid cards
+        for (int j = 0; j < 10; j++) {
+            XMLElement* card_element =
+                list_element->InsertNewChildElement("card");
+            card_element->SetAttribute("name",
+                                       std::format("Card {}", j).c_str());
+            card_element->SetAttribute("color", "rgb(23,12,45)");
+            card_element->SetAttribute("due", "1969-01-01");
+            card_element->SetAttribute("complete", false);
+
+            // Adding valid tasks to the current card
+            for (int k = 0; k < 10; k++) {
+                XMLElement* task_element =
+                    card_element->InsertNewChildElement("task");
+                task_element->SetAttribute("name",
+                                           std::format("Task {}", k).c_str());
+                task_element->SetAttribute("done", true);
+            }
+
+            XMLElement* notes_element =
+                card_element->InsertNewChildElement("notes");
+            notes_element->SetText("I'm pretty loaded really yay");
+        }
+    }
+
+    doc.InsertFirstChild(board_element);
+    doc.SaveFile("test-board.xml");
+
+    BoardBackend backend{BackendType::LOCAL};
+    REQUIRE(backend.set_attribute("filepath", "test-board.xml"));
+    Board board = backend.load();
+
+    // Basic properties must be available
+    CHECK(board.get_name() == "Progress Board");
+    CHECK(board.get_background() == "rgb(1,1,1)");
+    CHECK(!board.get_modified());
+
+    CHECK(!board.is_loaded());
+    CHECK(board.get_cardlists().empty());
+
+    board.load();
+
+    CHECK(board.is_loaded());
+    CHECK(board.get_cardlists().size() == 10);
+
+    filesystem::remove("test-board.xml");
+}
 
 TEST_CASE("Adding Cardlists to a Board", "[Board]") {
     BoardBackend backend{BackendType::LOCAL};
@@ -243,15 +308,15 @@ TEST_CASE("Adding Cardlists to a Board", "[Board]") {
     CardList cardlist1{"TODO"};
     CardList cardlist2{"TODO"};
 
-    auto added_cardlist = board.add_cardlist(cardlist1);
-    auto added_cardlist2 = board.add_cardlist(cardlist2);
+    auto added_cardlist = board.add(cardlist1);
+    auto added_cardlist2 = board.add(cardlist2);
 
     REQUIRE(added_cardlist);
     REQUIRE(added_cardlist2);
 
     // We're trying to add the exact same cardlist again. Don't and return
     // nullptr
-    CHECK(!board.add_cardlist(cardlist1));
+    CHECK(!board.add(cardlist1));
 
     CHECK(board.get_modified());
     CHECK(board.get_cardlists().size() == 2);
@@ -265,15 +330,15 @@ TEST_CASE("Removing cardlists of a Board", "[Board]") {
 
     CardList cardlist1{"Something else to be done"};
 
-    board.add_cardlist(cardlist1);
+    board.add(cardlist1);
     board.set_modified(false);
 
-    CHECK(board.remove_cardlist(cardlist1));
+    CHECK(board.remove(cardlist1));
     CHECK(board.get_modified());
 
     board.set_modified(false);
 
-    CHECK(!board.remove_cardlist(cardlist1));
+    CHECK(!board.remove(cardlist1));
     CHECK(!board.get_modified());
 }
 
@@ -281,16 +346,16 @@ TEST_CASE("Reordering Cardlists", "Board") {
     Board board =
         BoardBackend{BackendType::LOCAL}.create("Progress", "file.png");
 
-    auto cardlist1 = board.add_cardlist(CardList{"CardList 1"});
-    auto cardlist2 = board.add_cardlist(CardList{"CardList 2"});
-    auto cardlist3 = board.add_cardlist(CardList{"CardList 3"});
+    auto cardlist1 = board.add(CardList{"CardList 1"});
+    auto cardlist2 = board.add(CardList{"CardList 2"});
+    auto cardlist3 = board.add(CardList{"CardList 3"});
 
     auto& cardlists = board.get_cardlists();
 
     board.set_modified(false);
 
     SECTION("Reordering using the same object references") {
-        board.reorder_cardlist(*cardlist1, *cardlist1);
+        board.reorder(*cardlist1, *cardlist1);
 
         // Because we're trying to reorder the same thing, no reordering is
         // done, thus no modification either
@@ -303,7 +368,7 @@ TEST_CASE("Reordering Cardlists", "Board") {
     board.set_modified(false);
 
     SECTION("Reordering with one absent cardlist") {
-        board.reorder_cardlist(*cardlist1, CardList{"nobody here"});
+        board.reorder(*cardlist1, CardList{"nobody here"});
 
         // Trying to reorder a cardlist with an absent one does nothing exactly
         // since there's no other card to complete the operation
@@ -316,7 +381,7 @@ TEST_CASE("Reordering Cardlists", "Board") {
     board.set_modified(false);
 
     SECTION("Reordering where sibling and next are already sibling and next") {
-        board.reorder_cardlist(*cardlist3, *cardlist2);
+        board.reorder(*cardlist3, *cardlist2);
 
         // Because cardlist3 is already next to cardlist2, nothing should be
         // done, therefore no modification whatsoeever
@@ -329,7 +394,7 @@ TEST_CASE("Reordering Cardlists", "Board") {
     board.set_modified(false);
 
     SECTION("Reordering case 1") {
-        board.reorder_cardlist(*cardlist1, *cardlist3);
+        board.reorder(*cardlist1, *cardlist3);
 
         // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
         // last element and a modification is registered
@@ -342,7 +407,7 @@ TEST_CASE("Reordering Cardlists", "Board") {
     board.set_modified(false);
 
     SECTION("Reordering case 2") {
-        board.reorder_cardlist(*cardlist3, *cardlist1);
+        board.reorder(*cardlist3, *cardlist1);
 
         // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
         // last element and a modification is registered
@@ -361,8 +426,8 @@ TEST_CASE("Saving new boards") {
 
     CardList cardlist{"Things to do"};
     Card card{"Computer Science", Color{123, 456, 123, 1}};
-    cardlist.add_card(card);
-    board.add_cardlist(cardlist);
+    cardlist.add(card);
+    board.add(cardlist);
 
     board.save();
 

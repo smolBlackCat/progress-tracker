@@ -69,7 +69,7 @@ public:
      * returned if the caller is trying to add a Task that is already in the
      * Card
      */
-    std::shared_ptr<Task> add_task(const Task& task);
+    std::shared_ptr<Task> add(const Task& task);
 
     /**
      * @brief Removes a Task object
@@ -79,7 +79,7 @@ public:
      * @return True when the object is removed. False is returned if task is not
      * in tasks
      */
-    bool remove_task(const Task& task);
+    bool remove(const Task& task);
 
     /**
      * @brief Access the underlying Task collection
@@ -89,7 +89,7 @@ public:
     /**
      * @brief Put task "next" after task "sibling"
      */
-    void reorder_task(const Task& next, const Task& sibling);
+    void reorder(const Task& next, const Task& sibling);
 
     /**
      * @brief Returns true if this card is past due date and the date is valid,
