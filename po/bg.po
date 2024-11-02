@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 13:51-0300\n"
+"POT-Creation-Date: 2024-11-02 06:57-0300\n"
 "PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -18,29 +18,29 @@ msgstr ""
 "X-Generator: Gtranslator 45.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: src/window.cpp:34
-msgid "translator-credits"
-msgstr "twlvnn <kraft_werk@tutanota.com>"
-
-#: src/window.cpp:39
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Всички права запазени"
-
-#: src/window.cpp:55
+#: src/window.cpp:18
 msgid "Select the boards to be deleted"
 msgstr "Изберете дъските, които да бъдат премахнати"
 
-#: src/window.cpp:56
+#: src/window.cpp:19
 msgid "Delete"
 msgstr "Изтриване"
 
-#: src/window.cpp:57 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
 msgid "Cancel"
 msgstr "Отказване"
 
-#: src/window.cpp:165
+#: src/window.cpp:128
 msgid "It was not possible to load this board"
 msgstr "Не беше възможно да се зареди тази дъска"
+
+#: src/window.cpp:197
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Всички права запазени"
+
+#: src/window.cpp:199
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"
 
 #: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
@@ -50,7 +50,7 @@ msgstr ""
 msgid "New Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:146
+#: src/dialog/card-dialog.cpp:146 src/resources/ui/card-details-dialog.ui:50
 msgid "Set Due Date"
 msgstr ""
 
@@ -91,7 +91,7 @@ msgstr "Не са позволени дъски с празни имена"
 msgid "A file must be selected"
 msgstr "файл трябва да е избран"
 
-#: src/dialog/create_board_dialog.cpp:61
+#: src/dialog/create_board_dialog.cpp:63
 msgid "It was not possible to create a Board with given name"
 msgstr "Не беше възможно да се създаде дъска с даденото име"
 
@@ -108,27 +108,27 @@ msgstr "Запазване"
 msgid "No file was selected"
 msgstr "Няма избран файл"
 
-#: src/resources/ui/app-window.ui:13
+#: src/resources/ui/app-window.ui:15
 msgid "Homepage"
 msgstr "Начална страница"
 
-#: src/resources/ui/app-window.ui:20
+#: src/resources/ui/app-window.ui:22
 msgid "Add Board"
 msgstr "Добавяне на дъска"
 
-#: src/resources/ui/app-window.ui:28
+#: src/resources/ui/app-window.ui:31
 msgid "Main Menu"
 msgstr "Основно меню"
 
-#: src/resources/ui/app-window.ui:70
+#: src/resources/ui/app-window.ui:91
 msgid "Delete Boards"
 msgstr "Премахване на дъските"
 
-#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+#: src/resources/ui/app-window.ui:95 src/resources/ui/app-window.ui:107
 msgid "About Progress"
 msgstr "Относно „Progress“"
 
-#: src/resources/ui/app-window.ui:82
+#: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Настройки"
 
@@ -164,7 +164,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:423
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:422
 msgid "Notes"
 msgstr ""
 
@@ -227,28 +227,28 @@ msgstr ""
 msgid "This card is complete"
 msgstr ""
 
-#: src/widgets/card.cpp:381
+#: src/widgets/card.cpp:380
 #, c-format
 msgid "This card is due %x"
 msgstr ""
 
-#: src/widgets/card.cpp:385
+#: src/widgets/card.cpp:384
 msgid "The card is due today"
 msgstr ""
 
-#: src/widgets/card.cpp:394
+#: src/widgets/card.cpp:393
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:404
+#: src/widgets/card.cpp:403
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:413
+#: src/widgets/card.cpp:412
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: https://github.com/smolBlackCat/progress-tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 13:51-0300\n"
+"POT-Creation-Date: 2024-11-02 06:57-0300\n"
 "PO-Revision-Date: 2024-04-28 21:10+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: volkov <volkovissocool@gmail.com>\n"
@@ -18,30 +18,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-# Что такое "Канбан" - https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BD%D0%B1%D0%B0%D0%BD
-#: src/window.cpp:34
-msgid "translator-credits"
-msgstr "volkov <volkovissocool@gmail.com>"
-
-#: src/window.cpp:39
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Все права защищены"
-
-#: src/window.cpp:55
+#: src/window.cpp:18
 msgid "Select the boards to be deleted"
 msgstr "Выберите доски для удаления"
 
-#: src/window.cpp:56
+#: src/window.cpp:19
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/window.cpp:57 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
 msgid "Cancel"
 msgstr "Отменить"
 
-#: src/window.cpp:165
+#: src/window.cpp:128
 msgid "It was not possible to load this board"
 msgstr "Не удалось загрузить эту доску"
+
+#: src/window.cpp:197
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Все права защищены"
+
+# Что такое "Канбан" - https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BD%D0%B1%D0%B0%D0%BD
+#: src/window.cpp:199
+msgid "translator-credits"
+msgstr "volkov <volkovissocool@gmail.com>"
 
 #: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
@@ -51,7 +51,7 @@ msgstr ""
 msgid "New Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:146
+#: src/dialog/card-dialog.cpp:146 src/resources/ui/card-details-dialog.ui:50
 msgid "Set Due Date"
 msgstr ""
 
@@ -92,7 +92,7 @@ msgstr "Нельзя создать доску с пустым именем"
 msgid "A file must be selected"
 msgstr "Нужно выбрать файл"
 
-#: src/dialog/create_board_dialog.cpp:61
+#: src/dialog/create_board_dialog.cpp:63
 msgid "It was not possible to create a Board with given name"
 msgstr "Не удалось создать доску с таким названием"
 
@@ -109,27 +109,27 @@ msgstr "Сохранить"
 msgid "No file was selected"
 msgstr "Файл не был выбран"
 
-#: src/resources/ui/app-window.ui:13
+#: src/resources/ui/app-window.ui:15
 msgid "Homepage"
 msgstr "Домашняя страница"
 
-#: src/resources/ui/app-window.ui:20
+#: src/resources/ui/app-window.ui:22
 msgid "Add Board"
 msgstr "Добавить доску"
 
-#: src/resources/ui/app-window.ui:28
+#: src/resources/ui/app-window.ui:31
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/resources/ui/app-window.ui:70
+#: src/resources/ui/app-window.ui:91
 msgid "Delete Boards"
 msgstr "Удаление досок"
 
-#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+#: src/resources/ui/app-window.ui:95 src/resources/ui/app-window.ui:107
 msgid "About Progress"
 msgstr "Про приложение"
 
-#: src/resources/ui/app-window.ui:82
+#: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Настройки"
 
@@ -165,7 +165,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:423
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:422
 msgid "Notes"
 msgstr ""
 
@@ -228,28 +228,28 @@ msgstr ""
 msgid "This card is complete"
 msgstr ""
 
-#: src/widgets/card.cpp:381
+#: src/widgets/card.cpp:380
 #, c-format
 msgid "This card is due %x"
 msgstr ""
 
-#: src/widgets/card.cpp:385
+#: src/widgets/card.cpp:384
 msgid "The card is due today"
 msgstr ""
 
-#: src/widgets/card.cpp:394
+#: src/widgets/card.cpp:393
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:404
+#: src/widgets/card.cpp:403
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:413
+#: src/widgets/card.cpp:412
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""

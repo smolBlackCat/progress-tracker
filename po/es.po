@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 13:51-0300\n"
+"POT-Creation-Date: 2024-11-02 06:57-0300\n"
 "PO-Revision-Date: 2024-05-10 20:17-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,29 +17,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: src/window.cpp:34
-msgid "translator-credits"
-msgstr "haggen88"
-
-#: src/window.cpp:39
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © Todos los derechos reservados"
-
-#: src/window.cpp:55
+#: src/window.cpp:18
 msgid "Select the boards to be deleted"
 msgstr "Seleccione los tableros que desea eliminar"
 
-#: src/window.cpp:56
+#: src/window.cpp:19
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/window.cpp:57 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/window.cpp:165
+#: src/window.cpp:128
 msgid "It was not possible to load this board"
 msgstr "No ha sido posible cargar este tablero"
+
+#: src/window.cpp:197
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Todos los derechos reservados"
+
+#: src/window.cpp:199
+msgid "translator-credits"
+msgstr "haggen88"
 
 #: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
@@ -49,7 +49,7 @@ msgstr ""
 msgid "New Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:146
+#: src/dialog/card-dialog.cpp:146 src/resources/ui/card-details-dialog.ui:50
 msgid "Set Due Date"
 msgstr ""
 
@@ -90,7 +90,7 @@ msgstr "No se permiten nombres de tablero vacíos"
 msgid "A file must be selected"
 msgstr "Se debe seleccionar un archivo"
 
-#: src/dialog/create_board_dialog.cpp:61
+#: src/dialog/create_board_dialog.cpp:63
 msgid "It was not possible to create a Board with given name"
 msgstr "No ha sido posible crear un tablero con el nombre dado"
 
@@ -107,27 +107,27 @@ msgstr "Guardar"
 msgid "No file was selected"
 msgstr "No se seleccionó ningún archivo"
 
-#: src/resources/ui/app-window.ui:13
+#: src/resources/ui/app-window.ui:15
 msgid "Homepage"
 msgstr "Página de inicio"
 
-#: src/resources/ui/app-window.ui:20
+#: src/resources/ui/app-window.ui:22
 msgid "Add Board"
 msgstr "Añadir Tablero"
 
-#: src/resources/ui/app-window.ui:28
+#: src/resources/ui/app-window.ui:31
 msgid "Main Menu"
 msgstr "Menú principal"
 
-#: src/resources/ui/app-window.ui:70
+#: src/resources/ui/app-window.ui:91
 msgid "Delete Boards"
 msgstr "Eliminar Tableros"
 
-#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+#: src/resources/ui/app-window.ui:95 src/resources/ui/app-window.ui:107
 msgid "About Progress"
 msgstr "Acerca de Progress"
 
-#: src/resources/ui/app-window.ui:82
+#: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Preferencias"
 
@@ -163,7 +163,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:423
+#: src/resources/ui/card-details-dialog.ui:124 src/widgets/card.cpp:422
 msgid "Notes"
 msgstr ""
 
@@ -226,28 +226,28 @@ msgstr ""
 msgid "This card is complete"
 msgstr ""
 
-#: src/widgets/card.cpp:381
+#: src/widgets/card.cpp:380
 #, c-format
 msgid "This card is due %x"
 msgstr ""
 
-#: src/widgets/card.cpp:385
+#: src/widgets/card.cpp:384
 msgid "The card is due today"
 msgstr ""
 
-#: src/widgets/card.cpp:394
+#: src/widgets/card.cpp:393
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:404
+#: src/widgets/card.cpp:403
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:413
+#: src/widgets/card.cpp:412
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""
