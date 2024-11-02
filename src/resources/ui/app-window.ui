@@ -1,92 +1,111 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.92.1 -->
 <interface>
-    <requires lib="gtk" version="4.10"/>
-    <object class="GtkApplicationWindow" id="app-window">
-        <property name="title">Progress</property>
-        <property name="width-request">400</property>
-        <property name="height-request">400</property>
-        <property name="titlebar">
-            <object class="GtkHeaderBar">
-                <child type="start">
-                    <object class="GtkButton" id="home-button">
-                        <property name="icon-name">go-home</property>
-                        <property name="tooltip-text" translatable="yes">Homepage</property>
-                        <property name="visible">false</property>
-                    </object>
-                </child>
-                <child type="start">
-                    <object class="GtkButton" id="add-board-button">
-                        <property name="icon-name">list-add-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Add Board</property>
-                        <property name="visible">true</property>
-                    </object>
-                </child>
-                <child type="end">
-                    <object class="GtkMenuButton" id="app-menu-button">
-                        <property name="menu-model">board-grid-menu</property>
-                        <property name="icon-name">open-menu-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Main Menu</property>
-                        <property name="primary">true</property>
-                    </object>
-                </child>
-            </object>
-        </property>
-        <child>
-            <object class="GtkStack" id="app-stack">
-                <property name="transition-type">GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT</property>
-                <child>
-                    <object class="GtkStackPage">
-                        <property name="name">board-grid-page</property>
-                        <property name="child">
-                            <object class="GtkOverlay" id="app-overlay">
-                                <child>
-                                    <object class="GtkScrolledWindow">
-                                        <property name="width-request">-1</property>
-                                        <property name="height-request">-1</property>
-                                        <property name="child">
-                                            <object class="GtkFlowBox" id="boards-grid">
-                                                <property name="valign">start</property>
-                                                <property name="margin-top">10</property>
-                                                <property name="margin-end">10</property>
-                                                <property name="margin-bottom">10</property>
-                                                <property name="margin-start">10</property>
-                                                <property name="selection-mode">GTK_SELECTION_NONE</property>
-                                            </object>
-                                        </property>
-                                    </object>
-                                </child>
-                                <!--To add DeleteBoardsBar here-->
-                            </object>
-                        </property>
-                    </object>
-                </child>
-                <!--To add BoardWidget here-->
-            </object>
+  <!-- interface-name app-window.ui -->
+  <requires lib="gtk" version="4.10"/>
+  <requires lib="gio" version="2.0"/>
+  <object class="GtkApplicationWindow" id="app-window">
+    <property name="height-request">400</property>
+    <property name="title">Progress</property>
+    <property name="titlebar">
+      <object class="GtkHeaderBar">
+        <child type="start">
+          <object class="GtkButton" id="home-button">
+            <property name="icon-name">go-home</property>
+            <property name="tooltip-text" translatable="yes">Homepage</property>
+            <property name="visible">false</property>
+          </object>
         </child>
-    </object>
-    <menu id="board-grid-menu">
-        <section>
-            <item>
-                <attribute name="label" translatable="yes">Delete Boards</attribute>
-                <attribute name="action">win.delete</attribute>
-            </item>
-            <item>
-                <attribute name="label" translatable="yes">About Progress</attribute>
-                <attribute name="action">win.about</attribute>
-            </item>
-        </section>
-    </menu>
-    <menu id="board-menu">
-        <section>
-            <item>
-                <attribute name="label" translatable="yes">Preferences</attribute>
-                <attribute name="action">win.preferences</attribute>
-            </item>
-            <item>
-                <attribute name="label" translatable="yes">About Progress</attribute>
-                <attribute name="action">win.about</attribute>
-            </item>
-        </section>
-    </menu>
+        <child type="start">
+          <object class="GtkButton" id="add-board-button">
+            <property name="icon-name">list-add-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Add Board</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkMenuButton" id="app-menu-button">
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="menu-model">board-grid-menu</property>
+            <property name="primary">true</property>
+            <property name="tooltip-text" translatable="yes">Main Menu</property>
+          </object>
+        </child>
+      </object>
+    </property>
+    <property name="width-request">400</property>
+    <child>
+      <object class="GtkStack" id="app-stack">
+        <property name="transition-type">slide-left-right</property>
+        <property name="visible-child-name">board-grid-page</property>
+        <child>
+          <object class="GtkStackPage">
+            <property name="child">
+              <object class="GtkOverlay" id="app-overlay">
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="child">
+                      <object class="GtkFlowBox" id="boards-grid">
+                        <property name="margin-bottom">10</property>
+                        <property name="margin-end">10</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-top">10</property>
+                        <property name="selection-mode">none</property>
+                        <property name="valign">start</property>
+                      </object>
+                    </property>
+                    <property name="height-request">-1</property>
+                    <property name="width-request">-1</property>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="name">board-grid-page</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStackPage">
+            <property name="child">
+              <object class="GtkBox">
+                <child>
+                  <object class="GtkSpinner">
+                    <property name="halign">center</property>
+                    <property name="hexpand">True</property>
+                    <property name="spinning">True</property>
+                    <property name="valign">center</property>
+                    <property name="vexpand">True</property>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="name">loading-page</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <menu id="board-grid-menu">
+    <section>
+      <item>
+        <attribute name="action">win.delete</attribute>
+        <attribute name="label" translatable="yes">Delete Boards</attribute>
+      </item>
+      <item>
+        <attribute name="action">win.about</attribute>
+        <attribute name="label" translatable="yes">About Progress</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="board-menu">
+    <section>
+      <item>
+        <attribute name="action">win.preferences</attribute>
+        <attribute name="label" translatable="yes">Preferences</attribute>
+      </item>
+      <item>
+        <attribute name="action">win.about</attribute>
+        <attribute name="label" translatable="yes">About Progress</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>
-

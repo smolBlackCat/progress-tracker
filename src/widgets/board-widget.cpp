@@ -66,7 +66,7 @@ ui::BoardWidget::BoardWidget()
         [this]() {
             if (this->board) {
                 for (auto& cardlist : this->cardlist_vector) {
-                    for (auto& card : cardlist->get_cardwidget_vector()) {
+                    for (auto& card : cardlist->get_card_widgets()) {
                         card->update_due_date_label_style();
                     }
                 }

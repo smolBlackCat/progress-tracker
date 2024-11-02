@@ -124,7 +124,7 @@ void CardDetailsDialog::on_save() {
     std::string new_notes = notes_textbuffer->get_text();
 
     if (card->get_name() != new_card_name) {
-        card_widget.set_label(new_card_name);
+        card_widget.set_title(new_card_name);
         card->set_name(new_card_name);
     }
 

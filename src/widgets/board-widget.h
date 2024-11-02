@@ -60,7 +60,7 @@ public:
     /**
      * @brief Saves the contents edited in the Board class.
      *
-     * @param free indicates whether to free allocated memory by Board
+     * @param free indicates whether to clear the board after saving
      */
     bool save(bool free = true);
 

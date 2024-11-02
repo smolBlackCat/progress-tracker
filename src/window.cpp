@@ -119,7 +119,11 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
     board_card_button->signal_clicked().connect(
         [this, board_card_button, fb_child_p]() {
             if (!this->on_delete_mode) {
+                app_stack_p->set_visible_child(
+                    "loading-page", Gtk::StackTransitionType::CROSSFADE);
                 std::shared_ptr<Board> board;
+                // BoardBackend::load may block the execution, mainly when it's
+                // fetching a Board from the internet
                 try {
                     board = std::make_shared<Board>(
                         board_card_button->get_backend().load());

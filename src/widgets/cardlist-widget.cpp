@@ -11,7 +11,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     : Gtk::ListBox{},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
-      cards_tracker{},
+      card_widgets{},
       board{board},
       cardlist{cardlist_refptr},
       is_new{is_new},
@@ -47,7 +47,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     add_card_button.set_halign(Gtk::Align::FILL);
     add_card_button.set_hexpand(true);
     add_card_button.signal_clicked().connect(
-        [this]() { this->add_card(Card{_("New Card")}, true); });
+        [this]() { this->add(Card{_("New Card")}, true); });
     root.append(add_card_button);
 
     append(cardlist_header);
@@ -57,7 +57,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
         auto cardwidget =
             Gtk::manage(cur_builder->get_widget_derived<CardWidget>(
                 cur_builder, "card-root", card));
-        cards_tracker.push_back(cardwidget);
+        card_widgets.push_back(cardwidget);
         cardwidget->set_cardlist(this);
         root.append(*cardwidget);
         root.reorder_child_after(add_card_button, *cardwidget);
@@ -83,15 +83,15 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 
 ui::CardlistWidget::~CardlistWidget() {}
 
-void ui::CardlistWidget::reorder_cardwidget(ui::CardWidget& next,
+void ui::CardlistWidget::reorder(ui::CardWidget& next,
                                             ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
     cardlist->reorder(*next.get_card(), *sibling.get_card());
 }
 
 const std::vector<ui::CardWidget*>&
-ui::CardlistWidget::get_cardwidget_vector() {
-    return cards_tracker;
+ui::CardlistWidget::get_card_widgets() {
+    return card_widgets;
 }
 
 void ui::CardlistWidget::setup_drag_and_drop() {
@@ -168,7 +168,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 if (!this->is_child(dropped_card)) {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove_from_parent();
-                    this->add_card(*card_in_dropped);
+                    this->add(*card_in_dropped);
                 }
                 return true;
             }
@@ -178,18 +178,18 @@ void ui::CardlistWidget::setup_drag_and_drop() {
     add_controller(drop_target_card);
 }
 
-void ui::CardlistWidget::remove_card(ui::CardWidget* card) {
+void ui::CardlistWidget::remove(ui::CardWidget* card) {
     root.remove(*card);
     cardlist->remove(*card->get_card());
 
-    for (size_t i = 0; i < cards_tracker.size(); i++) {
-        if (cards_tracker[i] == card) {
-            cards_tracker.erase(cards_tracker.begin() + i);
+    for (size_t i = 0; i < card_widgets.size(); i++) {
+        if (card_widgets[i] == card) {
+            card_widgets.erase(card_widgets.begin() + i);
         }
     }
 }
 
-ui::CardWidget* ui::CardlistWidget::add_card(const Card& card,
+ui::CardWidget* ui::CardlistWidget::add(const Card& card,
                                              bool editing_mode) {
     auto card_builder = Gtk::Builder::create_from_resource(
         "/io/github/smolblackcat/Progress/card-widget.ui");
@@ -197,7 +197,7 @@ ui::CardWidget* ui::CardlistWidget::add_card(const Card& card,
         card_builder, "card-root", cardlist->add(card), editing_mode));
     new_card->set_cardlist(this);
 
-    cards_tracker.push_back(new_card);
+    card_widgets.push_back(new_card);
     root.append(*new_card);
     root.reorder_child_after(add_card_button, *new_card);
     return new_card;
@@ -208,7 +208,7 @@ const std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist() {
 }
 
 bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
-    for (auto& card_ : cards_tracker) {
+    for (auto& card_ : card_widgets) {
         if (card == card_) return true;
     }
     return false;

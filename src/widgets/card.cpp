@@ -36,7 +36,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
       color_dialog{Gtk::ColorDialog::create()} {
-    set_label(card->get_name());
+    set_title(card->get_name());
     if (is_new) {
         on_rename();  // Open card on rename mode by default whenever a new card
                       // is created
@@ -132,16 +132,16 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
     setup_drag_and_drop();
 }
 
-void ui::CardWidget::set_label(const std::string& label) {
+void ui::CardWidget::set_title(const std::string& label) {
     card_label->set_label(label);
     card_entry->set_text(label);
 }
 
-std::string ui::CardWidget::get_text() const { return card_label->get_label(); }
+std::string ui::CardWidget::get_title() const { return card_label->get_label(); }
 
 void ui::CardWidget::remove_from_parent() {
     if (cardlist_p) {
-        cardlist_p->remove_card(this);
+        cardlist_p->remove(this);
     }
 }
 
@@ -278,13 +278,13 @@ void ui::CardWidget::setup_drag_and_drop() {
                 }
 
                 if (this->cardlist_p->is_child(dropped_card)) {
-                    this->cardlist_p->reorder_cardwidget(*dropped_card, *this);
+                    this->cardlist_p->reorder(*dropped_card, *this);
                 } else {
                     auto card_from_dropped = dropped_card->get_card();
                     CardWidget* dropped_copy =
-                        this->cardlist_p->add_card(*card_from_dropped);
+                        this->cardlist_p->add(*card_from_dropped);
                     dropped_card->remove_from_parent();
-                    this->cardlist_p->reorder_cardwidget(*dropped_copy, *this);
+                    this->cardlist_p->reorder(*dropped_copy, *this);
                 }
                 return true;
             }

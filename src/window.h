@@ -40,6 +40,9 @@ public:
                    Glib::RefPtr<Gio::Settings>& progress_settings);
     ~ProgressWindow() override;
 
+    /**
+     * @brief Adds local boards from a given backend
+     */
     void add_local_board(BoardBackend board_backend);
 
     /**

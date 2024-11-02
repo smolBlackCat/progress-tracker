@@ -146,9 +146,9 @@ void TaskWidget::on_convert(CardWidget& card_widget) {
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->get_cardlist();
-    auto task_as_card = cardlist_widget->add_card(Card{task->get_name()});
+    auto task_as_card = cardlist_widget->add(Card{task->get_name()});
 
-    cardlist_widget->reorder_cardwidget(*task_as_card, card_widget);
+    cardlist_widget->reorder(*task_as_card, card_widget);
     card_details_dialog.remove_task(*this);
 }
 

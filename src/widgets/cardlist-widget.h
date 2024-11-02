@@ -26,7 +26,7 @@ public:
      * @brief CardlistWidget's constructor
      *
      * @param board BoardWidget reference to where this widget belongs
-     * @param cardlist_refptr CardList smart pointer that this widget is allowed
+     * @param cardlist CardList smart pointer that this widget is allowed
      *        to change
      * @param is_new Indicates whether it's completely new, therefore giving the
      *        user the chance to cancel creation
@@ -39,20 +39,20 @@ public:
     /**
      * @brief Adds a CardWidget object based on the given Card
      *
-     * @param card Card object
+     * @param card Card object reference
      * @param editing_mode Boolean indicating whether the card widget should
      * start in editing mode. Default is false
      *
      * @return The created CardWidget object pointer
      */
-    ui::CardWidget* add_card(const Card& card, bool editing_mode = false);
+    ui::CardWidget* add(const Card& card, bool editing_mode = false);
 
     /**
      * @brief Removes the specified CardWidget
      *
      * @param card Pointer to the CardWidget to be deleted.
      */
-    void remove_card(ui::CardWidget* card);
+    void remove(ui::CardWidget* card);
 
     /**
      * @brief Retrieves the underlying CardList smart pointer.
@@ -72,11 +72,17 @@ public:
      */
     bool is_child(ui::CardWidget* card);
 
+    /**
+     * @brief Reorders card widget "next" after card widget "sibling"
+     */
+    void reorder(ui::CardWidget& next, ui::CardWidget& sibling);
+
+    /**
+     * @brief Access the card widgets tracker vector
+     */
+    const std::vector<ui::CardWidget*>& get_card_widgets();
+
     BoardWidget& board;
-
-    void reorder_cardwidget(ui::CardWidget& next, ui::CardWidget& sibling);
-
-    const std::vector<ui::CardWidget*>& get_cardwidget_vector();
 
 private:
     void setup_drag_and_drop();
@@ -88,7 +94,7 @@ private:
 
     // Data
     std::shared_ptr<CardList> cardlist;
-    std::vector<ui::CardWidget*> cards_tracker;
+    std::vector<ui::CardWidget*> card_widgets;
 
     bool is_new;
 };
