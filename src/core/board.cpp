@@ -196,8 +196,7 @@ void BoardBackend::load_cardlists(Board& board) {
 
                     std::istringstream{std::string{cur_card_due_date}} >>
                         std::chrono::parse("%F", secs);
-                    Date date{std::chrono::floor<std::chrono::days>(secs)};
-                    date = date;
+                    date = Date{std::chrono::floor<std::chrono::days>(secs)};
                 }
 
                 Card cur_card{
