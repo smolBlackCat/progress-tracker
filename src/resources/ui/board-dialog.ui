@@ -63,7 +63,6 @@
         <child>
           <object class="GtkButton" id="footer-button">
             <property name="css-classes">suggested-action</property>
-            <property name="has-frame">False</property>
             <property name="label" translatable="yes">Create Board</property>
           </object>
         </child>
