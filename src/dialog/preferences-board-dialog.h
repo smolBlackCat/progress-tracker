@@ -11,30 +11,14 @@ namespace ui {
  */
 class PreferencesBoardDialog : public BoardDialog {
 public:
-    PreferencesBoardDialog(BaseObjectType* cobject,
-                           const Glib::RefPtr<Gtk::Builder>& builder,
-                           Gtk::Window& parent, BoardWidget& board_widget);
-
+    static PreferencesBoardDialog* create(BoardWidget& board_widget);
     ~PreferencesBoardDialog() override;
 
-    /**
-     * @brief Opens and loads the current board settings
-     */
-    void open_window() override;
-
-    /**
-     * @brief Creates a Board settings dialog for modification
-     *
-     * @param parent parent the dialog is transient for
-     *
-     * @return an object pointer to a PreferencesBoardDialog instance
-     */
-    static PreferencesBoardDialog* create(Gtk::Window& parent,
-                                          BoardWidget& board_widget);
+    void on_footer_button_click() override;
 
 protected:
+    PreferencesBoardDialog(BoardWidget& board_widget);
     BoardWidget& board_widget;
-    Gtk::Window& parent;
     void load_board();
     void on_save_changes();
 };

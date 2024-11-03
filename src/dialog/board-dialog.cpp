@@ -1,49 +1,55 @@
 #include "board-dialog.h"
 
+#include <adwaita.h>
 #include <glibmm/i18n.h>
+#include <sys/types.h>
+
+#include "core/colorable.h"
 
 namespace ui {
-BoardDialog::BoardDialog(BaseObjectType* cobject,
-                         const Glib::RefPtr<Gtk::Builder>& builder)
-    : Gtk::Window{cobject},
-      p_board_name_entry{builder->get_widget<Gtk::Entry>("board-name-entry")},
-      p_select_file_label{builder->get_widget<Gtk::Label>("select-file-label")},
-      p_background_selector_stack{
-          builder->get_widget<Gtk::Stack>("background-selector-stack")},
-      p_colour_button{
-          builder->get_widget<Gtk::ColorDialogButton>("colour-button")},
-      p_file_image{builder->get_widget<Gtk::Image>("file-image")},
-      p_left_button{builder->get_widget<Gtk::Button>("left-button")},
-      p_right_button{builder->get_widget<Gtk::Button>("right-button")},
-      p_select_file_button{
-          builder->get_widget<Gtk::Button>("select-file-button")} {
-    p_board_name_entry->set_placeholder_text(_("Board's name"));
-    p_left_button->set_label(_("Cancel"));
-    p_select_file_label->set_label(_("Select a file"));
-    p_select_file_button->set_label(_("Select File"));
 
-    p_left_button->signal_clicked().connect(
-        sigc::mem_fun(*this, &BoardDialog::close_window));
-    p_colour_button->property_rgba().signal_changed().connect(
-        sigc::mem_fun(*this, &BoardDialog::on_colourbutton_set));
-    p_select_file_button->signal_clicked().connect(
-        sigc::mem_fun(*this, &BoardDialog::on_bg_button_click));
+BoardDialog::BoardDialog()
+    : builder{Gtk::Builder::create_from_resource(BOARD_DIALOG)},
+      color_dialog{Gtk::ColorDialog::create()},
+      board_dialog{builder->get_object("board-dialog")},
+      board_title_entry{builder->get_widget<Gtk::Entry>("board-title-entry")},
+      background_setter_menubutton{
+          builder->get_widget<Gtk::MenuButton>("background-setter-menubutton")},
+      board_picture{builder->get_widget<Gtk::Picture>("board-picture")},
+      footer_button{builder->get_widget<Gtk::Button>("footer-button")} {
+    g_signal_connect(board_dialog->gobj(), "close-attempt",
+                     G_CALLBACK(+[](AdwDialog* self, gpointer data) {
+                         reinterpret_cast<BoardDialog*>(data)->close();
+                     }),
+                     this);
+    set_picture(Gdk::RGBA{0, 120, 212});
+    auto group = Gio::SimpleActionGroup::create();
+
+    group->add_action("set-color",
+                      sigc::mem_fun(*this, &BoardDialog::on_set_color));
+    group->add_action("set-image",
+                      sigc::mem_fun(*this, &BoardDialog::on_set_image));
+    background_setter_menubutton->insert_action_group("board-dialog", group);
+    footer_button->signal_clicked().connect(
+        sigc::mem_fun(*this, &BoardDialog::on_footer_button_click));
 }
 
-void BoardDialog::open_window() { set_visible(); }
+BoardDialog::~BoardDialog() {}
 
-void BoardDialog::close_window() {
-    set_visible(false);
-
-    // Cleanup any inserted data
-    p_board_name_entry->set_text("");
-    p_select_file_label->set_text(_("No file selected"));
-    p_file_image->clear();
-    p_colour_button->set_rgba(Gdk::RGBA("#FFFFFF"));
-    file_selected = false;
+void BoardDialog::open(Gtk::Window& parent) {
+    adw_dialog_present(ADW_DIALOG(board_dialog->gobj()),
+                       static_cast<Gtk::Widget&>(parent).gobj());
+    this->parent = &parent;
 }
 
-void BoardDialog::on_bg_button_click() {
+void BoardDialog::close() {
+    adw_dialog_force_close(ADW_DIALOG(board_dialog->gobj()));
+    // This line assumes that BoardDialog children will only be allocated to the
+    // heap
+    delete this;
+}
+
+void BoardDialog::on_set_image() {
     auto dialog = Gtk::FileDialog::create();
 
     dialog->set_title(_("Select a file"));
@@ -59,20 +65,35 @@ void BoardDialog::on_bg_button_click() {
     dialog->set_filters(filters);
 
     dialog->open(
-        *this,
+        *parent,
         sigc::bind(sigc::mem_fun(*this, &ui::BoardDialog::on_filedialog_finish),
                    dialog));
+}
+
+void BoardDialog::on_set_color() {
+    color_dialog->set_modal();
+    color_dialog->choose_rgba(
+        *parent, sigc::mem_fun(*this, &BoardDialog::on_color_finish));
+}
+
+void BoardDialog::on_color_finish(
+    const Glib::RefPtr<Gio::AsyncResult>& result) {
+    try {
+        rgba = color_dialog->choose_rgba_finish(result);
+        bg_type = BackgroundType::COLOR;
+        set_picture(rgba);
+    } catch (Gtk::DialogError& err) {
+        err.what();
+    }
 }
 
 void BoardDialog::on_filedialog_finish(
     const Glib::RefPtr<Gio::AsyncResult>& result,
     const Glib::RefPtr<Gtk::FileDialog>& dialog) {
     try {
-        selected_file = dialog->open_finish(result);
-        p_file_image->property_paintable().set_value(
-            Gdk::Texture::create_from_file(selected_file));
-        p_select_file_label->set_text(selected_file->get_path());
-        file_selected = true;
+        image_filename = dialog->open_finish(result)->get_path();
+        bg_type = BackgroundType::IMAGE;
+        set_picture(image_filename);
     } catch (Gtk::DialogError& err) {
         err.what();
     } catch (Glib::Error& err) {
@@ -80,7 +101,21 @@ void BoardDialog::on_filedialog_finish(
     }
 }
 
-void BoardDialog::on_colourbutton_set() {
-    selected_colour = p_colour_button->get_rgba();
+void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
+    auto color_frame_pixbuf =
+        Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 30, 30);
+    color_frame_pixbuf->fill((static_cast<u_int8_t>(rgba.get_red_u()) << 24) |
+                             (static_cast<u_int8_t>(rgba.get_green_u()) << 16) |
+                             (static_cast<u_int8_t>(rgba.get_blue_u()) << 8) |
+                             static_cast<u_int8_t>(1));
+    if (board_picture->get_paintable()) {
+        board_picture->set_paintable(nullptr);
+    }
+    board_picture->set_paintable(
+        Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
+}
+
+void BoardDialog::set_picture(const std::string& image_filename) {
+    board_picture->set_filename(image_filename);
 }
 }  // namespace ui

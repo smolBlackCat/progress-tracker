@@ -77,9 +77,6 @@ protected:
     Glib::RefPtr<Gio::Settings>& progress_settings;
 
     bool on_delete_mode = false;
-
-    ui::CreateBoardDialog* create_board_dialog;
-    ui::PreferencesBoardDialog* preferences_board_dialog;
     ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
     Gtk::Button *home_button_p, *add_board_button_p;

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: 2024-04-22 20:40+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -26,19 +26,19 @@ msgstr "Изберете дъските, които да бъдат премах
 msgid "Delete"
 msgstr "Изтриване"
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr "Отказване"
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr "Не беше възможно да се зареди тази дъска"
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Всички права запазени"
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr "twlvnn <kraft_werk@tutanota.com>"
 
@@ -54,59 +54,22 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Име на дъската"
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr "Изберете файл"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Избиране на файл"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "Няма избран файл"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr "Изображения"
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr "Създаване на дъска"
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr "Създаване"
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr "Не са позволени дъски с празни имена"
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr "файл трябва да е избран"
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr "Не беше възможно да се създаде дъска с даденото име"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr "Редактиране на дъската"
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
 msgstr "Запазване"
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
-msgstr "Няма избран файл"
 
 #: src/resources/ui/app-window.ui:15
 msgid "Homepage"
@@ -131,18 +94,6 @@ msgstr "Относно „Progress“"
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Настройки"
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Фон"
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "Като файл"
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
-msgstr "Като цвят"
 
 #: src/resources/ui/card-details-dialog.ui:27
 msgid "Card Title"
@@ -194,7 +145,7 @@ msgstr "Преименуване"
 msgid "Card Cover"
 msgstr ""
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr ""
 
@@ -206,6 +157,26 @@ msgstr ""
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
 msgstr "Премахване"
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr "Създаване на дъска"
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
+msgstr ""
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -261,6 +232,39 @@ msgstr "Добавяне на карта"
 #: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Board's name"
+#~ msgstr "Име на дъската"
+
+#~ msgid "Select File"
+#~ msgstr "Избиране на файл"
+
+#~ msgid "No file selected"
+#~ msgstr "Няма избран файл"
+
+#~ msgid "Create"
+#~ msgstr "Създаване"
+
+#~ msgid "A file must be selected"
+#~ msgstr "файл трябва да е избран"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "Не беше възможно да се създаде дъска с даденото име"
+
+#~ msgid "Edit Board"
+#~ msgstr "Редактиране на дъската"
+
+#~ msgid "No file was selected"
+#~ msgstr "Няма избран файл"
+
+#~ msgid "Background"
+#~ msgstr "Фон"
+
+#~ msgid "As a file"
+#~ msgstr "Като файл"
+
+#~ msgid "As a color"
+#~ msgstr "Като цвят"
 
 #~ msgid "About"
 #~ msgstr "Относно"

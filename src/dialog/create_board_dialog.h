@@ -13,12 +13,6 @@ namespace ui {
  */
 class CreateBoardDialog : public BoardDialog {
 public:
-    /**
-     * @brief Dialog Window constructor
-     */
-    CreateBoardDialog(BaseObjectType* cobject,
-                      const Glib::RefPtr<Gtk::Builder>& ref_builder,
-                      ProgressWindow& board_creator);
 
     /**
      * @brief Creates a Board settings dialog for creation
@@ -29,7 +23,11 @@ public:
      */
     static CreateBoardDialog* create(ProgressWindow& board_creator);
 
+    void on_footer_button_click() override;
+
 protected:
+    CreateBoardDialog(ProgressWindow& board_creator);
+
     ProgressWindow& board_creator;
     void create_board();
 };

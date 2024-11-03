@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: 2024-04-28 13:17+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -24,19 +24,19 @@ msgstr "Seleziona le bacheche da eliminare"
 msgid "Delete"
 msgstr "Elimina"
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr "Non è stato possibile caricare questa bacheca"
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Tutti i diritti riservati"
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
@@ -52,59 +52,22 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Nome della bacheca"
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr "Seleziona un file"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Seleziona file"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "Nessun file selezionato"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr "File di immagini"
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr "Crea bacheca"
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr "Crea"
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr "Non sono ammessi nomi di bacheche vuote"
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr "È necessario selezionare un file"
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr "Non è stato possibile creare una bacheca con il nome indicato"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr "Modifica bacheca"
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
 msgstr "Salva"
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
-msgstr "Nessun file è stato selezionato"
 
 #: src/resources/ui/app-window.ui:15
 msgid "Homepage"
@@ -129,18 +92,6 @@ msgstr "Informazioni su Progress"
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Preferenze"
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Sfondo"
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "Come file"
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
-msgstr "Come colore"
 
 #: src/resources/ui/card-details-dialog.ui:27
 msgid "Card Title"
@@ -192,7 +143,7 @@ msgstr "Rinomina"
 msgid "Card Cover"
 msgstr ""
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr ""
 
@@ -204,6 +155,26 @@ msgstr ""
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
 msgstr "Rimuovi"
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr "Crea bacheca"
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
+msgstr ""
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -259,6 +230,39 @@ msgstr "Aggiungi scheda"
 #: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Board's name"
+#~ msgstr "Nome della bacheca"
+
+#~ msgid "Select File"
+#~ msgstr "Seleziona file"
+
+#~ msgid "No file selected"
+#~ msgstr "Nessun file selezionato"
+
+#~ msgid "Create"
+#~ msgstr "Crea"
+
+#~ msgid "A file must be selected"
+#~ msgstr "È necessario selezionare un file"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "Non è stato possibile creare una bacheca con il nome indicato"
+
+#~ msgid "Edit Board"
+#~ msgstr "Modifica bacheca"
+
+#~ msgid "No file was selected"
+#~ msgstr "Nessun file è stato selezionato"
+
+#~ msgid "Background"
+#~ msgstr "Sfondo"
+
+#~ msgid "As a file"
+#~ msgstr "Come file"
+
+#~ msgid "As a color"
+#~ msgstr "Come colore"
 
 #~ msgid "About"
 #~ msgstr "Informazioni"

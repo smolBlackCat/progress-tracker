@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: 2024-07-10 11:12-0300\n"
 "Last-Translator: Gabriel de Moura <smolblackcat@proton.me>\n"
 "Language-Team: English (British) <(nothing)>\n"
@@ -25,19 +25,19 @@ msgstr "Select the boards to be deleted"
 msgid "Delete"
 msgstr "Delete"
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr "It was not possible to load this board"
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © All rights reserved"
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr "Gabriel de Moura"
 
@@ -53,59 +53,22 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Board's name"
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr "Select a file"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Select File"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "No file selected"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr "Image Files"
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr "Create Board"
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr "Create"
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr "Empty board names are not allowed"
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr "A file must be selected"
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr "It was not possible to create a Board with given name"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr "Edit Board"
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
 msgstr "Save"
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
-msgstr "No file was selected"
 
 #: src/resources/ui/app-window.ui:15
 msgid "Homepage"
@@ -130,18 +93,6 @@ msgstr "About Progress"
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Preferences"
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Background"
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "As a file"
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
-msgstr "As a colour"
 
 #: src/resources/ui/card-details-dialog.ui:27
 msgid "Card Title"
@@ -193,7 +144,7 @@ msgstr "Rename"
 msgid "Card Cover"
 msgstr "Card Cover"
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr "Set Colour"
 
@@ -205,6 +156,26 @@ msgstr ""
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
 msgstr "Remove"
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr "Create Board"
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
+msgstr ""
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -260,6 +231,39 @@ msgstr "Add card"
 #: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Board's name"
+#~ msgstr "Board's name"
+
+#~ msgid "Select File"
+#~ msgstr "Select File"
+
+#~ msgid "No file selected"
+#~ msgstr "No file selected"
+
+#~ msgid "Create"
+#~ msgstr "Create"
+
+#~ msgid "A file must be selected"
+#~ msgstr "A file must be selected"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "It was not possible to create a Board with given name"
+
+#~ msgid "Edit Board"
+#~ msgstr "Edit Board"
+
+#~ msgid "No file was selected"
+#~ msgstr "No file was selected"
+
+#~ msgid "Background"
+#~ msgstr "Background"
+
+#~ msgid "As a file"
+#~ msgstr "As a file"
+
+#~ msgid "As a color"
+#~ msgstr "As a colour"
 
 #~ msgid "Clear Color Frame"
 #~ msgstr "Clear Colour Frame"

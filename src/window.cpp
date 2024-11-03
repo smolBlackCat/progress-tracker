@@ -57,9 +57,6 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
-      create_board_dialog{CreateBoardDialog::create(*this)},
-      preferences_board_dialog{
-          PreferencesBoardDialog::create(*this, board_widget)},
       progress_settings{progress_settings} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -80,8 +77,11 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
 
     home_button_p->signal_clicked().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
-    add_board_button_p->signal_clicked().connect(
-        sigc::mem_fun(*create_board_dialog, &CreateBoardDialog::open_window));
+    add_board_button_p->signal_clicked().connect([this]() {
+        auto create_board_dialog = CreateBoardDialog::create(*this);
+
+        create_board_dialog->open(*this);
+    });
     setup_menu_button();
 
     boards_grid_p->set_sort_func([](Gtk::FlowBoxChild* child1,
@@ -106,10 +106,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     app_stack_p->add(board_widget, "board-page");
 }
 
-ProgressWindow::~ProgressWindow() {
-    delete create_board_dialog;
-    delete preferences_board_dialog;
-}
+ProgressWindow::~ProgressWindow() {}
 
 void ProgressWindow::add_local_board(BoardBackend board_backend) {
     auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
@@ -207,9 +204,11 @@ void ProgressWindow::setup_menu_button() {
     });
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
-    action_group->add_action(
-        "preferences", sigc::mem_fun(*preferences_board_dialog,
-                                     &PreferencesBoardDialog::open_window));
+    action_group->add_action("preferences", [this]() {
+        auto preference_dialog =
+            PreferencesBoardDialog::create(this->board_widget);
+        preference_dialog->open(*this);
+    });
 
     app_menu_button_p->insert_action_group("win", action_group);
 }

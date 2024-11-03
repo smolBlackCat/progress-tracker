@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.smolblackcat.Progress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: 2024-04-19 13:36+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -27,19 +27,19 @@ msgstr "Silinecek panoları seç"
 msgid "Delete"
 msgstr "Sil"
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr "Bu pano yüklenemedi"
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Tüm hakları saklıdır"
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr "Sabri Ünal <yakushabb@gmail.com>"
 
@@ -55,59 +55,22 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Pano adı"
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr "Dosya seç"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Dosya Seç"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "Dosya seçilmedi"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr "Görüntü Dosyaları"
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr "Pano Oluştur"
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr "Oluştur"
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr "Boş pano adlarına izin verilmez"
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr "Bir dosya seçilmeli"
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr "Verilen adla pano oluşturulamadı"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr "Panoyu Düzenle"
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
 msgstr "Kaydet"
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
-msgstr "Hiçbir dosya seçilmedi"
 
 #: src/resources/ui/app-window.ui:15
 msgid "Homepage"
@@ -132,18 +95,6 @@ msgstr "Progress Hakkında"
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Tercihler"
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Arka plan"
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "Dosya olarak"
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
-msgstr "Renk olarak"
 
 #: src/resources/ui/card-details-dialog.ui:27
 msgid "Card Title"
@@ -195,7 +146,7 @@ msgstr "Yeniden Adlandır"
 msgid "Card Cover"
 msgstr ""
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr ""
 
@@ -207,6 +158,26 @@ msgstr ""
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
 msgstr "Kaldır"
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr "Pano Oluştur"
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
+msgstr ""
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -259,6 +230,39 @@ msgstr "Kart ekle"
 #: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Board's name"
+#~ msgstr "Pano adı"
+
+#~ msgid "Select File"
+#~ msgstr "Dosya Seç"
+
+#~ msgid "No file selected"
+#~ msgstr "Dosya seçilmedi"
+
+#~ msgid "Create"
+#~ msgstr "Oluştur"
+
+#~ msgid "A file must be selected"
+#~ msgstr "Bir dosya seçilmeli"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "Verilen adla pano oluşturulamadı"
+
+#~ msgid "Edit Board"
+#~ msgstr "Panoyu Düzenle"
+
+#~ msgid "No file was selected"
+#~ msgstr "Hiçbir dosya seçilmedi"
+
+#~ msgid "Background"
+#~ msgstr "Arka plan"
+
+#~ msgid "As a file"
+#~ msgstr "Dosya olarak"
+
+#~ msgid "As a color"
+#~ msgstr "Renk olarak"
 
 #~ msgid "About"
 #~ msgstr "Hakkında"

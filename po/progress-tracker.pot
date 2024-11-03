@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,19 +26,19 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr ""
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr ""
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr ""
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr ""
 
@@ -54,58 +54,21 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr ""
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr ""
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr ""
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr ""
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr ""
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr ""
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr ""
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr ""
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr ""
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr ""
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
-msgstr ""
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
 msgstr ""
 
 #: src/resources/ui/app-window.ui:15
@@ -130,18 +93,6 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
-msgstr ""
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr ""
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr ""
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
 msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:27
@@ -194,7 +145,7 @@ msgstr ""
 msgid "Card Cover"
 msgstr ""
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr ""
 
@@ -205,6 +156,26 @@ msgstr ""
 #: src/resources/ui/card-widget.ui:118 src/widgets/cardlist-widget.cpp:31
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
 msgstr ""
 
 #: src/widgets/board-widget.cpp:22

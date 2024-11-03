@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 06:57-0300\n"
+"POT-Creation-Date: 2024-11-03 15:26-0300\n"
 "PO-Revision-Date: 2024-05-10 20:17-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,19 +25,19 @@ msgstr "Seleccione los tableros que desea eliminar"
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/window.cpp:20 src/dialog/board-dialog.cpp:21
+#: src/window.cpp:20
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/window.cpp:128
+#: src/window.cpp:129
 msgid "It was not possible to load this board"
 msgstr "No ha sido posible cargar este tablero"
 
-#: src/window.cpp:197
+#: src/window.cpp:198
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Todos los derechos reservados"
 
-#: src/window.cpp:199
+#: src/window.cpp:200
 msgid "translator-credits"
 msgstr "haggen88"
 
@@ -53,59 +53,22 @@ msgstr ""
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Nombre del tablero"
-
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:79
+#: src/dialog/board-dialog.cpp:55
 msgid "Select a file"
 msgstr "Seleccione un archivo"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Seleccionar archivo"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "No se ha seleccionado ningún archivo"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:60
 msgid "Image Files"
 msgstr "Archivos de imagen"
 
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create Board"
-msgstr "Crear tablero"
-
-#: src/dialog/create_board_dialog.cpp:15
-msgid "Create"
-msgstr "Crear"
-
-#: src/dialog/create_board_dialog.cpp:39
+#: src/dialog/create_board_dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:56
 msgid "Empty board names are not allowed"
 msgstr "No se permiten nombres de tablero vacíos"
 
-#: src/dialog/create_board_dialog.cpp:47
-msgid "A file must be selected"
-msgstr "Se debe seleccionar un archivo"
-
-#: src/dialog/create_board_dialog.cpp:63
-msgid "It was not possible to create a Board with given name"
-msgstr "No ha sido posible crear un tablero con el nombre dado"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Edit Board"
-msgstr "Editar tablero"
-
-#: src/dialog/preferences-board-dialog.cpp:19
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Save"
 msgstr "Guardar"
-
-#: src/dialog/preferences-board-dialog.cpp:34
-#: src/dialog/preferences-board-dialog.cpp:51
-msgid "No file was selected"
-msgstr "No se seleccionó ningún archivo"
 
 #: src/resources/ui/app-window.ui:15
 msgid "Homepage"
@@ -130,18 +93,6 @@ msgstr "Acerca de Progress"
 #: src/resources/ui/app-window.ui:103
 msgid "Preferences"
 msgstr "Preferencias"
-
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Fondo"
-
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "Como archivo"
-
-#: src/resources/ui/create-board-dialog.ui:96
-msgid "As a color"
-msgstr "Como color"
 
 #: src/resources/ui/card-details-dialog.ui:27
 msgid "Card Title"
@@ -193,7 +144,7 @@ msgstr "Renombrar"
 msgid "Card Cover"
 msgstr ""
 
-#: src/resources/ui/card-widget.ui:109
+#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:78
 msgid "Set Color"
 msgstr ""
 
@@ -205,6 +156,26 @@ msgstr ""
 #: src/widgets/task-widget.cpp:48
 msgid "Remove"
 msgstr "Eliminar"
+
+#: src/resources/ui/board-dialog.ui:26
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:42
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:57
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:67
+msgid "Create Board"
+msgstr "Crear tablero"
+
+#: src/resources/ui/board-dialog.ui:82
+msgid "Set Image"
+msgstr ""
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -260,6 +231,39 @@ msgstr "Añadir tarjeta"
 #: src/widgets/task-widget.cpp:49
 msgid "Convert to card"
 msgstr ""
+
+#~ msgid "Board's name"
+#~ msgstr "Nombre del tablero"
+
+#~ msgid "Select File"
+#~ msgstr "Seleccionar archivo"
+
+#~ msgid "No file selected"
+#~ msgstr "No se ha seleccionado ningún archivo"
+
+#~ msgid "Create"
+#~ msgstr "Crear"
+
+#~ msgid "A file must be selected"
+#~ msgstr "Se debe seleccionar un archivo"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "No ha sido posible crear un tablero con el nombre dado"
+
+#~ msgid "Edit Board"
+#~ msgstr "Editar tablero"
+
+#~ msgid "No file was selected"
+#~ msgstr "No se seleccionó ningún archivo"
+
+#~ msgid "Background"
+#~ msgstr "Fondo"
+
+#~ msgid "As a file"
+#~ msgstr "Como archivo"
+
+#~ msgid "As a color"
+#~ msgstr "Como color"
 
 #~ msgid "About"
 #~ msgstr "Acerca de"
