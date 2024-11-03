@@ -2,7 +2,6 @@
 
 #include <adwaita.h>
 #include <glibmm/i18n.h>
-#include <sys/types.h>
 
 #include "core/colorable.h"
 
@@ -104,10 +103,10 @@ void BoardDialog::on_filedialog_finish(
 void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     auto color_frame_pixbuf =
         Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 30, 30);
-    color_frame_pixbuf->fill((static_cast<u_int8_t>(rgba.get_red_u()) << 24) |
-                             (static_cast<u_int8_t>(rgba.get_green_u()) << 16) |
-                             (static_cast<u_int8_t>(rgba.get_blue_u()) << 8) |
-                             static_cast<u_int8_t>(1));
+    color_frame_pixbuf->fill((static_cast<uint8_t>(rgba.get_red_u()) << 24) |
+                             (static_cast<uint8_t>(rgba.get_green_u()) << 16) |
+                             (static_cast<uint8_t>(rgba.get_blue_u()) << 8) |
+                             static_cast<uint8_t>(1));
     if (board_picture->get_paintable()) {
         board_picture->set_paintable(nullptr);
     }
