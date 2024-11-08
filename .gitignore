@@ -44,3 +44,6 @@ build/
 .flatpak*/
 flatpak-build/
 repo/
+
+# Ignore Cambalache
+*.cmb
