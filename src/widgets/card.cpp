@@ -388,30 +388,28 @@ std::string ui::CardWidget::create_details_text() const {
             auto delta_days = -(days - now).count();
 
             if (delta_days < 30) {
-                details_text
-                    << Glib::ustring::compose(
-                           ngettext("This card is past due date %1 day ago",
+                details_text << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext("This card is past due date %1 day ago",
                                     "This card is past due date %1 days ago",
-                                    delta_days),
-                           delta_days)
-                    << "\n\n";
+                                    delta_days)),
+                           delta_days) << "\n\n";
             } else if (delta_days > 30 && delta_days < 365) {
                 long months_from_delta =
                     delta_days / 30;  // Assume every month has 30 days
                 details_text
                     << Glib::ustring::compose(
-                           ngettext("This card is past due date %1 month ago",
+                           Glib::locale_to_utf8(ngettext("This card is past due date %1 month ago",
                                     "This card is past due date %1 months ago",
-                                    months_from_delta),
+                                    months_from_delta)),
                            months_from_delta)
                     << "\n\n";
             } else if (delta_days >= 365) {
                 long years_from_delta = delta_days / 365;  // Ignore leap years
                 details_text
                     << Glib::ustring::compose(
-                           ngettext("This card is past due date %1 year ago",
+                           Glib::locale_to_utf8(ngettext("This card is past due date %1 year ago",
                                     "This card is past due date %1 years ago",
-                                    years_from_delta),
+                                    years_from_delta)),
                            years_from_delta)
                     << "\n\n";
             }
