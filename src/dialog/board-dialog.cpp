@@ -100,13 +100,14 @@ void BoardDialog::on_filedialog_finish(
     }
 }
 
+// FIXME: Colour setting code is pretty inneficient because of the to-hex
+// conversion overhead
 void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     auto color_frame_pixbuf =
         Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 30, 30);
-    color_frame_pixbuf->fill((static_cast<uint8_t>(rgba.get_red_u()) << 24) |
-                             (static_cast<uint8_t>(rgba.get_green_u()) << 16) |
-                             (static_cast<uint8_t>(rgba.get_blue_u()) << 8) |
-                             static_cast<uint8_t>(1));
+    auto c = Color{rgba.get_red() * 255, rgba.get_green() * 255,
+                   rgba.get_blue() * 255, rgba.get_alpha()};
+    color_frame_pixbuf->fill(rgb_to_hex(c));
     if (board_picture->get_paintable()) {
         board_picture->set_paintable(nullptr);
     }

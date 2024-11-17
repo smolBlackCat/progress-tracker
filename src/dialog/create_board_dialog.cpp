@@ -3,6 +3,8 @@
 #include <glibmm/i18n.h>
 #include <utils.h>
 
+#include <iostream>
+
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(ProgressWindow& board_creator)
     : BoardDialog{}, board_creator{board_creator} {}
@@ -27,8 +29,13 @@ void CreateBoardDialog::create_board() {
 
     switch (bg_type) {
         case BackgroundType::COLOR: {
+            // Not a clean solution, we have to rely on calculation everytime
+            // because there is no exact standard for colour setting
+            auto rgb_string = std::format(
+                "rgb({},{},{})", (int)(rgba.get_red() * 255),
+                (int)(rgba.get_green() * 255), (int)(rgba.get_blue() * 255));
             Board board =
-                backend.create(board_title_entry->get_text(), rgba.to_string());
+                backend.create(board_title_entry->get_text(), rgb_string);
             board.save();
             break;
         }
