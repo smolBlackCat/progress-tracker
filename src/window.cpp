@@ -9,6 +9,8 @@
 
 #include <filesystem>
 #include <format>
+#include <mutex>
+#include <thread>
 
 namespace ui {
 
@@ -60,6 +62,9 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       progress_settings{progress_settings} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    dispatcher.connect(
+        sigc::mem_fun(*this, &ProgressWindow::on_board_loading_done));
 
     load_appropriate_style();
 
@@ -118,23 +123,27 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
             if (!this->on_delete_mode) {
                 app_stack_p->set_visible_child(
                     "loading-page", Gtk::StackTransitionType::CROSSFADE);
-                std::shared_ptr<Board> board;
-                // BoardBackend::load may block the execution, mainly when it's
-                // fetching a Board from the internet
-                try {
-                    board = std::make_shared<Board>(
-                        board_card_button->get_backend().load());
-                } catch (std::invalid_argument& err) {
-                    Gtk::AlertDialog::create(
-                        _("It was not possible to load this board"))
-                        ->show(*this);
+                add_board_button_p->set_sensitive(false);
+                app_menu_button_p->set_sensitive(false);
 
-                    boards_grid_p->remove(*fb_child_p);
-                    return;
-                }
-                on_board_view();
-                board_widget.set(board, board_card_button);
-                set_title(board->get_name());
+                std::thread{[this, fb_child_p, board_card_button]() {
+                    try {
+                        std::lock_guard<std::mutex> lock(
+                            this->progress_window_mutex);
+
+                        this->cur_board_entry = board_card_button;
+                        this->cur_board = std::make_shared<Board>(
+                            board_card_button->get_backend().load());
+                    } catch (std::invalid_argument& err) {
+                        Gtk::AlertDialog::create(
+                            _("It was not possible to load this board"))
+                            ->show(*this);
+
+                        this->boards_grid_p->remove(*fb_child_p);
+                        return;
+                    }
+                    this->dispatcher.emit();
+                }}.detach();
             } else {
                 if (fb_child_p->is_selected()) {
                     boards_grid_p->unselect_child(*fb_child_p);
@@ -165,6 +174,9 @@ void ProgressWindow::on_main_menu() {
     set_title("Progress");
     board_widget.save();
     boards_grid_p->invalidate_sort();
+
+    cur_board = nullptr;
+    cur_board_entry = nullptr;
 }
 
 void ProgressWindow::on_board_view() {
@@ -219,6 +231,16 @@ void ProgressWindow::load_appropriate_style() {
     } else {
         css_provider->load_from_resource(ProgressWindow::STYLE_CSS);
     }
+}
+
+void ProgressWindow::on_board_loading_done() {
+    std::lock_guard<std::mutex> lock(progress_window_mutex);
+
+    board_widget.set(cur_board, cur_board_entry);
+    on_board_view();
+    set_title(cur_board->get_name());
+    add_board_button_p->set_sensitive();
+    app_menu_button_p->set_sensitive();
 }
 
 bool ProgressWindow::on_close_request() {

@@ -76,6 +76,11 @@ protected:
     Glib::RefPtr<Gtk::CssProvider> css_provider;
     Glib::RefPtr<Gio::Settings>& progress_settings;
 
+    mutable std::mutex progress_window_mutex;
+    std::shared_ptr<Board>cur_board;   // nullptr when not in board-page
+    BoardCardButton* cur_board_entry;  // nullptr when not in board-page
+    Glib::Dispatcher dispatcher;
+
     bool on_delete_mode = false;
     ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
@@ -88,6 +93,10 @@ protected:
 
     void setup_menu_button();
     void load_appropriate_style();
+
+    // Called when the loader thread is done working, therefore sets board
+    // widget and then changes app's view
+    void on_board_loading_done();
     bool on_close_request() override;
 };
 }  // namespace ui
