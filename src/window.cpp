@@ -9,7 +9,6 @@
 
 #include <filesystem>
 #include <format>
-#include <mutex>
 #include <thread>
 
 namespace ui {
@@ -126,21 +125,13 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
                 add_board_button_p->set_sensitive(false);
                 app_menu_button_p->set_sensitive(false);
 
-                std::thread{[this, fb_child_p, board_card_button]() {
+                std::thread{[this, board_card_button]() {
                     try {
-                        std::lock_guard<std::mutex> lock(
-                            this->progress_window_mutex);
-
                         this->cur_board_entry = board_card_button;
                         this->cur_board = std::make_shared<Board>(
                             board_card_button->get_backend().load());
                     } catch (std::invalid_argument& err) {
-                        Gtk::AlertDialog::create(
-                            _("It was not possible to load this board"))
-                            ->show(*this);
-
-                        this->boards_grid_p->remove(*fb_child_p);
-                        return;
+                        this->cur_board = nullptr;
                     }
                     this->dispatcher.emit();
                 }}.detach();
@@ -172,11 +163,8 @@ void ProgressWindow::on_main_menu() {
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
     set_title("Progress");
-    board_widget.save();
+    if (cur_board && cur_board_entry) board_widget.save();
     boards_grid_p->invalidate_sort();
-
-    cur_board = nullptr;
-    cur_board_entry = nullptr;
 }
 
 void ProgressWindow::on_board_view() {
@@ -234,11 +222,19 @@ void ProgressWindow::load_appropriate_style() {
 }
 
 void ProgressWindow::on_board_loading_done() {
-    std::lock_guard<std::mutex> lock(progress_window_mutex);
-
-    board_widget.set(cur_board, cur_board_entry);
-    on_board_view();
-    set_title(cur_board->get_name());
+    if (cur_board) {
+        board_widget.set(cur_board, cur_board_entry);
+        on_board_view();
+        set_title(cur_board->get_name());
+    } else {
+        // cur_board and cur_board_entry are still nullptrs because the loading
+        // thread has failed, therefore, go back to the main menu
+        Gtk::AlertDialog::create(_("It was not possible to load this board"))
+            ->show(*this);
+        boards_grid_p->remove(*cur_board_entry);
+        cur_board_entry = nullptr;
+        on_main_menu();
+    }
     add_board_button_p->set_sensitive();
     app_menu_button_p->set_sensitive();
 }

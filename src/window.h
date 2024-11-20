@@ -76,7 +76,6 @@ protected:
     Glib::RefPtr<Gtk::CssProvider> css_provider;
     Glib::RefPtr<Gio::Settings>& progress_settings;
 
-    mutable std::mutex progress_window_mutex;
     std::shared_ptr<Board>cur_board;   // nullptr when not in board-page
     BoardCardButton* cur_board_entry;  // nullptr when not in board-page
     Glib::Dispatcher dispatcher;
