@@ -54,6 +54,8 @@ if(Catch2_FOUND AND DEVELOPMENT)
     add_test(NAME TestColorable COMMAND test/colorable-test)
 endif()
 
+set(CPACK_PACKAGE_CHECKSUM SHA512)
+
 if (LINUX)
     set(CPACK_GENERATOR "DEB" "TXZ")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gabriel de Moura")
