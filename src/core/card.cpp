@@ -122,10 +122,8 @@ bool Card::past_due_date() {
 };
 
 void Card::set_due_date(const Date& date) {
-    if (date.ok()) {
-        due_date = date;
-        modified = true;
-    }
+    due_date = date;
+    modified = true;
 };
 
 Date Card::get_due_date() const { return due_date; };
