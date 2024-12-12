@@ -86,6 +86,8 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
 
         board->load();
 
+        set_background(board->get_background(), false);
+
         for (auto& cardlist : board->get_cardlists()) {
             auto new_cardlist =
                 Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
@@ -94,7 +96,6 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
             root.append(*new_cardlist);
             root.reorder_child_after(add_button, *new_cardlist);
         }
-        set_background(board->get_background(), false);
     }
 }
 

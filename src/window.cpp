@@ -223,8 +223,8 @@ void ProgressWindow::load_appropriate_style() {
 
 void ProgressWindow::on_board_loading_done() {
     if (cur_board) {
-        board_widget.set(cur_board, cur_board_entry);
         on_board_view();
+        board_widget.set(cur_board, cur_board_entry);
         set_title(cur_board->get_name());
     } else {
         // cur_board and cur_board_entry are still nullptrs because the loading
