@@ -62,11 +62,18 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
+    // We're not overriding 'on_close_request' because the behaviour is not
+    // executed. This may be due to the fact that cobject is actually a
+    // AdwApplicationWindow, not a GtkApplicationWindow
+    this->signal_close_request().connect(
+        sigc::mem_fun(*this, &ProgressWindow::on_close), true);
+
     dispatcher.connect(
         sigc::mem_fun(*this, &ProgressWindow::on_board_loading_done));
 
     load_appropriate_style();
 
+    // FIXME: Use automatic stylesheet loading provided by adwaita
     g_signal_connect_after(
         adw_style_manager, "notify::dark",
         G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,
@@ -187,21 +194,23 @@ void ProgressWindow::delete_selected_boards() {
     off_delete_board_mode();
 }
 
+void ProgressWindow::show_about_dialog() {
+    adw_show_about_dialog(
+        GTK_WIDGET(this->gobj()), "application-name", "Progress",
+        "application-icon", APPLICATION_ID, "version",
+        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
+            .c_str(),
+        "copyright", _("De Moura © All rights reserved"), "license-type",
+        GTK_LICENSE_MIT_X11, "developer-name", "Gabriel de Moura",
+        "translator-credits", _("translator-credits"), "issue-url",
+        "https://github.com/smolBlackCat/progress-tracker/issues", "website",
+        "https://github.com/smolBlackCat/progress-tracker", NULL);
+}
+
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
-    action_group->add_action("about", [this]() {
-        adw_show_about_dialog(
-            (GtkWidget*)this->gobj(), "application-name", "Progress",
-            "application-icon", APPLICATION_ID, "version",
-            std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
-                .c_str(),
-            "copyright", _("De Moura © All rights reserved"), "license-type",
-            GTK_LICENSE_MIT_X11, "developer-name", "Gabriel de Moura",
-            "translator-credits", _("translator-credits"), "issue-url",
-            "https://github.com/smolBlackCat/progress-tracker/issues",
-            "website", "https://github.com/smolBlackCat/progress-tracker",
-            NULL);
-    });
+    action_group->add_action(
+        "about", sigc::mem_fun(*this, &ProgressWindow::show_about_dialog));
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
     action_group->add_action("preferences", [this]() {
@@ -239,7 +248,7 @@ void ProgressWindow::on_board_loading_done() {
     app_menu_button_p->set_sensitive();
 }
 
-bool ProgressWindow::on_close_request() {
+bool ProgressWindow::on_close() {
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }

@@ -71,12 +71,17 @@ public:
      */
     void delete_selected_boards();
 
+    /**
+     * @brief Shows the general information about the application
+     */
+    void show_about_dialog();
+
 protected:
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
     Glib::RefPtr<Gio::Settings>& progress_settings;
 
-    std::shared_ptr<Board>cur_board;   // nullptr when not in board-page
+    std::shared_ptr<Board> cur_board;  // nullptr when not in board-page
     BoardCardButton* cur_board_entry;  // nullptr when not in board-page
     Glib::Dispatcher dispatcher;
 
@@ -96,6 +101,6 @@ protected:
     // Called when the loader thread is done working, therefore sets board
     // widget and then changes app's view
     void on_board_loading_done();
-    bool on_close_request() override;
+    bool on_close();
 };
 }  // namespace ui
