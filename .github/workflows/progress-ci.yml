@@ -1,0 +1,27 @@
+name: Progress CI
+
+on: ["push", "pull_request"]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Dependencies
+        run: |
+          sudo apt install libgtkmm-4.0-dev
+          sudo apt install libadwaita-1-dev
+          sudo apt install libtinyxml2-dev
+          sudo apt install gettext
+          sudo apt install catch2
+
+      - name: Build
+        run: |
+          cmake -B ${{github.workspace}}/build -DDEVELOPMENT=ON
+          cmake --build ${{github.workspace}}/build
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest
