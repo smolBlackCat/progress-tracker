@@ -4,6 +4,7 @@
 
 list.rich-list {
     border-radius: 20px;
+    box-shadow: 0 0 4px #000000;
 }
 
 .add-cardlist-button {
