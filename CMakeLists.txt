@@ -58,7 +58,7 @@ set(CPACK_PACKAGE_CHECKSUM SHA512)
 
 if (LINUX)
     set(CPACK_GENERATOR "DEB" "TXZ")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gabriel de Moura")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gabriel de Moura <smolblackcat@proton.me>")
     set(CPACK_DEBIAN_PACKAGE_NAME "progress-tracker")
     set(CPACK_DEBIAN_FILE_NAME "progress-tracker-${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.deb")
     set(CPACK_DEBIAN_PACKAGE_VERSION "${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.${Progress_VERSION_PATCH}")
