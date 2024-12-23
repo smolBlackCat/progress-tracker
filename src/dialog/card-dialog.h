@@ -20,6 +20,11 @@ class CardDetailsDialog {
 public:
     static CardDetailsDialog* create(CardWidget& card_widget);
 
+    /**
+     * @brief Default CardDetailsDialog constructor
+     */
+    CardDetailsDialog();
+
     ~CardDetailsDialog();
 
     /**
@@ -31,7 +36,13 @@ public:
 
     void reorder_task_widget(TaskWidget& next, TaskWidget& sibling);
 
-    void open(Gtk::Window& parent);
+    /**
+     * @brief Opens the details of a card widget
+     *
+     * @param parent transient window
+     * @param card_widget card widget pointer to modify settings from
+     */
+    void open(Gtk::Window& parent, CardWidget* card_widget);
 
     void on_save();
 
@@ -42,19 +53,18 @@ public:
     /**
      * @brief Returns the CardWidget object pointer
      */
-    CardWidget& get_card_widget();
+    CardWidget* get_card_widget();
 
 protected:
-    CardDetailsDialog(CardWidget& card_widget);
-
     void on_add_task();
     void on_delete_card();
     void on_unset_due_date();
     void on_set_due_date();
+    void clear();
 
     Glib::RefPtr<Gtk::Builder> builder;
 
-    Glib::RefPtr<Glib::Object> dialog;
+    Glib::RefPtr<Glib::Object> adw_dialog;
     Gtk::Entry* card_title_entry;
     Gtk::Button checklist_add_button;
     Gtk::Button *unset_due_date_button, *card_delete_button;
@@ -65,7 +75,8 @@ protected:
     Gtk::Box* tasks_box;
     Glib::RefPtr<Gtk::TextBuffer> notes_textbuffer;
 
-    CardWidget& card_widget;
+    CardWidget* cur_card_widget;
+    std::vector<TaskWidget*> tasks_tracker;
 
 private:
     void _add_task(const std::shared_ptr<Task> task, bool is_new = false);

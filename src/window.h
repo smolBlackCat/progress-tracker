@@ -3,6 +3,7 @@
 #include <adwaita.h>
 #include <gtkmm.h>
 #include <widgets/board-widget.h>
+#include "dialog/card-dialog.h"
 
 namespace ui {
 
@@ -76,6 +77,8 @@ public:
      */
     void show_about_dialog();
 
+    void show_card_dialog(CardWidget* card_widget);
+
 protected:
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
@@ -94,6 +97,8 @@ protected:
     Gtk::FlowBox* boards_grid_p;
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
     Gtk::MenuButton* app_menu_button_p;
+
+    CardDetailsDialog card_dialog;
 
     void setup_menu_button();
     void load_appropriate_style();

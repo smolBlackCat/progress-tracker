@@ -8,6 +8,7 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
+#include "window.h"
 
 ui::CardWidget::CardWidget(BaseObjectType* cobject,
                            const Glib::RefPtr<Gtk::Builder>& builder,
@@ -308,14 +309,14 @@ void ui::CardWidget::open_color_dialog() {
 }
 
 void ui::CardWidget::open_card_details_dialog() {
-    auto& parent_window = *(static_cast<Gtk::Window*>(get_root()));
-    auto card_details_dialog = CardDetailsDialog::create(*this);
-    card_details_dialog->open(parent_window);
+    auto& parent_window = *(static_cast<ProgressWindow*>(get_root()));
+    parent_window.show_card_dialog(this);
 }
 
 void ui::CardWidget::on_rename() {
     card_entry_revealer->set_reveal_child(true);
     card_label->set_visible(false);
+    card_entry->grab_focus();
 }
 
 void ui::CardWidget::off_rename() {

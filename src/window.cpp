@@ -58,7 +58,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
-      progress_settings{progress_settings} {
+      progress_settings{progress_settings},
+      card_dialog{} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
@@ -123,6 +124,7 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
     auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
     auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
     fb_child_p->set_child(*board_card_button);
+    fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
     board_card_button->signal_clicked().connect(
         [this, board_card_button, fb_child_p]() {
@@ -156,12 +158,21 @@ void ProgressWindow::on_delete_board_mode() {
     on_delete_mode = true;
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
     delete_boards_bar.set_reveal_child();
+
+    // TAB clicks won't include them, making more manageable to delete boards
+    add_board_button_p->set_focusable(false);
+    app_menu_button_p->set_focusable(false);
+    app_menu_button_p->set_sensitive(false);
 }
 
 void ProgressWindow::off_delete_board_mode() {
     on_delete_mode = false;
     delete_boards_bar.set_reveal_child(false);
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::NONE);
+
+    add_board_button_p->set_focusable();
+    app_menu_button_p->set_focusable();
+    app_menu_button_p->set_sensitive();
 }
 
 void ProgressWindow::on_main_menu() {
@@ -205,6 +216,10 @@ void ProgressWindow::show_about_dialog() {
         "translator-credits", _("translator-credits"), "issue-url",
         "https://github.com/smolBlackCat/progress-tracker/issues", "website",
         "https://github.com/smolBlackCat/progress-tracker", NULL);
+}
+
+void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
+    card_dialog.open(*this, card_widget);
 }
 
 void ProgressWindow::setup_menu_button() {
