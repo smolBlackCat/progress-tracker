@@ -106,6 +106,7 @@ void TaskWidget::on_rename() {
     task_label->set_visible(false);
 
     task_entry->set_text(task->get_name());
+    task_entry->grab_focus();
 }
 
 void TaskWidget::off_rename() {
@@ -129,7 +130,7 @@ void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
 
 void TaskWidget::on_checkbox() {
     this->task->set_done(task_checkbutton->get_active());
-    this->card_details_dialog.get_card_widget().update_complete_tasks();
+    this->card_details_dialog.get_card_widget()->update_complete_tasks();
     if (task_checkbutton->get_active()) {
         task_label->set_markup(
             Glib::ustring::compose("<s>%1</s>", task->get_name()));

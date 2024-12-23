@@ -111,6 +111,7 @@ void EditableLabelHeader::to_editing_mode() {
     label.set_visible(false);
     menu_button.set_visible(false);
     revealer.set_reveal_child();
+    entry.grab_focus();
 }
 
 void EditableLabelHeader::exit_editing_mode() {

@@ -51,6 +51,9 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     root.append(add_card_button);
 
     append(cardlist_header);
+    // When TABbing through the board, don't focus on the Cardlist header
+    get_row_at_index(0)->set_focusable(false);
+
     for (auto& card : cardlist_refptr->get_cards()) {
         auto cur_builder = Gtk::Builder::create_from_resource(
             "/io/github/smolblackcat/Progress/card-widget.ui");
@@ -84,13 +87,12 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 ui::CardlistWidget::~CardlistWidget() {}
 
 void ui::CardlistWidget::reorder(ui::CardWidget& next,
-                                            ui::CardWidget& sibling) {
+                                 ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
     cardlist->reorder(*next.get_card(), *sibling.get_card());
 }
 
-const std::vector<ui::CardWidget*>&
-ui::CardlistWidget::get_card_widgets() {
+const std::vector<ui::CardWidget*>& ui::CardlistWidget::get_card_widgets() {
     return card_widgets;
 }
 
@@ -189,8 +191,7 @@ void ui::CardlistWidget::remove(ui::CardWidget* card) {
     }
 }
 
-ui::CardWidget* ui::CardlistWidget::add(const Card& card,
-                                             bool editing_mode) {
+ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
     auto card_builder = Gtk::Builder::create_from_resource(
         "/io/github/smolblackcat/Progress/card-widget.ui");
     auto new_card = Gtk::manage(Gtk::Builder::get_widget_derived<CardWidget>(
