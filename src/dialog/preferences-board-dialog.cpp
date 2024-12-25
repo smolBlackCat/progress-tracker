@@ -5,12 +5,14 @@
 
 #include <filesystem>
 
-#include "gtkmm/messagedialog.h"
+#include "adwaita.h"
 
 namespace ui {
 
 PreferencesBoardDialog::PreferencesBoardDialog(BoardWidget& board_widget)
     : BoardDialog{}, board_widget{board_widget} {
+    adw_dialog_set_title(ADW_DIALOG(board_dialog->gobj()),
+                         _("Board Preferences"));
     footer_button->set_label(_("Save"));
     load_board();
 }
@@ -87,6 +89,6 @@ void PreferencesBoardDialog::on_save_changes() {
     }
 
     board_widget.save(false);
-    close();
+    adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

@@ -16,11 +16,6 @@ BoardDialog::BoardDialog()
           builder->get_widget<Gtk::MenuButton>("background-setter-menubutton")},
       board_picture{builder->get_widget<Gtk::Picture>("board-picture")},
       footer_button{builder->get_widget<Gtk::Button>("footer-button")} {
-    g_signal_connect(board_dialog->gobj(), "close-attempt",
-                     G_CALLBACK(+[](AdwDialog* self, gpointer data) {
-                         reinterpret_cast<BoardDialog*>(data)->close();
-                     }),
-                     this);
     set_picture(Gdk::RGBA{0, 120, 212});
     auto group = Gio::SimpleActionGroup::create();
 
@@ -39,13 +34,6 @@ void BoardDialog::open(Gtk::Window& parent) {
     adw_dialog_present(ADW_DIALOG(board_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
     this->parent = &parent;
-}
-
-void BoardDialog::close() {
-    adw_dialog_force_close(ADW_DIALOG(board_dialog->gobj()));
-    // This line assumes that BoardDialog children will only be allocated to the
-    // heap
-    delete this;
 }
 
 void BoardDialog::on_set_image() {

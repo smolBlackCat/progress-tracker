@@ -3,11 +3,12 @@
 #include <glibmm/i18n.h>
 #include <utils.h>
 
-#include <iostream>
-
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(ProgressWindow& board_creator)
-    : BoardDialog{}, board_creator{board_creator} {}
+    : BoardDialog{}, board_creator{board_creator} {
+    adw_dialog_set_title(ADW_DIALOG(board_dialog->gobj()),
+                         _("Create New Board"));
+}
 
 CreateBoardDialog* CreateBoardDialog::create(ProgressWindow& board_creator) {
     return new CreateBoardDialog(board_creator);
@@ -52,6 +53,6 @@ void CreateBoardDialog::create_board() {
     }
 
     board_creator.add_local_board(backend);
-    close();
+    adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

@@ -13,11 +13,6 @@ public:
      */
     void open(Gtk::Window& parent);
 
-    /**
-     * @brief Closes the window dialog. The dialog is then destroyed
-     */
-    void close();
-
 protected:
     BoardDialog();
     void on_set_image();
