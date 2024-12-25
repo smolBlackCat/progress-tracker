@@ -46,10 +46,10 @@ CardDetailsDialog::CardDetailsDialog()
     unset_due_date_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_unset_due_date));
 
-    g_signal_connect(adw_dialog->gobj(), "close-attempt",
+    g_signal_connect(adw_dialog->gobj(), "closed",
                      G_CALLBACK(+[](AdwDialog* self, gpointer data) {
                          reinterpret_cast<CardDetailsDialog*>(data)->on_save();
-                         reinterpret_cast<CardDetailsDialog*>(data)->close();
+                         reinterpret_cast<CardDetailsDialog*>(data)->clear();
                      }),
                      this);
 
