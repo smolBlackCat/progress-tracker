@@ -62,6 +62,7 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
     card->remove(*task.get_task());
     tasks_box->remove(task);
+    std::erase(tasks_tracker, &task);
     cur_card_widget->update_complete_tasks();
 }
 
