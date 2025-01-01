@@ -79,9 +79,24 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     scr_window.get_vscrollbar()->set_visible(false);
     append(scr_window);
 
+    auto shortcut_controller = Gtk::ShortcutController::create();
+    shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>N"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->board.add_cardlist(CardList{_("New Cardlist")}, true);
+                return true;
+            })));
+    add_controller(shortcut_controller);
+
     // Makes the header and the list itself non-selectable
     get_row_at_index(0)->set_activatable(false);
     get_row_at_index(1)->set_activatable(false);
+
+    // Don't focus on the rows
+    get_row_at_index(1)->set_focusable(false);
+    get_row_at_index(0)->set_focusable(false);
 }
 
 ui::CardlistWidget::~CardlistWidget() {}

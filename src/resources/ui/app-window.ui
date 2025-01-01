@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' ?>
+<!-- Created with Cambalache 0.94.1 -->
 <interface>
+  <!-- interface-name app-window.ui -->
   <requires lib="gtk" version="4.10" />
   <requires lib="gio" version="2.0" />
-  <requires lib="adw" version="1.4" />
   <object class="AdwApplicationWindow" id="app-window">
     <property name="height-request">400</property>
     <property name="title">Progress</property>
@@ -103,6 +104,13 @@
         <attribute name="label" translatable="yes">Delete Boards</attribute>
       </item>
       <item>
+        <attribute name="action">win.shortcuts</attribute>
+        <attribute
+                    name="label"
+                    translatable="yes"
+                >Keyboard Shortcuts</attribute>
+      </item>
+      <item>
         <attribute name="action">win.about</attribute>
         <attribute name="label" translatable="yes">About Progress</attribute>
       </item>
@@ -115,9 +123,92 @@
         <attribute name="label" translatable="yes">Preferences</attribute>
       </item>
       <item>
+        <attribute name="action">win.shortcuts</attribute>
+        <attribute
+                    name="label"
+                    translatable="yes"
+                >Keyboard Shortcuts</attribute>
+      </item>
+      <item>
         <attribute name="action">win.about</attribute>
         <attribute name="label" translatable="yes">About Progress</attribute>
       </item>
     </section>
   </menu>
+  <object class="GtkShortcutsWindow" id="progress-shortcuts">
+    <property name="destroy-with-parent">True</property>
+    <property name="hide-on-close">True</property>
+    <property name="modal">True</property>
+    <property name="transient-for">app-window</property>
+    <child>
+      <object class="GtkShortcutsSection">
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Board Grid View</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="accelerator">&lt;Control&gt;D</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Enables deletion mode</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="accelerator">&lt;Control&gt;N</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Opens the create board dialog</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title">Board View</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="accelerator">&lt;Control&gt;P</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Opens the current board preferences dialog</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="accelerator">&lt;Control&gt;N</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Adds a card to the focused card list</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property
+                                    name="accelerator"
+                                >&lt;Control&gt;&lt;Shift&gt;N</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Adds a cardlist next to the focused card list</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="accelerator">&lt;Control&gt;D</property>
+                <property
+                                    name="title"
+                                    translatable="yes"
+                                >Open the focused card's details dialog</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
 </interface>

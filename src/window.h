@@ -3,6 +3,7 @@
 #include <adwaita.h>
 #include <gtkmm.h>
 #include <widgets/board-widget.h>
+
 #include "dialog/card-dialog.h"
 
 namespace ui {
@@ -79,6 +80,8 @@ public:
 
     void show_card_dialog(CardWidget* card_widget);
 
+    void show_shortcuts_dialog();
+
 protected:
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
@@ -91,6 +94,7 @@ protected:
     bool on_delete_mode = false;
     ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
+    Gtk::ShortcutsWindow* sh_window;
     Gtk::Button *home_button_p, *add_board_button_p;
     Gtk::Overlay* app_overlay_p;
     Gtk::Stack* app_stack_p;

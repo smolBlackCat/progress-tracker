@@ -59,7 +59,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
       progress_settings{progress_settings},
-      card_dialog{} {
+      card_dialog{},
+      sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
@@ -82,6 +83,50 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
             reinterpret_cast<ProgressWindow*>(data)->load_appropriate_style();
         }),
         this);
+
+    auto shortcut_controller = Gtk::ShortcutController::create();
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>D"),
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            if (app_stack_p->get_visible_child_name() == "board-grid-page") {
+                this->on_delete_board_mode();
+            }
+
+            return true;
+        })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>N"),
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            if (app_stack_p->get_visible_child_name() == "board-grid-page") {
+                auto create_board_dialog = CreateBoardDialog::create(*this);
+                create_board_dialog->open(*this);
+            }
+
+            return true;
+        })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>P"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                if (app_stack_p->get_visible_child_name() == "board-page") {
+                    auto preference_dialog =
+                        PreferencesBoardDialog::create(this->board_widget);
+                    preference_dialog->open(*this);
+                }
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>H"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                if (app_stack_p->get_visible_child_name() == "board-page") {
+                    this->on_main_menu();
+                }
+                return true;
+            })));
+    add_controller(shortcut_controller);
 
 #if defined(DEVELOPMENT)
     add_css_class("devel");
@@ -109,6 +154,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
             return 0;
         }
     });
+
+    sh_window->set_application(this->get_application());
 
     delete_boards_bar.set_halign(Gtk::Align::CENTER);
     delete_boards_bar.set_valign(Gtk::Align::END);
@@ -222,10 +269,15 @@ void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
     card_dialog.open(*this, card_widget);
 }
 
+void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
+
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
     action_group->add_action(
         "about", sigc::mem_fun(*this, &ProgressWindow::show_about_dialog));
+    action_group->add_action(
+        "shortcuts",
+        sigc::mem_fun(*this, &ProgressWindow::show_shortcuts_dialog));
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
     action_group->add_action("preferences", [this]() {

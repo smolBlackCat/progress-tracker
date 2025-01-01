@@ -168,8 +168,10 @@ void CardDetailsDialog::clear() {
         tasks_box->remove(*task_widget);
     }
     tasks_tracker.clear();
-
     notes_textbuffer->set_text("");
+
+    date_menubutton->set_label(_("Set Due Date"));
+    checkbutton_revealer->set_reveal_child(false);
 
     cur_card_widget = nullptr;
 }

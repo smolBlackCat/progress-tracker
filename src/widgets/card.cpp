@@ -38,6 +38,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
       card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
       color_dialog{Gtk::ColorDialog::create()} {
     set_title(card->get_name());
+
     if (is_new) {
         on_rename();  // Open card on rename mode by default whenever a new card
                       // is created
@@ -62,6 +63,26 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
             if (!card_cover_revealer->get_child_revealed())
                 this->card_cover_picture->set_paintable(nullptr);
         });
+
+    auto shortcut_controller = Gtk::ShortcutController::create();
+    shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>N"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                auto new_card = cardlist_p->add(Card{_("New Card")}, true);
+                cardlist_p->reorder(*new_card, *this);
+
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>D"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->open_card_details_dialog();
+                return true;
+            })));
+    this->add_controller(shortcut_controller);
 
     popover_menu.set_parent(*this);
     popover_menu.set_menu_model(card_menu_model);
@@ -138,7 +159,9 @@ void ui::CardWidget::set_title(const std::string& label) {
     card_entry->set_text(label);
 }
 
-std::string ui::CardWidget::get_title() const { return card_label->get_label(); }
+std::string ui::CardWidget::get_title() const {
+    return card_label->get_label();
+}
 
 void ui::CardWidget::remove_from_parent() {
     if (cardlist_p) {
@@ -389,28 +412,33 @@ std::string ui::CardWidget::create_details_text() const {
             auto delta_days = -(days - now).count();
 
             if (delta_days < 30) {
-                details_text << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext("This card is past due date %1 day ago",
-                                    "This card is past due date %1 days ago",
-                                    delta_days)),
-                           delta_days) << "\n\n";
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date %1 day ago",
+                               "This card is past due date %1 days ago",
+                               delta_days)),
+                           delta_days)
+                    << "\n\n";
             } else if (delta_days > 30 && delta_days < 365) {
                 long months_from_delta =
                     delta_days / 30;  // Assume every month has 30 days
                 details_text
                     << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext("This card is past due date %1 month ago",
-                                    "This card is past due date %1 months ago",
-                                    months_from_delta)),
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date %1 month ago",
+                               "This card is past due date %1 months ago",
+                               months_from_delta)),
                            months_from_delta)
                     << "\n\n";
             } else if (delta_days >= 365) {
                 long years_from_delta = delta_days / 365;  // Ignore leap years
                 details_text
                     << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext("This card is past due date %1 year ago",
-                                    "This card is past due date %1 years ago",
-                                    years_from_delta)),
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date %1 year ago",
+                               "This card is past due date %1 years ago",
+                               years_from_delta)),
                            years_from_delta)
                     << "\n\n";
             }
