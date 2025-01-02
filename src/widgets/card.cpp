@@ -52,16 +52,17 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{Gio::Menu::create()},
       color_dialog{Gtk::ColorDialog::create()} {
-    set_title(card->get_name());
-
     // Setup Widgets
     root_box.set_spacing(4);
     root_box.set_size_request(240, -1);
+
+    set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
 
     // Card's cover
     root_box.append(card_cover_revealer);
     card_cover_revealer.set_child(card_cover_picture);
     card_cover_picture.set_content_fit(Gtk::ContentFit::COVER);
+    card_cover_picture.add_css_class("card");
     card_cover_picture.set_size_request(-1, 50);
 
     // Card Body
@@ -130,6 +131,10 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     root_box.insert_at_end(*this);
 
     signal_destroy().connect(sigc::mem_fun(root_box, &Gtk::Widget::unparent));
+
+    // CardWidget Setup
+
+    set_title(card->get_name());
 
     if (is_new) {
         on_rename();  // Open card on rename mode by default whenever a new card
