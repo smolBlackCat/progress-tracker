@@ -112,19 +112,19 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_menu_button.set_menu_model(card_menu_model);
     card_menu_button.set_can_focus(false);
 
-    card_menu_model->append(Glib::locale_to_utf8(_("Rename")), "card.rename");
-    card_menu_model->append(Glib::locale_to_utf8(_("Card Details")),
+    card_menu_model->append(_("Rename"), "card.rename");
+    card_menu_model->append(_("Card Details"),
                             "card.details");
     auto card_cover_submenu = Gio::Menu::create();
-    card_cover_submenu->append(Glib::locale_to_utf8(_("Set Color")),
+    card_cover_submenu->append(_("Set Color"),
                                "card.set-color");
-    card_cover_submenu->append(Glib::locale_to_utf8(_("Unset Color")),
+    card_cover_submenu->append(_("Unset Color"),
                                "card.unset-color");
-    card_menu_model->append_submenu(Glib::locale_to_utf8(_("Card Cover")),
+    card_menu_model->append_submenu(_("Card Cover"),
                                     card_cover_submenu);
-    card_menu_model->append(Glib::locale_to_utf8(_("Remove")), "card.remove");
+    card_menu_model->append(_("Remove"), "card.remove");
 
-    card_menu_button.set_tooltip_text(Glib::locale_to_utf8(_("Card Options")));
+    card_menu_button.set_tooltip_text(_("Card Options"));
     card_menu_button.set_valign(Gtk::Align::CENTER);
     card_body.append(card_menu_button);
 
