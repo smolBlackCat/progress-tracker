@@ -7,42 +7,53 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
-#include "gdk/gdkkeysyms.h"
-#include "gdkmm/rectangle.h"
-#include "glibmm/ustring.h"
-#include "sigc++/functors/mem_fun.h"
 
 namespace ui {
 
-TaskWidget::TaskWidget(BaseObjectType* cobject,
-                       const Glib::RefPtr<Gtk::Builder>& builder,
-                       CardDetailsDialog& card_details_dialog,
+TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
                        CardWidget& card_widget, std::shared_ptr<Task> task,
                        bool is_new)
-    : Gtk::Box{cobject},
+    : Gtk::Box{},
       card_details_dialog{card_details_dialog},
       task{task},
       menu_model{Gio::Menu::create()},
       group{Gio::SimpleActionGroup::create()},
       popover_menu{menu_model},
       is_new{is_new} {
+    set_margin_start(5);
+    set_margin_end(5);
+    set_spacing(3);
+
+    Gtk::Box& inner_box =
+        *Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+    inner_box.set_valign(Gtk::Align::CENTER);
+    inner_box.append(task_label);
+    task_label.set_halign(Gtk::Align::START);
+    task_label.set_margin_start(5);
+    task_label.set_wrap();
+    task_label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
+    task_label.set_label(task->get_name());
+
+    inner_box.append(task_entry_revealer);
+    task_entry_revealer.set_hexpand();
+    task_entry_revealer.set_child(task_entry);
+
+    append(inner_box);
+
+    append(task_checkbutton);
+    task_checkbutton.set_halign(Gtk::Align::END);
+    task_checkbutton.set_hexpand();
+    task_checkbutton.set_margin_end(5);
+
     if (task->get_done()) {
         add_css_class("complete-task");
     } else {
         add_css_class("incomplete-task");
     }
 
-    task_label = builder->get_widget<Gtk::Label>("task-label");
-    task_label->set_label(task->get_name());
-    task_entry_revealer =
-        builder->get_widget<Gtk::Revealer>("task-entry-revealer");
-    task_entry = builder->get_widget<Gtk::Entry>("task-entry");
-    task_checkbutton =
-        builder->get_widget<Gtk::CheckButton>("task-checkbutton");
-
-    task_checkbutton->signal_toggled().connect(
+    task_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));
-    task_checkbutton->set_active(task->get_done());
+    task_checkbutton.set_active(task->get_done());
 
     menu_model->append(_("Rename"), "task-widget.rename");
     menu_model->append(_("Remove"), "task-widget.remove");
@@ -70,15 +81,10 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
         });
     this->add_controller(gesture_click);
 
-    auto focus_controller = Gtk::EventControllerFocus::create();
-    focus_controller->signal_leave().connect(
-        sigc::mem_fun(*this, &TaskWidget::off_rename));
-    task_entry->add_controller(focus_controller);
-
     auto key_controller = Gtk::EventControllerKey::create();
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
-            if (task_entry_revealer->get_child_revealed()) {
+            if (task_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
                     case (GDK_KEY_Return): {
                         off_rename();
@@ -88,7 +94,7 @@ TaskWidget::TaskWidget(BaseObjectType* cobject,
             }
         },
         false);
-    task_entry->add_controller(key_controller);
+    task_entry.add_controller(key_controller);
 
     setup_drag_and_drop();
 
@@ -102,24 +108,24 @@ TaskWidget::~TaskWidget() {}
 std::shared_ptr<Task> TaskWidget::get_task() { return task; }
 
 void TaskWidget::on_rename() {
-    task_entry_revealer->set_reveal_child();
-    task_label->set_visible(false);
+    task_entry_revealer.set_reveal_child();
+    task_label.set_visible(false);
 
-    task_entry->set_text(task->get_name());
-    task_entry->grab_focus();
+    task_entry.set_text(task->get_name());
+    task_entry.grab_focus();
 }
 
 void TaskWidget::off_rename() {
-    task_entry_revealer->set_reveal_child(false);
-    task_label->set_visible(true);
+    task_entry_revealer.set_reveal_child(false);
+    task_label.set_visible(true);
 
-    std::string new_label = task_entry->get_text();
+    std::string new_label = task_entry.get_text();
     if (new_label != task->get_name()) {
-        if (task_checkbutton->get_active()) {
-            task_label->set_markup(
+        if (task_checkbutton.get_active()) {
+            task_label.set_markup(
                 Glib::ustring::compose("<s>%1</s>", new_label));
         } else {
-            task_label->set_markup(new_label);
+            task_label.set_markup(new_label);
         }
         task->set_name(new_label);
         is_new = false;
@@ -129,15 +135,15 @@ void TaskWidget::off_rename() {
 void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
 
 void TaskWidget::on_checkbox() {
-    this->task->set_done(task_checkbutton->get_active());
+    this->task->set_done(task_checkbutton.get_active());
     this->card_details_dialog.get_card_widget()->update_complete_tasks();
-    if (task_checkbutton->get_active()) {
-        task_label->set_markup(
+    if (task_checkbutton.get_active()) {
+        task_label.set_markup(
             Glib::ustring::compose("<s>%1</s>", task->get_name()));
         add_css_class("complete-task");
         remove_css_class("incomplete-task");
     } else {
-        task_label->set_markup(task->get_name());
+        task_label.set_markup(task->get_name());
         add_css_class("incomplete-task");
         remove_css_class("complete-task");
     }

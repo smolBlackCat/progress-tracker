@@ -28,6 +28,7 @@ CardDetailsDialog::CardDetailsDialog()
       notes_textbuffer{
           builder->get_object<Gtk::TextBuffer>("notes-textbuffer")},
       adw_dialog{builder->get_object("card-dialog")} {
+
     checklist_add_button.signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_add_task));
 
@@ -178,10 +179,8 @@ void CardDetailsDialog::clear() {
 
 void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
                                   bool is_new) {
-    auto builder = Gtk::Builder::create_from_resource(
-        "/io/github/smolblackcat/Progress/checklist-item-widget.ui");
-    auto task_widget = Gtk::Builder::get_widget_derived<TaskWidget>(
-        builder, "task-widget", *this, *cur_card_widget, task, is_new);
+    auto task_widget =
+        Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
     tasks_box->append(*task_widget);
     tasks_tracker.push_back(task_widget);
 }
