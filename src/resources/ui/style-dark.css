@@ -29,10 +29,20 @@ list.rich-list {
     box-shadow: 0 0 2px #9a9996;
 }
 
-.card {
+card {
     background-color: #5e5c64;
     border-radius: 5px;
     box-shadow: 0 0 2px #000000;
+    transition-property: background-color, border, box-shadow, outline;
+    transition-duration: 1s;
+}
+
+card:focus {
+    box-shadow: 0 0 5px #3772af;
+    background-color: #6e6c74;
+    border: 1px solid #3772af;
+    transition-property: background-color, border, box-shadow, outline;
+    transition-duration: 1s;
 }
 
 .delete-board-infobar-text {

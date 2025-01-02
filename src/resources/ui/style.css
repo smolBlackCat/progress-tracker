@@ -31,10 +31,17 @@ list.rich-list {
     box-shadow: 0 0 2px #9a9996;
 }
 
-.card {
+card {
     background-color: #deddda;
     border-radius: 5px;
     box-shadow: 0 0 2px #9a9996;
+}
+
+card:focus {
+    padding: 4px;
+    box-shadow: 0 0 5px #4a90e2;
+    background-color: #f0f0f0;
+    border: 1px solid #4a90e2;
 }
 
 .delete-board-infobar-text {

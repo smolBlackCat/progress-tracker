@@ -55,11 +55,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     get_row_at_index(0)->set_focusable(false);
 
     for (auto& card : cardlist_refptr->get_cards()) {
-        auto cur_builder = Gtk::Builder::create_from_resource(
-            "/io/github/smolblackcat/Progress/card-widget.ui");
-        auto cardwidget =
-            Gtk::manage(cur_builder->get_widget_derived<CardWidget>(
-                cur_builder, "card-root", card));
+        auto cardwidget = Gtk::make_managed<CardWidget>(card);
         card_widgets.push_back(cardwidget);
         cardwidget->set_cardlist(this);
         root.append(*cardwidget);
@@ -207,10 +203,8 @@ void ui::CardlistWidget::remove(ui::CardWidget* card) {
 }
 
 ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
-    auto card_builder = Gtk::Builder::create_from_resource(
-        "/io/github/smolblackcat/Progress/card-widget.ui");
-    auto new_card = Gtk::manage(Gtk::Builder::get_widget_derived<CardWidget>(
-        card_builder, "card-root", cardlist->add(card), editing_mode));
+    ui::CardWidget* new_card =
+        Gtk::make_managed<ui::CardWidget>(cardlist->add(card), editing_mode);
     new_card->set_cardlist(this);
 
     card_widgets.push_back(new_card);

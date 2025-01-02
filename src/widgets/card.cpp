@@ -8,36 +8,128 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
+#include "gtk/gtk.h"
 #include "window.h"
 
-ui::CardWidget::CardWidget(BaseObjectType* cobject,
-                           const Glib::RefPtr<Gtk::Builder>& builder,
-                           std::shared_ptr<Card> card, bool is_new)
-    : Gtk::Box{cobject},
+extern "C" {
+static void card_class_init(void* g_class, void* data) {
+    g_return_if_fail(GTK_IS_WIDGET_CLASS(g_class));
+    gtk_widget_class_set_css_name(GTK_WIDGET_CLASS(g_class), "card");
+}
+
+static void card_init(GTypeInstance* instance, void* g_class) {
+    g_return_if_fail(GTK_IS_WIDGET(instance));
+
+    gtk_widget_set_focusable(GTK_WIDGET(instance), TRUE);
+    gtk_widget_set_receives_default(GTK_WIDGET(instance), TRUE);
+}
+}
+
+namespace ui {
+CardInit::CardInit()
+    : Glib::ExtraClassInit(card_class_init, nullptr, card_init) {}
+
+CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
+    : Glib::ObjectBase{"CardWidget"},
+      CardInit{},
+      Gtk::Widget{},
       card{card},
       cardlist_p{nullptr},
       is_new{is_new},
-      card_cover_revealer{
-          builder->get_widget<Gtk::Revealer>("card-cover-revealer")},
-      card_entry_revealer{
-          builder->get_widget<Gtk::Revealer>("card-entry-revealer")},
-      card_cover_picture{
-          builder->get_widget<Gtk::Picture>("card-cover-picture")},
-      card_label{builder->get_widget<Gtk::Label>("card-label")},
-      complete_tasks_label{
-          builder->get_widget<Gtk::Label>("complete-tasks-label")},
-      due_date_label{builder->get_widget<Gtk::Label>("due-date-label")},
-      card_entry{builder->get_widget<Gtk::Entry>("card-entry")},
-      card_menu_button{
-          builder->get_widget<Gtk::MenuButton>("card-menu-button")},
+      root_box{Gtk::Orientation::VERTICAL},
+      card_cover_revealer{},
+      card_entry_revealer{},
+      card_cover_picture{},
+      card_label{},
+      complete_tasks_label{},
+      due_date_label{},
+      card_entry{},
+      card_menu_button{},
       popover_menu{},
       key_controller{Gtk::EventControllerKey::create()},
       card_label_click_controller{Gtk::GestureClick::create()},
       focus_controller{Gtk::EventControllerFocus::create()},
       click_controller{Gtk::GestureClick::create()},
-      card_menu_model{builder->get_object<Gio::MenuModel>("card-menu-model")},
+      card_menu_model{Gio::Menu::create()},
       color_dialog{Gtk::ColorDialog::create()} {
     set_title(card->get_name());
+
+    // Setup Widgets
+    root_box.set_spacing(4);
+    root_box.set_size_request(240, -1);
+
+    // Card's cover
+    root_box.append(card_cover_revealer);
+    card_cover_revealer.set_child(card_cover_picture);
+    card_cover_picture.set_content_fit(Gtk::ContentFit::COVER);
+    card_cover_picture.set_size_request(-1, 50);
+
+    // Card Body
+    Gtk::Box& card_body = *Gtk::make_managed<Gtk::Box>();
+    card_body.set_margin(4);
+    card_body.set_spacing(10);
+    root_box.append(card_body);
+
+    // inner box
+    Gtk::Box& card_data_box =
+        *Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+    card_data_box.set_spacing(4);
+    card_data_box.set_valign(Gtk::Align::CENTER);
+
+    Gtk::Box& card_label_box =
+        *Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+    card_label_box.append(card_label);
+    card_label.set_halign(Gtk::Align::START);
+    card_label.set_hexpand();
+    card_label.set_label(Glib::locale_to_utf8(_("New Card")));
+    card_label.set_wrap();
+    card_label.set_natural_wrap_mode(Gtk::NaturalWrapMode::WORD);
+    card_label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
+
+    card_label_box.append(card_entry_revealer);
+    card_entry_revealer.set_child(card_entry);
+    card_entry.set_hexpand();
+    card_data_box.append(card_label_box);
+
+    Gtk::Box& card_info_box = *Gtk::make_managed<Gtk::Box>();
+    card_info_box.set_spacing(15);
+
+    card_info_box.append(complete_tasks_label);
+    complete_tasks_label.set_visible(false);
+
+    card_info_box.append(due_date_label);
+    due_date_label.add_css_class("due-date");
+    due_date_label.set_visible(false);
+
+    card_data_box.append(card_info_box);
+
+    card_body.append(card_data_box);
+
+    card_menu_button.set_halign(Gtk::Align::CENTER);
+    card_menu_button.set_has_frame(false);
+    card_menu_button.set_icon_name("view-more-horizontal-symbolic");
+    card_menu_button.set_menu_model(card_menu_model);
+    card_menu_button.set_can_focus(false);
+
+    card_menu_model->append(Glib::locale_to_utf8(_("Rename")), "card.rename");
+    card_menu_model->append(Glib::locale_to_utf8(_("Card Details")),
+                            "card.details");
+    auto card_cover_submenu = Gio::Menu::create();
+    card_cover_submenu->append(Glib::locale_to_utf8(_("Set Color")),
+                               "card.set-color");
+    card_cover_submenu->append(Glib::locale_to_utf8(_("Unset Color")),
+                               "card.unset-color");
+    card_menu_model->append_submenu(Glib::locale_to_utf8(_("Card Cover")),
+                                    card_cover_submenu);
+    card_menu_model->append(Glib::locale_to_utf8(_("Remove")), "card.remove");
+
+    card_menu_button.set_tooltip_text(Glib::locale_to_utf8(_("Card Options")));
+    card_menu_button.set_valign(Gtk::Align::CENTER);
+    card_body.append(card_menu_button);
+
+    root_box.insert_at_end(*this);
+
+    signal_destroy().connect(sigc::mem_fun(root_box, &Gtk::Widget::unparent));
 
     if (is_new) {
         on_rename();  // Open card on rename mode by default whenever a new card
@@ -46,22 +138,21 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
 
     auto card_actions = Gio::SimpleActionGroup::create();
     card_actions->add_action("rename",
-                             sigc::mem_fun(*this, &ui::CardWidget::on_rename));
+                             sigc::mem_fun(*this, &CardWidget::on_rename));
     card_actions->add_action(
-        "details",
-        sigc::mem_fun(*this, &ui::CardWidget::open_card_details_dialog));
+        "details", sigc::mem_fun(*this, &CardWidget::open_card_details_dialog));
     card_actions->add_action(
-        "set-color", sigc::mem_fun(*this, &ui::CardWidget::open_color_dialog));
+        "set-color", sigc::mem_fun(*this, &CardWidget::open_color_dialog));
     card_actions->add_action("unset-color",
                              sigc::mem_fun(*this, &CardWidget::clear_color));
     card_actions->add_action(
-        "remove", sigc::mem_fun(*this, &ui::CardWidget::remove_from_parent));
-    card_menu_button->insert_action_group("card", card_actions);
+        "remove", sigc::mem_fun(*this, &CardWidget::remove_from_parent));
+    card_menu_button.insert_action_group("card", card_actions);
 
-    card_cover_revealer->property_child_revealed().signal_changed().connect(
+    card_cover_revealer.property_child_revealed().signal_changed().connect(
         [this]() {
-            if (!card_cover_revealer->get_child_revealed())
-                this->card_cover_picture->set_paintable(nullptr);
+            if (!card_cover_revealer.get_child_revealed())
+                this->card_cover_picture.set_paintable(nullptr);
         });
 
     auto shortcut_controller = Gtk::ShortcutController::create();
@@ -84,13 +175,13 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
             })));
     this->add_controller(shortcut_controller);
 
-    popover_menu.set_parent(*this);
+    popover_menu.set_parent(root_box);
     popover_menu.set_menu_model(card_menu_model);
     popover_menu.insert_action_group("card", card_actions);
 
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
-            if (card_entry_revealer->get_child_revealed()) {
+            if (card_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
                     case GDK_KEY_Return: {
                         this->on_confirm_changes();
@@ -108,7 +199,7 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
 
     card_label_click_controller->signal_released().connect(
         [this](int n_pressed, double x, double y) {
-            if (n_pressed >= 1 && !card_entry_revealer->get_child_revealed() &&
+            if (n_pressed >= 1 && !card_entry_revealer.get_child_revealed() &&
                 this->card_label_click_controller->get_current_button() ==
                     GDK_BUTTON_PRIMARY) {
                 this->on_rename();
@@ -130,9 +221,9 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
         this->off_rename();
     });
 
-    card_entry->add_controller(key_controller);
-    card_entry->add_controller(focus_controller);
-    card_label->add_controller(card_label_click_controller);
+    card_entry.add_controller(key_controller);
+    card_entry.add_controller(focus_controller);
+    card_label.add_controller(card_label_click_controller);
     add_controller(click_controller);
 
     if (card->is_color_set()) {
@@ -154,45 +245,51 @@ ui::CardWidget::CardWidget(BaseObjectType* cobject,
     setup_drag_and_drop();
 }
 
-void ui::CardWidget::set_title(const std::string& label) {
-    card_label->set_label(label);
-    card_entry->set_text(label);
+CardWidget::~CardWidget() {
+    if (!gobj()) {
+        return;
+    }
+
+    root_box.unparent();
 }
 
-std::string ui::CardWidget::get_title() const {
-    return card_label->get_label();
+void CardWidget::set_title(const std::string& label) {
+    card_label.set_label(label);
+    card_entry.set_text(label);
 }
 
-void ui::CardWidget::remove_from_parent() {
+std::string CardWidget::get_title() const { return card_label.get_label(); }
+
+void CardWidget::remove_from_parent() {
     if (cardlist_p) {
         cardlist_p->remove(this);
     }
 }
 
-void ui::CardWidget::set_cardlist(ui::CardlistWidget* cardlist_p) {
+void CardWidget::set_cardlist(CardlistWidget* cardlist_p) {
     if (cardlist_p) {
         this->cardlist_p = cardlist_p;
     }
 }
 
-std::shared_ptr<Card> ui::CardWidget::get_card() { return card; }
+std::shared_ptr<Card> CardWidget::get_card() { return card; }
 
-ui::CardlistWidget const* ui::CardWidget::get_cardlist_widget() const {
+CardlistWidget const* CardWidget::get_cardlist_widget() const {
     return cardlist_p;
 }
 
-void ui::CardWidget::update_complete_tasks() {
+void CardWidget::update_complete_tasks() {
     if (card->get_tasks().empty()) {
-        complete_tasks_label->set_label("");
-        complete_tasks_label->set_visible(false);
+        complete_tasks_label.set_label("");
+        complete_tasks_label.set_visible(false);
     } else {
-        complete_tasks_label->set_visible();
+        complete_tasks_label.set_visible();
         float n_complete_tasks =
             std::accumulate(card->get_tasks().begin(), card->get_tasks().end(),
                             0, [](int acc, const std::shared_ptr<Task>& task) {
                                 return task->get_done() ? ++acc : acc;
                             });
-        complete_tasks_label->set_label(
+        complete_tasks_label.set_label(
             std::format("{}/{}", n_complete_tasks, card->get_tasks().size()));
 
         // Silences warning about deleting empty css classes
@@ -200,28 +297,28 @@ void ui::CardWidget::update_complete_tasks() {
     }
 }
 
-void ui::CardWidget::update_due_date() {
+void CardWidget::update_due_date() {
     if (card->get_due_date().ok()) {
-        due_date_label->set_visible();
+        due_date_label.set_visible();
         auto sys_days = std::chrono::sys_days(card->get_due_date());
         sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
 
         char date_str[255];
         strftime(date_str, 255, "%d %b, %Y", std::localtime(&time));
-        due_date_label->set_label(_("Due: ") + Glib::ustring{date_str});
+        due_date_label.set_label(_("Due: ") + Glib::ustring{date_str});
 
         update_due_date_label_style();
     } else {
-        due_date_label->set_visible(false);
+        due_date_label.set_visible(false);
     }
 }
 
-void ui::CardWidget::update_due_date_label_style() {
+void CardWidget::update_due_date_label_style() {
     auto date_now = Date{std::chrono::floor<std::chrono::days>(
         std::chrono::system_clock::now())};
     auto date_in_card = card->get_due_date();
-    due_date_label->remove_css_class(last_due_date_label_css_class);
+    due_date_label.remove_css_class(last_due_date_label_css_class);
 
     if (card->get_complete()) {
         last_due_date_label_css_class = "due-date-complete";
@@ -231,13 +328,12 @@ void ui::CardWidget::update_due_date_label_style() {
         last_due_date_label_css_class = "due-date";
     }
 
-    due_date_label->add_css_class(last_due_date_label_css_class);
+    due_date_label.add_css_class(last_due_date_label_css_class);
 }
 
-void ui::CardWidget::update_complete_tasks_style(
-    unsigned long n_complete_tasks) {
+void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
     if (!last_complete_tasks_label_css_class.empty())
-        complete_tasks_label->remove_css_class(
+        complete_tasks_label.remove_css_class(
             last_complete_tasks_label_css_class);
 
     if (n_complete_tasks == card->get_tasks().size()) {
@@ -250,17 +346,104 @@ void ui::CardWidget::update_complete_tasks_style(
     } else if (n_complete_tasks >= card->get_tasks().size() / 2.0F) {
         last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
     }
-    complete_tasks_label->add_css_class(last_complete_tasks_label_css_class);
+    complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
 }
 
-void ui::CardWidget::setup_drag_and_drop() {
+int CardWidget::get_n_visible_children() const {
+    int n_children = 0;
+    for (const Widget* child = get_first_child(); child;
+         child = child->get_next_sibling()) {
+        if (child->get_visible()) ++n_children;
+    }
+    return n_children;
+}
+
+Gtk::SizeRequestMode CardWidget::get_request_mode_vfunc() {
+    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
+}
+
+void CardWidget::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                               int& minimum, int& natural,
+                               int& minimum_baseline,
+                               int& natural_baseline) const {
+    // Don't use baseline alignment.
+    minimum_baseline = -1;
+    natural_baseline = -1;
+
+    minimum = 0;
+    natural = 0;
+
+    // Number of visible children.
+    const int nvis_children = get_n_visible_children();
+
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        // Divide the height equally among the visible children.
+        if (for_size > 0 && nvis_children > 0) for_size /= nvis_children;
+
+        // Request a width equal to the width of the widest visible child.
+    }
+
+    for (const Widget* child = get_first_child(); child;
+         child = child->get_next_sibling())
+        if (child->get_visible()) {
+            int child_minimum, child_natural, ignore;
+            child->measure(orientation, for_size, child_minimum, child_natural,
+                           ignore, ignore);
+            minimum = std::max(minimum, child_minimum);
+            natural = std::max(natural, child_natural);
+        }
+
+    if (orientation == Gtk::Orientation::VERTICAL) {
+        // The allocated height will be divided equally among the visible
+        // children. Request a height equal to the number of visible
+        // children times the height of the highest child.
+        minimum *= nvis_children;
+        natural *= nvis_children;
+    }
+}
+
+void CardWidget::size_allocate_vfunc(int width, int height, int baseline) {
+    // Do something with the space that we have actually been given:
+    //(We will not be given heights or widths less than we have requested,
+    // though we might get more.)
+
+    // Number of visible children.
+    const int nvis_children = get_n_visible_children();
+
+    if (nvis_children <= 0) {
+        // No visible child.
+        return;
+    }
+
+    // Assign space to the children:
+    Gtk::Allocation child_allocation;
+    const int height_per_child = height / nvis_children;
+
+    // Place the first visible child at the top-left:
+    child_allocation.set_x(0);
+    child_allocation.set_y(0);
+
+    // Make it take up the full width available:
+    child_allocation.set_width(width);
+    child_allocation.set_height(height_per_child);
+
+    // Divide the height equally among the visible children.
+    for (Widget* child = get_first_child(); child;
+         child = child->get_next_sibling())
+        if (child->get_visible()) {
+            child->size_allocate(child_allocation, baseline);
+            child_allocation.set_y(child_allocation.get_y() + height_per_child);
+        }
+}
+
+void CardWidget::setup_drag_and_drop() {
     // DragSource Settings
     auto drag_source_c = Gtk::DragSource::create();
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     drag_source_c->signal_prepare().connect(
         [this, drag_source_c](double x, double y) {
-            Glib::Value<ui::CardWidget*> value_new_cardptr;
-            value_new_cardptr.init(Glib::Value<ui::CardWidget*>::value_type());
+            Glib::Value<CardWidget*> value_new_cardptr;
+            value_new_cardptr.init(Glib::Value<CardWidget*>::value_type());
             value_new_cardptr.set(this);
             auto card_icon = Gtk::WidgetPaintable::create(*this);
             drag_source_c->set_icon(card_icon, x, y);
@@ -287,13 +470,13 @@ void ui::CardWidget::setup_drag_and_drop() {
 
     // DropTarget Settings
     auto drop_target_c = Gtk::DropTarget::create(
-        Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
+        Glib::Value<CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
             this->cardlist_p->board.set_on_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
-                              Glib::Value<ui::CardWidget*>::value_type())) {
-                Glib::Value<ui::CardWidget*> dropped_value;
+                              Glib::Value<CardWidget*>::value_type())) {
+                Glib::Value<CardWidget*> dropped_value;
                 dropped_value.init(value.gobj());
                 auto dropped_card = dropped_value.get();
 
@@ -318,7 +501,7 @@ void ui::CardWidget::setup_drag_and_drop() {
     add_controller(drop_target_c);
 }
 
-void ui::CardWidget::open_color_dialog() {
+void CardWidget::open_color_dialog() {
     color_dialog->choose_rgba(
         *static_cast<Gtk::Window*>(get_root()),
         [this](const Glib::RefPtr<Gio::AsyncResult>& result) {
@@ -331,56 +514,56 @@ void ui::CardWidget::open_color_dialog() {
         });
 }
 
-void ui::CardWidget::open_card_details_dialog() {
+void CardWidget::open_card_details_dialog() {
     auto& parent_window = *(static_cast<ProgressWindow*>(get_root()));
     parent_window.show_card_dialog(this);
 }
 
-void ui::CardWidget::on_rename() {
-    card_entry_revealer->set_reveal_child(true);
-    card_label->set_visible(false);
-    card_entry->grab_focus();
+void CardWidget::on_rename() {
+    card_entry_revealer.set_reveal_child(true);
+    card_label.set_visible(false);
+    card_entry.grab_focus();
 }
 
-void ui::CardWidget::off_rename() {
-    card_label->set_visible();
-    card_entry_revealer->set_reveal_child(false);
+void CardWidget::off_rename() {
+    card_label.set_visible();
+    card_entry_revealer.set_reveal_child(false);
 }
 
-void ui::CardWidget::clear_color() {
-    card_cover_revealer->set_reveal_child(false);
+void CardWidget::clear_color() {
+    card_cover_revealer.set_reveal_child(false);
     card->set_color(NO_COLOR);
 }
 
-void ui::CardWidget::on_confirm_changes() {
-    if (card_entry->get_text().compare(card_label->get_label()) != 0) {
-        card->set_name(card_entry->get_text());
-        card_label->set_label(card_entry->get_text());
+void CardWidget::on_confirm_changes() {
+    if (card_entry.get_text().compare(card_label.get_label()) != 0) {
+        card->set_name(card_entry.get_text());
+        card_label.set_label(card_entry.get_text());
     }
     is_new = false;
 }
 
-void ui::CardWidget::on_cancel_changes() {
+void CardWidget::on_cancel_changes() {
     if (is_new) {
         remove_from_parent();
     }
 }
 
-void ui::CardWidget::set_color(const Gdk::RGBA& color) {
+void CardWidget::set_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
     card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
                           color.get_blue() * 255, 1.0});
     color_frame_pixbuf->fill(rgb_to_hex(card->get_color()));
-    if (card_cover_picture->get_paintable()) {
-        card_cover_picture->set_paintable(nullptr);
+    if (card_cover_picture.get_paintable()) {
+        card_cover_picture.set_paintable(nullptr);
     }
-    card_cover_picture->set_paintable(
+    card_cover_picture.set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
-    card_cover_revealer->set_reveal_child(true);
+    card_cover_revealer.set_reveal_child(true);
 }
 
-std::string ui::CardWidget::create_details_text() const {
+std::string CardWidget::create_details_text() const {
     using namespace std::chrono;
 
     std::ostringstream details_text;
@@ -457,3 +640,4 @@ std::string ui::CardWidget::create_details_text() const {
 
     return final_text;
 }
+}  // namespace ui

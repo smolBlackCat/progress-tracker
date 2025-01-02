@@ -6,15 +6,26 @@
 #include <memory>
 
 #include "cardlist-widget.h"
+#include "glibmm/extraclassinit.h"
+
+extern "C" {
+static void card_class_init(void* g_class, void* data);
+static void card_init(GTypeInstance* instance, void* g_class);
+}
 
 namespace ui {
 
 class CardlistWidget;
 
+class CardInit : public Glib::ExtraClassInit {
+public:
+    CardInit();
+};
+
 /**
  * @brief Card widget
  */
-class CardWidget : public Gtk::Box {
+class CardWidget : public CardInit, public Gtk::Widget {
 public:
     /**
      * @brief CardWidget constructor
@@ -24,9 +35,9 @@ public:
      * scratch rather than being loaded from a Progress board file. True means
      * the Card did not come from a file otherwise False
      */
-    CardWidget(BaseObjectType* cobject,
-               const Glib::RefPtr<Gtk::Builder>& builder,
-               std::shared_ptr<Card> card, bool is_new = false);
+    CardWidget(std::shared_ptr<Card> card, bool is_new = false);
+
+    ~CardWidget();
 
     void set_title(const std::string& label);
 
@@ -45,7 +56,7 @@ public:
     void set_cardlist(ui::CardlistWidget* cardlist_p);
 
     /**
-     * @brief Sets this card's colour
+     * @brief Sets this card cover's colour
      *
      * @param color rgba object representing the colour
      */
@@ -94,18 +105,19 @@ public:
 
 protected:
     bool is_new;
-    Gtk::Revealer *card_cover_revealer, *card_entry_revealer;
-    Gtk::Picture* card_cover_picture;
-    Gtk::Label *card_label, *complete_tasks_label, *due_date_label;
-    Gtk::Entry* card_entry;
-    Gtk::MenuButton* card_menu_button;
+    Gtk::Box root_box;
+    Gtk::Revealer card_cover_revealer, card_entry_revealer;
+    Gtk::Picture card_cover_picture;
+    Gtk::Label card_label, complete_tasks_label, due_date_label;
+    Gtk::Entry card_entry;
+    Gtk::MenuButton card_menu_button;
     Gtk::PopoverMenu popover_menu;
 
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> card_label_click_controller,
         click_controller;
     Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
-    Glib::RefPtr<Gio::MenuModel> card_menu_model;
+    Glib::RefPtr<Gio::Menu> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
     ui::CardlistWidget* cardlist_p;
@@ -113,6 +125,14 @@ protected:
 
     std::string last_complete_tasks_label_css_class = "";
     std::string last_due_date_label_css_class = "due-date";
+
+    int get_n_visible_children() const;
+
+    Gtk::SizeRequestMode get_request_mode_vfunc();
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum,
+                       int& natural, int& minimum_baseline,
+                       int& natural_baseline) const;
+    void size_allocate_vfunc(int width, int height, int baseline);
 
     void setup_drag_and_drop();
     void open_color_dialog();

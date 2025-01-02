@@ -5,7 +5,6 @@
         <file>io.github.smolblackcat.Progress.svg</file>
         <file>style.css</file>
         <file>style-dark.css</file>
-        <file>card-widget.ui</file>
         <file>app-window.ui</file>
         <file>board-dialog.ui</file>
     </gresource>
