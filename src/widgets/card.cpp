@@ -48,7 +48,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
       popover_menu{},
       key_controller{Gtk::EventControllerKey::create()},
       card_label_click_controller{Gtk::GestureClick::create()},
-      focus_controller{Gtk::EventControllerFocus::create()},
       click_controller{Gtk::GestureClick::create()},
       card_menu_model{Gio::Menu::create()},
       color_dialog{Gtk::ColorDialog::create()} {
@@ -113,15 +112,11 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_menu_button.set_can_focus(false);
 
     card_menu_model->append(_("Rename"), "card.rename");
-    card_menu_model->append(_("Card Details"),
-                            "card.details");
+    card_menu_model->append(_("Card Details"), "card.details");
     auto card_cover_submenu = Gio::Menu::create();
-    card_cover_submenu->append(_("Set Color"),
-                               "card.set-color");
-    card_cover_submenu->append(_("Unset Color"),
-                               "card.unset-color");
-    card_menu_model->append_submenu(_("Card Cover"),
-                                    card_cover_submenu);
+    card_cover_submenu->append(_("Set Color"), "card.set-color");
+    card_cover_submenu->append(_("Unset Color"), "card.unset-color");
+    card_menu_model->append_submenu(_("Card Cover"), card_cover_submenu);
     card_menu_model->append(_("Remove"), "card.remove");
 
     card_menu_button.set_tooltip_text(_("Card Options"));
@@ -221,13 +216,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
             }
         });
 
-    focus_controller->signal_leave().connect([this]() {
-        this->on_confirm_changes();
-        this->off_rename();
-    });
-
     card_entry.add_controller(key_controller);
-    card_entry.add_controller(focus_controller);
     card_label.add_controller(card_label_click_controller);
     add_controller(click_controller);
 
