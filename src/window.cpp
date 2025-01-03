@@ -96,7 +96,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
             return true;
         })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>N"),
+        Gtk::ShortcutTrigger::parse_string("<Control>B"),
         Gtk::CallbackAction::create([this](Gtk::Widget&,
                                            const Glib::VariantBase&) {
             if (app_stack_p->get_visible_child_name() == "board-grid-page") {
@@ -224,6 +224,7 @@ void ProgressWindow::off_delete_board_mode() {
 
 void ProgressWindow::on_main_menu() {
     app_stack_p->set_visible_child("board-grid-page");
+    sh_window->property_view_name().set_value("board-grid-view");
     app_menu_button_p->set_menu_model(board_grid_menu_p);
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
@@ -234,6 +235,7 @@ void ProgressWindow::on_main_menu() {
 
 void ProgressWindow::on_board_view() {
     app_stack_p->set_visible_child("board-page");
+    sh_window->property_view_name().set_value("board-view");
     app_menu_button_p->set_menu_model(board_menu_p);
     home_button_p->set_visible();
     add_board_button_p->set_visible(false);

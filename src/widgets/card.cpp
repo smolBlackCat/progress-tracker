@@ -173,6 +173,83 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                 this->open_card_details_dialog();
                 return true;
             })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>R"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->on_rename();
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control><Shift>C"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->open_color_dialog();
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->remove_from_parent();
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Up"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                CardWidget* previous_card =
+                    static_cast<CardWidget*>(this->get_prev_sibling());
+                if (previous_card) {
+                    this->cardlist_p->reorder(*previous_card, *this);
+                }
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Down"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                Widget* next = this->get_next_sibling();
+
+                if (!(G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
+                                                 Gtk::Button::get_type()))) {
+                    this->cardlist_p->reorder(*this,
+                                              *static_cast<CardWidget*>(next));
+                }
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Left"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                CardlistWidget* prev_parent = static_cast<CardlistWidget*>(
+                    this->cardlist_p->get_prev_sibling());
+
+                if (prev_parent) {
+                    this->remove_from_parent();
+                    auto this_card = prev_parent->add(*this->card);
+                    this_card->grab_focus();
+                }
+
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Right"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                Widget* next_parent = this->cardlist_p->get_next_sibling();
+
+                if (!(G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
+                                                 Gtk::Button::get_type()))) {
+                    CardlistWidget* next_cardlist =
+                        static_cast<CardlistWidget*>(next_parent);
+                    this->remove_from_parent();
+                    auto this_card = next_cardlist->add(*this->card);
+                    this_card->grab_focus();
+                }
+
+                return true;
+            })));
     this->add_controller(shortcut_controller);
 
     popover_menu.set_parent(root_box);

@@ -84,6 +84,13 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                 this->board.add_cardlist(CardList{_("New Cardlist")}, true);
                 return true;
             })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->board.remove_cardlist(*this);
+                return true;
+            })));
     add_controller(shortcut_controller);
 
     // Makes the header and the list itself non-selectable
