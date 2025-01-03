@@ -5,7 +5,6 @@ src/dialog/create_board_dialog.cpp
 src/dialog/preferences-board-dialog.cpp
 src/resources/ui/app-window.ui
 src/resources/ui/card-details-dialog.ui
-src/resources/ui/card-widget.ui
 src/resources/ui/board-dialog.ui
 src/widgets/board-widget.cpp
 src/widgets/card.cpp

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-25 12:52-0300\n"
+"POT-Creation-Date: 2025-01-03 11:50-0300\n"
 "PO-Revision-Date: 2024-05-10 20:17-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -29,15 +29,15 @@ msgstr "Eliminar"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/window.cpp:214
+#: src/window.cpp:263
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Todos los derechos reservados"
 
-#: src/window.cpp:216
+#: src/window.cpp:265
 msgid "translator-credits"
 msgstr "haggen88"
 
-#: src/window.cpp:256
+#: src/window.cpp:310
 msgid "It was not possible to load this board"
 msgstr "No ha sido posible cargar este tablero"
 
@@ -45,19 +45,20 @@ msgstr "No ha sido posible cargar este tablero"
 msgid "Add Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:113
+#: src/dialog/card-dialog.cpp:115
 msgid "New Task"
 msgstr ""
 
-#: src/dialog/card-dialog.cpp:142 src/resources/ui/card-details-dialog.ui:65
+#: src/dialog/card-dialog.cpp:144 src/dialog/card-dialog.cpp:174
+#: src/resources/ui/card-details-dialog.ui:65
 msgid "Set Due Date"
 msgstr ""
 
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:42
 msgid "Select a file"
 msgstr "Seleccione un archivo"
 
-#: src/dialog/board-dialog.cpp:59
+#: src/dialog/board-dialog.cpp:47
 msgid "Image Files"
 msgstr "Archivos de imagen"
 
@@ -78,29 +79,117 @@ msgstr ""
 msgid "Save"
 msgstr "Guardar"
 
-#: src/resources/ui/app-window.ui:68
+#: src/resources/ui/app-window.ui:69
 msgid "Homepage"
 msgstr "Página de inicio"
 
-#: src/resources/ui/app-window.ui:78
+#: src/resources/ui/app-window.ui:79
 msgid "Add Board"
 msgstr "Añadir Tablero"
 
-#: src/resources/ui/app-window.ui:90
+#: src/resources/ui/app-window.ui:91
 msgid "Main Menu"
 msgstr "Menú principal"
 
-#: src/resources/ui/app-window.ui:103
+#: src/resources/ui/app-window.ui:104
 msgid "Delete Boards"
 msgstr "Eliminar Tableros"
 
-#: src/resources/ui/app-window.ui:107 src/resources/ui/app-window.ui:119
+#: src/resources/ui/app-window.ui:111 src/resources/ui/app-window.ui:130
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:115 src/resources/ui/app-window.ui:134
 msgid "About Progress"
 msgstr "Acerca de Progress"
 
-#: src/resources/ui/app-window.ui:115
+#: src/resources/ui/app-window.ui:123
 msgid "Preferences"
 msgstr "Preferencias"
+
+#: src/resources/ui/app-window.ui:151
+msgid "Board Grid View"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:160
+msgid "Allows the user the user to delete boards by selecting them"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:165
+msgid "Enable deletion"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:174
+msgid "Open dialog to create a new board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:181
+msgid "Board View"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:189
+msgid "Open preferences dialog"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:198
+msgid "Automatically save the board and head to the board grid view"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:199
+msgid "Go home"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:209
+msgid "Card Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:217
+msgid "Add a new card next to the focused card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:226
+msgid "It opens a dialog presenting the card extra settings"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:230
+msgid "See card details"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:239
+msgid "Rename card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:250
+msgid "Opens a color dialog so the user can set the card's cover's color"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:251
+msgid "Set color"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:260
+msgid "Deletes current focused card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:271
+msgid "Reorder card within cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:282
+msgid "Moves a card to previous or next cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:292
+msgid "Cardlist Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:300
+msgid "Add a new cardlist next to the focused cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:309
+msgid "Deletes cardlist from board"
+msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:36
 msgid "Card Title"
@@ -122,7 +211,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:155 src/widgets/card.cpp:421
+#: src/resources/ui/card-details-dialog.ui:155 src/widgets/card.cpp:703
 msgid "Notes"
 msgstr ""
 
@@ -130,40 +219,9 @@ msgstr ""
 msgid "Delete Card"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:195
-#: src/resources/ui/card-widget.ui:103
+#: src/resources/ui/card-details-dialog.ui:195 src/widgets/card.cpp:115
 msgid "Card Details"
 msgstr ""
-
-#: src/resources/ui/card-widget.ui:45 src/widgets/cardlist-widget.cpp:50
-msgid "New Card"
-msgstr "Nueva tarjeta"
-
-#: src/resources/ui/card-widget.ui:89
-msgid "Card Options"
-msgstr ""
-
-#: src/resources/ui/card-widget.ui:99 src/widgets/editable-label-header.cpp:76
-#: src/widgets/task-widget.cpp:47
-msgid "Rename"
-msgstr "Renombrar"
-
-#: src/resources/ui/card-widget.ui:106
-msgid "Card Cover"
-msgstr ""
-
-#: src/resources/ui/card-widget.ui:109 src/resources/ui/board-dialog.ui:101
-msgid "Set Color"
-msgstr ""
-
-#: src/resources/ui/card-widget.ui:113
-msgid "Unset Color"
-msgstr ""
-
-#: src/resources/ui/card-widget.ui:118 src/widgets/cardlist-widget.cpp:31
-#: src/widgets/task-widget.cpp:48
-msgid "Remove"
-msgstr "Eliminar"
 
 #: src/resources/ui/board-dialog.ui:34
 msgid "Board Title"
@@ -181,6 +239,10 @@ msgstr ""
 msgid "Create Board"
 msgstr "Crear tablero"
 
+#: src/resources/ui/board-dialog.ui:101 src/widgets/card.cpp:117
+msgid "Set Color"
+msgstr ""
+
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
 msgstr ""
@@ -193,40 +255,67 @@ msgstr "Añadir lista"
 msgid "New CardList"
 msgstr "Nueva lista de tarjetas"
 
-#: src/widgets/card.cpp:189
+#: src/widgets/card.cpp:84 src/widgets/card.cpp:164
+#: src/widgets/cardlist-widget.cpp:50
+msgid "New Card"
+msgstr "Nueva tarjeta"
+
+#: src/widgets/card.cpp:114 src/widgets/editable-label-header.cpp:76
+#: src/widgets/task-widget.cpp:58
+msgid "Rename"
+msgstr "Renombrar"
+
+#: src/widgets/card.cpp:118
+msgid "Unset Color"
+msgstr ""
+
+#: src/widgets/card.cpp:119
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/card.cpp:120 src/widgets/cardlist-widget.cpp:31
+#: src/widgets/task-widget.cpp:59
+msgid "Remove"
+msgstr "Eliminar"
+
+#: src/widgets/card.cpp:122
+msgid "Card Options"
+msgstr ""
+
+#: src/widgets/card.cpp:380
 msgid "Due: "
 msgstr ""
 
-#: src/widgets/card.cpp:366
+#: src/widgets/card.cpp:643
 msgid "%1%% complete"
 msgstr ""
 
-#: src/widgets/card.cpp:376
+#: src/widgets/card.cpp:653
 msgid "This card is complete"
 msgstr ""
 
-#: src/widgets/card.cpp:381
+#: src/widgets/card.cpp:658
 #, c-format
 msgid "This card is due %x"
 msgstr ""
 
-#: src/widgets/card.cpp:385
+#: src/widgets/card.cpp:662
 msgid "The card is due today"
 msgstr ""
 
-#: src/widgets/card.cpp:393
+#: src/widgets/card.cpp:672
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:402
+#: src/widgets/card.cpp:683
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card.cpp:411
+#: src/widgets/card.cpp:693
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""
@@ -236,7 +325,11 @@ msgstr[1] ""
 msgid "Add card"
 msgstr "Añadir tarjeta"
 
-#: src/widgets/task-widget.cpp:49
+#: src/widgets/cardlist-widget.cpp:84
+msgid "New Cardlist"
+msgstr ""
+
+#: src/widgets/task-widget.cpp:60
 msgid "Convert to card"
 msgstr ""
 
