@@ -91,6 +91,32 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                 this->board.remove_cardlist(*this);
                 return true;
             })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Left"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                CardlistWidget* previous_cardlist =
+                    static_cast<CardlistWidget*>(this->get_prev_sibling());
+
+                if (previous_cardlist) {
+                    this->board.reorder_cardlist(*previous_cardlist, *this);
+                }
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Right"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                Widget* maybe_cardlist = this->get_next_sibling();
+
+                if (!G_TYPE_CHECK_INSTANCE_TYPE(maybe_cardlist->gobj(),
+                                                Gtk::Button::get_type())) {
+                    CardlistWidget* cardlist_widget =
+                        static_cast<CardlistWidget*>(maybe_cardlist);
+                    this->board.reorder_cardlist(*this, *cardlist_widget);
+                }
+                return true;
+            })));
     add_controller(shortcut_controller);
 
     // Makes the header and the list itself non-selectable

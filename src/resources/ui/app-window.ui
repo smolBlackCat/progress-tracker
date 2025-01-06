@@ -309,6 +309,17 @@
                                 >Deletes cardlist from board</property>
                 </object>
               </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
+                  <property
+                                    name="accelerator"
+                                >&lt;Control&gt;Left &lt;Control&gt;Right</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Move cardlist across the board</property>
+                </object>
+              </child>
             </object>
           </child>
         </object>

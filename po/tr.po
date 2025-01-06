@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.smolblackcat.Progress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-03 11:50-0300\n"
+"POT-Creation-Date: 2025-01-05 20:51-0300\n"
 "PO-Revision-Date: 2024-04-19 13:36+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -191,6 +191,10 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:309
 msgid "Deletes cardlist from board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:320
+msgid "Move cardlist across the board"
 msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:36

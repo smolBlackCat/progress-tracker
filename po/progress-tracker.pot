@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-03 11:50-0300\n"
+"POT-Creation-Date: 2025-01-05 20:51-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -190,6 +190,10 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:309
 msgid "Deletes cardlist from board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:320
+msgid "Move cardlist across the board"
 msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:36

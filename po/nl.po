@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-03 11:50-0300\n"
+"POT-Creation-Date: 2025-01-05 20:51-0300\n"
 "PO-Revision-Date: 2024-03-28 17:47+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -191,6 +191,10 @@ msgstr ""
 
 #: src/resources/ui/app-window.ui:309
 msgid "Deletes cardlist from board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:320
+msgid "Move cardlist across the board"
 msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:36
