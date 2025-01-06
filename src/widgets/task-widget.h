@@ -1,3 +1,5 @@
+#pragma once
+
 #include <core/task.h>
 #include <dialog/card-dialog.h>
 #include <gtkmm.h>
@@ -5,6 +7,7 @@
 #include <memory>
 
 namespace ui {
+
 /**
  * @brief Class implementing controlling facilities of Task widget.
  *
@@ -20,6 +23,8 @@ public:
      *
      * Initializes a new TaskWidget.
      *
+     * @param card_details_dialog Reference to the CardDetailsDialog this widget
+     * is related to.
      * @param card_widget Reference to the CardWidget this widget is related to.
      * @param task Smart pointer to the Task object associated with this widget.
      * @param is_new Boolean flag indicating if this is a new task.
@@ -92,4 +97,5 @@ protected:
 
     bool is_new;  ///< Flag indicating if this is a new task.
 };
+
 }  // namespace ui

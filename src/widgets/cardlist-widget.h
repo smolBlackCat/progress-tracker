@@ -16,39 +16,43 @@ class BoardWidget;
 class CardWidget;
 
 /**
- * @brief Class that implements the facilities of a card list widget
+ * @brief Class that implements the facilities of a card list widget.
  */
 class CardlistWidget : public Gtk::ListBox {
 public:
-    static constexpr int CARDLIST_MAX_WIDTH = 240;
+    static constexpr int CARDLIST_MAX_WIDTH =
+        240;  ///< Maximum width for the card list widget.
 
     /**
-     * @brief CardlistWidget's constructor
+     * @brief Constructs a CardlistWidget object.
      *
-     * @param board BoardWidget reference to where this widget belongs
+     * @param board BoardWidget reference to where this widget belongs.
      * @param cardlist CardList smart pointer that this widget is allowed
-     *        to change
+     *        to change.
      * @param is_new Indicates whether it's completely new, therefore giving the
-     *        user the chance to cancel creation
+     *        user the chance to cancel creation.
      */
     CardlistWidget(BoardWidget& board, std::shared_ptr<CardList> cardlist,
                    bool is_new = false);
 
+    /**
+     * @brief Destroys the CardlistWidget object.
+     */
     ~CardlistWidget() override;
 
     /**
-     * @brief Adds a CardWidget object based on the given Card
+     * @brief Adds a CardWidget object based on the given Card.
      *
-     * @param card Card object reference
+     * @param card Card object reference.
      * @param editing_mode Boolean indicating whether the card widget should
-     * start in editing mode. Default is false
+     * start in editing mode. Default is false.
      *
-     * @return The created CardWidget object pointer
+     * @return The created CardWidget object pointer.
      */
     ui::CardWidget* add(const Card& card, bool editing_mode = false);
 
     /**
-     * @brief Removes the specified CardWidget
+     * @brief Removes the specified CardWidget.
      *
      * @param card Pointer to the CardWidget to be deleted.
      */
@@ -65,7 +69,7 @@ public:
      * @brief Determines whether a given CardWidget object belongs to this
      *        CardlistWidget instance.
      *
-     * @param card Pointer to the CardWidget object to check
+     * @param card Pointer to the CardWidget object to check.
      *
      * @return True if the CardWidget belongs to this CardlistWidget,
      *         false otherwise.
@@ -73,29 +77,42 @@ public:
     bool is_child(ui::CardWidget* card);
 
     /**
-     * @brief Reorders card widget "next" after card widget "sibling"
+     * @brief Reorders card widget "next" after card widget "sibling".
+     *
+     * @param next Reference to the CardWidget to be placed after the sibling.
+     * @param sibling Reference to the CardWidget to be placed before the next.
      */
     void reorder(ui::CardWidget& next, ui::CardWidget& sibling);
 
     /**
-     * @brief Access the card widgets tracker vector
+     * @brief Access the card widgets tracker vector.
+     *
+     * @return Reference to the vector of CardWidget pointers.
      */
     const std::vector<ui::CardWidget*>& get_card_widgets();
 
-    BoardWidget& board;
+    BoardWidget& board;  ///< Reference to the BoardWidget to which this
+                         ///< CardlistWidget belongs.
 
 private:
+    /**
+     * @brief Sets up drag and drop functionality for the card list widget.
+     */
     void setup_drag_and_drop();
 
     // Widgets
-    EditableLabelHeader cardlist_header;
-    Gtk::Button add_card_button;
-    Gtk::Box root;
+    EditableLabelHeader cardlist_header;  ///< Header widget for the card list.
+    Gtk::Button add_card_button;          ///< Button to add new cards.
+    Gtk::Box root;  ///< Root container for the card list widget.
 
     // Data
-    std::shared_ptr<CardList> cardlist;
-    std::vector<ui::CardWidget*> card_widgets;
+    std::shared_ptr<CardList>
+        cardlist;  ///< Pointer to the current CardList object.
+    std::vector<ui::CardWidget*>
+        card_widgets;  ///< Vector holding pointers to CardWidget objects.
 
-    bool is_new;
+    bool is_new;  ///< Flag indicating whether the card list is new or loaded
+                  ///< from a file.
 };
+
 }  // namespace ui
