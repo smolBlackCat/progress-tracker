@@ -1,5 +1,8 @@
 #include "item.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include <chrono>
 #include <random>
 
@@ -12,6 +15,10 @@ Item::Item(const std::string& name) : name{name} {
 }
 
 void Item::set_name(const std::string& other) {
+    if (!name.empty())
+        spdlog::get("core")->info("Item name changed from \"{}\" to \"{}\"",
+                                  name, other);
+
     name = other;
     modified = true;
 }

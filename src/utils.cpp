@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <format>
 #include <random>
-#include <regex>
 
 #ifdef DEVELOPMENT
 constexpr const char* BOARDS_FOLDER = "/progress-debug/boards/";

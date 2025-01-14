@@ -2,6 +2,7 @@
 
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 #include <utils.h>
 
 #include <chrono>
@@ -322,6 +323,8 @@ CardWidget::~CardWidget() {
     }
 
     root_box.unparent();
+
+    spdlog::get("ui")->debug("CardWidget has been destroyed");
 }
 
 void CardWidget::set_title(const std::string& label) {
@@ -339,6 +342,14 @@ void CardWidget::remove_from_parent() {
 
 void CardWidget::set_cardlist(CardlistWidget* cardlist_p) {
     if (cardlist_p) {
+        if (this->cardlist_p) {
+            spdlog::get("ui")->debug(
+                "CardWidget \"{}\" changed parent from CardlistWidget \"{}\" "
+                "to "
+                "CardlistWidget \"{}\"",
+                card->get_name(), this->cardlist_p->get_cardlist()->get_name(),
+                cardlist_p->get_cardlist()->get_name());
+        }
         this->cardlist_p = cardlist_p;
     }
 }
@@ -366,6 +377,9 @@ void CardWidget::update_complete_tasks() {
         // Silences warning about deleting empty css classes
         update_complete_tasks_style(n_complete_tasks);
     }
+
+    spdlog::get("ui")->debug(
+        "CardWidget \"{}\" has updated complete tasks label", card->get_name());
 }
 
 void CardWidget::update_due_date() {
@@ -383,6 +397,9 @@ void CardWidget::update_due_date() {
     } else {
         due_date_label.set_visible(false);
     }
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has updated due date label",
+                             card->get_name());
 }
 
 void CardWidget::update_due_date_label_style() {
@@ -400,6 +417,9 @@ void CardWidget::update_due_date_label_style() {
     }
 
     due_date_label.add_css_class(last_due_date_label_css_class);
+
+    spdlog::get("ui")->debug(
+        "CardWidget \"{}\" has updated due date label style", card->get_name());
 }
 
 void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
@@ -524,18 +544,27 @@ void CardWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
             this->cardlist_p->board.set_on_scroll();
+
+            spdlog::get("ui")->debug("CardWidget \"{}\" has started dragging",
+                                     card->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
             this->cardlist_p->board.set_on_scroll(false);
+
+            spdlog::get("ui")->debug("CardWidget \"{}\" has cancelled dragging",
+                                     card->get_name());
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
             this->cardlist_p->board.set_on_scroll(false);
+
+            spdlog::get("ui")->debug("CardWidget \"{}\" has ended dragging",
+                                     card->get_name());
         });
     add_controller(drag_source_c);
 
@@ -552,6 +581,8 @@ void CardWidget::setup_drag_and_drop() {
                 auto dropped_card = dropped_value.get();
 
                 if (dropped_card == this) {
+                    spdlog::warn("Dropped CardWidget \"{}\" onto itself",
+                                 card->get_name());
                     return true;
                 }
 
@@ -579,10 +610,14 @@ void CardWidget::open_color_dialog() {
             try {
                 set_color(color_dialog->choose_rgba_finish(result));
             } catch (Gtk::DialogError& err) {
-                // FIXME: This would be a good opportunity to have a logging
-                // system here
+                spdlog::get("ui")->warn(
+                    "CardWidget \"{}\" has failed to set color: {}",
+                    card->get_name(), err.what());
             }
         });
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has opened color dialog",
+                             card->get_name());
 }
 
 void CardWidget::open_card_details_dialog() {
@@ -594,22 +629,35 @@ void CardWidget::on_rename() {
     card_entry_revealer.set_reveal_child(true);
     card_label.set_visible(false);
     card_entry.grab_focus();
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has entered rename mode",
+                             card->get_name());
 }
 
 void CardWidget::off_rename() {
     card_label.set_visible();
     card_entry_revealer.set_reveal_child(false);
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has exited rename mode",
+                             card->get_name());
 }
 
 void CardWidget::clear_color() {
     card_cover_revealer.set_reveal_child(false);
     card->set_color(NO_COLOR);
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has cleared color",
+                             card->get_name());
 }
 
 void CardWidget::on_confirm_changes() {
     if (card_entry.get_text().compare(card_label.get_label()) != 0) {
         card->set_name(card_entry.get_text());
         card_label.set_label(card_entry.get_text());
+
+        spdlog::get("ui")->debug("CardWidget \"{}\" has been renamed to \"{}\"",
+                                 card->get_name(),
+                                 card_entry.get_text().c_str());
     }
     is_new = false;
 }
@@ -632,6 +680,9 @@ void CardWidget::set_color(const Gdk::RGBA& color) {
     card_cover_picture.set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     card_cover_revealer.set_reveal_child(true);
+
+    spdlog::get("ui")->debug("CardWidget \"{}\" has set color to {}",
+                             card->get_name(), color.to_string().c_str());
 }
 
 std::string CardWidget::create_details_text() const {

@@ -29,6 +29,7 @@ pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
 
 find_package(Intl REQUIRED)
+find_package(spdlog REQUIRED)
 find_package(Catch2 3)
 
 find_library(TINYXML2 libtinyxml2 tinyxml2 REQUIRED)
@@ -63,7 +64,9 @@ if (LINUX)
     set(CPACK_DEBIAN_FILE_NAME "progress-tracker-${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.deb")
     set(CPACK_DEBIAN_PACKAGE_VERSION "${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.${Progress_VERSION_PATCH}")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Simple app for kanban todo lists")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgtkmm-4.0-0, libadwaita-1-0, libtinyxml2-10")
+    # For now, requiring to install spdlod-dev to use the application may suffice for downloading
+    # the libraries without having to specify a version
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgtkmm-4.0-0, libadwaita-1-0, libtinyxml2-10, libspdlog-dev")
     set(CPACK_DEBIAN_PACKAGE_SECTION "gnome")
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/smolBlackCat/progress-tracker")
 elseif(WIN32)

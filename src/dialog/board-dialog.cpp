@@ -2,6 +2,7 @@
 
 #include <adwaita.h>
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 
 #include "core/colorable.h"
 
@@ -26,6 +27,12 @@ BoardDialog::BoardDialog()
     background_setter_menubutton->insert_action_group("board-dialog", group);
     footer_button->signal_clicked().connect(
         sigc::mem_fun(*this, &BoardDialog::on_footer_button_click));
+
+    g_signal_connect(board_dialog->gobj(), "closed",
+                     G_CALLBACK(+[](AdwDialog*, gpointer user_data) {
+                         spdlog::get("ui")->info("Board Dialog closed");
+                     }),
+                     nullptr);
 }
 
 BoardDialog::~BoardDialog() {}
@@ -34,6 +41,8 @@ void BoardDialog::open(Gtk::Window& parent) {
     adw_dialog_present(ADW_DIALOG(board_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
     this->parent = &parent;
+
+    spdlog::get("ui")->info("Board dialog opened");
 }
 
 void BoardDialog::on_set_image() {
@@ -55,12 +64,16 @@ void BoardDialog::on_set_image() {
         *parent,
         sigc::bind(sigc::mem_fun(*this, &ui::BoardDialog::on_filedialog_finish),
                    dialog));
+
+    spdlog::get("ui")->info("Board dialog's file dialog opened");
 }
 
 void BoardDialog::on_set_color() {
     color_dialog->set_modal();
     color_dialog->choose_rgba(
         *parent, sigc::mem_fun(*this, &BoardDialog::on_color_finish));
+
+    spdlog::get("ui")->info("Board dialog's color dialog opened");
 }
 
 void BoardDialog::on_color_finish(
@@ -70,8 +83,13 @@ void BoardDialog::on_color_finish(
         bg_type = BackgroundType::COLOR;
         set_picture(rgba);
     } catch (Gtk::DialogError& err) {
-        err.what();
+        spdlog::get("ui")->warn(
+            "Board Dialog has failed when finishing selecting a color: {}",
+            err.what());
     }
+
+    spdlog::get("ui")->debug("Board color set in the board dialog: {}",
+                             rgba.to_string().c_str());
 }
 
 void BoardDialog::on_filedialog_finish(
@@ -81,11 +99,14 @@ void BoardDialog::on_filedialog_finish(
         image_filename = dialog->open_finish(result)->get_path();
         bg_type = BackgroundType::IMAGE;
         set_picture(image_filename);
-    } catch (Gtk::DialogError& err) {
-        err.what();
     } catch (Glib::Error& err) {
-        err.what();
+        spdlog::get("ui")->warn(
+            "Board Dialog has failed when finishing selecting a file: {}",
+            err.what());
     }
+
+    spdlog::get("ui")->debug("Board image set in the board dialog: {}",
+                             image_filename);
 }
 
 // FIXME: Colour setting code is pretty inneficient because of the to-hex
@@ -101,9 +122,13 @@ void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     }
     board_picture->set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
+
+    spdlog::get("ui")->info("Board picture set to color in the board dialog");
 }
 
 void BoardDialog::set_picture(const std::string& image_filename) {
     board_picture->set_filename(image_filename);
+
+    spdlog::get("ui")->info("Board picture set to image in the board dialog");
 }
 }  // namespace ui

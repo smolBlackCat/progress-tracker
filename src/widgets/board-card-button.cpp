@@ -1,5 +1,7 @@
 #include "board-card-button.h"
 
+#include <spdlog/spdlog.h>
+
 #include <string>
 
 ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
@@ -39,12 +41,17 @@ time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
 }
 
 void ui::BoardCardButton::update(BoardBackend& board_backend) {
+    spdlog::get("ui")->debug("Updating BoardCardButton \"{}\" widget",
+                             board_name.get_text().c_str());
     this->board_backend = board_backend;
     Board board = board_backend.load();
 
     last_modified = board.get_last_modified();
     set_name_(board.get_name());
     set_background(board.get_background());
+
+    spdlog::get("ui")->debug("BoardCardButton \"{}\" widget has been updated",
+                             board.get_name());
 }
 
 void ui::BoardCardButton::set_name_(const std::string& name) {
@@ -52,6 +59,9 @@ void ui::BoardCardButton::set_name_(const std::string& name) {
 }
 
 void ui::BoardCardButton::set_background(const std::string& background) {
+    spdlog::get("ui")->debug(
+        "Setting BoardCardButton \"{}\" widget's background",
+        board_name.get_text().c_str());
     BackgroundType bg_type = Board::get_background_type(background);
 
     switch (bg_type) {
@@ -75,9 +85,17 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             Color colour{0, 0, 0, 1};
             solid_colour->fill(rgb_to_hex(colour));
             board_thumbnail.set(solid_colour);
+            spdlog::get("ui")->warn(
+                "BoardCardButton \"{}\" widget's background is invalid. "
+                "Falling back to default",
+                board_name.get_text().c_str());
             break;
         }
     }
+
+    spdlog::get("ui")->debug(
+        "BoardCardButton \"{}\" widget's background has been set to \"{}\"",
+        board_name.get_text().c_str(), background);
 }
 
 BoardBackend ui::BoardCardButton::get_backend() const { return board_backend; }

@@ -5,7 +5,10 @@
 #include <dialog/create_board_dialog.h>
 #include <dialog/preferences-board-dialog.h>
 #include <glibmm/i18n.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <widgets/board-card-button.h>
+#include <widgets/card.h>
 
 #include <filesystem>
 #include <format>
@@ -165,7 +168,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     app_stack_p->add(board_widget, "board-page");
 }
 
-ProgressWindow::~ProgressWindow() {}
+ProgressWindow::~ProgressWindow() {
+    spdlog::get("ui")->debug("ProgressWindow (at {}) has been destroyed",
+                             fmt::ptr(this));
+}
 
 void ProgressWindow::add_local_board(BoardBackend board_backend) {
     auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
@@ -173,32 +179,41 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
     fb_child_p->set_child(*board_card_button);
     fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
-    board_card_button->signal_clicked().connect(
-        [this, board_card_button, fb_child_p]() {
-            if (!this->on_delete_mode) {
-                app_stack_p->set_visible_child(
-                    "loading-page", Gtk::StackTransitionType::CROSSFADE);
-                add_board_button_p->set_sensitive(false);
-                app_menu_button_p->set_sensitive(false);
+    board_card_button->signal_clicked().connect([this, board_card_button,
+                                                 fb_child_p]() {
+        if (!this->on_delete_mode) {
+            app_stack_p->set_visible_child("loading-page",
+                                           Gtk::StackTransitionType::CROSSFADE);
+            add_board_button_p->set_sensitive(false);
+            app_menu_button_p->set_sensitive(false);
 
-                std::thread{[this, board_card_button]() {
-                    try {
-                        this->cur_board_entry = board_card_button;
-                        this->cur_board = std::make_shared<Board>(
-                            board_card_button->get_backend().load());
-                    } catch (std::invalid_argument& err) {
-                        this->cur_board = nullptr;
-                    }
-                    this->dispatcher.emit();
-                }}.detach();
-            } else {
-                if (fb_child_p->is_selected()) {
-                    boards_grid_p->unselect_child(*fb_child_p);
-                } else {
-                    boards_grid_p->select_child(*fb_child_p);
+            std::thread{[this, board_card_button]() {
+                spdlog::get("app")->debug(
+                    "Starting helper thread to load board");
+                try {
+                    this->cur_board_entry = board_card_button;
+                    this->cur_board = std::make_shared<Board>(
+                        board_card_button->get_backend().load());
+                } catch (std::invalid_argument& err) {
+                    this->cur_board = nullptr;
+                    spdlog::get("app")->error("Failed to load board: {}",
+                                              err.what());
                 }
+                this->dispatcher.emit();
+                spdlog::get("app")->debug(
+                    "Helper thread finished. Dispatching for main GUI thread");
+            }}.detach();
+        } else {
+            if (fb_child_p->is_selected()) {
+                boards_grid_p->unselect_child(*fb_child_p);
+            } else {
+                boards_grid_p->select_child(*fb_child_p);
             }
-        });
+        }
+    });
+
+    spdlog::get("ui")->debug("Board {} added to the grid",
+                             board_backend.get_attribute("name"));
 }
 
 void ProgressWindow::on_delete_board_mode() {
@@ -210,6 +225,8 @@ void ProgressWindow::on_delete_board_mode() {
     add_board_button_p->set_focusable(false);
     app_menu_button_p->set_focusable(false);
     app_menu_button_p->set_sensitive(false);
+
+    spdlog::get("app")->info("Delete board mode activated");
 }
 
 void ProgressWindow::off_delete_board_mode() {
@@ -220,6 +237,8 @@ void ProgressWindow::off_delete_board_mode() {
     add_board_button_p->set_focusable();
     app_menu_button_p->set_focusable();
     app_menu_button_p->set_sensitive();
+
+    spdlog::get("app")->info("Delete board mode deactivated");
 }
 
 void ProgressWindow::on_main_menu() {
@@ -231,6 +250,8 @@ void ProgressWindow::on_main_menu() {
     set_title("Progress");
     if (cur_board && cur_board_entry) board_widget.save();
     boards_grid_p->invalidate_sort();
+
+    spdlog::get("app")->info("App view changed to main menu view");
 }
 
 void ProgressWindow::on_board_view() {
@@ -239,6 +260,8 @@ void ProgressWindow::on_board_view() {
     app_menu_button_p->set_menu_model(board_menu_p);
     home_button_p->set_visible();
     add_board_button_p->set_visible(false);
+
+    spdlog::get("app")->info("App view changed to board view");
 }
 
 void ProgressWindow::delete_selected_boards() {
@@ -250,6 +273,9 @@ void ProgressWindow::delete_selected_boards() {
             cur_child->get_backend().get_attribute("filepath"));
         boards_grid_p->remove(*cur_child);
     }
+
+    spdlog::get("app")->info("{} boards have been deleted",
+                             selected_children.size());
 
     off_delete_board_mode();
 }
@@ -265,13 +291,21 @@ void ProgressWindow::show_about_dialog() {
         "translator-credits", _("translator-credits"), "issue-url",
         "https://github.com/smolBlackCat/progress-tracker/issues", "website",
         "https://github.com/smolBlackCat/progress-tracker", NULL);
+    spdlog::get("app")->info("Show about dialog");
 }
 
 void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
     card_dialog.open(*this, card_widget);
+
+    spdlog::get("app")->info("Card dialog opened for Card {}",
+                             card_widget->get_card()->get_name());
 }
 
-void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
+void ProgressWindow::show_shortcuts_dialog() {
+    sh_window->set_visible();
+
+    spdlog::get("app")->info("Shortcuts dialog opened");
+}
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
@@ -304,6 +338,7 @@ void ProgressWindow::on_board_loading_done() {
         on_board_view();
         board_widget.set(cur_board, cur_board_entry);
         set_title(cur_board->get_name());
+        spdlog::get("ui")->info("Board widget loaded successfully");
     } else {
         // cur_board and cur_board_entry are still nullptrs because the loading
         // thread has failed, therefore, go back to the main menu
@@ -312,6 +347,8 @@ void ProgressWindow::on_board_loading_done() {
         boards_grid_p->remove(*cur_board_entry);
         cur_board_entry = nullptr;
         on_main_menu();
+
+        spdlog::get("ui")->error("Failed to load board widget");
     }
     add_board_button_p->set_sensitive();
     app_menu_button_p->set_sensitive();
@@ -326,6 +363,8 @@ bool ProgressWindow::on_close() {
     progress_settings->set_int("window-height", get_height());
     progress_settings->set_int("window-width", get_width());
     set_visible(false);
+
+    spdlog::get("app")->info("Application window has been closed");
     return true;
 }
 }  // namespace ui

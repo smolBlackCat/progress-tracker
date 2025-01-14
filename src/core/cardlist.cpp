@@ -1,13 +1,17 @@
 #include "cardlist.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include <iterator>
-#include <stdexcept>
 
 CardList::CardList(const std::string& name) : Item{name}, cards{} {}
 
 std::shared_ptr<Card> CardList::add(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
     if (new_card) {
+        spdlog::get("core")->info("Cardlist \"{}\" added card \"{}\"", name,
+                                  new_card->get_name());
         cards.push_back(new_card);
         modified = true;
     }
@@ -19,9 +23,13 @@ bool CardList::remove(const Card& card) {
         if (card == *cards.at(i)) {
             cards.erase(cards.begin() + i);
             modified = true;
+            spdlog::get("core")->info("Cardlist \"{}\" removed Card \"{}\"",
+                                      name, card.get_name());
             return true;
         }
     }
+    spdlog::get("core")->warn("Cardlist \"{}\" failed to remove Card \"{}\"",
+                              name, card.get_name());
     return false;
 }
 
@@ -65,6 +73,7 @@ void CardList::reorder(const Card& next, const Card& sibling) {
     bool is_same_item = next_i == sibling_i;
     bool already_in_order = next_i - sibling_i == 1;
     if (any_absent_item || is_same_item || already_in_order) {
+        spdlog::get("core")->warn("Invalid reorder request");
         return;
     }
 
@@ -83,4 +92,7 @@ void CardList::reorder(const Card& next, const Card& sibling) {
         cards.insert(sibling_it, temp_v);
     }
     modified = true;
+    spdlog::get("core")->info(
+        "Cardlist \"{}\" reordered card \"{}\" after \"{}\"", name,
+        next.get_name(), sibling.get_name());
 }

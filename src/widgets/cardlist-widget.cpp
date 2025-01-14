@@ -1,6 +1,7 @@
 #include "cardlist-widget.h"
 
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card.h"
@@ -134,6 +135,10 @@ void ui::CardlistWidget::reorder(ui::CardWidget& next,
                                  ui::CardWidget& sibling) {
     root.reorder_child_after(next, sibling);
     cardlist->reorder(*next.get_card(), *sibling.get_card());
+
+    spdlog::get("ui")->info(
+        "CardWidget \"{}\" has been reordered after CardWidget \"{}\"",
+        next.get_card()->get_name(), sibling.get_card()->get_name());
 }
 
 const std::vector<ui::CardWidget*>& ui::CardlistWidget::get_card_widgets() {
@@ -157,6 +162,10 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
             this->board.set_on_scroll();
+
+            spdlog::get("ui")->debug(
+                "CardlistWidget \"{}\" has started dragging",
+                this->get_cardlist()->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -164,6 +173,10 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
             this->board.set_on_scroll(false);
+
+            spdlog::get("ui")->debug(
+                "CardlistWidget \"{}\" has cancelled dragging",
+                this->get_cardlist()->get_name());
             return true;
         },
         false);
@@ -171,6 +184,9 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
             this->board.set_on_scroll(false);
+
+            spdlog::get("ui")->debug("CardlistWidget \"{}\" has ended dragging",
+                                     this->get_cardlist()->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     cardlist_header.add_controller(drag_source_c);
@@ -188,11 +204,21 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 ui::CardlistWidget* dropped_cardlist = dropped_value.get();
 
                 if (dropped_cardlist == this) {
+                    spdlog::get("ui")->warn(
+                        "CardlistWidget \"{}\" has been dropped on itself. "
+                        "Nothing happens",
+                        this->get_cardlist()->get_name());
                     return true;
                 }
 
                 this->board.reorder_cardlist(*dropped_cardlist, *this);
                 dropped_cardlist->set_opacity(1);
+
+                spdlog::get("ui")->info(
+                    "CardlistWidget \"{}\" has been dropped on CardlistWidget "
+                    "\"{}\"",
+                    dropped_cardlist->get_cardlist()->get_name(),
+                    this->get_cardlist()->get_name());
                 return true;
             }
             return false;
@@ -215,6 +241,12 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove_from_parent();
                     this->add(*card_in_dropped);
+
+                    spdlog::get("ui")->info(
+                        "CardWidget \"{}\" has been dropped on CardlistWidget "
+                        "\"{}\"",
+                        dropped_card->get_card()->get_name(),
+                        this->get_cardlist()->get_name());
                 }
                 return true;
             }
@@ -233,6 +265,10 @@ void ui::CardlistWidget::remove(ui::CardWidget* card) {
             card_widgets.erase(card_widgets.begin() + i);
         }
     }
+
+    spdlog::get("ui")->info(
+        "CardWidget \"{}\" has been removed from CardlistWidget \"{}\"",
+        card->get_card()->get_name(), cardlist->get_name());
 }
 
 ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
@@ -243,6 +279,10 @@ ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
     card_widgets.push_back(new_card);
     root.append(*new_card);
     root.reorder_child_after(add_card_button, *new_card);
+
+    spdlog::get("ui")->info(
+        "CardWidget \"{}\" has been added to CardlistWidget \"{}\"",
+        card.get_name(), cardlist->get_name());
     return new_card;
 }
 

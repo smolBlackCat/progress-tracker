@@ -1,6 +1,7 @@
 #include "card-dialog.h"
 
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 #include <widgets/card.h>
 #include <widgets/task-widget.h>
 
@@ -28,7 +29,6 @@ CardDetailsDialog::CardDetailsDialog()
       notes_textbuffer{
           builder->get_object<Gtk::TextBuffer>("notes-textbuffer")},
       adw_dialog{builder->get_object("card-dialog")} {
-
     checklist_add_button.signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_add_task));
 
@@ -51,6 +51,8 @@ CardDetailsDialog::CardDetailsDialog()
                      G_CALLBACK(+[](AdwDialog* self, gpointer data) {
                          reinterpret_cast<CardDetailsDialog*>(data)->on_save();
                          reinterpret_cast<CardDetailsDialog*>(data)->clear();
+
+                         spdlog::get("ui")->info("Card Dialog closed");
                      }),
                      this);
 
@@ -65,12 +67,19 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
     cur_card_widget->update_complete_tasks();
+
+    spdlog::get("ui")->info("TaskWidget \"{}\" removed from the Card Dialog",
+                            task.get_task()->get_name());
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
     tasks_box->reorder_child_after(next, sibling);
     cur_card_widget->get_card()->reorder(*next.get_task(), *sibling.get_task());
+
+    spdlog::get("ui")->info(
+        "TaskWidget \"{}\" reordered after TaskWidget \"{}\"",
+        next.get_task()->get_name(), sibling.get_task()->get_name());
 }
 
 void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
@@ -92,6 +101,8 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
 
     adw_dialog_present(ADW_DIALOG(adw_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
+    spdlog::get("ui")->info(
+        "Card Dialog opened with selected card information");
 }
 
 void CardDetailsDialog::close() {
@@ -107,6 +118,8 @@ void CardDetailsDialog::update_due_date_label() {
     char date_str[255];
     strftime(date_str, 255, "%x", std::localtime(&time));
     date_menubutton->set_label(Glib::ustring{date_str});
+
+    spdlog::get("ui")->debug("Card Dialog's due date label has been updated");
 }
 
 CardWidget* CardDetailsDialog::get_card_widget() { return cur_card_widget; }
@@ -131,11 +144,15 @@ void CardDetailsDialog::on_save() {
     }
 
     cur_card_widget->set_tooltip_text(cur_card_widget->create_details_text());
+
+    spdlog::get("ui")->info("Card Dialog saved selected card information");
 }
 
 void CardDetailsDialog::on_delete_card() {
     cur_card_widget->remove_from_parent();
     close();
+
+    spdlog::get("ui")->debug("Card Dialog just had a card deleted");
 }
 
 void CardDetailsDialog::on_unset_due_date() {
@@ -145,6 +162,8 @@ void CardDetailsDialog::on_unset_due_date() {
     card_ptr->set_due_date(Date{});
     checkbutton_revealer->set_reveal_child(false);
     cur_card_widget->update_due_date();
+
+    spdlog::get("ui")->debug("Card Dialog just had a due date unset");
 }
 
 void CardDetailsDialog::on_set_due_date() {
@@ -161,6 +180,8 @@ void CardDetailsDialog::on_set_due_date() {
     checkbutton_revealer->set_reveal_child(true);
     cur_card_widget->update_due_date();
     update_due_date_label();
+
+    spdlog::get("ui")->debug("Card Dialog just had a due date set");
 }
 
 void CardDetailsDialog::clear() {
@@ -175,6 +196,8 @@ void CardDetailsDialog::clear() {
     checkbutton_revealer->set_reveal_child(false);
 
     cur_card_widget = nullptr;
+
+    spdlog::get("ui")->debug("Card Dialog set to an empty state");
 }
 
 void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
@@ -183,5 +206,7 @@ void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
         Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
     tasks_box->append(*task_widget);
     tasks_tracker.push_back(task_widget);
+    spdlog::get("ui")->debug("Added TaskWidget \"{}\" to the Card Dialog",
+                             task->get_name());
 }
 }  // namespace ui

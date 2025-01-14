@@ -1,5 +1,8 @@
 #include "card.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include <numeric>
 
 Card::Card(const std::string& name, const Date& date, bool complete,
@@ -11,9 +14,13 @@ Card::Card(const std::string& name, const Date& date, bool complete,
 Card::Card(const std::string& name, const Color& color)
     : Card{name, Date{}, false, color} {}
 
+Card::~Card() { spdlog::get("core")->debug("Card \"{}\" destroyed", name); }
+
 void Card::set_color(const Color& color) {
     this->color = color;
     modified = true;
+    spdlog::get("core")->info("Card \"{}\" color set to: {}", name,
+                              color_to_string(color));
 }
 
 const std::string& Card::get_notes() const { return notes; }
@@ -38,6 +45,7 @@ bool Card::get_modified() {
 void Card::set_notes(const std::string& notes) {
     this->notes = notes;
     modified = true;
+    spdlog::get("core")->info("Card \"{}\" notes set to: \"{}\"", name, notes);
 }
 
 double Card::get_completion() const {
@@ -52,13 +60,20 @@ double Card::get_completion() const {
 
 std::shared_ptr<Task> Card::add(const Task& task) {
     for (auto& ctask : tasks) {
-        if (task == *ctask) return nullptr;
+        if (task == *ctask) {
+            spdlog::get("core")->warn(
+                "Task \"{}\" already exists in card \"{}\"", task.get_name(),
+                name);
+            return nullptr;
+        }
     }
 
     std::shared_ptr<Task> new_task = std::make_shared<Task>(task);
     tasks.push_back(new_task);
 
     modified = true;
+    spdlog::get("core")->info("Card \"{}\" added task \"{}\"", name,
+                              task.get_name());
 
     return new_task;
 }
@@ -68,9 +83,13 @@ bool Card::remove(const Task& task) {
         if (*tasks[i] == task) {
             tasks.erase(tasks.begin() + i);
             modified = true;
+            spdlog::get("core")->info("Card \"{}\" removed task \"{}\"", name,
+                                      task.get_name());
             return true;
         }
     }
+    spdlog::get("core")->warn("Card \"{}\" failed to remove task \"{}\"", name,
+                              task.get_name());
     return false;
 }
 
@@ -93,6 +112,7 @@ void Card::reorder(const Task& next, const Task& sibling) {
     bool is_same_item = next_i == sibling_i;
     bool already_in_order = next_i - sibling_i == 1;
     if (any_absent_item || is_same_item || already_in_order) {
+        spdlog::get("core")->warn("Invalid reorder request");
         return;
     }
 
@@ -124,6 +144,8 @@ bool Card::past_due_date() {
 void Card::set_due_date(const Date& date) {
     due_date = date;
     modified = true;
+    spdlog::get("core")->info("Card \"{}\" due date set to: {}", name,
+                              std::format("{}", date));
 };
 
 Date Card::get_due_date() const { return due_date; };
@@ -134,5 +156,10 @@ void Card::set_complete(bool complete) {
     if (due_date.ok()) {
         this->complete = complete;
         modified = true;
+        spdlog::get("core")->info("Card \"{}\" completion set to: {}", name,
+                                  complete);
+    } else {
+        spdlog::get("core")->warn("Card \"{}\" cannot set complete state",
+                                  name);
     }
 }

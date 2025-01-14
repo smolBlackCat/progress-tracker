@@ -120,6 +120,24 @@
         }
       ]
     },
+
+    {
+      "name": "spdlog",
+      "buildsystem": "cmake",
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/gabime/spdlog.git",
+          "branch": "v1.x"
+        }
+      ],
+      "config-opts": [
+        "-DSPDLOG_BUILD_EXAMPLE=OFF",
+        "-DSPDLOG_BUILD_TESTS=OFF",
+        "-DSPDLOG_ENABLE_PCH=ON",
+        "-DSPDLOG_BUILD_SHARED=ON"
+      ]
+    },
     {
       "name": "progress-tracker",
       "buildsystem": "cmake-ninja",

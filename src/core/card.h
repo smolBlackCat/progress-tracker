@@ -27,6 +27,8 @@ public:
      */
     Card(const std::string& name, const Color& color = NO_COLOR);
 
+    ~Card() override;
+
     /**
      * @brief Sets the card's cover color
      *

@@ -1,6 +1,7 @@
 #include "board-widget.h"
 
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 #include <window.h>
 
 #include <format>
@@ -76,7 +77,9 @@ ui::BoardWidget::BoardWidget()
         BoardWidget::SAVE_INTERVAL * 6);
 }
 
-ui::BoardWidget::~BoardWidget() {}
+ui::BoardWidget::~BoardWidget() {
+    spdlog::get("ui")->debug("BoardWidget has been destroyed");
+}
 
 void ui::BoardWidget::set(std::shared_ptr<Board>& board,
                           BoardCardButton* board_card_button) {
@@ -96,6 +99,11 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
             root.append(*new_cardlist);
             root.reorder_child_after(add_button, *new_cardlist);
         }
+
+        spdlog::get("ui")->debug("BoardWidget has been set");
+    } else {
+        spdlog::get("ui")->warn(
+            "Board Widget cannot be set without a Board and a BoardCardButton");
     }
 }
 
@@ -106,6 +114,8 @@ void ui::BoardWidget::clear() {
         }
         cardlist_vector.clear();
     }
+
+    spdlog::get("ui")->debug("BoardWidget has been cleared");
 }
 
 bool ui::BoardWidget::save(bool free) {
@@ -117,6 +127,9 @@ bool ui::BoardWidget::save(bool free) {
     if (free) {
         clear();
     }
+
+    spdlog::get("ui")->debug("BoardWidget made Board save its state: {}",
+                             success);
     return success;
 }
 
@@ -129,10 +142,18 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
     root.append(*new_cardlist);
     root.reorder_child_after(add_button, *new_cardlist);
 
+    spdlog::get("ui")->debug(
+        "BoardWidget has added a CardlistWidget \"{}\" to itself",
+        cardlist.get_name());
+
     return new_cardlist;
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
+    spdlog::get("ui")->debug(
+        "BoardWidget has removed a CardlistWidget \"{}\" from itself",
+        cardlist.get_cardlist()->get_name());
+
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
     board->remove(*cardlist.get_cardlist());
@@ -143,6 +164,10 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
     board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
     root.reorder_child_after(next, sibling);
+
+    spdlog::get("ui")->debug(
+        "BoardWidget has reordered a CardlistWidget \"{}\" after \"{}\"",
+        next.get_cardlist()->get_name(), sibling.get_cardlist()->get_name());
 }
 
 void ui::BoardWidget::set_background(const std::string& background,
@@ -157,6 +182,8 @@ void ui::BoardWidget::set_background(const std::string& background,
 #ifdef WIN32
             picture.set_visible(false);
 #endif
+            spdlog::get("ui")->debug(
+                "BoardWidget has set a background color: {}", background);
             break;
         }
         case BackgroundType::IMAGE: {
@@ -167,6 +194,9 @@ void ui::BoardWidget::set_background(const std::string& background,
 #else
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_FILE, background));
+
+            spdlog::get("ui")->debug(
+                "BoardWidget has set a background image: {}", background);
             break;
 #endif
         }
@@ -176,6 +206,9 @@ void ui::BoardWidget::set_background(const std::string& background,
 #ifdef WIN32
             picture.set_visible(false);
 #endif
+            spdlog::get("ui")->warn(
+                "BoardWidget has set an invalid background, setting default "
+                "background");
             break;
         }
     }
@@ -188,6 +221,8 @@ const std::string& ui::BoardWidget::get_background() const {
 void ui::BoardWidget::set_name(const std::string& board_name) {
     if (board) {
         board->set_name(board_name);
+
+        spdlog::get("ui")->debug("BoardWidget has set a name: {}", board_name);
     }
 }
 

@@ -1,5 +1,7 @@
 #include "colorable.h"
 
+#include <regex>
+
 std::string color_to_string(const Color& color) {
     std::ostringstream oss{};
     oss << "rgb(" << std::to_string(std::get<0>(color)) << ","

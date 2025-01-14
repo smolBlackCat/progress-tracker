@@ -30,6 +30,7 @@ target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
 target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${Intl_LIBRARIES})
 target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
+target_link_libraries(progress-tracker PUBLIC spdlog::spdlog)
 
 target_link_directories(progress-tracker PUBLIC ${GTKMM_LIBRARY_DIR})
 

@@ -2,7 +2,6 @@
 
 #include <tinyxml2.h>
 
-#include <list>
 #include <map>
 #include <string>
 

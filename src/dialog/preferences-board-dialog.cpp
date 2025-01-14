@@ -1,6 +1,7 @@
 #include "preferences-board-dialog.h"
 
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 #include <utils.h>
 
 #include <filesystem>
@@ -38,6 +39,10 @@ void PreferencesBoardDialog::load_board() {
         case BackgroundType::INVALID: {
             this->bg_type = BackgroundType::COLOR;
             set_picture(Gdk::RGBA{});
+
+            spdlog::get("ui")->warn(
+                "Current board background is invalid. Falling back to "
+                "default");
             break;
         }
     }
@@ -76,6 +81,9 @@ void PreferencesBoardDialog::on_save_changes() {
 
     const std::string& previous_name = board_widget.get_name();
     if (previous_name != new_name) {
+        spdlog::get("ui")->debug(
+            "Preferences Board Dialog has detected a board name change. "
+            "Replacing old file with new file with the new name");
         board_widget.set_name(new_name);
         parent->set_title(new_name);
         auto& board_backend = board_widget.get_board()->backend;
@@ -89,6 +97,9 @@ void PreferencesBoardDialog::on_save_changes() {
     }
 
     board_widget.save(false);
+
+    spdlog::get("ui")->info("Board Preferences Dialog has saved Board changes");
+
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

@@ -2,12 +2,13 @@
 
 #include <adwaita.h>
 #include <app_info.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <utils.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
-#include <iostream>
 
 #include "core/board.h"
 
@@ -30,24 +31,28 @@ void ui::Application::on_startup() {
     main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
         window_builder, "app-window", progress_settings);
     if (!main_window) {
+        spdlog::get("app")->error("Failed to create main window");
         exit(1);
     }
 
     if (progress_settings->get_boolean("window-maximized")) {
         main_window->maximize();
+        spdlog::get("app")->debug("Window maximized");
     } else {
-        main_window->set_default_size(
-            progress_settings->get_int("window-width"),
-            progress_settings->get_int("window-height"));
+        int window_height = progress_settings->get_int("window-height");
+        int window_width = progress_settings->get_int("window-width");
+        main_window->set_default_size(window_width, window_height);
+
+        spdlog::get("app")->debug("Window size set to {}x{}", window_width,
+                                  window_height);
     }
 
     std::string app_dir = progress_boards_folder();
 
     if (!std::filesystem::exists(app_dir)) {
         if (!std::filesystem::create_directories(app_dir)) {
-            std::cerr
-                << "\033[;32mIt was not possible to create a directory\033[m"
-                << std::endl;
+            spdlog::get("app")->error(
+                "Failed to create Progress Boards folder");
         }
     } else {
         for (const auto& dir_entry :
@@ -62,10 +67,12 @@ void ui::Application::on_startup() {
                 } catch (std::invalid_argument& err) {
                     // TODO: Add code keeping track of how many failures to
                     // load boards
-                    std::cerr << err.what() << std::endl;
+                    spdlog::get("app")->error("Failed to load board: {}",
+                                              err.what());
                 }
             }
         }
+        spdlog::get("app")->info("Loaded all local boards from {}", app_dir);
     }
 
     add_window(*main_window);
@@ -74,4 +81,5 @@ void ui::Application::on_startup() {
 void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
+    spdlog::get("app")->info("Application activated");
 }
