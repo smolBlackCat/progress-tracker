@@ -14,7 +14,7 @@ jobs:
           sudo apt install libgtkmm-4.0-dev
           sudo apt install libadwaita-1-dev
           sudo apt install libtinyxml2-dev
-          sudo apt instal libspdlog-dev
+          sudo apt install libspdlog-dev
           sudo apt install gettext
           sudo apt install catch2
 
