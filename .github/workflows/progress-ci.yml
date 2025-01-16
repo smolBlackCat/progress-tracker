@@ -11,6 +11,7 @@ jobs:
 
       - name: Fetch Dependencies
         run: |
+          sudo apt install gcc-14
           sudo apt install libgtkmm-4.0-dev
           sudo apt install libadwaita-1-dev
           sudo apt install libtinyxml2-dev
