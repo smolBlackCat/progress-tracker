@@ -18,7 +18,9 @@ list(APPEND TEST_EXECUTABLES
 foreach(EXECUTABLE ${TEST_EXECUTABLES})
     target_link_libraries(${EXECUTABLE} PRIVATE Catch2::Catch2WithMain)
     target_link_libraries(${EXECUTABLE} PRIVATE ${TINYXML2})
+    target_link_libraries(${EXECUTABLE} PRIVATE spdlog::spdlog)
 
+    target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_BINARY_DIR}/src/)
     target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src/)
     target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src/core)
 endforeach()
