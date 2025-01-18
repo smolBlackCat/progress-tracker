@@ -322,7 +322,13 @@ Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
 
 Board::Board(const std::string& name, const std::string& background,
              const BoardBackend& backend)
-    : Item{name}, background{background}, backend{backend} {}
+    : Item{name}, background{background}, backend{backend} {
+    if (Board::get_background_type(background) == BackgroundType::INVALID) {
+        spdlog::get("core")->warn(
+            "Invalid background type: {}. Falling back to default", background);
+        this->background = Board::BACKGROUND_DEFAULT;
+    }
+}
 
 Board::~Board() {}
 
