@@ -88,22 +88,17 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
         this->board_card_button = board_card_button;
 
         board->load();
-
         set_background(board->get_background(), false);
-
         for (auto& cardlist : board->get_cardlists()) {
-            auto new_cardlist =
-                Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
-            cardlist_vector.push_back(new_cardlist);
-
-            root.append(*new_cardlist);
-            root.reorder_child_after(add_button, *new_cardlist);
+            _add_cardlist(cardlist, false);
         }
 
-        spdlog::get("ui")->debug("BoardWidget has been set");
+        spdlog::get("ui")->debug("Board \"{}\" is fully set to usage",
+                                 board->get_name());
     } else {
         spdlog::get("ui")->warn(
-            "Board Widget cannot be set without a Board and a BoardCardButton");
+            "Board view has received invalid Board or BoardCardButton "
+            "pointers");
     }
 }
 
@@ -115,7 +110,7 @@ void ui::BoardWidget::clear() {
         cardlist_vector.clear();
     }
 
-    spdlog::get("ui")->debug("BoardWidget has been cleared");
+    spdlog::get("ui")->debug("Board view has been cleared");
 }
 
 bool ui::BoardWidget::save(bool free) {
@@ -127,36 +122,23 @@ bool ui::BoardWidget::save(bool free) {
     if (free) {
         clear();
     }
-
-    spdlog::get("ui")->debug("BoardWidget made Board save its state: {}",
-                             success);
     return success;
 }
 
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
                                                   bool editing_mode) {
-    auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
-        *this, board->add(cardlist), editing_mode);
-    cardlist_vector.push_back(new_cardlist);
-
-    root.append(*new_cardlist);
-    root.reorder_child_after(add_button, *new_cardlist);
-
-    spdlog::get("ui")->debug(
-        "BoardWidget has added a CardlistWidget \"{}\" to itself",
-        cardlist.get_name());
-
-    return new_cardlist;
+    return _add_cardlist(board->add(cardlist), editing_mode);
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
-    spdlog::get("ui")->debug(
-        "BoardWidget has removed a CardlistWidget \"{}\" from itself",
-        cardlist.get_cardlist()->get_name());
+    spdlog::get("ui")->debug("BoardWidget has removed a CardlistWidget \"{}\"",
+                             cardlist.get_cardlist()->get_name());
 
     root.remove(cardlist);
     std::erase(cardlist_vector, &cardlist);
+
     board->remove(*cardlist.get_cardlist());
+
     return true;
 }
 
@@ -170,6 +152,7 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
         next.get_cardlist()->get_name(), sibling.get_cardlist()->get_name());
 }
 
+#ifdef WIN32
 void ui::BoardWidget::set_background(const std::string& background,
                                      bool modify) {
     // Reseting background is the approach to ensure that a background is set
@@ -179,40 +162,47 @@ void ui::BoardWidget::set_background(const std::string& background,
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
-#ifdef WIN32
             picture.set_visible(false);
-#endif
-            spdlog::get("ui")->debug(
-                "BoardWidget has set a background color: {}", background);
             break;
         }
         case BackgroundType::IMAGE: {
-#ifdef WIN32
             picture.set_filename(background);
             picture.set_visible(true);
             break;
-#else
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_FILE, background));
-
-            spdlog::get("ui")->debug(
-                "BoardWidget has set a background image: {}", background);
-            break;
-#endif
         }
         case BackgroundType::INVALID: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
-#ifdef WIN32
             picture.set_visible(false);
-#endif
-            spdlog::get("ui")->warn(
-                "BoardWidget has set an invalid background, setting default "
-                "background");
             break;
         }
     }
 }
+#else
+void ui::BoardWidget::set_background(const std::string& background,
+                                     bool modify) {
+    // Reseting background is the approach to ensure that a background is set
+    // even when background turns invalid for whatever reason
+    BackgroundType bg_type = board->set_background(background, modify);
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, background));
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_FILE, background));
+            break;
+        }
+        case BackgroundType::INVALID: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+            break;
+        }
+    }
+}
+#endif
 
 const std::string& ui::BoardWidget::get_background() const {
     return board->get_background();
@@ -221,8 +211,6 @@ const std::string& ui::BoardWidget::get_background() const {
 void ui::BoardWidget::set_name(const std::string& board_name) {
     if (board) {
         board->set_name(board_name);
-
-        spdlog::get("ui")->debug("BoardWidget has set a name: {}", board_name);
     }
 }
 
@@ -277,4 +265,19 @@ void ui::BoardWidget::setup_auto_scrolling() {
             return true;
         },
         10);
+}
+
+ui::CardlistWidget* ui::BoardWidget::_add_cardlist(
+    const std::shared_ptr<CardList>& cardlist, bool editing_mode) {
+    auto new_cardlist =
+        Gtk::make_managed<ui::CardlistWidget>(*this, cardlist, editing_mode);
+    cardlist_vector.push_back(new_cardlist);
+
+    root.append(*new_cardlist);
+    root.reorder_child_after(add_button, *new_cardlist);
+
+    spdlog::get("ui")->debug("BoardWidget has added a CardlistWidget \"{}\"",
+                             cardlist->get_name());
+
+    return new_cardlist;
 }

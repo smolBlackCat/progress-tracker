@@ -1,6 +1,6 @@
 #include "colorable.h"
 
-#include <regex>
+#include <sstream>
 
 std::string color_to_string(const Color& color) {
     std::ostringstream oss{};
@@ -21,20 +21,32 @@ uint32_t rgb_to_hex(const Color& color) {
 }
 
 Color string_to_color(const std::string& str) {
-    std::regex color_code_r{"\\d{1,3}"};
-
-    auto color_code_begin =
-        std::sregex_iterator(str.begin(), str.end(), color_code_r);
-    auto color_code_end = std::sregex_iterator();
-
-    if (std::distance(color_code_begin, color_code_end) == 3) {
-        uint8_t r = std::stoi(std::smatch{*color_code_begin}.str());
-        uint8_t g =
-            std::stoi(std::smatch{*(std::next(color_code_begin, 1))}.str());
-        uint8_t b =
-            std::stoi(std::smatch{*(std::next(color_code_begin, 2))}.str());
-        return {r, g, b, 1.0};
-    } else {
+    // Check the basic format
+    if (str.size() < 10 || str.substr(0, 4) != "rgb(" || str.back() != ')') {
         return NO_COLOR;
     }
+
+    // Extract the numbers as substrings
+    size_t start = 4;  // Skip "rgb("
+    size_t end = str.find(',', start);
+    if (end == std::string::npos) return NO_COLOR;
+    int r = std::stoi(str.substr(start, end - start));
+
+    start = end + 1;
+    end = str.find(',', start);
+    if (end == std::string::npos) return NO_COLOR;
+    int g = std::stoi(str.substr(start, end - start));
+
+    start = end + 1;
+    end = str.find(')', start);
+    if (end == std::string::npos) return NO_COLOR;
+    int b = std::stoi(str.substr(start, end - start));
+
+    // Ensure values are in the 0-255 range
+    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+        return NO_COLOR;
+    }
+
+    return {static_cast<uint8_t>(r), static_cast<uint8_t>(g),
+            static_cast<uint8_t>(b), 1.0f};
 }

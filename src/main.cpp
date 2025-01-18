@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
 #endif
 
     auto app_logger = spdlog::stdout_color_mt("app");
-    auto core_logger = spdlog::stdout_color_mt("core");
     auto ui_logger = spdlog::stdout_color_mt("ui");
 
     auto sys_locale = std::setlocale(LC_ALL, "");

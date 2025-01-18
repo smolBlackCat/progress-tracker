@@ -25,13 +25,14 @@ ui::Application::~Application() { delete main_window; }
 
 void ui::Application::on_startup() {
     Gtk::Application::on_startup();
+    spdlog::get("app")->debug("Application started");
     adw_init();
 
     auto window_builder = Gtk::Builder::create_from_resource(PROGRESS_WINDOW);
     main_window = Gtk::Builder::get_widget_derived<ui::ProgressWindow>(
         window_builder, "app-window", progress_settings);
     if (!main_window) {
-        spdlog::get("app")->error("Failed to create main window");
+        spdlog::get("app")->critical("Failed to create main window");
         exit(1);
     }
 
@@ -55,15 +56,15 @@ void ui::Application::on_startup() {
                 "Failed to create Progress Boards folder");
         }
     } else {
+        spdlog::get("core")->info("Loading boards from local storage");
         for (const auto& dir_entry :
              std::filesystem::directory_iterator(app_dir)) {
             std::string board_filename = dir_entry.path().string();
             if (board_filename.ends_with(".xml")) {
                 try {
-                    BoardBackend backend{BackendType::LOCAL,
-                                         std::map<std::string, std::string>{
-                                             {"filepath", board_filename}}};
-                    main_window->add_local_board(backend);
+                    main_window->add_local_board(BoardBackend{
+                        BackendType::LOCAL, std::map<std::string, std::string>{
+                                                {"filepath", board_filename}}});
                 } catch (std::invalid_argument& err) {
                     // TODO: Add code keeping track of how many failures to
                     // load boards
@@ -72,7 +73,8 @@ void ui::Application::on_startup() {
                 }
             }
         }
-        spdlog::get("app")->info("Loaded all local boards from {}", app_dir);
+        spdlog::get("app")->info("Local boards have been successfully loaded",
+                                 app_dir);
     }
 
     add_window(*main_window);
@@ -81,5 +83,5 @@ void ui::Application::on_startup() {
 void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
-    spdlog::get("app")->info("Application activated");
+    spdlog::get("app")->info("Application initialised");
 }

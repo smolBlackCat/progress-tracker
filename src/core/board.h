@@ -84,6 +84,8 @@ protected:
 class Board : public Item {
 public:
     Board() = delete;
+    Board(const std::string& name, const std::string& background,
+          const BoardBackend& backend);
     Board(BoardBackend& backend);
 
     ~Board();

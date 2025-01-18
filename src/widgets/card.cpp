@@ -9,6 +9,7 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
+#include "core/item.h"
 #include "gtk/gtk.h"
 #include "window.h"
 
@@ -403,23 +404,27 @@ void CardWidget::update_due_date() {
 }
 
 void CardWidget::update_due_date_label_style() {
-    auto date_now = Date{std::chrono::floor<std::chrono::days>(
-        std::chrono::system_clock::now())};
-    auto date_in_card = card->get_due_date();
-    due_date_label.remove_css_class(last_due_date_label_css_class);
+    // We will only update the due date label style if the card has a due date
+    if (card->get_due_date().ok()) {
+        auto date_now = Date{std::chrono::floor<std::chrono::days>(
+            std::chrono::system_clock::now())};
+        auto date_in_card = card->get_due_date();
+        due_date_label.remove_css_class(last_due_date_label_css_class);
 
-    if (card->get_complete()) {
-        last_due_date_label_css_class = "due-date-complete";
-    } else if (date_in_card < date_now) {
-        last_due_date_label_css_class = "past-due-date";
-    } else {
-        last_due_date_label_css_class = "due-date";
+        if (card->get_complete()) {
+            last_due_date_label_css_class = "due-date-complete";
+        } else if (date_in_card < date_now) {
+            last_due_date_label_css_class = "past-due-date";
+        } else {
+            last_due_date_label_css_class = "due-date";
+        }
+
+        due_date_label.add_css_class(last_due_date_label_css_class);
+
+        spdlog::get("ui")->debug(
+            "CardWidget \"{}\" has updated due date label style",
+            card->get_name());
     }
-
-    due_date_label.add_css_class(last_due_date_label_css_class);
-
-    spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has updated due date label style", card->get_name());
 }
 
 void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
@@ -438,6 +443,10 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
         last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
     }
     complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
+
+    spdlog::get("ui")->debug(
+        "CardWidget \"{}\" has updated complete tasks label style",
+        card->get_name());
 }
 
 int CardWidget::get_n_visible_children() const {

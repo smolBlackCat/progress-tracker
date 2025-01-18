@@ -1,10 +1,12 @@
 #include "item.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include <chrono>
 #include <random>
+
+// Item is the core class of the project, so the "core" logger is created here.
+// This will generate warnings!!!
+extern std::shared_ptr<spdlog::logger> core_logger =
+    spdlog::stdout_color_mt("core");
 
 Item::Item(const std::string& name) : name{name} {
     std::default_random_engine gen(

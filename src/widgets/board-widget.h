@@ -162,6 +162,12 @@ private:
      */
     void setup_auto_scrolling();
 
+    /**
+     * @brief Adds a new cardlist widget to the board widget.
+     */
+    CardlistWidget* _add_cardlist(const std::shared_ptr<CardList>& cardlist,
+                                  bool editing_mode = false);
+
 #ifdef WIN32
     Gtk::Overlay overlay;     ///< Overlay widget for Windows platform
     Gtk::Picture picture;     ///< Picture widget for Windows platform

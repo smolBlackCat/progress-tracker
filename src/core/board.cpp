@@ -79,9 +79,7 @@ Board BoardBackend::load() {
                     settings["filepath"])};
             }
 
-            Board board{*this};
-            board.set_name(name);
-            board.set_background(background);
+            Board board{name, background, *this};
             auto lm_filepath =
                 std::chrono::clock_cast<std::chrono::system_clock,
                                         std::chrono::file_clock>(
@@ -100,15 +98,10 @@ Board BoardBackend::load() {
 
 Board BoardBackend::create(const std::string& name,
                            const std::string& background) {
-    Board board{*this};
+    Board board{name, background, *this};
 
     // Because a new Board is created from scratch, it is essentially loaded
     board.fully_loaded = true;
-
-    board.set_name(name);
-    board.set_background(background);
-    board.set_modified(false);
-
     spdlog::get("core")->debug("BoardBackend has created Board \"{}\"", name);
     return board;
 }
@@ -327,10 +320,11 @@ const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
 Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
 
-Board::~Board() {
-    spdlog::get("core")->debug("Board \"{}\" (at {}) destroyed", name,
-                               fmt::ptr(this));
-}
+Board::Board(const std::string& name, const std::string& background,
+             const BoardBackend& backend)
+    : Item{name}, background{background}, backend{backend} {}
+
+Board::~Board() {}
 
 BackgroundType Board::set_background(const std::string& other, bool modify) {
     BackgroundType bg_type = Board::get_background_type(other);

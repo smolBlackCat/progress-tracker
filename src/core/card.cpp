@@ -14,12 +14,13 @@ Card::Card(const std::string& name, const Date& date, bool complete,
 Card::Card(const std::string& name, const Color& color)
     : Card{name, Date{}, false, color} {}
 
-Card::~Card() { spdlog::get("core")->debug("Card \"{}\" destroyed", name); }
+Card::~Card() {}
 
 void Card::set_color(const Color& color) {
     this->color = color;
     modified = true;
-    spdlog::get("core")->info("Card \"{}\" color set to: {}", name,
+
+    spdlog::get("core")->info("Card \"{}\"'s color set to: {}", name,
                               color_to_string(color));
 }
 

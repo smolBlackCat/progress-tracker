@@ -212,7 +212,7 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
         }
     });
 
-    spdlog::get("ui")->debug("Board {} added to the grid",
+    spdlog::get("ui")->debug("Board \"{}\" added to the grid",
                              board_backend.get_attribute("name"));
 }
 
@@ -226,7 +226,7 @@ void ProgressWindow::on_delete_board_mode() {
     app_menu_button_p->set_focusable(false);
     app_menu_button_p->set_sensitive(false);
 
-    spdlog::get("app")->info("Delete board mode activated");
+    spdlog::get("app")->info("User entered delete board mode");
 }
 
 void ProgressWindow::off_delete_board_mode() {
@@ -238,7 +238,7 @@ void ProgressWindow::off_delete_board_mode() {
     app_menu_button_p->set_focusable();
     app_menu_button_p->set_sensitive();
 
-    spdlog::get("app")->info("Delete board mode deactivated");
+    spdlog::get("app")->info("User has left delete board mode");
 }
 
 void ProgressWindow::on_main_menu() {
@@ -251,7 +251,7 @@ void ProgressWindow::on_main_menu() {
     if (cur_board && cur_board_entry) board_widget.save();
     boards_grid_p->invalidate_sort();
 
-    spdlog::get("app")->info("App view changed to main menu view");
+    spdlog::get("app")->info("Current view changed to board grid");
 }
 
 void ProgressWindow::on_board_view() {
@@ -274,7 +274,7 @@ void ProgressWindow::delete_selected_boards() {
         boards_grid_p->remove(*cur_child);
     }
 
-    spdlog::get("app")->info("{} boards have been deleted",
+    spdlog::get("app")->info("User has deleted {} boards",
                              selected_children.size());
 
     off_delete_board_mode();
@@ -328,7 +328,9 @@ void ProgressWindow::setup_menu_button() {
 void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
         css_provider->load_from_resource(ProgressWindow::STYLE_DARK_CSS);
+        spdlog::get("ui")->debug("Loaded dark style");
     } else {
+        spdlog::get("ui")->debug("Loaded light style");
         css_provider->load_from_resource(ProgressWindow::STYLE_CSS);
     }
 }

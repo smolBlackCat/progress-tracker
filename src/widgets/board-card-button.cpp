@@ -41,8 +41,6 @@ time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
 }
 
 void ui::BoardCardButton::update(BoardBackend& board_backend) {
-    spdlog::get("ui")->debug("Updating BoardCardButton \"{}\" widget",
-                             board_name.get_text().c_str());
     this->board_backend = board_backend;
     Board board = board_backend.load();
 
@@ -50,8 +48,9 @@ void ui::BoardCardButton::update(BoardBackend& board_backend) {
     set_name_(board.get_name());
     set_background(board.get_background());
 
-    spdlog::get("ui")->debug("BoardCardButton \"{}\" widget has been updated",
-                             board.get_name());
+    spdlog::get("ui")->info(
+        "Entry button for Board \"{}\" widget has been updated",
+        board.get_name());
 }
 
 void ui::BoardCardButton::set_name_(const std::string& name) {
@@ -59,9 +58,6 @@ void ui::BoardCardButton::set_name_(const std::string& name) {
 }
 
 void ui::BoardCardButton::set_background(const std::string& background) {
-    spdlog::get("ui")->debug(
-        "Setting BoardCardButton \"{}\" widget's background",
-        board_name.get_text().c_str());
     BackgroundType bg_type = Board::get_background_type(background);
 
     switch (bg_type) {
@@ -92,10 +88,6 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             break;
         }
     }
-
-    spdlog::get("ui")->debug(
-        "BoardCardButton \"{}\" widget's background has been set to \"{}\"",
-        board_name.get_text().c_str(), background);
 }
 
 BoardBackend ui::BoardCardButton::get_backend() const { return board_backend; }

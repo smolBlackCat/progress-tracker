@@ -46,11 +46,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     task_checkbutton.set_hexpand();
     task_checkbutton.set_margin_end(5);
 
-    if (task->get_done()) {
-        add_css_class("complete-task");
-    } else {
-        add_css_class("incomplete-task");
-    }
+    add_css_class(task->get_done() ? "complete-task" : "incomplete-task");
 
     task_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));

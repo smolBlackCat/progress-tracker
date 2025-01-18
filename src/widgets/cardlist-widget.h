@@ -100,6 +100,9 @@ private:
      */
     void setup_drag_and_drop();
 
+    CardWidget* _add(const std::shared_ptr<Card>& card,
+                     bool editing_mode = false);
+
     // Widgets
     EditableLabelHeader cardlist_header;  ///< Header widget for the card list.
     Gtk::Button add_card_button;          ///< Button to add new cards.

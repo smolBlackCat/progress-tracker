@@ -56,11 +56,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     get_row_at_index(0)->set_focusable(false);
 
     for (auto& card : cardlist_refptr->get_cards()) {
-        auto cardwidget = Gtk::make_managed<CardWidget>(card);
-        card_widgets.push_back(cardwidget);
-        cardwidget->set_cardlist(this);
-        root.append(*cardwidget);
-        root.reorder_child_after(add_card_button, *cardwidget);
+        _add(card);
     }
 
     root.set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH);
@@ -136,7 +132,7 @@ void ui::CardlistWidget::reorder(ui::CardWidget& next,
     root.reorder_child_after(next, sibling);
     cardlist->reorder(*next.get_card(), *sibling.get_card());
 
-    spdlog::get("ui")->info(
+    spdlog::get("ui")->debug(
         "CardWidget \"{}\" has been reordered after CardWidget \"{}\"",
         next.get_card()->get_name(), sibling.get_card()->get_name());
 }
@@ -257,33 +253,17 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 }
 
 void ui::CardlistWidget::remove(ui::CardWidget* card) {
-    root.remove(*card);
-    cardlist->remove(*card->get_card());
-
-    for (size_t i = 0; i < card_widgets.size(); i++) {
-        if (card_widgets[i] == card) {
-            card_widgets.erase(card_widgets.begin() + i);
-        }
-    }
-
-    spdlog::get("ui")->info(
+    spdlog::get("ui")->debug(
         "CardWidget \"{}\" has been removed from CardlistWidget \"{}\"",
         card->get_card()->get_name(), cardlist->get_name());
+
+    root.remove(*card);
+    cardlist->remove(*card->get_card());
+    std::erase(card_widgets, card);
 }
 
 ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
-    ui::CardWidget* new_card =
-        Gtk::make_managed<ui::CardWidget>(cardlist->add(card), editing_mode);
-    new_card->set_cardlist(this);
-
-    card_widgets.push_back(new_card);
-    root.append(*new_card);
-    root.reorder_child_after(add_card_button, *new_card);
-
-    spdlog::get("ui")->info(
-        "CardWidget \"{}\" has been added to CardlistWidget \"{}\"",
-        card.get_name(), cardlist->get_name());
-    return new_card;
+    return _add(cardlist->add(card), editing_mode);
 }
 
 const std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist() {
@@ -297,6 +277,17 @@ bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
     return false;
 }
 
-// ui::EditableLabelHeader& ui::CardlistWidget::get_header() {
-//     return cardlist_header;
-// }
+ui::CardWidget* ui::CardlistWidget::_add(const std::shared_ptr<Card>& card,
+                                         bool editing_mode) {
+    auto cardwidget = Gtk::make_managed<CardWidget>(card);
+    card_widgets.push_back(cardwidget);
+    cardwidget->set_cardlist(this);
+    root.append(*cardwidget);
+    root.reorder_child_after(add_card_button, *cardwidget);
+
+    spdlog::get("ui")->debug(
+        "CardWidget \"{}\" has been added to CardlistWidget \"{}\"",
+        card->get_name(), cardlist->get_name());
+
+    return cardwidget;
+}
