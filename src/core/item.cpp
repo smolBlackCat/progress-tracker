@@ -3,9 +3,7 @@
 #include <chrono>
 #include <random>
 
-// Item is the core class of the project, so the "core" logger is created here.
-// This will generate warnings!!!
-extern std::shared_ptr<spdlog::logger> core_logger =
+extern const std::shared_ptr<spdlog::logger> core_logger =
     spdlog::stdout_color_mt("core");
 
 Item::Item(const std::string& name) : name{name} {
