@@ -210,7 +210,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 this->board.reorder_cardlist(*dropped_cardlist, *this);
                 dropped_cardlist->set_opacity(1);
 
-                spdlog::get("ui")->info(
+                spdlog::get("ui")->debug(
                     "CardlistWidget \"{}\" has been dropped on CardlistWidget "
                     "\"{}\"",
                     dropped_cardlist->get_cardlist()->get_name(),
@@ -238,7 +238,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                     dropped_card->remove_from_parent();
                     this->add(*card_in_dropped);
 
-                    spdlog::get("ui")->info(
+                    spdlog::get("ui")->debug(
                         "CardWidget \"{}\" has been dropped on CardlistWidget "
                         "\"{}\"",
                         dropped_card->get_card()->get_name(),
@@ -279,7 +279,7 @@ bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
 
 ui::CardWidget* ui::CardlistWidget::_add(const std::shared_ptr<Card>& card,
                                          bool editing_mode) {
-    auto cardwidget = Gtk::make_managed<CardWidget>(card);
+    auto cardwidget = Gtk::make_managed<CardWidget>(card, editing_mode);
     card_widgets.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     root.append(*cardwidget);

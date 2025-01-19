@@ -160,7 +160,7 @@ void TaskWidget::on_checkbox() {
 }
 
 void TaskWidget::on_convert(CardWidget& card_widget) {
-    spdlog::get("ui")->info("TaskWidget \"{}\" has been converted to a card",
+    spdlog::get("app")->info("Task \"{}\" has been converted to a card",
                             task->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
@@ -226,7 +226,7 @@ void TaskWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                spdlog::get("ui")->info(
+                spdlog::get("ui")->debug(
                     "TaskWidget \"{}\" has been dropped on TaskWidget \"{}\"",
                     dropped_taskwidget->get_task()->get_name(),
                     task->get_name());

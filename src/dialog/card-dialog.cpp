@@ -68,8 +68,8 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     std::erase(tasks_tracker, &task);
     cur_card_widget->update_complete_tasks();
 
-    spdlog::get("ui")->info("TaskWidget \"{}\" removed from the Card Dialog",
-                            task.get_task()->get_name());
+    spdlog::get("ui")->debug("TaskWidget \"{}\" removed from the Card Dialog",
+                             task.get_task()->get_name());
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
@@ -77,7 +77,7 @@ void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
     tasks_box->reorder_child_after(next, sibling);
     cur_card_widget->get_card()->reorder(*next.get_task(), *sibling.get_task());
 
-    spdlog::get("ui")->info(
+    spdlog::get("ui")->debug(
         "TaskWidget \"{}\" reordered after TaskWidget \"{}\"",
         next.get_task()->get_name(), sibling.get_task()->get_name());
 }
@@ -101,8 +101,9 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
 
     adw_dialog_present(ADW_DIALOG(adw_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
-    spdlog::get("ui")->info(
-        "Card Dialog opened with selected card information");
+
+    spdlog::get("app")->info("Card dialog opened for Card {}",
+                             card_widget->get_card()->get_name());
 }
 
 void CardDetailsDialog::close() {
@@ -145,14 +146,13 @@ void CardDetailsDialog::on_save() {
 
     cur_card_widget->set_tooltip_text(cur_card_widget->create_details_text());
 
-    spdlog::get("ui")->info("Card Dialog saved selected card information");
+    spdlog::get("ui")->info("Card dialog has saved changes made to Card \"{}\"",
+                            card->get_name());
 }
 
 void CardDetailsDialog::on_delete_card() {
     cur_card_widget->remove_from_parent();
     close();
-
-    spdlog::get("ui")->debug("Card Dialog just had a card deleted");
 }
 
 void CardDetailsDialog::on_unset_due_date() {
@@ -206,7 +206,9 @@ void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
         Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
     tasks_box->append(*task_widget);
     tasks_tracker.push_back(task_widget);
-    spdlog::get("ui")->debug("Added TaskWidget \"{}\" to the Card Dialog",
-                             task->get_name());
+
+    spdlog::get("ui")->debug(
+        "TaskWidget \"{}\" has been added to the Card Dialog's task list",
+        task->get_name());
 }
 }  // namespace ui

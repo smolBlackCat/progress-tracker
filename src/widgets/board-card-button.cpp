@@ -48,7 +48,7 @@ void ui::BoardCardButton::update(BoardBackend& board_backend) {
     set_name_(board.get_name());
     set_background(board.get_background());
 
-    spdlog::get("ui")->info(
+    spdlog::get("ui")->debug(
         "Entry button for Board \"{}\" widget has been updated",
         board.get_name());
 }

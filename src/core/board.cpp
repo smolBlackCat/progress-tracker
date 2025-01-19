@@ -237,8 +237,9 @@ void BoardBackend::load_cardlists(Board& board) {
         }
         board.set_modified(false);
 
-        spdlog::get("core")->debug("Cardlists loaded for board \"{}\"",
-                                   board.get_name());
+        spdlog::get("core")->debug(
+            "BoardBackend has loaded all cardlists for board \"{}\"",
+            board.get_name());
     } else {
         spdlog::get("core")->warn("Board \"{}\" is already loaded",
                                   board.get_name());
@@ -467,6 +468,7 @@ bool Board::save() {
 
 void Board::load() {
     backend.load_cardlists(*this);
+
     spdlog::get("core")->info("Board \"{}\" fully loaded", name);
 }
 

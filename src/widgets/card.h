@@ -228,6 +228,11 @@ protected:
     void on_cancel_changes();
 
     /**
+     * @brief Sets the card's color
+     */
+    void _set_color(const Gdk::RGBA& color);
+
+    /**
      * @brief Clears the card cover color.
      */
     void clear_color();

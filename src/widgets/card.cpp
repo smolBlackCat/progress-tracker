@@ -9,7 +9,6 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
-#include "core/item.h"
 #include "gtk/gtk.h"
 #include "window.h"
 
@@ -301,18 +300,22 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
 
     if (card->is_color_set()) {
         Color card_color = card->get_color();
-        set_color(Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
-                            static_cast<float>(std::get<1>(card_color)) / 255,
-                            static_cast<float>(std::get<2>(card_color)) / 255,
-                            std::get<3>(card_color)});
+        _set_color(Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
+                             static_cast<float>(std::get<1>(card_color)) / 255,
+                             static_cast<float>(std::get<2>(card_color)) / 255,
+                             std::get<3>(card_color)});
 
         if (!is_new) {
             card->set_modified(false);
         }
     }
+    if (card->get_due_date().ok()) {
+        update_due_date();
+    }
 
-    update_due_date();
-    update_complete_tasks();
+    if (!card->get_tasks().empty()) {
+        update_complete_tasks();
+    }
 
     set_tooltip_text(create_details_text());
     setup_drag_and_drop();
@@ -324,8 +327,6 @@ CardWidget::~CardWidget() {
     }
 
     root_box.unparent();
-
-    spdlog::get("ui")->debug("CardWidget has been destroyed");
 }
 
 void CardWidget::set_title(const std::string& label) {
@@ -420,10 +421,6 @@ void CardWidget::update_due_date_label_style() {
         }
 
         due_date_label.add_css_class(last_due_date_label_css_class);
-
-        spdlog::get("ui")->debug(
-            "CardWidget \"{}\" has updated due date label style",
-            card->get_name());
     }
 }
 
@@ -443,10 +440,6 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
         last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
     }
     complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
-
-    spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has updated complete tasks label style",
-        card->get_name());
 }
 
 int CardWidget::get_n_visible_children() const {
@@ -654,19 +647,12 @@ void CardWidget::off_rename() {
 void CardWidget::clear_color() {
     card_cover_revealer.set_reveal_child(false);
     card->set_color(NO_COLOR);
-
-    spdlog::get("ui")->debug("CardWidget \"{}\" has cleared color",
-                             card->get_name());
 }
 
 void CardWidget::on_confirm_changes() {
     if (card_entry.get_text().compare(card_label.get_label()) != 0) {
         card->set_name(card_entry.get_text());
         card_label.set_label(card_entry.get_text());
-
-        spdlog::get("ui")->debug("CardWidget \"{}\" has been renamed to \"{}\"",
-                                 card->get_name(),
-                                 card_entry.get_text().c_str());
     }
     is_new = false;
 }
@@ -678,17 +664,9 @@ void CardWidget::on_cancel_changes() {
 }
 
 void CardWidget::set_color(const Gdk::RGBA& color) {
-    auto color_frame_pixbuf = Gdk::Pixbuf::create(
-        Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
     card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
                           color.get_blue() * 255, 1.0});
-    color_frame_pixbuf->fill(rgb_to_hex(card->get_color()));
-    if (card_cover_picture.get_paintable()) {
-        card_cover_picture.set_paintable(nullptr);
-    }
-    card_cover_picture.set_paintable(
-        Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
-    card_cover_revealer.set_reveal_child(true);
+    _set_color(color);
 
     spdlog::get("ui")->debug("CardWidget \"{}\" has set color to {}",
                              card->get_name(), color.to_string().c_str());
@@ -770,5 +748,19 @@ std::string CardWidget::create_details_text() const {
     }
 
     return final_text;
+}
+
+void CardWidget::_set_color(const Gdk::RGBA& color) {
+    auto color_frame_pixbuf = Gdk::Pixbuf::create(
+        Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
+    color_frame_pixbuf->fill(rgb_to_hex(card->get_color()));
+
+    if (card_cover_picture.get_paintable()) {
+        card_cover_picture.set_paintable(nullptr);
+    }
+
+    card_cover_picture.set_paintable(
+        Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
+    card_cover_revealer.set_reveal_child(true);
 }
 }  // namespace ui

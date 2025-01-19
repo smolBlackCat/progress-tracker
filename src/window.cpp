@@ -168,10 +168,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     app_stack_p->add(board_widget, "board-page");
 }
 
-ProgressWindow::~ProgressWindow() {
-    spdlog::get("ui")->debug("ProgressWindow (at {}) has been destroyed",
-                             fmt::ptr(this));
-}
+ProgressWindow::~ProgressWindow() {}
 
 void ProgressWindow::add_local_board(BoardBackend board_backend) {
     auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
@@ -211,9 +208,6 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
             }
         }
     });
-
-    spdlog::get("ui")->debug("Board \"{}\" added to the grid",
-                             board_backend.get_attribute("name"));
 }
 
 void ProgressWindow::on_delete_board_mode() {
@@ -296,9 +290,6 @@ void ProgressWindow::show_about_dialog() {
 
 void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
     card_dialog.open(*this, card_widget);
-
-    spdlog::get("app")->info("Card dialog opened for Card {}",
-                             card_widget->get_card()->get_name());
 }
 
 void ProgressWindow::show_shortcuts_dialog() {
