@@ -1,12 +1,17 @@
 configure_file(app_info.h.in app_info.h)
 
-file(GLOB_RECURSE CORE_SOURCES "core/*.h" "core/*.cpp")
+file(GLOB_RECURSE CORE_HEADERS "core/*.h")
+file(GLOB_RECURSE CORE_SOURCES "core/*.cpp")
+
+add_library(libcore STATIC ${CORE_SOURCES})
+target_link_libraries(libcore PRIVATE ${TINYXML2})
+target_link_libraries(libcore PRIVATE spdlog::spdlog)
+
+target_include_directories(libcore PRIVATE ${TINYXML2_INCLUDE_DIRS})
+target_include_directories(libcore PRIVATE ${CORE_HEADERS})
+
 file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp" "widgets/*.h")
 file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp" "dialog/*.h")
-
-list(APPEND APP_INCLUDES
-     "${PROJECT_SOURCE_DIR}/src"
-     "${PROJECT_BINARY_DIR}/src")
 
 add_executable(progress-tracker
     main.cpp
@@ -18,27 +23,25 @@ add_executable(progress-tracker
     utils.cpp
     ${WIDGET_SOURCES}
     ${DIALOG_SOURCES}
-    ${CORE_SOURCES}
     ${CMAKE_CURRENT_BINARY_DIR}/resources.cpp)
 
 if ((WIN32 AND (NOT DEVELOPMENT)))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
 
-target_link_libraries(progress-tracker PUBLIC ${GTKMM_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${TINYXML2})
-target_link_libraries(progress-tracker PUBLIC ${ADWAITA_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${Intl_LIBRARIES})
-target_link_libraries(progress-tracker PUBLIC ${APP_LIBS})
-target_link_libraries(progress-tracker PUBLIC spdlog::spdlog)
+target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
+target_link_libraries(progress-tracker PRIVATE ${ADWAITA_LIBRARIES})
+target_link_libraries(progress-tracker PRIVATE ${Intl_LIBRARIES})
+target_link_libraries(progress-tracker PRIVATE spdlog::spdlog)
+target_link_libraries(progress-tracker PRIVATE libcore)
 
-target_link_directories(progress-tracker PUBLIC ${GTKMM_LIBRARY_DIR})
+target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIR})
 
-target_include_directories(progress-tracker PUBLIC ${TINYXML2_INCLUDE_DIRS})
-target_include_directories(progress-tracker PUBLIC ${GTKMM_INCLUDE_DIRS})
-target_include_directories(progress-tracker PUBLIC ${ADWAITA_INCLUDE_DIRS})
-target_include_directories(progress-tracker PUBLIC ${Intl_INCLUDE_DIRS})
-target_include_directories(progress-tracker PUBLIC ${APP_INCLUDES})
+target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
+target_include_directories(progress-tracker PRIVATE ${ADWAITA_INCLUDE_DIRS})
+target_include_directories(progress-tracker PRIVATE ${Intl_INCLUDE_DIRS})
+target_include_directories(progress-tracker PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(progress-tracker PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
