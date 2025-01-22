@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Progress
+StartupWMClass=@APPLICATION_ID@
+Comment=_Kanban style todo app
+Categories=ProjectManagement;Office;
+Keywords=_Kanban;Todo;Progress;
+Exec=@EXECUTABLE_NAME@
+Icon=@APPLICATION_ID@

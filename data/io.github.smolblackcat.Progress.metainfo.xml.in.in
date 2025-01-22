@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>@APPLICATION_ID@</id>
-  <name>@APP_NAME@</name>
+  <name>Progress</name>
   <summary>Kanban-style task organiser</summary>
   <developer id="io.github.smolblackcat">
     <name>Gabriel de Moura</name>
