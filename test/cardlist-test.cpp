@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "core/cardlist.h"
+#include <core/cardlist.h>
 
 #include <catch2/catch_test_macros.hpp>
 

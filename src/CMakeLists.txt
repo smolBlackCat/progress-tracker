@@ -1,14 +1,13 @@
 configure_file(app_info.h.in app_info.h)
 
-file(GLOB_RECURSE CORE_HEADERS "core/*.h")
+# file(GLOB_RECURSE CORE_HEADERS "core/*.h")
 file(GLOB_RECURSE CORE_SOURCES "core/*.cpp")
 
 add_library(libcore STATIC ${CORE_SOURCES})
 target_link_libraries(libcore PRIVATE ${TINYXML2})
-target_link_libraries(libcore PRIVATE spdlog::spdlog)
+target_link_libraries(libcore PUBLIC spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 
 target_include_directories(libcore PRIVATE ${TINYXML2_INCLUDE_DIRS})
-target_include_directories(libcore PRIVATE ${CORE_HEADERS})
 
 file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp" "widgets/*.h")
 file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp" "dialog/*.h")
@@ -32,7 +31,7 @@ endif()
 target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
 target_link_libraries(progress-tracker PRIVATE ${ADWAITA_LIBRARIES})
 target_link_libraries(progress-tracker PRIVATE ${Intl_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE spdlog::spdlog)
+target_link_libraries(progress-tracker PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 target_link_libraries(progress-tracker PRIVATE libcore)
 
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIR})

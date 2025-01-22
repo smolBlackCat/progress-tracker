@@ -2,11 +2,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "board.h"
-#include "card.h"
-#include "cardlist.h"
-#include "item.h"
-#include "task.h"
+#include <core/board.h>
+#include <core/card.h>
+#include <core/cardlist.h>
+#include <core/item.h>
+#include <core/task.h>
 
 TEST_CASE("Item set name marks modified", "[Item]") {
     Item item("initial name");

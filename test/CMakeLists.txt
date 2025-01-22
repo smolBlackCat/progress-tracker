@@ -18,5 +18,4 @@ foreach(EXECUTABLE ${TEST_EXECUTABLES})
 
     target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_BINARY_DIR}/src/)
     target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src/)
-    target_include_directories(${EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src/core)
 endforeach()
