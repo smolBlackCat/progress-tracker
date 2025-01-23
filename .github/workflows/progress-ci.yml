@@ -16,7 +16,7 @@ jobs:
       - name: Setup UCRT64 Environment
         uses: msys2/setup-msys2@v2
         with:
-          msystem: ucrt-x86_64
+          msystem: UCRT64
           update: true
           install: |
             mingw-w64-ucrt-x86_64-cmake
