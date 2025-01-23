@@ -3,6 +3,43 @@ name: Progress CI
 on: ["push", "pull_request"]
 
 jobs:
+  windows:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup UCRT64 Environment
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ucrt-x86_64
+          update: true
+          install: |
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gtkmm4
+            mingw-w64-ucrt-x86_64-libadwaita
+            mingw-w64-ucrt-x86_64-tinyxml2
+            mingw-w64-ucrt-x86_64-gettext
+            mingw-w64-ucrt-x86_64-catch
+            mingw-w64-ucrt-x86_64-spdlog
+            mingw-w64-ucrt-x86_64-nsis
+            git
+
+      - name: Build
+        run: |
+          cmake -GNinja -B build -DDEVELOPMENT=ON
+          cmake --build build
+
+      - name: Test
+        run: |
+          cd build/
+          ctest
+
   linux:
     runs-on: ubuntu-latest
 
