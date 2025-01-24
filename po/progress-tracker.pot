@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 15:25-0300\n"
+"POT-Creation-Date: 2025-01-23 22:17-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,122 +56,143 @@ msgid ""
 msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:58
-msgid "What's new in Progress 1.5.1"
+msgid "What's new in Progress 1.6.0"
 msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:60
+msgid "Added Polish Translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:61
+msgid "Fixed rendering artifact (Windows)"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:67
+msgid "What's new in Progress 1.5.2"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:69
+msgid ""
+"Fix bug where application would crash after dropping a cardlist onto itself"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:76
+msgid "What's new in Progress 1.5.1"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:78
 msgid ""
 "Fix bug where the board's background was set only if the board's name was "
 "also modified"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:67
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:85
 msgid "What's new in Progress 1.5.0"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:69
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:87
 msgid "Board buttons will now appear in the order of modification"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:70
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:88
 msgid ""
 "Preferences Board Dialog will only generate a new name file if the board's "
 "name was changed"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:77
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:95
 msgid "What's new in Progress 1.4.1"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:79
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:97
 msgid "Locale directory resolution optimised"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:85
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:103
 msgid "What's new in Progress 1.4"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:87
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:105
 msgid "Spanish translation has been updated"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:93
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:111
 msgid "What's new in Progress 1.3"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:95
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:113
 msgid "Italian translation has been updated"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:96
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:114
 msgid "Russian Translation has been added"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:97
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:115
 msgid "Ukranian Translation has been added"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:98
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:116
 msgid "Card widgets have gotten an UI rework"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:99
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:117
 msgid "A cancel button has been added to cancel creation and renaming"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:105
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:123
 msgid "The current minor releases brings some additions and improvements"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:107
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:125
 msgid "Utilise Adwaita About Dialogs"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:108
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:126
 msgid "Added Bulgarian Translation"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:109
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:127
 msgid "Added Turkish Translation"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:110
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:128
 msgid "Progress will not fail to start in case the boards are corrupted"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:111
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:129
 msgid "Added tooltips"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:117
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:135
 msgid "Bug Fixes and Improvements"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:119
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:137
 msgid "Board grid UI enhance"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:120
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:138
 msgid "Fix segmentation fault error when moving cards onto themselves"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:121
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:139
 msgid "Progress is better integrated on GNOME systems"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:122
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:140
 msgid "Add Dutch translation"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:123
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:141
 msgid "Add Italian translation"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:124
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:142
 msgid "Add Spanish translation"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:130
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:148
 msgid "First official release of Progress 1.0"
 msgstr ""
 

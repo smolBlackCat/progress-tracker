@@ -13,6 +13,7 @@ list(APPEND LINGUAS
         en_US
         it
         nl
+        pl
         pt_BR
         ru_RU
         tr
