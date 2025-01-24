@@ -64,3 +64,18 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         run: ctest
+
+  flatpak:
+    name: "Flatpak"
+    runs-on: "ubuntu-latest"
+    container:
+      image: bilelmoussaoui/flatpak-github-actions-gnome-47
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: progress.flatpak
+          manifest-path: io.github.smoblackcat.Progress.Devel.json
+          cache-key: flatpak-builder-${{ github.sha }}
+          run-tests: true
