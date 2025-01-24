@@ -138,6 +138,18 @@
         "-DSPDLOG_BUILD_SHARED=ON"
       ]
     },
+
+    {
+      "name": "catch2",
+      "buildsystem": "cmake",
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/catchorg/Catch2.git",
+          "tag": "v3.8.0"
+        }
+      ]
+    },
     {
       "name": "progress-tracker",
       "buildsystem": "cmake-ninja",
