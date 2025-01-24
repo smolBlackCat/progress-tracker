@@ -73,7 +73,7 @@ jobs:
       options: --privileged
     steps:
       - uses: actions/checkout@v4
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
         with:
           bundle: progress.flatpak
           manifest-path: io.github.smoblackcat.Progress.Devel.json
