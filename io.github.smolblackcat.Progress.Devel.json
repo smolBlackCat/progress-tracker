@@ -142,6 +142,7 @@
     {
       "name": "catch2",
       "buildsystem": "cmake",
+      "builddir": true,
       "sources": [
         {
           "type": "git",
