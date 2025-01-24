@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: "Setup Environment"
         run: |
-          apt install flatpak-builder flatpak
+          sudo apt install flatpak-builder flatpak
           flatpak install runtime/org.gnome.Sdk/x86_64/47
       - uses: actions/checkout@v4
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
