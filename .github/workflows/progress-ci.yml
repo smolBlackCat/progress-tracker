@@ -41,6 +41,12 @@ jobs:
           cd build/
           ctest
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Progress-2.0.0.exe
+          path: build/
+
   linux:
     runs-on: ubuntu-latest
 
@@ -64,3 +70,9 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         run: ctest
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Progress-2.0.0.deb
+          path: build/
