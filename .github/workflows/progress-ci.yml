@@ -41,11 +41,19 @@ jobs:
           cd build/
           ctest
 
+      - name: Setup Windows Artifacts
+        run: |
+          cd build/
+          mkdir dev-build/
+          cpack
+          mv *.exe dev-build/
+          mv *.zip dev-build/
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Progress-2.0.0.exe
-          path: build/
+          name: Windows Build
+          path: build/dev-build/
 
   linux:
     runs-on: ubuntu-latest
@@ -71,8 +79,16 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: ctest
 
+      - name: Setup Linux Artifacts
+        run: |
+          cd build/
+          cpack
+          mkdir dev-build
+          mv *.deb dev-build
+          mv *.tar.xz dev-build
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Progress-2.0.0.deb
-          path: build/
+          name: Linux Build
+          path: build/dev-build
