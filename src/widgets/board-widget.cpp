@@ -117,7 +117,7 @@ bool ui::BoardWidget::save(bool free) {
     bool success;
     if (board->get_modified()) {
         success = board->save();
-        board_card_button->update(board->backend);
+        board_card_button->update(*board);
     }
     if (free) {
         clear();

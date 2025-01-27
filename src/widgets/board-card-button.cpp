@@ -40,9 +40,8 @@ time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
     return last_modified;
 }
 
-void ui::BoardCardButton::update(BoardBackend& board_backend) {
-    this->board_backend = board_backend;
-    Board board = board_backend.load();
+void ui::BoardCardButton::update(const Board& board) {
+    this->board_backend = board.backend;
 
     last_modified = board.get_last_modified();
     set_name_(board.get_name());

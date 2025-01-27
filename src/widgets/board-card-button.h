@@ -36,7 +36,7 @@ public:
     /**
      * @brief Sets a new backend to present information from a Board
      */
-    void update(BoardBackend& board_backend);
+    void update(const Board& board);
 
     /**
      * @brief Updates the button's title

@@ -107,17 +107,15 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
 }
 
 void CardDetailsDialog::close() {
-    adw_dialog_force_close(ADW_DIALOG(adw_dialog->gobj()));
-    clear();
+    adw_dialog_close(ADW_DIALOG(adw_dialog->gobj()));
 }
 
 void CardDetailsDialog::update_due_date_label() {
     auto sys_days =
         std::chrono::sys_days(cur_card_widget->get_card()->get_due_date());
-    sys_days++;
     std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
     char date_str[255];
-    strftime(date_str, 255, "%x", std::localtime(&time));
+    strftime(date_str, 255, "%x", std::gmtime(&time));
     date_menubutton->set_label(Glib::ustring{date_str});
 
     spdlog::get("ui")->debug("Card Dialog's due date label has been updated");
@@ -131,6 +129,10 @@ void CardDetailsDialog::on_add_task() {
 }
 
 void CardDetailsDialog::on_save() {
+    if (!cur_card_widget) {
+        return;
+    }
+
     auto card = cur_card_widget->get_card();
     std::string new_card_name = card_title_entry->get_text();
     std::string new_notes = notes_textbuffer->get_text();
@@ -152,6 +154,10 @@ void CardDetailsDialog::on_save() {
 
 void CardDetailsDialog::on_delete_card() {
     cur_card_widget->remove_from_parent();
+    cur_card_widget = nullptr;
+
+    spdlog::get("ui")->info("Card dialog has deleted a card");
+
     close();
 }
 

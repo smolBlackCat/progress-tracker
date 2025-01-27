@@ -17,7 +17,7 @@ BoardDialog::BoardDialog()
           builder->get_widget<Gtk::MenuButton>("background-setter-menubutton")},
       board_picture{builder->get_widget<Gtk::Picture>("board-picture")},
       footer_button{builder->get_widget<Gtk::Button>("footer-button")} {
-    set_picture(Gdk::RGBA{0, 120, 212});
+    set_picture(Gdk::RGBA{0, 0, 0, 0});
     auto group = Gio::SimpleActionGroup::create();
 
     group->add_action("set-color",
@@ -112,6 +112,7 @@ void BoardDialog::on_filedialog_finish(
 // FIXME: Colour setting code is pretty inneficient because of the to-hex
 // conversion overhead
 void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
+    this->rgba = rgba;
     auto color_frame_pixbuf =
         Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 30, 30);
     auto c = Color{rgba.get_red() * 255, rgba.get_green() * 255,

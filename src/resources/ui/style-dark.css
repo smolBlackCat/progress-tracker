@@ -37,10 +37,11 @@ card {
     transition-duration: 1s;
 }
 
-card:focus {
-    box-shadow: 0 0 5px #3772af;
+card:focus,
+.card-to-drop {
+    box-shadow: 0 0 6px #3772af;
     background-color: #6e6c74;
-    border: 1px solid #3772af;
+    border: 2px solid #3772af;
     transition-property: background-color, border, box-shadow, outline;
     transition-duration: 1s;
 }

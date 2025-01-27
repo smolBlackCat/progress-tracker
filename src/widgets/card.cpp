@@ -294,9 +294,16 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
             }
         });
 
+    auto drop_motion_controller = Gtk::DropControllerMotion::create();
+    drop_motion_controller->signal_motion().connect(
+        [this](double x, double y) { this->add_css_class("card-to-drop"); });
+    drop_motion_controller->signal_leave().connect(
+        [this]() { this->remove_css_class("card-to-drop"); });
+
     card_entry.add_controller(key_controller);
     card_label.add_controller(card_label_click_controller);
     add_controller(click_controller);
+    add_controller(drop_motion_controller);
 
     if (card->is_color_set()) {
         Color card_color = card->get_color();
@@ -387,12 +394,14 @@ void CardWidget::update_complete_tasks() {
 void CardWidget::update_due_date() {
     if (card->get_due_date().ok()) {
         due_date_label.set_visible();
+
         auto sys_days = std::chrono::sys_days(card->get_due_date());
-        sys_days++;
         std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
 
-        char date_str[255];
-        strftime(date_str, 255, "%d %b, %Y", std::localtime(&time));
+        char date_str[100];
+        std::strftime(date_str, sizeof(date_str), "%d %b, %Y",
+                      std::gmtime(&time));
+
         due_date_label.set_label(_("Due: ") + Glib::ustring{date_str});
 
         update_due_date_label_style();
@@ -585,6 +594,10 @@ void CardWidget::setup_drag_and_drop() {
                 if (dropped_card == this) {
                     spdlog::warn("Dropped CardWidget \"{}\" onto itself",
                                  card->get_name());
+
+                    // After dropping, the receiver card still has the style set
+                    // by DropControllerMotion. Reset
+                    this->remove_css_class("card-to-drop");
                     return true;
                 }
 
@@ -597,6 +610,11 @@ void CardWidget::setup_drag_and_drop() {
                     dropped_card->remove_from_parent();
                     this->cardlist_p->reorder(*dropped_copy, *this);
                 }
+
+                // After dropping, the receiver card still has the style set by
+                // DropControllerMotion. Reset
+                this->remove_css_class("card-to-drop");
+
                 return true;
             }
             return false;
@@ -691,10 +709,10 @@ std::string CardWidget::create_details_text() const {
             details_text << _("This card is complete") << "\n\n";
         } else if (card_due_date > cur_date) {
             auto due_date_tm =
-                system_clock::to_time_t(++sys_days(card_due_date));
+                system_clock::to_time_t(sys_days(card_due_date));
             char date_info[100];
             strftime(date_info, 100, _("This card is due %x"),
-                     std::localtime(&due_date_tm));
+                     std::gmtime(&due_date_tm));
             details_text << std::string{date_info} << "\n\n";
         } else if (card_due_date == cur_date) {
             details_text << _("The card is due today") << "\n\n";
