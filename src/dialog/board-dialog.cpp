@@ -80,7 +80,6 @@ void BoardDialog::on_color_finish(
     const Glib::RefPtr<Gio::AsyncResult>& result) {
     try {
         rgba = color_dialog->choose_rgba_finish(result);
-        bg_type = BackgroundType::COLOR;
         set_picture(rgba);
     } catch (Gtk::DialogError& err) {
         spdlog::get("ui")->warn(
@@ -97,7 +96,6 @@ void BoardDialog::on_filedialog_finish(
     const Glib::RefPtr<Gtk::FileDialog>& dialog) {
     try {
         image_filename = dialog->open_finish(result)->get_path();
-        bg_type = BackgroundType::IMAGE;
         set_picture(image_filename);
     } catch (Glib::Error& err) {
         spdlog::get("ui")->warn(
@@ -113,6 +111,7 @@ void BoardDialog::on_filedialog_finish(
 // conversion overhead
 void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     this->rgba = rgba;
+    bg_type = BackgroundType::COLOR;
     auto color_frame_pixbuf =
         Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 30, 30);
     auto c = Color{rgba.get_red() * 255, rgba.get_green() * 255,
@@ -129,6 +128,7 @@ void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
 
 void BoardDialog::set_picture(const std::string& image_filename) {
     board_picture->set_filename(image_filename);
+    bg_type = BackgroundType::IMAGE;
 
     spdlog::get("ui")->info("Board picture set to image in the board dialog");
 }
