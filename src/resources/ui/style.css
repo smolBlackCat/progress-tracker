@@ -2,11 +2,6 @@
     background-color: #26a269;
 }
 
-list.rich-list {
-    border-radius: 20px;
-    box-shadow: 0 0 4px #9a9996;
-}
-
 .add-cardlist-button {
     background-color: #c0bfbc;
 }
@@ -29,6 +24,13 @@ list.rich-list {
     border-radius: 5px;
     padding: 4px;
     box-shadow: 0 0 2px #9a9996;
+}
+
+.cardlist {
+    background-color: @theme_bg_color;
+    padding: 12px;
+    border-radius: 20px;
+    box-shadow: 0 0 4px #9a9996;
 }
 
 card {

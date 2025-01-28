@@ -36,6 +36,7 @@ ui::BoardWidget::BoardWidget()
 
     setup_auto_scrolling();
 
+    root.set_halign(Gtk::Align::START);
     root.set_spacing(25);
     root.set_margin(10);
 

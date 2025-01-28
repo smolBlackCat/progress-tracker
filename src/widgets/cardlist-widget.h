@@ -18,7 +18,7 @@ class CardWidget;
 /**
  * @brief Class that implements the facilities of a card list widget.
  */
-class CardlistWidget : public Gtk::ListBox {
+class CardlistWidget : public Gtk::Box {
 public:
     static constexpr int CARDLIST_MAX_WIDTH =
         240;  ///< Maximum width for the card list widget.

@@ -9,7 +9,7 @@
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                                    std::shared_ptr<CardList> cardlist_refptr,
                                    bool is_new)
-    : Gtk::ListBox{},
+    : Gtk::Box{Gtk::Orientation::VERTICAL},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
       card_widgets{},
@@ -18,12 +18,9 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
       is_new{is_new},
       cardlist_header{cardlist_refptr->get_name(), "cardlist-title",
                       "cardlist-title"} {
-    add_css_class("rich-list");
-    set_valign(Gtk::Align::START);
-    set_vexpand(true);
+    add_css_class("cardlist");
     set_halign(Gtk::Align::START);
-    set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH * 2);
-    set_selection_mode(Gtk::SelectionMode::NONE);
+    set_size_request(CARDLIST_MAX_WIDTH, -1);
     setup_drag_and_drop();
 
     if (is_new) {
@@ -43,33 +40,27 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                 this->board.remove_cardlist(*this);
             }
         });
+    cardlist_header.set_margin_bottom(15);
 
     add_card_button.set_valign(Gtk::Align::CENTER);
-    add_card_button.set_halign(Gtk::Align::FILL);
     add_card_button.set_hexpand(true);
     add_card_button.signal_clicked().connect(
         [this]() { this->add(Card{_("New Card")}, true); });
     root.append(add_card_button);
 
     append(cardlist_header);
-    // When TABbing through the board, don't focus on the Cardlist header
-    get_row_at_index(0)->set_focusable(false);
 
     for (auto& card : cardlist_refptr->get_cards()) {
         _add(card);
     }
 
-    root.set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH);
-    root.set_valign(Gtk::Align::FILL);
     root.set_vexpand();
     root.set_spacing(15);
-    root.set_margin_top(4);
 
     Gtk::ScrolledWindow scr_window{};
     scr_window.set_child(root);
-    scr_window.set_size_request(CARDLIST_MAX_WIDTH, CARDLIST_MAX_WIDTH * 2);
+    scr_window.set_size_request(CARDLIST_MAX_WIDTH, -1);
     scr_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-    scr_window.get_vscrollbar()->set_visible(false);
     append(scr_window);
 
     auto shortcut_controller = Gtk::ShortcutController::create();
@@ -115,14 +106,6 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                 return true;
             })));
     add_controller(shortcut_controller);
-
-    // Makes the header and the list itself non-selectable
-    get_row_at_index(0)->set_activatable(false);
-    get_row_at_index(1)->set_activatable(false);
-
-    // Don't focus on the rows
-    get_row_at_index(1)->set_focusable(false);
-    get_row_at_index(0)->set_focusable(false);
 }
 
 ui::CardlistWidget::~CardlistWidget() {}
