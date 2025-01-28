@@ -45,17 +45,18 @@ Use these prefixes when writing commits:
 As a translator of this project, you may interact with the following files in
 the project's source code to add or update translations:
 
+* `po/LINGUAS`: Standard list of available translations
 * `po/CMakeLists.txt`: Contains the list of translations available
 * `po/progress-tracker.pot`: App's POT file
 
 Steps for translations:
 
 1. Include the country code in `po/CMakeLists.txt`. The country codes list
-is defined in the `PO_NAMES` variable.
+is defined in the `LINGUAS` variable.
 
     ```cmake
     # Add the country code in alphabetical order
-    list(APPEND PO_NAMES bg es it nl pt_BR ru_RU tr uk_UA)
+    list(APPEND LINGUAS bg es it nl pt_BR ru_RU tr uk_UA)
     ```
 
 2. Use **msginit** to generate the new POT file. You may also use **msgmerge**
@@ -80,13 +81,14 @@ to update existent translation files.
 
 4. Whenever possible, build the source code and run the application to check if
 the translations are properly set up. You can build the application using either
-cmake (with `CMAKE_BUILD_TYPE` set to Debug) or Flatpak (GNOME Builder). Most
-importantly, set the `LANGUAGE` environment variable to the language's country
-code you are developing the translation for.
+cmake (preferably with -DDEVELOPMENT=ON) or Flatpak (GNOME Builder). Most
+importantly, set the `LANGUAGE` or `LANG` environment variable to the language's
+country code you are developing the translation for.
 
     ```sh
-    # Starts the application in Dutch
-    LANGUAGE=nl src/progress-tracker
+    # Starts the application in Dutch. Note that this assumes that program was
+    # installed into the system
+    LANGUAGE=nl progress-debug
     ```
 
     ```sh
