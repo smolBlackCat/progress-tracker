@@ -1,5 +1,5 @@
 .confirm-action {
-    background-color: #26a269;
+    background-color: @success_color;
 }
 
 .add-cardlist-button {
@@ -9,19 +9,19 @@
 .incomplete-task {
     transition-property: background-color;
     transition-duration: 1s;
-    background-color: #5e5c64;
+    background-color: @insensitive_bg_color;
     border-radius: 5px;
     padding: 4px;
-    box-shadow: 0 0 2px #9a9996;
+    box-shadow: 0 0 2px @insensitive_bg_color;
 }
 
 .complete-task {
     transition-property: background-color;
     transition-duration: 1s;
-    background-color: #3d3846;
+    background-color: @theme_bg_color;
     border-radius: 5px;
     padding: 4px;
-    box-shadow: 0 0 2px #9a9996;
+    box-shadow: 0 0 2px @theme_bg_color;
 }
 
 cardlist {
@@ -32,44 +32,32 @@ cardlist {
 }
 
 card {
-    background-color: #5e5c64;
+    background-color: @insensitive_bg_color;
     border-radius: 5px;
     box-shadow: 0 0 2px #000000;
     transition-property: background-color, border, box-shadow, outline;
-    transition-duration: 1s;
+    transition-duration: 0.2s;
 }
 
 card:focus,
 .card-to-drop {
-    box-shadow: 0 0 6px #3772af;
-    background-color: #6e6c74;
-    border: 2px solid #3772af;
+    box-shadow: 0 0 6px @accent_bg_color;
+    border: 2px solid @accent_bg_color;
     transition-property: background-color, border, box-shadow, outline;
-    transition-duration: 1s;
+    transition-duration: 0.2s;
 }
 
 .delete-board-infobar-text {
-    color: #ffffff;
     font-weight: bold;
 }
 
 .delete-board-infobar {
-    background-color: #1a5fb4;
+    background-color: @insensitive_bg_color;
     border-radius: 5px;
 }
 
-.cardlist-title {
-    font-weight: bold;
-    font-size: large;
-}
-
-.image-label {
-    font-weight: bold;
-    font-size: medium;
-}
-
 .complete-tasks-indicator-complete {
-    background-color: #26a269;
+    background-color: @success_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;
@@ -78,7 +66,7 @@ card:focus,
 }
 
 .complete-tasks-indicator-almost {
-    background-color: #e5a50a;
+    background-color: @warning_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;
@@ -87,7 +75,7 @@ card:focus,
 }
 
 .complete-tasks-indicator-incomplete {
-    background-color: #a51d2d;
+    background-color: @error_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;
@@ -96,7 +84,7 @@ card:focus,
 }
 
 .due-date {
-    background-color: #5e5c64;
+    background-color: @insensitive_bg_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;
@@ -106,7 +94,7 @@ card:focus,
 }
 
 .past-due-date {
-    background-color: #a51d2d;
+    background-color: @error_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;
@@ -116,7 +104,7 @@ card:focus,
 }
 
 .due-date-complete {
-    background-color: #26a269;
+    background-color: @success_color;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-style: solid;

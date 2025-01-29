@@ -28,8 +28,8 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
       board{board},
       cardlist{cardlist_refptr},
       is_new{is_new},
-      cardlist_header{cardlist_refptr->get_name(), "cardlist-title",
-                      "cardlist-title"} {
+      cardlist_header{cardlist_refptr->get_name(), "title-2",
+                      "title-2"} {
     add_css_class("cardlist");
     set_halign(Gtk::Align::START);
     set_size_request(CARDLIST_MAX_WIDTH, -1);
