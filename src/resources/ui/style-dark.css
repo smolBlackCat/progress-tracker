@@ -9,32 +9,34 @@
 .incomplete-task {
     transition-property: background-color;
     transition-duration: 1s;
-    background-color: @insensitive_bg_color;
+    background-color: @card_bg_color;
     border-radius: 5px;
     padding: 4px;
-    box-shadow: 0 0 2px @insensitive_bg_color;
+    box-shadow: 0 0 2px @card_shade_color;
 }
 
 .complete-task {
     transition-property: background-color;
     transition-duration: 1s;
-    background-color: @theme_bg_color;
+    background-color: @insensitive_bg_color;
     border-radius: 5px;
     padding: 4px;
-    box-shadow: 0 0 2px @theme_bg_color;
+    box-shadow: 0 0 2px @card_shade_color;
 }
 
 cardlist {
     background-color: @theme_bg_color;
     padding: 12px;
+    border: 2px solid @card_shade_color;
     border-radius: 20px;
-    box-shadow: 0 0 4px #000000;
+    box-shadow: 0 0 4px @card_shade_color;
 }
 
 card {
-    background-color: @insensitive_bg_color;
+    background-color: @card_bg_color;
     border-radius: 5px;
-    box-shadow: 0 0 2px #000000;
+    border: 2px solid @card_shade_color;
+    box-shadow: 0 0 3px @card_shade_color;
     transition-property: background-color, border, box-shadow, outline;
     transition-duration: 0.2s;
 }
@@ -52,7 +54,7 @@ card:focus,
 }
 
 .delete-board-infobar {
-    background-color: @insensitive_bg_color;
+    background-color: @popover_bg_color;
     border-radius: 5px;
 }
 
@@ -90,7 +92,7 @@ card:focus,
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
-    box-shadow: 0 0 2px #000000;
+    box-shadow: 0 0 2px @card_shade_color;
 }
 
 .past-due-date {
@@ -100,7 +102,7 @@ card:focus,
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
-    box-shadow: 0 0 2px #000000;
+    box-shadow: 0 0 2px @card_shade_color;
 }
 
 .due-date-complete {
@@ -110,5 +112,5 @@ card:focus,
     border-style: solid;
     border-radius: 4px;
     padding: 4px;
-    box-shadow: 0 0 2px #000000;
+    box-shadow: 0 0 2px @card_shade_color;
 }
