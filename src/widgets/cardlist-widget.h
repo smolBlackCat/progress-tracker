@@ -2,6 +2,7 @@
 
 #include <core/card.h>
 #include <core/cardlist.h>
+#include <glibmm/extraclassinit.h>
 #include <gtkmm.h>
 
 #include <memory>
@@ -10,15 +11,24 @@
 #include "card.h"
 #include "editable-label-header.h"
 
+extern "C" {
+static void cardlist_class_init(void* klass, void* user_data);
+}
+
 namespace ui {
 
 class BoardWidget;
 class CardWidget;
 
+class CardlistInit : public Glib::ExtraClassInit {
+public:
+    CardlistInit();
+};
+
 /**
  * @brief Class that implements the facilities of a card list widget.
  */
-class CardlistWidget : public Gtk::Box {
+class CardlistWidget : public CardlistInit, public Gtk::Box {
 public:
     static constexpr int CARDLIST_MAX_WIDTH =
         240;  ///< Maximum width for the card list widget.

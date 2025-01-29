@@ -5,11 +5,23 @@
 
 #include "board-widget.h"
 #include "card.h"
+#include "glib.h"
+
+extern "C" {
+static void cardlist_class_init(void* klass, void* user_data) {
+    g_return_if_fail(GTK_IS_WIDGET_CLASS(klass));
+    gtk_widget_class_set_css_name(GTK_WIDGET_CLASS(klass), "cardlist");
+}
+}
+
+ui::CardlistInit::CardlistInit() : Glib::ExtraClassInit(cardlist_class_init) {}
 
 ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                                    std::shared_ptr<CardList> cardlist_refptr,
                                    bool is_new)
-    : Gtk::Box{Gtk::Orientation::VERTICAL},
+    : Glib::ObjectBase{"CardlistWidget"},
+      CardlistInit{},
+      Gtk::Box{Gtk::Orientation::VERTICAL},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
       card_widgets{},

@@ -24,7 +24,7 @@
     box-shadow: 0 0 2px #9a9996;
 }
 
-.cardlist {
+cardlist {
     background-color: @theme_bg_color;
     padding: 12px;
     border-radius: 20px;
