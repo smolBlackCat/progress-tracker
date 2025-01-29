@@ -81,7 +81,10 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
         Gtk::ShortcutTrigger::parse_string("<Control>N"),
         Gtk::CallbackAction::create(
             [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->board.add_cardlist(CardList{_("New Cardlist")}, true);
+                auto n_cardlist =
+                    this->board.add_cardlist(CardList{_("New Cardlist")}, true);
+
+                this->board.reorder_cardlist(*n_cardlist, *this);
                 return true;
             })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
