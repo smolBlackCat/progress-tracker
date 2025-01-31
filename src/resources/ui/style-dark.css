@@ -13,6 +13,7 @@
     border-radius: 5px;
     padding: 4px;
     box-shadow: 0 0 2px @card_shade_color;
+    box-shadow: 0 0 2px @card_shade_color;
 }
 
 .complete-task {
@@ -21,6 +22,7 @@
     background-color: @insensitive_bg_color;
     border-radius: 5px;
     padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
     box-shadow: 0 0 2px @card_shade_color;
 }
 
