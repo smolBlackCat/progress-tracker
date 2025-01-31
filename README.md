@@ -5,6 +5,8 @@ Simple kanban-style task organiser
 ![GitHub Release][github-release-badge]
 ![Flathub Downloads][flatpak-release-badge]
 ![GitHub License][github-licence]
+![GitHub Actions Workflow Status][build-status]
+
 
 ![App Windows](pictures/progress-app-presentation.png)
 
@@ -156,3 +158,4 @@ supporting me through [PayPal][paypal-link]
 [github-release-badge]: https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github
 [flatpak-release-badge]: https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub
 [github-licence]: https://img.shields.io/github/license/smolBlackCat/progress-tracker
+[build-status]: https://img.shields.io/github/actions/workflow/status/smolBlackCat/progress-tracker/progress-ci.yml
