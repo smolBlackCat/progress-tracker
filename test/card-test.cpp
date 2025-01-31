@@ -81,10 +81,14 @@ TEST_CASE("Card operations", "[Card]") {
         Card card_with_due_date{"Uni assignment"};
         Date date_now = std::chrono::floor<std::chrono::days>(
             std::chrono::system_clock::now());
+
         Date past_due_date = date_now - std::chrono::months(2);
+        Date n_past_due_date =
+            std::chrono::sys_days(past_due_date + std::chrono::months{0});
+
         card_with_due_date.set_due_date(
-            past_due_date);  // Regardless of today's date, this card is always
-                             // past the due date
+            n_past_due_date);  // Regardless of today's date, this card is
+                               // always past the due date
 
         CHECK(card_with_due_date.get_modified());
         REQUIRE(card_with_due_date.past_due_date());
