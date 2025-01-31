@@ -49,7 +49,7 @@ ui::BoardWidget::BoardWidget()
         [this]() { add_cardlist(CardList{_("New CardList")}, true); });
     add_button.set_valign(Gtk::Align::START);
     add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
-    add_button.add_css_class("add-cardlist-button");
+    add_button.add_css_class("raised");
 
     root.append(add_button);
 

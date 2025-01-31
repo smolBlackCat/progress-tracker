@@ -2,10 +2,6 @@
     background-color: @success_color;
 }
 
-.add-cardlist-button {
-    background-color: #3d3846;
-}
-
 .incomplete-task {
     transition-property: background-color;
     transition-duration: 1s;
