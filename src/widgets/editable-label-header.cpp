@@ -82,6 +82,7 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
     menu_button.set_valign(Gtk::Align::START);
     menu_button.set_hexpand();
     menu_button.set_halign(Gtk::Align::END);
+    menu_button.set_can_focus(false);
     menu_button.set_has_frame(false);
 
     key_controller->signal_key_released().connect(

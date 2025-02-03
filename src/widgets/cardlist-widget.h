@@ -28,7 +28,7 @@ public:
 /**
  * @brief Class that implements the facilities of a card list widget.
  */
-class CardlistWidget : public CardlistInit, public Gtk::Box {
+class CardlistWidget : public CardlistInit, public Gtk::Widget {
 public:
     static constexpr int CARDLIST_MAX_WIDTH =
         240;  ///< Maximum width for the card list widget.
@@ -113,8 +113,46 @@ private:
     CardWidget* _add(const std::shared_ptr<Card>& card,
                      bool editing_mode = false);
 
+    /**
+     * @brief Retrieves the number of visible children in the root box.
+     *
+     * @return the number of visible children.
+     */
+    int get_n_visible_children() const;
+
+    /**
+     * @brief Retrieves the size request mode.
+     *
+     * @return the size request mode.
+     */
+    Gtk::SizeRequestMode get_request_mode_vfunc();
+
+    /**
+     * @brief Measures the widget size.
+     *
+     * @param orientation the orientation to measure.
+     * @param for_size the size to measure for.
+     * @param minimum the minimum size.
+     * @param natural the natural size.
+     * @param minimum_baseline the minimum baseline.
+     * @param natural_baseline the natural baseline.
+     */
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum,
+                       int& natural, int& minimum_baseline,
+                       int& natural_baseline) const override;
+
+    /**
+     * @brief Allocates size for the widget.
+     *
+     * @param width the allocated width.
+     * @param height the allocated height.
+     * @param baseline the allocated baseline.
+     */
+    void size_allocate_vfunc(int width, int height, int baseline) override;
+
     // Widgets
     EditableLabelHeader cardlist_header;  ///< Header widget for the card list.
+    Gtk::ScrolledWindow scr_window{};
     Gtk::Button add_card_button;          ///< Button to add new cards.
     Gtk::Box root;  ///< Root container for the card list widget.
 

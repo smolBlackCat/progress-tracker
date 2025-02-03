@@ -40,7 +40,9 @@ card {
 }
 
 card:focus,
-.card-to-drop {
+.card-to-drop,
+cardlist:focus,
+.cardlist-to-drop {
     box-shadow: 0 0 6px @accent_bg_color;
     border: 2px solid @accent_bg_color;
     transition-property: background-color, border, box-shadow, outline;
