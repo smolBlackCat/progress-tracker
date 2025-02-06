@@ -479,10 +479,6 @@ const std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
 void Board::set_modified(bool modified) {
     if (fully_loaded) {
         Item::set_modified(modified);
-
-        for (auto& cardlist : cardlists) {
-            cardlist->set_modified(modified);
-        }
     }
 }
 

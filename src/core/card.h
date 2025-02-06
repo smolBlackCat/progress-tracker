@@ -41,8 +41,6 @@ public:
      */
     const std::string& get_notes() const;
 
-    void set_modified(bool modified) override;
-
     bool get_modified() override;
 
     /**

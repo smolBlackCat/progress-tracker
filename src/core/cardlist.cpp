@@ -33,14 +33,6 @@ bool CardList::remove(const Card& card) {
     return false;
 }
 
-void CardList::set_modified(bool modified) {
-    Item::set_modified(modified);
-
-    for (auto& card : cards) {
-        card->set_modified(modified);
-    }
-}
-
 bool CardList::cards_modified() {
     for (auto& card : cards) {
         if (card->get_modified()) {
