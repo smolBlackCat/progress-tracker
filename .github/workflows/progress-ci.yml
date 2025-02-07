@@ -33,6 +33,7 @@ jobs:
 
       - name: Build
         run: |
+          git submodule update --init
           cmake -GNinja -B build -DDEVELOPMENT=ON
           cmake --build build
 
@@ -72,6 +73,7 @@ jobs:
 
       - name: Build
         run: |
+          git submodule update --init
           cmake -B ${{github.workspace}}/build -DDEVELOPMENT=ON -DCMAKE_CXX_COMPILER=g++-14
           cmake --build ${{github.workspace}}/build
 
