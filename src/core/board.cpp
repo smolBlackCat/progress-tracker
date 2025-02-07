@@ -10,6 +10,7 @@
 #include <set>
 
 #include "exceptions.h"
+#include "guid.hpp"
 
 BoardBackend::BoardBackend(BackendType backend_type,
                            const std::map<std::string, std::string>& settings)
@@ -59,6 +60,7 @@ Board BoardBackend::load() {
             auto board_element_name = board_element->FindAttribute("name");
             auto board_element_background =
                 board_element->FindAttribute("background");
+            auto board_element_uuid = board_element->FindAttribute("uuid");
 
             if (!(board_element_name && board_element_background)) {
                 std::string missing_attr =
@@ -72,6 +74,11 @@ Board BoardBackend::load() {
             std::string name = board_element_name->Value();
             std::string background = board_element_background->Value();
 
+            // There might exist some boards that do not keep track of uuids
+            xg::Guid uuid = board_element_uuid
+                                ? xg::Guid(board_element_uuid->Value())
+                                : xg::newGuid();
+
             if (name.empty()) {
                 throw board_parse_error{std::format(
                     "Failed to parse given Progress Board XML file: {}\n"
@@ -79,7 +86,7 @@ Board BoardBackend::load() {
                     settings["filepath"])};
             }
 
-            Board board{name, background, *this};
+            Board board{name, background, uuid, *this};
             auto lm_filepath =
                 std::chrono::clock_cast<std::chrono::system_clock,
                                         std::chrono::file_clock>(
@@ -160,6 +167,7 @@ void BoardBackend::load_cardlists(Board& board) {
 
         while (list_element) {
             auto cur_cardlist_name = list_element->Attribute("name");
+            auto cur_cardlist_uuid = list_element->Attribute("uuid");
 
             if (!cur_cardlist_name) {
                 throw board_parse_error{std::format(
@@ -168,7 +176,10 @@ void BoardBackend::load_cardlists(Board& board) {
                     settings["filepath"], list_element->GetLineNum())};
             }
 
-            CardList cur_cardlist{cur_cardlist_name};
+            CardList cur_cardlist{cur_cardlist_name,
+                                  cur_cardlist_uuid
+                                      ? xg::Guid{cur_cardlist_uuid}
+                                      : xg::newGuid()};
             auto card_element = list_element->FirstChildElement("card");
 
             while (card_element) {
@@ -177,6 +188,7 @@ void BoardBackend::load_cardlists(Board& board) {
                 auto cur_card_due_date = card_element->Attribute("due");
                 auto cur_card_complete =
                     card_element->BoolAttribute("complete");
+                auto cur_card_uuid = card_element->Attribute("uuid");
 
                 if (!cur_card_name) {
                     throw board_parse_error{std::format(
@@ -207,13 +219,18 @@ void BoardBackend::load_cardlists(Board& board) {
                 Card cur_card{
                     cur_card_name,
                     date,
+                    cur_card_uuid ? xg::Guid{cur_card_uuid} : xg::newGuid(),
                     cur_card_complete,
                     cur_card_color ? string_to_color(cur_card_color) : NO_COLOR,
                 };
 
                 auto task_element = card_element->FirstChildElement("task");
                 while (task_element) {
+                    auto task_element_uuid = task_element->Attribute("uuid");
                     cur_card.add(Task{task_element->Attribute("name"),
+                                      task_element_uuid
+                                          ? xg::Guid{task_element_uuid}
+                                          : xg::newGuid(),
                                       task_element->BoolAttribute("done")});
                     task_element = task_element->NextSiblingElement("task");
                 }
@@ -254,16 +271,19 @@ bool BoardBackend::save_xml(Board& board) {
     tinyxml2::XMLElement* board_element = doc->NewElement("board");
     board_element->SetAttribute("name", board.get_name().c_str());
     board_element->SetAttribute("background", board.get_background().c_str());
+    board_element->SetAttribute("uuid", std::string(board.get_id()).c_str());
     doc->InsertEndChild(board_element);
 
     for (auto& cardlist : board.get_cardlists()) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
+        list_element->SetAttribute("uuid", cardlist->get_id().str().c_str());
         cardlist->set_modified(false);
 
         for (auto& card : cardlist->get_cards()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
+            card_element->SetAttribute("uuid", card->get_id().str().c_str());
             if (card->is_color_set())
                 card_element->SetAttribute(
                     "color", color_to_string(card->get_color()).c_str());
@@ -279,6 +299,8 @@ bool BoardBackend::save_xml(Board& board) {
                 tinyxml2::XMLElement* task_element = doc->NewElement("task");
                 task_element->SetAttribute("name", task->get_name().c_str());
                 task_element->SetAttribute("done", task->get_done());
+                task_element->SetAttribute("uuid",
+                                           task->get_id().str().c_str());
 
                 card_element->InsertEndChild(task_element);
             }
@@ -322,14 +344,18 @@ const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
 
 Board::Board(const std::string& name, const std::string& background,
-             const BoardBackend& backend)
-    : Item{name}, background{background}, backend{backend} {
+             const xg::Guid uuid, const BoardBackend& backend)
+    : Item{name, uuid}, background{background}, backend{backend} {
     if (Board::get_background_type(background) == BackgroundType::INVALID) {
         spdlog::get("core")->warn(
             "Invalid background type: {}. Falling back to default", background);
         this->background = Board::BACKGROUND_DEFAULT;
     }
 }
+
+Board::Board(const std::string& name, const std::string& background,
+             const BoardBackend& backend)
+    : Board{name, background, xg::newGuid(), backend} {}
 
 Board::~Board() {}
 

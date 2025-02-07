@@ -11,6 +11,7 @@ public:
      * @brief Task constructor
      */
     Task(const std::string& name, bool done = false);
+    Task(const std::string& name, const xg::Guid uuid, bool done = false);
 
     /**
      * @brief Returns true if the card is marked as done, otherwise false

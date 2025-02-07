@@ -7,12 +7,21 @@
 
 Card::Card(const std::string& name, const Date& date, bool complete,
            const Color& color)
+    : Item{name, xg::newGuid()}, complete{complete}, due_date{date} {
+    this->color = color;
+}
+
+Card::Card(const std::string& name, const Date& date, const xg::Guid uuid,
+           bool complete, const Color& color)
     : Item{name}, complete{complete}, due_date{date} {
     this->color = color;
 }
 
 Card::Card(const std::string& name, const Color& color)
     : Card{name, Date{}, false, color} {}
+
+Card::Card(const std::string& name, const xg::Guid uuid, const Color& color)
+    : Card{name, Date{}, uuid, false, color} {}
 
 Card::~Card() {}
 

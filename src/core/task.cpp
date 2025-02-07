@@ -3,7 +3,11 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-Task::Task(const std::string& name, bool done) : Item{name}, done{done} {}
+Task::Task(const std::string& name, bool done)
+    : Item{name, xg::newGuid()}, done{done} {}
+
+Task::Task(const std::string& name, const xg::Guid uuid, bool done)
+    : Item{name, uuid}, done{done} {}
 
 bool Task::get_done() const { return done; }
 

@@ -1,9 +1,9 @@
 #pragma once
+#include <guid.hpp>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 extern const std::shared_ptr<spdlog::logger> core_logger;
 
@@ -20,6 +20,7 @@ public:
      * @param name The item's name.
      */
     Item(const std::string& name);
+    Item(const std::string& name, xg::Guid uuid);
 
     virtual ~Item() = default;
 
@@ -52,12 +53,12 @@ public:
      *
      * @returns The integer as the object's ID.
      */
-    virtual unsigned long long get_id() const;
+    virtual xg::Guid get_id() const;
 
     bool operator==(const Item& Item) const;
 
 protected:
     std::string name;
-    unsigned long long id;
+    xg::Guid uuid;
     bool modified = false;
 };

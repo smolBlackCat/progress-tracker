@@ -5,7 +5,13 @@
 
 #include <iterator>
 
-CardList::CardList(const std::string& name) : Item{name}, cards{} {}
+#include "guid.hpp"
+
+CardList::CardList(const std::string& name)
+    : Item{name, xg::newGuid()}, cards{} {}
+
+CardList::CardList(const std::string& name, const xg::Guid uuid)
+    : Item{name, uuid}, cards{} {}
 
 std::shared_ptr<Card> CardList::add(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};

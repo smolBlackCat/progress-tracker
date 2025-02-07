@@ -5,9 +5,11 @@ file(GLOB_RECURSE CORE_SOURCES "core/*.cpp")
 
 add_library(libcore STATIC ${CORE_SOURCES})
 target_link_libraries(libcore PRIVATE ${TINYXML2})
+target_link_libraries(libcore PRIVATE crossguid)
 target_link_libraries(libcore PUBLIC spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 
 target_include_directories(libcore PRIVATE ${TINYXML2_INCLUDE_DIRS})
+target_include_directories(libcore PUBLIC ${CMAKE_SOURCE_DIR}/subprojects/crossguid/include/crossguid/)
 
 file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp" "widgets/*.h")
 file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp" "dialog/*.h")

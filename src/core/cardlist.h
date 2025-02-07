@@ -16,6 +16,8 @@ public:
      */
     CardList(const std::string& name);
 
+    CardList(const std::string& name, const xg::Guid uuid);
+
     /**
      * @brief Adds a Card object to the cardlist by copying the Card object
      * into a newly allocated space.

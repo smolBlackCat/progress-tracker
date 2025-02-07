@@ -27,6 +27,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
 
+add_subdirectory(subprojects/crossguid)
+
 find_package(Intl REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(Catch2 3)

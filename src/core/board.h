@@ -86,6 +86,8 @@ public:
     Board() = delete;
     Board(const std::string& name, const std::string& background,
           const BoardBackend& backend);
+    Board(const std::string& name, const std::string& background,
+          const xg::Guid uuid, const BoardBackend& backend);
     Board(BoardBackend& backend);
 
     ~Board();

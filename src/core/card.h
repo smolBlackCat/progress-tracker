@@ -22,10 +22,19 @@ public:
     Card(const std::string& name, const Date& date, bool complete = false,
          const Color& color = NO_COLOR);
 
+    Card(const std::string& name, const Date& date, const xg::Guid uuid,
+         bool complete = false, const Color& color = NO_COLOR);
+
     /**
      * @brief Card constructor
      */
     Card(const std::string& name, const Color& color = NO_COLOR);
+
+    /**
+     * @brief Card constructor
+     */
+    Card(const std::string& name, const xg::Guid uuid,
+         const Color& color = NO_COLOR);
 
     ~Card() override;
 
