@@ -162,8 +162,9 @@
       ],
       "sources": [
         {
-          "type": "dir",
-          "path": "./"
+          "type": "git",
+          "path": "./",
+          "branch": "new-feature"
         }
       ],
       "post-install": ["glib-compile-schemas /app/share/glib-2.0/schemas/"]
