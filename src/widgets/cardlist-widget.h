@@ -9,7 +9,7 @@
 
 #include "base-item.h"
 #include "board-widget.h"
-#include "card.h"
+#include "card-widget.h"
 #include "editable-label-header.h"
 
 extern "C" {

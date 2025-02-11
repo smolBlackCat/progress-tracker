@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
-#include "card.h"
+#include "card-widget.h"
 #include "glib.h"
 
 extern "C" {

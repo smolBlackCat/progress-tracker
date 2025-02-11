@@ -1,4 +1,4 @@
-#include "card.h"
+#include "card-widget.h"
 
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>

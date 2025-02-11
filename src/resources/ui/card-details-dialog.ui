@@ -144,7 +144,6 @@ a Card object details. -->
                         <object class="GtkScrolledWindow">
                           <property name="child">
                             <object class="GtkBox" id="tasks-box">
-                              <property name="css-name">list</property>
                               <property name="margin-end">4</property>
                               <property name="margin-start">4</property>
                               <property name="margin-top">4</property>
