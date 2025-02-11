@@ -8,25 +8,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(DEVELOPMENT "Build the application in development mode" ON)
 option(FLATPAK "Defines whether the application is a flatpak distribution" OFF)
 
+if (NOT CMAKE_BUILD_TYPE)
+    if(DEVELOPMENT)
+        set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+    else()
+        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+    endif()
+endif()
+
 if (DEVELOPMENT)
     set(APPLICATION_ID "io.github.smolblackcat.Progress.Devel")
     set(EXECUTABLE_NAME "progress-debug")
-    set(CMAKE_BUILD_TYPE "Debug")
 else()
     set(APPLICATION_ID "io.github.smolblackcat.Progress")
     set(EXECUTABLE_NAME "progress")
-    set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(APP_NAME "Progress")
 set(APP_ICON ${APPLICATION_ID}.svg)
 
-find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources)
-find_program(GLIB_COMPILE_SCHEMAS NAMES glib-compile-schemas)
+find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources REQUIRED)
+find_program(GLIB_COMPILE_SCHEMAS NAMES glib-compile-schemas REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
 
+# Crossuid dependency
 add_subdirectory(subprojects/crossguid)
 
 find_package(Intl REQUIRED)
@@ -60,14 +67,19 @@ set(CPACK_PACKAGE_CHECKSUM SHA512)
 
 if (LINUX)
     set(CPACK_GENERATOR "DEB" "TXZ")
+    set(CPACK_STRIP_FILES YES)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
+    set(
+        CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    )
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gabriel de Moura <smolblackcat@proton.me>")
     set(CPACK_DEBIAN_PACKAGE_NAME "progress-tracker")
     set(CPACK_DEBIAN_FILE_NAME "progress-tracker-${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.deb")
     set(CPACK_DEBIAN_PACKAGE_VERSION "${Progress_VERSION_MAJOR}.${Progress_VERSION_MINOR}.${Progress_VERSION_PATCH}")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Simple app for kanban todo lists")
-    # For now, requiring to install spdlod-dev to use the application may suffice for downloading
-    # the libraries without having to specify a version
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgtkmm-4.0-0, libadwaita-1-0, libtinyxml2-10, libspdlog-dev")
     set(CPACK_DEBIAN_PACKAGE_SECTION "gnome")
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/smolBlackCat/progress-tracker")
 elseif(WIN32)

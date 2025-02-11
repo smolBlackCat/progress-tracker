@@ -1,6 +1,5 @@
 configure_file(app_info.h.in app_info.h)
 
-# file(GLOB_RECURSE CORE_HEADERS "core/*.h")
 file(GLOB_RECURSE CORE_SOURCES "core/*.cpp")
 
 add_library(libcore STATIC ${CORE_SOURCES})
@@ -30,19 +29,23 @@ if ((WIN32 AND (NOT DEVELOPMENT)))
     target_link_options(progress-tracker PRIVATE "-mwindows")
 endif()
 
-target_link_libraries(progress-tracker PRIVATE ${GTKMM_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE ${ADWAITA_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE ${Intl_LIBRARIES})
-target_link_libraries(progress-tracker PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
-target_link_libraries(progress-tracker PRIVATE libcore)
+target_link_libraries(progress-tracker
+    PRIVATE ${GTKMM_LIBRARIES}
+    PRIVATE ${ADWAITA_LIBRARIES}
+    PRIVATE ${Intl_LIBRARIES}
+    PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>
+    PRIVATE libcore
+)
 
 target_link_directories(progress-tracker PRIVATE ${GTKMM_LIBRARY_DIR})
 
-target_include_directories(progress-tracker PRIVATE ${GTKMM_INCLUDE_DIRS})
-target_include_directories(progress-tracker PRIVATE ${ADWAITA_INCLUDE_DIRS})
-target_include_directories(progress-tracker PRIVATE ${Intl_INCLUDE_DIRS})
-target_include_directories(progress-tracker PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_include_directories(progress-tracker PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(progress-tracker
+    PRIVATE ${GTKMM_INCLUDE_DIRS}
+    PRIVATE ${ADWAITA_INCLUDE_DIRS}
+    PRIVATE ${Intl_INCLUDE_DIRS}
+    PRIVATE ${PROJECT_SOURCE_DIR}/src
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 target_compile_options(progress-tracker PRIVATE ${GTKMM_CFLAGS_OTHER})
 
