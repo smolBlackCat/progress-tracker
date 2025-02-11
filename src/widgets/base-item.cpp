@@ -1,8 +1,12 @@
 #include "base-item.h"
 
 namespace ui {
-BaseItem::BaseItem() : Gtk::Widget{} {
-    set_layout_manager(Gtk::BoxLayout::create());
+BaseItem::BaseItem(Gtk::Orientation orientation, int spacing) : Gtk::Widget{} {
+    set_layout_manager(Gtk::BoxLayout::create(orientation));
+
+    static_cast<Gtk::BoxLayout*>(get_layout_manager().get())
+        ->set_spacing(spacing);
+
     signal_destroy().connect(sigc::mem_fun(*this, &BaseItem::cleanup));
 }
 

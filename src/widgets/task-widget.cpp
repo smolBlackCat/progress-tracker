@@ -2,19 +2,38 @@
 
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
-#include <widgets/card.h>
+#include <widgets/card-widget.h>
 #include <widgets/cardlist-widget.h>
 
 #include <memory>
 
 #include "dialog/card-dialog.h"
 
+extern "C" {
+static void task_class_init(void* klass, void* user_data) {
+    g_return_if_fail(GTK_IS_WIDGET_CLASS(klass));
+    gtk_widget_class_set_css_name(GTK_WIDGET_CLASS(klass), "task");
+}
+
+static void task_init(GTypeInstance* instance, void* klass) {
+    g_return_if_fail(GTK_IS_WIDGET(instance));
+
+    gtk_widget_set_receives_default(GTK_WIDGET(instance), TRUE);
+    gtk_widget_set_focusable(GTK_WIDGET(instance), TRUE);
+}
+}
+
 namespace ui {
+
+TaskInit::TaskInit()
+    : Glib::ExtraClassInit{task_class_init, nullptr, task_init} {}
 
 TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
                        CardWidget& card_widget, std::shared_ptr<Task> task,
                        bool is_new)
-    : Gtk::Box{},
+    : Glib::ObjectBase{"TaskWidget"},
+      TaskInit{},
+      BaseItem{Gtk::Orientation::HORIZONTAL, 3},
       card_details_dialog{card_details_dialog},
       task{task},
       menu_model{Gio::Menu::create()},
@@ -23,7 +42,6 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
       is_new{is_new} {
     set_margin_start(5);
     set_margin_end(5);
-    set_spacing(3);
 
     Gtk::Box& inner_box =
         *Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
@@ -39,14 +57,14 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     task_entry_revealer.set_hexpand();
     task_entry_revealer.set_child(task_entry);
 
-    append(inner_box);
+    inner_box.insert_at_end(*this);
 
-    append(task_checkbutton);
+    task_checkbutton.insert_at_end(*this);
     task_checkbutton.set_halign(Gtk::Align::END);
     task_checkbutton.set_hexpand();
     task_checkbutton.set_margin_end(5);
 
-    add_css_class(task->get_done() ? "complete-task" : "incomplete-task");
+    if (task->get_done()) add_css_class("complete-task");
 
     task_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));
@@ -100,8 +118,6 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     }
 }
 
-TaskWidget::~TaskWidget() {}
-
 std::shared_ptr<Task> TaskWidget::get_task() { return task; }
 
 void TaskWidget::on_rename() {
@@ -144,13 +160,11 @@ void TaskWidget::on_checkbox() {
         task_label.set_markup(
             Glib::ustring::compose("<s>%1</s>", task->get_name()));
         add_css_class("complete-task");
-        remove_css_class("incomplete-task");
 
         spdlog::get("ui")->debug(
             "TaskWidget \"{}\" has been marked as complete", task->get_name());
     } else {
         task_label.set_markup(task->get_name());
-        add_css_class("incomplete-task");
         remove_css_class("complete-task");
 
         spdlog::get("ui")->debug(
@@ -161,7 +175,7 @@ void TaskWidget::on_checkbox() {
 
 void TaskWidget::on_convert(CardWidget& card_widget) {
     spdlog::get("app")->info("Task \"{}\" has been converted to a card",
-                            task->get_name());
+                             task->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->get_cardlist();
@@ -241,5 +255,11 @@ void TaskWidget::setup_drag_and_drop() {
         },
         false);
     add_controller(drop_target_taskwidget);
+}
+
+void TaskWidget::cleanup() {
+    static_cast<Gtk::Box*>(get_first_child())->unparent();  // inner_box
+    task_checkbutton.unparent();
+    popover_menu.unparent();
 }
 }  // namespace ui

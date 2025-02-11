@@ -6,7 +6,20 @@
 
 #include <memory>
 
+#include "base-item.h"
+#include "glibmm/extraclassinit.h"
+
+extern "C" {
+static void task_class_init(void* klass, void* user_data);
+static void task_init(GTypeInstance* instance, void* klass);
+}
+
 namespace ui {
+
+class TaskInit : public Glib::ExtraClassInit {
+public:
+    TaskInit();
+};
 
 /**
  * @brief Class implementing controlling facilities of Task widget.
@@ -16,7 +29,7 @@ namespace ui {
  * converting tasks, as well as handling drag-and-drop operations. This widget
  * is typically used within a CardDetailsDialog.
  */
-class TaskWidget : public Gtk::Box {
+class TaskWidget : public TaskInit, public BaseItem {
 public:
     /**
      * @brief TaskWidget constructor.
@@ -31,11 +44,6 @@ public:
      */
     TaskWidget(CardDetailsDialog& card_details_dialog, CardWidget& card_widget,
                std::shared_ptr<Task> task, bool is_new = false);
-
-    /**
-     * @brief Destructor.
-     */
-    ~TaskWidget() override;
 
     /**
      * @brief Returns the Task object smart pointer associated with this widget.
@@ -76,6 +84,8 @@ protected:
      * @brief Sets up drag-and-drop functionality for the task widget.
      */
     void setup_drag_and_drop();
+
+    void cleanup() override;
 
     Gtk::Label task_label;              ///< Label displaying the task name.
     Gtk::Revealer task_entry_revealer;  ///< Revealer for the task entry.

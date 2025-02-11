@@ -10,7 +10,7 @@ namespace ui {
  */
 class BaseItem : public Gtk::Widget {
 public:
-    BaseItem();
+    BaseItem(Gtk::Orientation orientation, int spacing);
     virtual ~BaseItem();
 
 protected:

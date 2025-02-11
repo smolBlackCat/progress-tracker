@@ -2,16 +2,6 @@
     background-color: @success_color;
 }
 
-.incomplete-task {
-    transition-property: background-color;
-    transition-duration: 1s;
-    background-color: @card_bg_color;
-    border-radius: 5px;
-    padding: 4px;
-    box-shadow: 0 0 2px @card_shade_color;
-    box-shadow: 0 0 2px @card_shade_color;
-}
-
 .complete-task {
     transition-property: background-color;
     transition-duration: 1s;
@@ -39,10 +29,21 @@ card {
     transition-duration: 0.2s;
 }
 
+task {
+    transition-property: background-color;
+    transition-duration: 1s;
+    background-color: @card_bg_color;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
 card:focus,
 .card-to-drop,
 cardlist:focus,
-.cardlist-to-drop {
+.cardlist-to-drop,
+task:focus {
     box-shadow: 0 0 6px @accent_bg_color;
     border: 2px solid @accent_bg_color;
     transition-property: background-color, border, box-shadow, outline;

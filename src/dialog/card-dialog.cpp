@@ -2,7 +2,7 @@
 
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
-#include <widgets/card.h>
+#include <widgets/card-widget.h>
 #include <widgets/task-widget.h>
 
 #include <ctime>

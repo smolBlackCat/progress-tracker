@@ -33,7 +33,7 @@ CardInit::CardInit()
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
-      BaseItem{},
+      BaseItem{Gtk::Orientation::VERTICAL, 0},
       card{card},
       cardlist_p{nullptr},
       is_new{is_new},

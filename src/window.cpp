@@ -8,7 +8,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <widgets/board-card-button.h>
-#include <widgets/card.h>
+#include <widgets/card-widget.h>
 
 #include <filesystem>
 #include <format>

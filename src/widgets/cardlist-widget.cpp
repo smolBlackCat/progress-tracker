@@ -33,7 +33,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
                                    bool is_new)
     : Glib::ObjectBase{"CardlistWidget"},
       CardlistInit{},
-      BaseItem{},
+      BaseItem{Gtk::Orientation::VERTICAL, 0},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
       card_widgets{},
