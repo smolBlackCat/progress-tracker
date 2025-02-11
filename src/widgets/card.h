@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "base-item.h"
 #include "cardlist-widget.h"
 #include "glibmm/extraclassinit.h"
 
@@ -25,7 +26,7 @@ public:
 /**
  * @brief Widget that represents a single card.
  */
-class CardWidget : public CardInit, public Gtk::Widget {
+class CardWidget : public CardInit, public BaseItem {
 public:
     /**
      * @brief Constructs a CardWidget object.
@@ -36,11 +37,6 @@ public:
      * the Card did not come from a file otherwise False.
      */
     CardWidget(std::shared_ptr<Card> card, bool is_new = false);
-
-    /**
-     * @brief Destroys the CardWidget object.
-     */
-    ~CardWidget();
 
     /**
      * @brief Sets the title of the card.
@@ -156,43 +152,6 @@ protected:
         "due-date";  ///< Last CSS class for due date label.
 
     /**
-     * @brief Retrieves the number of visible children in the root box.
-     *
-     * @return the number of visible children.
-     */
-    int get_n_visible_children() const;
-
-    /**
-     * @brief Retrieves the size request mode.
-     *
-     * @return the size request mode.
-     */
-    Gtk::SizeRequestMode get_request_mode_vfunc();
-
-    /**
-     * @brief Measures the widget size.
-     *
-     * @param orientation the orientation to measure.
-     * @param for_size the size to measure for.
-     * @param minimum the minimum size.
-     * @param natural the natural size.
-     * @param minimum_baseline the minimum baseline.
-     * @param natural_baseline the natural baseline.
-     */
-    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum,
-                       int& natural, int& minimum_baseline,
-                       int& natural_baseline) const;
-
-    /**
-     * @brief Allocates size for the widget.
-     *
-     * @param width the allocated width.
-     * @param height the allocated height.
-     * @param baseline the allocated baseline.
-     */
-    void size_allocate_vfunc(int width, int height, int baseline);
-
-    /**
      * @brief Sets up drag and drop functionality for the card widget.
      */
     void setup_drag_and_drop();
@@ -236,6 +195,8 @@ protected:
      * @brief Clears the card cover color.
      */
     void clear_color();
+
+    void cleanup() override;
 };
 
 }  // namespace ui

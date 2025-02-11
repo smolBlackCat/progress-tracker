@@ -33,7 +33,7 @@ CardInit::CardInit()
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
-      Gtk::Widget{},
+      BaseItem{},
       card{card},
       cardlist_p{nullptr},
       is_new{is_new},
@@ -55,8 +55,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     // Setup Widgets
     root_box.set_spacing(4);
     root_box.set_size_request(240, -1);
-
-    set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
 
     // Card's cover
     root_box.append(card_cover_revealer);
@@ -125,8 +123,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_body.append(card_menu_button);
 
     root_box.insert_at_end(*this);
-
-    signal_destroy().connect(sigc::mem_fun(root_box, &Gtk::Widget::unparent));
 
     // CardWidget Setup
 
@@ -328,14 +324,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     setup_drag_and_drop();
 }
 
-CardWidget::~CardWidget() {
-    if (!gobj()) {
-        return;
-    }
-
-    root_box.unparent();
-}
-
 void CardWidget::set_title(const std::string& label) {
     card_label.set_label(label);
     card_entry.set_text(label);
@@ -449,93 +437,6 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
         last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
     }
     complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
-}
-
-int CardWidget::get_n_visible_children() const {
-    int n_children = 0;
-    for (const Widget* child = get_first_child(); child;
-         child = child->get_next_sibling()) {
-        if (child->get_visible()) ++n_children;
-    }
-    return n_children;
-}
-
-Gtk::SizeRequestMode CardWidget::get_request_mode_vfunc() {
-    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
-}
-
-void CardWidget::measure_vfunc(Gtk::Orientation orientation, int for_size,
-                               int& minimum, int& natural,
-                               int& minimum_baseline,
-                               int& natural_baseline) const {
-    // Don't use baseline alignment.
-    minimum_baseline = -1;
-    natural_baseline = -1;
-
-    minimum = 0;
-    natural = 0;
-
-    // Number of visible children.
-    const int nvis_children = get_n_visible_children();
-
-    if (orientation == Gtk::Orientation::HORIZONTAL) {
-        // Divide the height equally among the visible children.
-        if (for_size > 0 && nvis_children > 0) for_size /= nvis_children;
-
-        // Request a width equal to the width of the widest visible child.
-    }
-
-    for (const Widget* child = get_first_child(); child;
-         child = child->get_next_sibling())
-        if (child->get_visible()) {
-            int child_minimum, child_natural, ignore;
-            child->measure(orientation, for_size, child_minimum, child_natural,
-                           ignore, ignore);
-            minimum = std::max(minimum, child_minimum);
-            natural = std::max(natural, child_natural);
-        }
-
-    if (orientation == Gtk::Orientation::VERTICAL) {
-        // The allocated height will be divided equally among the visible
-        // children. Request a height equal to the number of visible
-        // children times the height of the highest child.
-        minimum *= nvis_children;
-        natural *= nvis_children;
-    }
-}
-
-void CardWidget::size_allocate_vfunc(int width, int height, int baseline) {
-    // Do something with the space that we have actually been given:
-    //(We will not be given heights or widths less than we have requested,
-    // though we might get more.)
-
-    // Number of visible children.
-    const int nvis_children = get_n_visible_children();
-
-    if (nvis_children <= 0) {
-        // No visible child.
-        return;
-    }
-
-    // Assign space to the children:
-    Gtk::Allocation child_allocation;
-    const int height_per_child = height / nvis_children;
-
-    // Place the first visible child at the top-left:
-    child_allocation.set_x(0);
-    child_allocation.set_y(0);
-
-    // Make it take up the full width available:
-    child_allocation.set_width(width);
-    child_allocation.set_height(height_per_child);
-
-    // Divide the height equally among the visible children.
-    for (Widget* child = get_first_child(); child;
-         child = child->get_next_sibling())
-        if (child->get_visible()) {
-            child->size_allocate(child_allocation, baseline);
-            child_allocation.set_y(child_allocation.get_y() + height_per_child);
-        }
 }
 
 void CardWidget::setup_drag_and_drop() {
@@ -708,8 +609,7 @@ std::string CardWidget::create_details_text() const {
         if (card->get_complete()) {
             details_text << _("This card is complete") << "\n\n";
         } else if (card_due_date > cur_date) {
-            auto due_date_tm =
-                system_clock::to_time_t(sys_days(card_due_date));
+            auto due_date_tm = system_clock::to_time_t(sys_days(card_due_date));
             char date_info[100];
             strftime(date_info, 100, _("This card is due %x"),
                      std::gmtime(&due_date_tm));
@@ -781,4 +681,6 @@ void CardWidget::_set_color(const Gdk::RGBA& color) {
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     card_cover_revealer.set_reveal_child(true);
 }
+
+void CardWidget::cleanup() { root_box.unparent(); }
 }  // namespace ui
