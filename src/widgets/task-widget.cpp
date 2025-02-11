@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
+#include "gtkmm/shortcutaction.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -110,6 +111,54 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         },
         false);
     task_entry.add_controller(key_controller);
+
+    auto shortcut_controller = Gtk::ShortcutController::create();
+    shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>R"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                on_rename();
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                on_remove();
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control><Shift>C"),
+        Gtk::CallbackAction::create(
+            [this, &card_widget](Gtk::Widget&, const Glib::VariantBase&) {
+                on_convert(card_widget);
+                return true;
+            })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Up"),
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            Gtk::Widget* previous = this->get_prev_sibling();
+            if (!G_TYPE_CHECK_INSTANCE_TYPE(previous->gobj(),
+                                            Gtk::Button::get_type())) {
+                TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
+                this->card_details_dialog.reorder_task_widget(prev_task, *this);
+            }
+            return true;
+        })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>Down"),
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            Gtk::Widget* next = this->get_next_sibling();
+            if (next) {
+                TaskWidget& next_task = *static_cast<TaskWidget*>(next);
+                this->card_details_dialog.reorder_task_widget(*this, next_task);
+            }
+            return true;
+        })));
+    add_controller(shortcut_controller);
 
     setup_drag_and_drop();
 

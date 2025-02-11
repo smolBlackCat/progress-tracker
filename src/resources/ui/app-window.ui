@@ -322,6 +322,55 @@
               </child>
             </object>
           </child>
+          <child>
+            <object class="GtkShortcutsGroup">
+              <property
+                            name="title"
+                            translatable="yes"
+                        >Task Shortcuts</property>
+              <property name="view">board-view</property>
+              <child>
+                <object class="GtkShortcutsShortcut">
+                  <property name="accelerator">&lt;Control&gt;R</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Rename task</property>
+                </object>
+              </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
+                  <property name="accelerator">&lt;Control&gt;Delete</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Delete task from card</property>
+                </object>
+              </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
+                  <property
+                                    name="accelerator"
+                                >&lt;Control&gt;&lt;Shift&gt;C</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Convert task to card</property>
+                </object>
+              </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
+                  <property
+                                    name="accelerator"
+                                >&lt;Control&gt;Up &lt;Control&gt;Down</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Move task across the checklist</property>
+                </object>
+              </child>
+            </object>
+          </child>
         </object>
       </child>
     </object>

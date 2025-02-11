@@ -9,11 +9,8 @@ src/resources/ui/app-window.ui
 src/resources/ui/card-details-dialog.ui
 src/resources/ui/board-dialog.ui
 src/widgets/board-widget.cpp
-src/widgets/card.cpp
+src/widgets/card-widget.cpp
 src/widgets/cardlist-widget.cpp
 src/widgets/editable-label-header.cpp
 src/widgets/board-widget.cpp
-src/widgets/card.cpp
-src/widgets/cardlist-widget.cpp
-src/widgets/editable-label-header.cpp
 src/widgets/task-widget.cpp
