@@ -14,9 +14,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           "submodules": true
-      - uses: jochumdev/flatpak-github-actions/flatpak-builder@builder-update-deps
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           manifest-path: io.github.smolblackcat.Progress.Devel.json
+          bundle: progress.flatpak
           run-tests: true
           cache-key: flatpak-builder-${{ github.sha }}
-          upload-artifact: false
+          upload-artifact: true
