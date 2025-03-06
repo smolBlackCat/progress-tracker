@@ -111,6 +111,10 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         },
         false);
     task_entry.add_controller(key_controller);
+    auto focus_controller = Gtk::EventControllerFocus::create();
+    focus_controller->signal_leave().connect(
+        sigc::mem_fun(*this, &TaskWidget::off_rename));
+    task_entry.add_controller(focus_controller);
 
     auto shortcut_controller = Gtk::ShortcutController::create();
     shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
@@ -140,8 +144,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         Gtk::CallbackAction::create([this](Gtk::Widget&,
                                            const Glib::VariantBase&) {
             Gtk::Widget* previous = this->get_prev_sibling();
-            if (!G_TYPE_CHECK_INSTANCE_TYPE(previous->gobj(),
-                                            Gtk::Button::get_type())) {
+            if (previous) {
                 TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
                 this->card_details_dialog.reorder_task_widget(prev_task, *this);
             }
@@ -152,7 +155,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         Gtk::CallbackAction::create([this](Gtk::Widget&,
                                            const Glib::VariantBase&) {
             Gtk::Widget* next = this->get_next_sibling();
-            if (next) {
+            if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
+                                            Gtk::Button::get_type())) {
                 TaskWidget& next_task = *static_cast<TaskWidget*>(next);
                 this->card_details_dialog.reorder_task_widget(*this, next_task);
             }

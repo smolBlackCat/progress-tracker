@@ -211,6 +211,7 @@ void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
     auto task_widget =
         Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
     tasks_box->append(*task_widget);
+    tasks_box->reorder_child_after(checklist_add_button, *task_widget);
     tasks_tracker.push_back(task_widget);
 
     spdlog::get("ui")->debug(
