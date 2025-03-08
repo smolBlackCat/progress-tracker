@@ -14,7 +14,8 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
       menu{Gio::Menu::create()},
       menu_actions{Gio::SimpleActionGroup::create()},
       key_controller{Gtk::EventControllerKey::create()},
-      click_controller{Gtk::GestureClick::create()} {
+      click_controller{Gtk::GestureClick::create()},
+      focus_controller{Gtk::EventControllerFocus::create()} {
     editing_box.set_spacing(BOX_SPACING);
 
     if (entry_css_class != "") {
@@ -25,6 +26,9 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
     entry.set_hexpand();
     entry.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH -
                            confirm_changes_button.get_width());
+    focus_controller->signal_leave().connect(
+        sigc::mem_fun(*this, &EditableLabelHeader::exit_editing_mode));
+    entry.add_controller(focus_controller);
     editing_box.append(entry);
 
     confirm_changes_button.set_valign(Gtk::Align::CENTER);
@@ -72,9 +76,13 @@ EditableLabelHeader::EditableLabelHeader(const std::string& label,
     cancel_changes_button.signal_clicked().connect(
         sigc::mem_fun(*this, &EditableLabelHeader::on_cancel_changes));
 
-    add_option_button(
-        _("Rename"), "rename",
-        sigc::mem_fun(*this, &ui::EditableLabelHeader::to_editing_mode));
+    add_option_button(_("Rename"), "rename", [this]() {
+        // Interacting with the popover may cause the card to lose focus thus
+        // we need to disable and the enable it again before the rename
+        this->entry.remove_controller(focus_controller);
+        this->to_editing_mode();
+        this->entry.add_controller(focus_controller);
+    });
 
     menu_button.insert_action_group("label-header", menu_actions);
     menu_button.set_menu_model(menu);

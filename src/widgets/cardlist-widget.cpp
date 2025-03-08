@@ -141,11 +141,6 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     drop_motion_controller->signal_leave().connect(
         [this]() { this->remove_css_class("cardlist-to-drop"); });
     add_controller(drop_motion_controller);
-
-    // signal_destroy().connect(
-    //     sigc::mem_fun(cardlist_header, &Gtk::Widget::unparent));
-    // signal_destroy().connect(sigc::mem_fun(scr_window,
-    // &Gtk::Widget::unparent));
 }
 
 void ui::CardlistWidget::reorder(ui::CardWidget& next,

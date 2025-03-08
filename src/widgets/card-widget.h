@@ -121,35 +121,26 @@ public:
     std::string create_details_text() const;
 
 protected:
-    bool is_new;  ///< Flag indicating whether the card is new or loaded from a
-                  ///< file.
-    Gtk::Box root_box;  ///< Root container for the card widget.
-    Gtk::Revealer card_cover_revealer,
-        card_entry_revealer;  ///< Revealer widgets for card cover and entry.
-    Gtk::Picture card_cover_picture;  ///< Picture widget for card cover.
-    Gtk::Label card_label, complete_tasks_label,
-        due_date_label;     ///< Labels for card title, complete tasks, and due
-                            ///< date.
-    Gtk::Entry card_entry;  ///< Entry widget for editing card title.
-    Gtk::MenuButton card_menu_button;  ///< Menu button for card options.
-    Gtk::PopoverMenu popover_menu;     ///< Popover menu for card options.
+    bool is_new;
+    Gtk::Box root_box;
+    Gtk::Revealer card_cover_revealer, card_entry_revealer;
+    Gtk::Picture card_cover_picture;
+    Gtk::Label card_label, complete_tasks_label, due_date_label;
+    Gtk::Entry card_entry;
+    Gtk::MenuButton card_menu_button;
+    Gtk::PopoverMenu popover_menu;
 
-    Glib::RefPtr<Gtk::EventControllerKey>
-        key_controller;  ///< Key event controller.
-    Glib::RefPtr<Gtk::GestureClick> card_label_click_controller,
-        click_controller;                     ///< Click gesture controllers.
-    Glib::RefPtr<Gio::Menu> card_menu_model;  ///< Menu model for card options.
-    Glib::RefPtr<Gtk::ColorDialog>
-        color_dialog;  ///< Color dialog for selecting card cover color.
+    Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
+    Glib::RefPtr<Gtk::EventControllerKey> key_controller;
+    Glib::RefPtr<Gtk::GestureClick> click_controller;
+    Glib::RefPtr<Gio::Menu> card_menu_model;
+    Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
-    ui::CardlistWidget*
-        cardlist_p;              ///< Pointer to the associated CardlistWidget.
-    std::shared_ptr<Card> card;  ///< Pointer to the current Card object.
+    ui::CardlistWidget* cardlist_p;
+    std::shared_ptr<Card> card;
 
-    std::string last_complete_tasks_label_css_class =
-        "";  ///< Last CSS class for complete tasks label.
-    std::string last_due_date_label_css_class =
-        "due-date";  ///< Last CSS class for due date label.
+    std::string last_complete_tasks_label_css_class = "";
+    std::string last_due_date_label_css_class = "due-date";
 
     /**
      * @brief Sets up drag and drop functionality for the card widget.

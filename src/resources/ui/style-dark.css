@@ -20,6 +20,10 @@ cardlist {
     box-shadow: 0 0 4px @card_shade_color;
 }
 
+.card-cover {
+    border-radius: 5px;
+}
+
 card {
     background-color: @card_bg_color;
     border-radius: 5px;

@@ -9,6 +9,7 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
+#include "glib-object.h"
 #include "gtk/gtk.h"
 #include "window.h"
 
@@ -48,8 +49,8 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
       card_menu_button{},
       popover_menu{},
       key_controller{Gtk::EventControllerKey::create()},
-      card_label_click_controller{Gtk::GestureClick::create()},
       click_controller{Gtk::GestureClick::create()},
+      focus_controller{Gtk::EventControllerFocus::create()},
       card_menu_model{Gio::Menu::create()},
       color_dialog{Gtk::ColorDialog::create()} {
     // Setup Widgets
@@ -60,7 +61,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     root_box.append(card_cover_revealer);
     card_cover_revealer.set_child(card_cover_picture);
     card_cover_picture.set_content_fit(Gtk::ContentFit::COVER);
-    card_cover_picture.add_css_class("card");
+    card_cover_picture.add_css_class("card-cover");
     card_cover_picture.set_size_request(-1, 50);
 
     // Card Body
@@ -88,6 +89,9 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_label_box.append(card_entry_revealer);
     card_entry_revealer.set_child(card_entry);
     card_entry.set_hexpand();
+    focus_controller->signal_leave().connect(
+        sigc::mem_fun(*this, &CardWidget::off_rename));
+    card_entry.add_controller(focus_controller);
     card_data_box.append(card_label_box);
 
     Gtk::Box& card_info_box = *Gtk::make_managed<Gtk::Box>();
@@ -134,8 +138,15 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     }
 
     auto card_actions = Gio::SimpleActionGroup::create();
-    card_actions->add_action("rename",
-                             sigc::mem_fun(*this, &CardWidget::on_rename));
+    card_actions->add_action("rename", [this]() {
+        // Interacting with the popover may cause the card to lose focus thus
+        // we need to disable and the enable it again before the rename
+        this->card_entry.remove_controller(
+            focus_controller);
+        this->on_rename();
+        this->card_entry.add_controller(focus_controller);
+    });
+
     card_actions->add_action(
         "details", sigc::mem_fun(*this, &CardWidget::open_card_details_dialog));
     card_actions->add_action(
@@ -271,22 +282,17 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
             }
         });
 
-    card_label_click_controller->signal_released().connect(
-        [this](int n_pressed, double x, double y) {
-            if (n_pressed >= 1 && !card_entry_revealer.get_child_revealed() &&
-                this->card_label_click_controller->get_current_button() ==
-                    GDK_BUTTON_PRIMARY) {
-                this->on_rename();
-            }
-        });
-
-    click_controller->set_button(GDK_BUTTON_SECONDARY);
+    click_controller->set_button(0);
     click_controller->signal_released().connect(
         [this](int n_pressed, double x, double y) {
             auto clicked = this->click_controller->get_current_button();
             if (clicked == GDK_BUTTON_SECONDARY && n_pressed >= 1) {
                 this->popover_menu.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
                 this->popover_menu.popup();
+            } else if (n_pressed >= 1 &&
+                       !card_entry_revealer.get_child_revealed() &&
+                       clicked == GDK_BUTTON_PRIMARY) {
+                this->on_rename();
             }
         });
 
@@ -297,7 +303,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         [this]() { this->remove_css_class("card-to-drop"); });
 
     card_entry.add_controller(key_controller);
-    card_label.add_controller(card_label_click_controller);
     add_controller(click_controller);
     add_controller(drop_motion_controller);
 

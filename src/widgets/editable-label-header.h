@@ -65,8 +65,10 @@ protected:
     Glib::RefPtr<Gio::Menu> menu;
     Gtk::MenuButton menu_button;
 
+    Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
+
 
     sigc::signal<void(const std::string&)> on_confirm_signal;
     sigc::signal<void(const std::string&)> on_cancel_signal;
