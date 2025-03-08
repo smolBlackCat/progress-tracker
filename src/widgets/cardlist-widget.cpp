@@ -145,8 +145,16 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 
 void ui::CardlistWidget::reorder(ui::CardWidget& next,
                                  ui::CardWidget& sibling) {
-    root.reorder_child_after(next, sibling);
     cardlist->reorder(*next.get_card(), *sibling.get_card());
+
+    if (sibling.get_next_sibling() == &next) {
+        root.reorder_child_after(sibling, next);
+        spdlog::get("ui")->debug(
+            "CardWidget has reordered a CardWidget \"{}\" after \"{}\"",
+            sibling.get_card()->get_name(), next.get_card()->get_name());
+    } else {
+        root.reorder_child_after(next, sibling);
+    }
 
     spdlog::get("ui")->debug(
         "CardWidget \"{}\" has been reordered after CardWidget \"{}\"",

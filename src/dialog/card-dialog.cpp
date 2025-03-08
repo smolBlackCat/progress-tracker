@@ -74,8 +74,16 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
-    tasks_box->reorder_child_after(next, sibling);
     cur_card_widget->get_card()->reorder(*next.get_task(), *sibling.get_task());
+
+    if (sibling.get_next_sibling() == &next) {
+        tasks_box->reorder_child_after(sibling, next);
+        spdlog::get("ui")->debug(
+            "TaskWidget has reordered a TaskWidget \"{}\" after \"{}\"",
+            sibling.get_task()->get_name(), next.get_task()->get_name());
+    } else {
+        tasks_box->reorder_child_after(next, sibling);
+    }
 
     spdlog::get("ui")->debug(
         "TaskWidget \"{}\" reordered after TaskWidget \"{}\"",

@@ -452,8 +452,15 @@ void Board::reorder(const CardList& next, const CardList& sibling) {
         bool any_absent_item = next_i + sibling_i < 0;
         bool is_same_item = next_i == sibling_i;
         bool already_in_order = next_i - sibling_i == 1;
-        if (any_absent_item || is_same_item || already_in_order) {
+        if (any_absent_item || is_same_item) {
             spdlog::get("core")->warn("Invalid reorder request");
+            return;
+        } else if (already_in_order) {
+            // We will simply revert the order of the cardlists
+            std::shared_ptr<CardList> temp_v = cardlists[next_i];
+            cardlists.at(next_i) = cardlists.at(sibling_i);
+            cardlists.at(sibling_i) = temp_v;
+            modified = true;
             return;
         }
 

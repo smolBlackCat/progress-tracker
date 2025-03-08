@@ -52,6 +52,29 @@ TEST_CASE("CardList operations", "[CardList]") {
         REQUIRE(cardList.get_modified() == true);
     }
 
+    SECTION("Reordering Cards that are already in order") {
+        Card card1("Card1");
+        Card card2("Card2");
+        Card card3("Card3");
+
+        auto cardPtr1 = cardList.add(card1);
+        auto cardPtr2 = cardList.add(card2);
+        auto cardPtr3 = cardList.add(card3);
+
+        REQUIRE(*cardList.get_cards().at(0) == card1);
+        REQUIRE(*cardList.get_cards().at(1) == card2);
+        REQUIRE(*cardList.get_cards().at(2) == card3);
+
+        // Cards will simply exchange places
+        cardList.reorder(card2, card1);
+
+        REQUIRE(*cardList.get_cards().at(0) == card2);
+        REQUIRE(*cardList.get_cards().at(1) == card1);
+        REQUIRE(*cardList.get_cards().at(2) == card3);
+
+        REQUIRE(cardList.get_modified() == true);
+    }
+
     SECTION("Reorder Cards invalid arguments") {
         Card card1("Card1");
         Card card2("Card2");

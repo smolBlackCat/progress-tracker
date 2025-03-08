@@ -383,12 +383,12 @@ TEST_CASE("Reordering Cardlists", "Board") {
     SECTION("Reordering where sibling and next are already sibling and next") {
         board.reorder(*cardlist3, *cardlist2);
 
-        // Because cardlist3 is already next to cardlist2, nothing should be
-        // done, therefore no modification whatsoeever
+        // Because cardlist3 is already next to cardlist2, They'll just exchange
+        // places
         CHECK(*cardlists[0] == *cardlist1);
-        CHECK(*cardlists[1] == *cardlist2);
-        CHECK(*cardlists[2] == *cardlist3);
-        CHECK(!board.get_modified());
+        CHECK(*cardlists[1] == *cardlist3);
+        CHECK(*cardlists[2] == *cardlist2);
+        CHECK(board.get_modified());
     }
 
     board.set_modified(false);

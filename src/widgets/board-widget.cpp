@@ -146,7 +146,17 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
     board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
-    root.reorder_child_after(next, sibling);
+
+    // The user might want to simply exchange the places of the cardlists
+    if (sibling.get_next_sibling() == &next) {
+        root.reorder_child_after(sibling, next);
+        spdlog::get("ui")->debug(
+            "BoardWidget has reordered a CardlistWidget \"{}\" after \"{}\"",
+            sibling.get_cardlist()->get_name(),
+            next.get_cardlist()->get_name());
+    } else {
+        root.reorder_child_after(next, sibling);
+    }
 
     spdlog::get("ui")->debug(
         "BoardWidget has reordered a CardlistWidget \"{}\" after \"{}\"",

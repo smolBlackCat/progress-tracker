@@ -154,3 +154,31 @@ TEST_CASE("Task reordering", "[Card]") {
 
     REQUIRE(card1.get_modified());
 }
+
+TEST_CASE("Reordering tasks that are already in order") {
+    Card card1{"Operating Systems"};
+
+    Task task1{"Windows"};
+    Task task2{"MacOS"};
+    Task task3{"Debian"};
+
+    auto task1_p = card1.add(task1);
+    auto task2_p = card1.add(task2);
+    auto task3_p = card1.add(task3);
+
+    card1.set_modified(false);
+
+    auto& tasks = card1.get_tasks();
+
+    REQUIRE(task1_p == tasks[0]);
+    REQUIRE(task2_p == tasks[1]);
+    REQUIRE(task3_p == tasks[2]);
+
+    card1.reorder(task2, task1);
+
+    CHECK(task1 == *tasks[1]);
+    CHECK(task2 == *tasks[0]);
+    CHECK(task3 == *tasks[2]);
+
+    REQUIRE(card1.get_modified());
+}
