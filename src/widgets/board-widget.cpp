@@ -145,21 +145,31 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
-    board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
+    ReorderingType reordering =
+        board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
 
-    // The user might want to simply exchange the places of the cardlists
-    if (sibling.get_next_sibling() == &next) {
-        root.reorder_child_after(sibling, next);
-        spdlog::get("ui")->debug(
-            "BoardWidget has reordered a CardlistWidget \"{}\" after \"{}\"",
-            sibling.get_cardlist()->get_name(),
-            next.get_cardlist()->get_name());
-    } else {
-        root.reorder_child_after(next, sibling);
+    switch (reordering) {
+        case ReorderingType::DOWNUP: {
+            auto sibling_sibling = sibling.get_prev_sibling();
+            if (!sibling_sibling) {
+                root.reorder_child_at_start(next);
+            } else {
+                root.reorder_child_after(next, *sibling_sibling);
+            }
+            break;
+        }
+        case ReorderingType::UPDOWN: {
+            root.reorder_child_after(next, sibling);
+            break;
+        }
+        case ReorderingType::INVALID: {
+            spdlog::get("ui")->warn("Invalid reorder request");
+            break;
+        }
     }
 
     spdlog::get("ui")->debug(
-        "BoardWidget has reordered a CardlistWidget \"{}\" after \"{}\"",
+        "BoardWidget has reordered a CardlistWidget \"{}\" and \"{}\"",
         next.get_cardlist()->get_name(), sibling.get_cardlist()->get_name());
 }
 

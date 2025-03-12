@@ -138,7 +138,7 @@ public:
     /**
      * @brief Reorders cardlist "next" after cardlist "sibling"
      */
-    void reorder(const CardList& next, const CardList& sibling);
+    ReorderingType reorder(const CardList& next, const CardList& sibling);
 
     /**
      * @brief Saves the board using the backend functionality

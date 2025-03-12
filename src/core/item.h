@@ -1,11 +1,17 @@
 #pragma once
-#include <guid.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <guid.hpp>
 #include <string>
 
 extern const std::shared_ptr<spdlog::logger> core_logger;
+
+enum class ReorderingType {
+    UPDOWN,
+    DOWNUP,
+    INVALID,
+};
 
 /**
  * @class Item

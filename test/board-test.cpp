@@ -409,10 +409,10 @@ TEST_CASE("Reordering Cardlists", "Board") {
     SECTION("Reordering case 2") {
         board.reorder(*cardlist3, *cardlist1);
 
-        // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
-        // last element and a modification is registered
-        CHECK(*cardlists[0] == *cardlist1);
-        CHECK(*cardlists[1] == *cardlist3);
+        // Cardlist 3 will be placed in the Cardlist 1 position, thus being the
+        // first item
+        CHECK(*cardlists[0] == *cardlist3);
+        CHECK(*cardlists[1] == *cardlist1);
         CHECK(*cardlists[2] == *cardlist2);
         CHECK(board.get_modified());
     }

@@ -98,50 +98,48 @@ bool Card::remove(const Task& task) {
 
 std::vector<std::shared_ptr<Task>> const& Card::get_tasks() { return tasks; }
 
-void Card::reorder(const Task& next, const Task& sibling) {
+ReorderingType Card::reorder(const Task& next, const Task& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 
-    for (ssize_t i = 0; i < tasks.size(); i++) {
-        if (*tasks[i] == next) {
-            next_i = i;
+    ssize_t c = 0;
+    for (auto& task : tasks) {
+        if (*task == next) {
+            next_i = c;
+        } else if (*task == sibling) {
+            sibling_i = c;
         }
-        if (*tasks[i] == sibling) {
-            sibling_i = i;
-        }
+        c++;
     }
 
-    bool any_absent_item = next_i + sibling_i < 0;
-    bool is_same_item = next_i == sibling_i;
-    bool already_in_order = next_i - sibling_i == 1;
-    if (any_absent_item || is_same_item) {
+    bool any_absent = next_i == -1 || sibling_i == -1;
+    bool is_same = next_i == sibling_i;
+
+    if (any_absent || is_same) {
         spdlog::get("core")->warn("Invalid reorder request");
-        return;
-    } else if (already_in_order) {
-        // We will simply revert the order of the cardlists
-        std::shared_ptr<Task> temp_v = tasks[next_i];
-        tasks.at(next_i) = tasks.at(sibling_i);
-        tasks.at(sibling_i) = temp_v;
-        modified = true;
-        return;
+        return ReorderingType::INVALID;
     }
 
-    auto next_it = std::next(tasks.begin(), next_i);
-    std::shared_ptr<Task> temp_v = tasks[next_i];
-    tasks.erase(next_it);
+    std::shared_ptr<Task> next_v = tasks[next_i];
+    tasks.erase(tasks.begin() + next_i);
 
-    // Support for right to left drags and drops
-    if (next_i < sibling_i) {
-        sibling_i -= 1;
+    ReorderingType reordering;
+
+    if (next_i > sibling_i) {
+        // Down to up reordering
+        tasks.insert(tasks.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
+        reordering = ReorderingType::DOWNUP;
+    } else if (next_i < sibling_i) {
+        // Up to down reordering
+        tasks.insert(tasks.begin() + sibling_i, next_v);
+        reordering = ReorderingType::UPDOWN;
     }
 
-    if (sibling_i == tasks.size() - 1) {
-        tasks.push_back(temp_v);
-    } else {
-        auto sibling_it = std::next(tasks.begin(), sibling_i + 1);
-        tasks.insert(sibling_it, temp_v);
-    }
+    spdlog::get("core")->info("Card \"{}\" reordered tasks: \"{}\" and \"{}\"",
+                              name, next.get_name(), sibling.get_name());
+
     modified = true;
+    return reordering;
 }
 
 bool Card::past_due_date() {

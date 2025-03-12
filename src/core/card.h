@@ -98,7 +98,7 @@ public:
     /**
      * @brief Put task "next" after task "sibling"
      */
-    void reorder(const Task& next, const Task& sibling);
+    ReorderingType reorder(const Task& next, const Task& sibling);
 
     /**
      * @brief Returns true if this card is past due date and the date is valid,

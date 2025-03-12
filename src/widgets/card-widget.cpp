@@ -297,10 +297,10 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         });
 
     auto drop_motion_controller = Gtk::DropControllerMotion::create();
-    drop_motion_controller->signal_motion().connect(
-        [this](double x, double y) { this->add_css_class("card-to-drop"); });
-    drop_motion_controller->signal_leave().connect(
-        [this]() { this->remove_css_class("card-to-drop"); });
+    // drop_motion_controller->signal_motion().connect(
+    //     [this](double x, double y) { this->add_css_class("card-to-drop"); });
+    // drop_motion_controller->signal_leave().connect(
+    //     [this]() { this->remove_css_class("card-to-drop"); });
 
     card_entry.add_controller(key_controller);
     add_controller(click_controller);

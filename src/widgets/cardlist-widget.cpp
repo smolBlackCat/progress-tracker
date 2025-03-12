@@ -135,29 +135,42 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     add_controller(shortcut_controller);
 
     auto drop_motion_controller = Gtk::DropControllerMotion::create();
-    drop_motion_controller->signal_motion().connect([this](double x, double y) {
-        this->add_css_class("cardlist-to-drop");
-    });
-    drop_motion_controller->signal_leave().connect(
-        [this]() { this->remove_css_class("cardlist-to-drop"); });
+    // drop_motion_controller->signal_motion().connect([this](double x, double
+    // y) {
+    //     this->add_css_class("cardlist-to-drop");
+    // });
+    // drop_motion_controller->signal_leave().connect(
+    //     [this]() { this->remove_css_class("cardlist-to-drop"); });
     add_controller(drop_motion_controller);
 }
 
 void ui::CardlistWidget::reorder(ui::CardWidget& next,
                                  ui::CardWidget& sibling) {
-    cardlist->reorder(*next.get_card(), *sibling.get_card());
+    ReorderingType reordering =
+        cardlist->reorder(*next.get_card(), *sibling.get_card());
 
-    if (sibling.get_next_sibling() == &next) {
-        root.reorder_child_after(sibling, next);
-        spdlog::get("ui")->debug(
-            "CardWidget has reordered a CardWidget \"{}\" after \"{}\"",
-            sibling.get_card()->get_name(), next.get_card()->get_name());
-    } else {
-        root.reorder_child_after(next, sibling);
+    switch (reordering) {
+        case ReorderingType::DOWNUP: {
+            auto sibling_sibling = sibling.get_prev_sibling();
+            if (!sibling_sibling) {
+                root.reorder_child_at_start(next);
+            } else {
+                root.reorder_child_after(next, *sibling_sibling);
+            }
+            break;
+        }
+        case ReorderingType::UPDOWN: {
+            root.reorder_child_after(next, sibling);
+            break;
+        }
+        case ReorderingType::INVALID: {
+            spdlog::get("ui")->warn("Invalid reorder request");
+            break;
+        }
     }
 
     spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has been reordered after CardWidget \"{}\"",
+        "CardWidget \"{}\" has been reordered and CardWidget \"{}\"",
         next.get_card()->get_name(), sibling.get_card()->get_name());
 }
 

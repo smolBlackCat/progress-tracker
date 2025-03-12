@@ -30,7 +30,7 @@ TEST_CASE("CardList operations", "[CardList]") {
         REQUIRE(cardList.get_modified() == true);
     }
 
-    SECTION("Reorder Cards") {
+    SECTION("Reorder Cards down-up") {
         Card card1("Card1");
         Card card2("Card2");
         Card card3("Card3");
@@ -43,11 +43,33 @@ TEST_CASE("CardList operations", "[CardList]") {
         REQUIRE(*cardList.get_cards().at(1) == card2);
         REQUIRE(*cardList.get_cards().at(2) == card3);
 
-        cardList.reorder(card3, card1);  // Move card3 after card1
+        cardList.reorder(card3, card1);  // Place card3 in card1's position
+
+        REQUIRE(*cardList.get_cards().at(0) == card3);
+        REQUIRE(*cardList.get_cards().at(1) == card1);
+        REQUIRE(*cardList.get_cards().at(2) == card2);
+
+        REQUIRE(cardList.get_modified() == true);
+    }
+
+    SECTION("Reorder Cards up-down") {
+        Card card1("Card1");
+        Card card2("Card2");
+        Card card3("Card3");
+
+        auto cardPtr1 = cardList.add(card1);
+        auto cardPtr2 = cardList.add(card2);
+        auto cardPtr3 = cardList.add(card3);
 
         REQUIRE(*cardList.get_cards().at(0) == card1);
+        REQUIRE(*cardList.get_cards().at(1) == card2);
+        REQUIRE(*cardList.get_cards().at(2) == card3);
+
+        cardList.reorder(card1, card3);  // Place card3 in card1's position
+
+        REQUIRE(*cardList.get_cards().at(0) == card2);
         REQUIRE(*cardList.get_cards().at(1) == card3);
-        REQUIRE(*cardList.get_cards().at(2) == card2);
+        REQUIRE(*cardList.get_cards().at(2) == card1);
 
         REQUIRE(cardList.get_modified() == true);
     }

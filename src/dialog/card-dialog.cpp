@@ -74,19 +74,30 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
-    cur_card_widget->get_card()->reorder(*next.get_task(), *sibling.get_task());
+    ReorderingType reordering = cur_card_widget->get_card()->reorder(
+        *next.get_task(), *sibling.get_task());
 
-    if (sibling.get_next_sibling() == &next) {
-        tasks_box->reorder_child_after(sibling, next);
-        spdlog::get("ui")->debug(
-            "TaskWidget has reordered a TaskWidget \"{}\" after \"{}\"",
-            sibling.get_task()->get_name(), next.get_task()->get_name());
-    } else {
-        tasks_box->reorder_child_after(next, sibling);
+    switch (reordering) {
+        case ReorderingType::DOWNUP: {
+            auto sibling_sibling = sibling.get_prev_sibling();
+            if (!sibling_sibling) {
+                tasks_box->reorder_child_at_start(next);
+            } else {
+                tasks_box->reorder_child_after(next, *sibling_sibling);
+            }
+        }
+        case ReorderingType::UPDOWN: {
+            tasks_box->reorder_child_after(next, sibling);
+            break;
+        }
+        case ReorderingType::INVALID: {
+            spdlog::get("ui")->warn("Invalid reorder request");
+            break;
+        }
     }
 
     spdlog::get("ui")->debug(
-        "TaskWidget \"{}\" reordered after TaskWidget \"{}\"",
+        "TaskWidget \"{}\" reordered and TaskWidget \"{}\"",
         next.get_task()->get_name(), sibling.get_task()->get_name());
 }
 

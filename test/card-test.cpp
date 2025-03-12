@@ -127,7 +127,7 @@ TEST_CASE("Card operations", "[Card]") {
     }
 }
 
-TEST_CASE("Task reordering", "[Card]") {
+TEST_CASE("Task reordering (up-down)", "[Card]") {
     Card card1{"Operating Systems"};
 
     Task task1{"Windows"};
@@ -148,14 +148,14 @@ TEST_CASE("Task reordering", "[Card]") {
 
     card1.reorder(task1, task3);  // Moves "Windows" task after "Debian"
 
-    CHECK(task1 == *card1_tasks[2]);
     CHECK(task2 == *card1_tasks[0]);
     CHECK(task3 == *card1_tasks[1]);
+    CHECK(task1 == *card1_tasks[2]);
 
     REQUIRE(card1.get_modified());
 }
 
-TEST_CASE("Reordering tasks that are already in order") {
+TEST_CASE("Task Reordering (down-up)", "[Card]") {
     Card card1{"Operating Systems"};
 
     Task task1{"Windows"};
@@ -176,8 +176,8 @@ TEST_CASE("Reordering tasks that are already in order") {
 
     card1.reorder(task2, task1);
 
-    CHECK(task1 == *tasks[1]);
     CHECK(task2 == *tasks[0]);
+    CHECK(task1 == *tasks[1]);
     CHECK(task3 == *tasks[2]);
 
     REQUIRE(card1.get_modified());

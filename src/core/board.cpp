@@ -434,7 +434,7 @@ bool Board::remove(const CardList& cardlist) {
     return false;
 }
 
-void Board::reorder(const CardList& next, const CardList& sibling) {
+ReorderingType Board::reorder(const CardList& next, const CardList& sibling) {
     if (fully_loaded) {
         ssize_t next_i = -1;
         ssize_t sibling_i = -1;
@@ -449,42 +449,38 @@ void Board::reorder(const CardList& next, const CardList& sibling) {
             c++;
         }
 
-        bool any_absent_item = next_i + sibling_i < 0;
-        bool is_same_item = next_i == sibling_i;
-        bool already_in_order = next_i - sibling_i == 1;
-        if (any_absent_item || is_same_item) {
+        bool any_absent = next_i == -1 || sibling_i == -1;
+        bool is_same = next_i == sibling_i;
+
+        if (any_absent || is_same) {
             spdlog::get("core")->warn("Invalid reorder request");
-            return;
-        } else if (already_in_order) {
-            // We will simply revert the order of the cardlists
-            std::shared_ptr<CardList> temp_v = cardlists[next_i];
-            cardlists.at(next_i) = cardlists.at(sibling_i);
-            cardlists.at(sibling_i) = temp_v;
-            modified = true;
-            return;
+            return ReorderingType::INVALID;
         }
 
-        auto next_it = std::next(cardlists.begin(), next_i);
-        std::shared_ptr<CardList> temp_v = cardlists[next_i];
-        cardlists.erase(next_it);
+        std::shared_ptr<CardList> next_v = cardlists[next_i];
+        cardlists.erase(cardlists.begin() + next_i);
 
-        // Support for right to left drags and drops
-        if (next_i < sibling_i) {
-            sibling_i -= 1;
+        ReorderingType reordering;
+        if (next_i > sibling_i) {
+            // Down to up reordering
+            cardlists.insert(
+                cardlists.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
+            reordering = ReorderingType::DOWNUP;
+        } else if (next_i < sibling_i) {
+            // Up to down reordering
+            cardlists.insert(cardlists.begin() + sibling_i, next_v);
+            reordering = ReorderingType::UPDOWN;
         }
 
-        if (sibling_i == cardlists.size() - 1) {
-            cardlists.push_back(temp_v);
-        } else {
-            auto sibling_it = std::next(cardlists.begin(), sibling_i + 1);
-            cardlists.insert(sibling_it, temp_v);
-        }
         modified = true;
         spdlog::get("core")->info(
-            "Board \"{}\" reordered cardlist \"{}\" after "
+            "Board \"{}\" reordered cardlist \"{}\" and"
             "\"{}\"",
             name, next.get_name(), sibling.get_name());
+
+        return reordering;
     }
+    return ReorderingType::INVALID;
 }
 
 bool Board::save() {

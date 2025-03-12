@@ -48,7 +48,7 @@ public:
     /**
      * @brief Reorders card "next" after card "sibling"
      */
-    void reorder(const Card& next, const Card& sibling);
+    ReorderingType reorder(const Card& next, const Card& sibling);
 
 private:
     bool cards_modified();
