@@ -157,21 +157,26 @@ void ui::CardlistWidget::reorder(ui::CardWidget& next,
             } else {
                 root.reorder_child_after(next, *sibling_sibling);
             }
+            spdlog::get("ui")->debug(
+                "[CardlistWidget] CardWidget \"{}\" was inserted before "
+                "CardWidget \"{}\"",
+                next.get_card()->get_name(), sibling.get_card()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
             root.reorder_child_after(next, sibling);
+
+            spdlog::get("ui")->debug(
+                "[CardlistWidget] CardWidget \"{}\" was inserted after "
+                "CardWidget \"{}\"",
+                next.get_card()->get_name(), sibling.get_card()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn("Invalid reorder request");
+            spdlog::get("ui")->warn("[CardlistWidget] Invalid reorder request");
             break;
         }
     }
-
-    spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has been reordered and CardWidget \"{}\"",
-        next.get_card()->get_name(), sibling.get_card()->get_name());
 }
 
 const std::vector<ui::CardWidget*>& ui::CardlistWidget::get_card_widgets() {

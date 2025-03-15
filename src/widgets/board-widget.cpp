@@ -156,21 +156,28 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
             } else {
                 root.reorder_child_after(next, *sibling_sibling);
             }
+
+            spdlog::get("ui")->debug(
+                "[BoardWidget] CardListWidget \"{}\" was inserted before "
+                "CardListWidget \"{}\"",
+                next.get_cardlist()->get_name(),
+                sibling.get_cardlist()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
             root.reorder_child_after(next, sibling);
+            spdlog::get("ui")->debug(
+                "[BoardWidget] CardListWidget \"{}\" was inserted after "
+                "CardListWidget \"{}\"",
+                next.get_cardlist()->get_name(),
+                sibling.get_cardlist()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn("Invalid reorder request");
+            spdlog::get("ui")->warn("[BoardWidget] Cannot reorder cardlists:");
             break;
         }
     }
-
-    spdlog::get("ui")->debug(
-        "BoardWidget has reordered a CardlistWidget \"{}\" and \"{}\"",
-        next.get_cardlist()->get_name(), sibling.get_cardlist()->get_name());
 }
 
 #ifdef WIN32

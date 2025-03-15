@@ -3,8 +3,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include <iterator>
-
 #include "guid.hpp"
 
 CardList::CardList(const std::string& name)
@@ -72,7 +70,8 @@ ReorderingType CardList::reorder(const Card& next, const Card& sibling) {
     bool is_same = next_i == sibling_i;
 
     if (any_absent || is_same) {
-        spdlog::get("core")->warn("Invalid reorder request");
+        spdlog::get("core")->warn(
+            "[CardList] Cannot reorder cards: same references or missing");
         return ReorderingType::INVALID;
     }
 
@@ -84,16 +83,19 @@ ReorderingType CardList::reorder(const Card& next, const Card& sibling) {
         // Down to up reordering
         cards.insert(cards.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
         reordering = ReorderingType::DOWNUP;
+        spdlog::get("core")->info(
+            "[CardList] Reordered Card \"{}\" before Card \"{}\"",
+            next.get_name(), sibling.get_name());
     } else if (next_i < sibling_i) {
         // Up to down reordering
         cards.insert(cards.begin() + sibling_i, next_v);
         reordering = ReorderingType::UPDOWN;
+        spdlog::get("core")->info(
+            "[CardList] Reordered Card \"{}\" after Card \"{}\"",
+            next.get_name(), sibling.get_name());
     }
 
     modified = true;
-    spdlog::get("core")->info(
-        "Cardlist \"{}\" reordered card \"{}\" and \"{}\"", name,
-        next.get_name(), sibling.get_name());
 
     return reordering;
 }

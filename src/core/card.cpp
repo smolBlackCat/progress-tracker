@@ -116,7 +116,8 @@ ReorderingType Card::reorder(const Task& next, const Task& sibling) {
     bool is_same = next_i == sibling_i;
 
     if (any_absent || is_same) {
-        spdlog::get("core")->warn("Invalid reorder request");
+        spdlog::get("core")->warn(
+            "[Card] Cannot reorder tasks: same references or missing");
         return ReorderingType::INVALID;
     }
 
@@ -129,14 +130,17 @@ ReorderingType Card::reorder(const Task& next, const Task& sibling) {
         // Down to up reordering
         tasks.insert(tasks.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
         reordering = ReorderingType::DOWNUP;
+        spdlog::get("core")->info(
+            "[Card] Task \"{}\" was inserted before Task \"{}\"",
+            next.get_name(), sibling.get_name());
     } else if (next_i < sibling_i) {
         // Up to down reordering
         tasks.insert(tasks.begin() + sibling_i, next_v);
         reordering = ReorderingType::UPDOWN;
+        spdlog::get("core")->info(
+            "[Card] Task \"{}\" was inserted after Task \"{}\"",
+            next.get_name(), sibling.get_name());
     }
-
-    spdlog::get("core")->info("Card \"{}\" reordered tasks: \"{}\" and \"{}\"",
-                              name, next.get_name(), sibling.get_name());
 
     modified = true;
     return reordering;

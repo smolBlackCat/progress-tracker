@@ -85,20 +85,27 @@ void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
             } else {
                 tasks_box->reorder_child_after(next, *sibling_sibling);
             }
+
+            spdlog::get("ui")->debug(
+                "[CardDetailsDialog] TaskWidget \"{}\" was inserted before "
+                "TaskWidget \"{}\"",
+                next.get_task()->get_name(), sibling.get_task()->get_name());
+            break;
         }
         case ReorderingType::UPDOWN: {
             tasks_box->reorder_child_after(next, sibling);
+            spdlog::get("ui")->debug(
+                "[CardDetailsDialog] TaskWidget \"{}\" was inserted after "
+                "TaskWidget \"{}\"",
+                next.get_task()->get_name(), sibling.get_task()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn("Invalid reorder request");
+            spdlog::get("ui")->warn(
+                "[CardDetailsDialog] Invalid reorder request");
             break;
         }
     }
-
-    spdlog::get("ui")->debug(
-        "TaskWidget \"{}\" reordered and TaskWidget \"{}\"",
-        next.get_task()->get_name(), sibling.get_task()->get_name());
 }
 
 void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {

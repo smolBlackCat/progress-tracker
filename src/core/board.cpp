@@ -453,7 +453,8 @@ ReorderingType Board::reorder(const CardList& next, const CardList& sibling) {
         bool is_same = next_i == sibling_i;
 
         if (any_absent || is_same) {
-            spdlog::get("core")->warn("Invalid reorder request");
+            spdlog::get("core")->warn(
+                "[Board] Cannot reorder cardlists: same references or missing");
             return ReorderingType::INVALID;
         }
 
@@ -466,17 +467,19 @@ ReorderingType Board::reorder(const CardList& next, const CardList& sibling) {
             cardlists.insert(
                 cardlists.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
             reordering = ReorderingType::DOWNUP;
+            spdlog::get("core")->info(
+                "[Board] CardList \"{}\" was inserted before CardList \"{}\"",
+                next.get_name(), sibling.get_name());
         } else if (next_i < sibling_i) {
             // Up to down reordering
             cardlists.insert(cardlists.begin() + sibling_i, next_v);
             reordering = ReorderingType::UPDOWN;
+            spdlog::get("core")->info(
+                "[Board] CardList \"{}\" was inserted after CardList \"{}\"",
+                next.get_name(), sibling.get_name());
         }
 
         modified = true;
-        spdlog::get("core")->info(
-            "Board \"{}\" reordered cardlist \"{}\" and"
-            "\"{}\"",
-            name, next.get_name(), sibling.get_name());
 
         return reordering;
     }
