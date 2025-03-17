@@ -48,7 +48,8 @@ void ui::BoardCardButton::update(const Board& board) {
     set_background(board.get_background());
 
     spdlog::get("ui")->debug(
-        "Entry button for Board \"{}\" widget has been updated",
+        "[BoardCardButton] Entry button for Board \"{}\" widget has been "
+        "updated",
         board.get_name());
 }
 
@@ -81,8 +82,8 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             solid_colour->fill(rgb_to_hex(colour));
             board_thumbnail.set(solid_colour);
             spdlog::get("ui")->warn(
-                "BoardCardButton \"{}\" widget's background is invalid. "
-                "Falling back to default",
+                "[BoardCardButton] Cannot load background for Board \"{}\". "
+                "Falling back to default color",
                 board_name.get_text().c_str());
             break;
         }

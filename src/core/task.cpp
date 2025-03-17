@@ -14,5 +14,6 @@ bool Task::get_done() const { return done; }
 void Task::set_done(bool done) {
     this->done = done;
     modified = true;
-    spdlog::get("core")->info("Task \"{}\" done set to: {}", name, done);
+    spdlog::get("core")->info("[Task] Task \"{}\" marked as {}", name,
+                              (done ? "done" : "undone"));
 }

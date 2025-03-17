@@ -40,11 +40,6 @@ public:
     BoardWidget();
 
     /**
-     * @brief Destroys the BoardWidget object.
-     */
-    ~BoardWidget() override;
-
-    /**
      * @brief Sets and updates the board widget.
      *
      * @param board pointer to a board object.
@@ -183,7 +178,7 @@ private:
     Glib::RefPtr<Gtk::CssProvider>
         css_provider_refptr;  ///< CSS provider for styling the widget
     std::vector<ui::CardlistWidget*>
-        cardlist_vector;  ///< Vector holding pointers to CardlistWidget objects
+        cardlist_widgets;  ///< Vector holding pointers to CardlistWidget objects
     double x, y;          ///< Cursor Position
     bool on_scroll =
         false;  ///< Flag indicating whether horizontal scrolling is enabled

@@ -55,7 +55,7 @@ void CreateBoardDialog::create_board() {
 
     board_creator.add_local_board(backend);
     spdlog::get("ui")->info(
-        "Create Board Dialog has created a new board successfully");
+        "[CreateBoardDialog] Dialog has created a new board successfully");
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

@@ -31,7 +31,7 @@ Board BoardBackend::load() {
     switch (type) {
         case BackendType::LOCAL: {
             spdlog::get("core")->debug(
-                "LocalBackend is loading board from file: {}",
+                "[BoardBackend] LocalBackend is loading board from file: {}",
                 settings["filepath"]);
             if (!std::filesystem::exists(settings["filepath"]))
                 throw std::invalid_argument{std::format(
@@ -109,7 +109,8 @@ Board BoardBackend::create(const std::string& name,
 
     // Because a new Board is created from scratch, it is essentially loaded
     board.fully_loaded = true;
-    spdlog::get("core")->debug("BoardBackend has created Board \"{}\"", name);
+    spdlog::get("core")->debug("[BoardBackend] Board \"{}\" has been created",
+                               name);
     return board;
 }
 
@@ -129,8 +130,9 @@ bool BoardBackend::set_attribute(const std::string& key,
             if (local_attributes.contains(key) && !value.empty()) {
                 settings[key] = value;
             }
-            spdlog::get("core")->debug("Attribute \"{}\" set to: {}", key,
-                                       value);
+            spdlog::get("core")->debug(
+                "[BoardBackend] LocalBackend attribute \"{}\" set to: {}", key,
+                value);
             return true;
         }
         case BackendType::CALDAV:
@@ -152,7 +154,8 @@ bool BoardBackend::save(Board& board) {
     }
 
     spdlog::get("core")->error(
-        "Failed to save board \"{}\" because it was not fully loaded",
+        "[BoardBackend] Failed to save Board \"{}\" because it was not fully "
+        "loaded",
         board.get_name());
     return false;
 }
@@ -318,19 +321,22 @@ bool BoardBackend::save_xml(Board& board) {
 
     std::filesystem::path p{settings["filepath"]};
     if (p.has_parent_path() && !std::filesystem::exists(p.parent_path())) {
-        spdlog::get("core")->warn("Parent path \"{}\" does not exist. Creating",
-                                  p.parent_path().string());
+        spdlog::get("core")->warn(
+            "[BoardBackend] Parent path \"{}\" does not exist. Creating",
+            p.parent_path().string());
         std::filesystem::create_directories(p.parent_path());
     }
 
     bool success =
         doc->SaveFile(settings["filepath"].c_str()) == tinyxml2::XML_SUCCESS;
     if (success) {
-        spdlog::get("core")->debug("LocalBackend has saved Board \"{}\" to: {}",
-                                   board.get_name(), settings["filepath"]);
+        spdlog::get("core")->debug(
+            "[BoardBackend] LocalBackend has saved Board \"{}\" to: {}",
+            board.get_name(), settings["filepath"]);
     } else {
-        spdlog::get("core")->error("Failed to save board \"{}\" to: {}",
-                                   board.get_name(), settings["filepath"]);
+        spdlog::get("core")->error(
+            "[BoardBackend] Failed to save board \"{}\" to: {}",
+            board.get_name(), settings["filepath"]);
     }
     return success;
 }
@@ -367,11 +373,13 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
         case BackgroundType::COLOR: {
             background = other;
             spdlog::get("core")->debug(
-                "Board \"{}\" background field set to: {}", name, background);
+                "[Board] Board \"{}\" background field set to: {}", name,
+                background);
         } break;
         default: {
             spdlog::get("core")->warn(
-                "Invalid background type: {}. Falling back to default", other);
+                "[Board] Invalid background type: {}. Falling back to default",
+                other);
             background = Board::BACKGROUND_DEFAULT;
         } break;
     }
@@ -388,7 +396,7 @@ std::shared_ptr<CardList> Board::add(const CardList& cardlist) {
         for (auto& ccardlist : cardlists) {
             if (*ccardlist == cardlist) {
                 spdlog::get("core")->warn(
-                    "Cardlist \"{}\" already exists in board \"{}\"",
+                    "[Board] Cardlist \"{}\" already exists in board \"{}\"",
                     cardlist.get_name(), name);
                 return nullptr;
             }
@@ -399,8 +407,9 @@ std::shared_ptr<CardList> Board::add(const CardList& cardlist) {
                 std::make_shared<CardList>(cardlist);
             cardlists.push_back(new_cardlist);
             modified = true;
-            spdlog::get("core")->info("Board \"{}\" added cardlist \"{}\"",
-                                      name, cardlist.get_name());
+            spdlog::get("core")->info(
+                "[Board] Board \"{}\" added cardlist \"{}\"", name,
+                cardlist.get_name());
             return new_cardlist;
         } catch (std::bad_alloc& err) {
             return nullptr;
@@ -408,7 +417,8 @@ std::shared_ptr<CardList> Board::add(const CardList& cardlist) {
     }
 
     spdlog::get("core")->warn(
-        "Board \"{}\" cannot add cardlist \"{}\" because it is not loaded yet",
+        "[Board] Board \"{}\" cannot add cardlist \"{}\" because it is not "
+        "loaded yet",
         name, cardlist.get_name());
     return nullptr;
 }
@@ -420,7 +430,7 @@ bool Board::remove(const CardList& cardlist) {
                 cardlists.erase(cardlists.begin() + i);
                 modified = true;
                 spdlog::get("core")->info(
-                    "Board \"{}\" removed cardlist \"{}\"", name,
+                    "[Board] Board \"{}\" removed cardlist \"{}\"", name,
                     cardlist.get_name());
                 return true;
             }
@@ -428,8 +438,8 @@ bool Board::remove(const CardList& cardlist) {
     }
 
     spdlog::get("core")->warn(
-        "Board \"{}\" cannot remove cardlist \"{}\" because it is not loaded "
-        "yet",
+        "[Board] Board \"{}\" cannot remove cardlist \"{}\" because it is not "
+        "loaded yet",
         name, cardlist.get_name());
     return false;
 }
@@ -490,9 +500,10 @@ bool Board::save() {
     bool success = backend.save(*this);
 
     if (success) {
-        spdlog::get("core")->info("Board \"{}\" saved successfully", name);
+        spdlog::get("core")->info("[Board] Board \"{}\" saved successfully",
+                                  name);
     } else {
-        spdlog::get("core")->error("Failed to save board \"{}\"", name);
+        spdlog::get("core")->error("[Board] Failed to save board \"{}\"", name);
     }
 
     return success;
@@ -501,7 +512,7 @@ bool Board::save() {
 void Board::load() {
     backend.load_cardlists(*this);
 
-    spdlog::get("core")->info("Board \"{}\" fully loaded", name);
+    spdlog::get("core")->info("[Board] Board \"{}\" fully loaded", name);
 }
 
 const std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
@@ -512,6 +523,11 @@ void Board::set_modified(bool modified) {
     if (fully_loaded) {
         Item::set_modified(modified);
     }
+
+    spdlog::get("core")->warn(
+        "[Board] Board \"{}\" cannot set modified because it is not fully "
+        "loaded",
+        name);
 }
 
 time_point<system_clock, seconds> Board::get_last_modified() const {

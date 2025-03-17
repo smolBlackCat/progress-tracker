@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <window.h>
 
+
 #include <format>
 
 #include "cardlist-widget.h"
@@ -67,7 +68,7 @@ ui::BoardWidget::BoardWidget()
     Glib::signal_timeout().connect(
         [this]() {
             if (this->board) {
-                for (auto& cardlist : this->cardlist_vector) {
+                for (auto& cardlist : this->cardlist_widgets) {
                     for (auto& card : cardlist->get_card_widgets()) {
                         card->update_due_date_label_style();
                     }
@@ -76,10 +77,6 @@ ui::BoardWidget::BoardWidget()
             return true;
         },
         BoardWidget::SAVE_INTERVAL * 6);
-}
-
-ui::BoardWidget::~BoardWidget() {
-    spdlog::get("ui")->debug("BoardWidget has been destroyed");
 }
 
 void ui::BoardWidget::set(std::shared_ptr<Board>& board,
@@ -94,24 +91,24 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
             _add_cardlist(cardlist, false);
         }
 
-        spdlog::get("ui")->debug("Board \"{}\" is fully set to usage",
+        spdlog::get("ui")->debug("[BoardWidget] Board \"{}\" has been set",
                                  board->get_name());
     } else {
         spdlog::get("ui")->warn(
-            "Board view has received invalid Board or BoardCardButton "
-            "pointers");
+            "[BoardWidget] Board or BoardCardButton is "
+            "not set properly");
     }
 }
 
 void ui::BoardWidget::clear() {
-    if (!cardlist_vector.empty()) {
-        for (auto& cardlist_widget : cardlist_vector) {
+    if (!cardlist_widgets.empty()) {
+        for (const auto& cardlist_widget : cardlist_widgets) {
             root.remove(*cardlist_widget);
         }
-        cardlist_vector.clear();
+        cardlist_widgets.clear();
     }
 
-    spdlog::get("ui")->debug("Board view has been cleared");
+    spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
 
 bool ui::BoardWidget::save(bool free) {
@@ -132,11 +129,12 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
-    spdlog::get("ui")->debug("BoardWidget has removed a CardlistWidget \"{}\"",
-                             cardlist.get_cardlist()->get_name());
+    spdlog::get("ui")->debug(
+        "[BoardWidget] CardlistWidget \"{}\" has been removed",
+        cardlist.get_cardlist()->get_name());
 
     root.remove(cardlist);
-    std::erase(cardlist_vector, &cardlist);
+    std::erase(cardlist_widgets, &cardlist);
 
     board->remove(*cardlist.get_cardlist());
 
@@ -299,13 +297,14 @@ ui::CardlistWidget* ui::BoardWidget::_add_cardlist(
     const std::shared_ptr<CardList>& cardlist, bool editing_mode) {
     auto new_cardlist =
         Gtk::make_managed<ui::CardlistWidget>(*this, cardlist, editing_mode);
-    cardlist_vector.push_back(new_cardlist);
+    cardlist_widgets.push_back(new_cardlist);
 
     root.append(*new_cardlist);
     root.reorder_child_after(add_button, *new_cardlist);
 
-    spdlog::get("ui")->debug("BoardWidget has added a CardlistWidget \"{}\"",
-                             cardlist->get_name());
+    spdlog::get("ui")->debug(
+        "[BoardWidget] CardlistWidget \"{}\" has been added",
+        cardlist->get_name());
 
     return new_cardlist;
 }

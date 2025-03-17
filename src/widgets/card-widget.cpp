@@ -36,7 +36,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
       CardInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
       card{card},
-      cardlist_p{nullptr},
+      parent{nullptr},
       is_new{is_new},
       root_box{Gtk::Orientation::VERTICAL},
       card_cover_revealer{},
@@ -141,8 +141,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_actions->add_action("rename", [this]() {
         // Interacting with the popover may cause the card to lose focus thus
         // we need to disable and the enable it again before the rename
-        this->card_entry.remove_controller(
-            focus_controller);
+        this->card_entry.remove_controller(focus_controller);
         this->on_rename();
         this->card_entry.add_controller(focus_controller);
     });
@@ -169,8 +168,8 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         Gtk::ShortcutTrigger::parse_string("<Control>N"),
         Gtk::CallbackAction::create(
             [this](Gtk::Widget&, const Glib::VariantBase&) {
-                auto new_card = cardlist_p->add(Card{_("New Card")}, true);
-                cardlist_p->reorder(*new_card, *this);
+                auto new_card = parent->add(Card{_("New Card")}, true);
+                parent->reorder(*new_card, *this);
 
                 return true;
             })));
@@ -209,43 +208,42 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                 CardWidget* previous_card =
                     static_cast<CardWidget*>(this->get_prev_sibling());
                 if (previous_card) {
-                    this->cardlist_p->reorder(*previous_card, *this);
+                    this->parent->reorder(*previous_card, *this);
                 }
                 return true;
             })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
         Gtk::ShortcutTrigger::parse_string("<Control>Down"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                Widget* next = this->get_next_sibling();
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            Widget* next = this->get_next_sibling();
 
-                if (!(G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
-                                                 Gtk::Button::get_type()))) {
-                    this->cardlist_p->reorder(*this,
-                                              *static_cast<CardWidget*>(next));
-                }
-                return true;
-            })));
+            if (!(G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
+                                             Gtk::Button::get_type()))) {
+                this->parent->reorder(*this, *static_cast<CardWidget*>(next));
+            }
+            return true;
+        })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
         Gtk::ShortcutTrigger::parse_string("<Control>Left"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                CardlistWidget* prev_parent = static_cast<CardlistWidget*>(
-                    this->cardlist_p->get_prev_sibling());
+        Gtk::CallbackAction::create([this](Gtk::Widget&,
+                                           const Glib::VariantBase&) {
+            CardlistWidget* prev_parent =
+                static_cast<CardlistWidget*>(this->parent->get_prev_sibling());
 
-                if (prev_parent) {
-                    this->remove_from_parent();
-                    auto this_card = prev_parent->add(*this->card);
-                    this_card->grab_focus();
-                }
+            if (prev_parent) {
+                this->remove_from_parent();
+                auto this_card = prev_parent->add(*this->card);
+                this_card->grab_focus();
+            }
 
-                return true;
-            })));
+            return true;
+        })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
         Gtk::ShortcutTrigger::parse_string("<Control>Right"),
         Gtk::CallbackAction::create(
             [this](Gtk::Widget&, const Glib::VariantBase&) {
-                Widget* next_parent = this->cardlist_p->get_next_sibling();
+                Widget* next_parent = this->parent->get_next_sibling();
 
                 if (!(G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
                                                  Gtk::Button::get_type()))) {
@@ -337,30 +335,27 @@ void CardWidget::set_title(const std::string& label) {
 std::string CardWidget::get_title() const { return card_label.get_label(); }
 
 void CardWidget::remove_from_parent() {
-    if (cardlist_p) {
-        cardlist_p->remove(this);
+    if (parent) {
+        parent->remove(this);
     }
 }
 
-void CardWidget::set_cardlist(CardlistWidget* cardlist_p) {
-    if (cardlist_p) {
-        if (this->cardlist_p) {
+void CardWidget::set_cardlist(CardlistWidget* new_parent) {
+    if (new_parent) {
+        if (this->parent) {
             spdlog::get("ui")->debug(
-                "CardWidget \"{}\" changed parent from CardlistWidget \"{}\" "
-                "to "
-                "CardlistWidget \"{}\"",
-                card->get_name(), this->cardlist_p->get_cardlist()->get_name(),
-                cardlist_p->get_cardlist()->get_name());
+                "[CardWidget] CardWidget \"{}\" changed parents: "
+                "(CardlistWidget \"{}\") -> (CardlistWidget \"{}\")",
+                card->get_name(), this->parent->get_cardlist()->get_name(),
+                new_parent->get_cardlist()->get_name());
         }
-        this->cardlist_p = cardlist_p;
+        this->parent = new_parent;
     }
 }
 
 std::shared_ptr<Card> CardWidget::get_card() { return card; }
 
-CardlistWidget const* CardWidget::get_cardlist_widget() const {
-    return cardlist_p;
-}
+CardlistWidget const* CardWidget::get_cardlist_widget() const { return parent; }
 
 void CardWidget::update_complete_tasks() {
     if (card->get_tasks().empty()) {
@@ -368,6 +363,7 @@ void CardWidget::update_complete_tasks() {
         complete_tasks_label.set_visible(false);
     } else {
         complete_tasks_label.set_visible();
+        // FIXME: Do not use float for simple integer addition
         float n_complete_tasks =
             std::accumulate(card->get_tasks().begin(), card->get_tasks().end(),
                             0, [](int acc, const std::shared_ptr<Task>& task) {
@@ -381,7 +377,9 @@ void CardWidget::update_complete_tasks() {
     }
 
     spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has updated complete tasks label", card->get_name());
+        "[CardWidget] CardWidget \"{}\"'s complete tasks label has been "
+        "updated",
+        card->get_name());
 }
 
 void CardWidget::update_due_date() {
@@ -402,8 +400,9 @@ void CardWidget::update_due_date() {
         due_date_label.set_visible(false);
     }
 
-    spdlog::get("ui")->debug("CardWidget \"{}\" has updated due date label",
-                             card->get_name());
+    spdlog::get("ui")->debug(
+        "[CardWidget] CardWidget \"{}\"'s due date label has been updated",
+        card->get_name());
 }
 
 void CardWidget::update_due_date_label_style() {
@@ -460,28 +459,31 @@ void CardWidget::setup_drag_and_drop() {
         false);
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
-            this->cardlist_p->board.set_on_scroll();
+            this->parent->board.set_on_scroll();
 
-            spdlog::get("ui")->debug("CardWidget \"{}\" has started dragging",
-                                     card->get_name());
+            spdlog::get("ui")->debug(
+                "[CardWidget] CardWidget \"{}\" is being dragged",
+                card->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
-            this->cardlist_p->board.set_on_scroll(false);
+            this->parent->board.set_on_scroll(false);
 
-            spdlog::get("ui")->debug("CardWidget \"{}\" has cancelled dragging",
-                                     card->get_name());
+            spdlog::get("ui")->debug(
+                "[CardWidget] CardWidget \"{}\" dragging has been canceled",
+                card->get_name());
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
-            this->cardlist_p->board.set_on_scroll(false);
+            this->parent->board.set_on_scroll(false);
 
-            spdlog::get("ui")->debug("CardWidget \"{}\" has ended dragging",
-                                     card->get_name());
+            spdlog::get("ui")->debug(
+                "[CardWidget] CardWidget \"{}\" stopped being dragged",
+                card->get_name());
         });
     add_controller(drag_source_c);
 
@@ -490,7 +492,7 @@ void CardWidget::setup_drag_and_drop() {
         Glib::Value<CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->cardlist_p->board.set_on_scroll(false);
+            this->parent->board.set_on_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<CardWidget*>::value_type())) {
                 Glib::Value<CardWidget*> dropped_value;
@@ -498,8 +500,10 @@ void CardWidget::setup_drag_and_drop() {
                 auto dropped_card = dropped_value.get();
 
                 if (dropped_card == this) {
-                    spdlog::warn("Dropped CardWidget \"{}\" onto itself",
-                                 card->get_name());
+                    spdlog::warn(
+                        "[CardWidget] CardWidget \"{}\" has been dropped to "
+                        "itself",
+                        card->get_name());
 
                     // After dropping, the receiver card still has the style set
                     // by DropControllerMotion. Reset
@@ -507,14 +511,14 @@ void CardWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                if (this->cardlist_p->is_child(dropped_card)) {
-                    this->cardlist_p->reorder(*dropped_card, *this);
+                if (this->parent->is_child(dropped_card)) {
+                    this->parent->reorder(*dropped_card, *this);
                 } else {
                     auto card_from_dropped = dropped_card->get_card();
                     CardWidget* dropped_copy =
-                        this->cardlist_p->add(*card_from_dropped);
+                        this->parent->add(*card_from_dropped);
                     dropped_card->remove_from_parent();
-                    this->cardlist_p->reorder(*dropped_copy, *this);
+                    this->parent->reorder(*dropped_copy, *this);
                 }
 
                 // After dropping, the receiver card still has the style set by
@@ -537,13 +541,15 @@ void CardWidget::open_color_dialog() {
                 set_color(color_dialog->choose_rgba_finish(result));
             } catch (Gtk::DialogError& err) {
                 spdlog::get("ui")->warn(
-                    "CardWidget \"{}\" has failed to set color: {}",
+                    "[CardWidget] CardWidget \"{}\" has failed to set color: "
+                    "{}",
                     card->get_name(), err.what());
             }
         });
 
-    spdlog::get("ui")->debug("CardWidget \"{}\" has opened color dialog",
-                             card->get_name());
+    spdlog::get("ui")->debug(
+        "[CardWidget] CardWidget \"{}\" has opened color dialog",
+        card->get_name());
 }
 
 void CardWidget::open_card_details_dialog() {
@@ -556,16 +562,18 @@ void CardWidget::on_rename() {
     card_label.set_visible(false);
     card_entry.grab_focus();
 
-    spdlog::get("ui")->debug("CardWidget \"{}\" has entered rename mode",
-                             card->get_name());
+    spdlog::get("ui")->debug(
+        "[CardWidget] CardWidget \"{}\" has entered rename mode",
+        card->get_name());
 }
 
 void CardWidget::off_rename() {
     card_label.set_visible();
     card_entry_revealer.set_reveal_child(false);
 
-    spdlog::get("ui")->debug("CardWidget \"{}\" has exited rename mode",
-                             card->get_name());
+    spdlog::get("ui")->debug(
+        "[CardWidget] CardWidget \"{}\" has exited rename mode",
+        card->get_name());
 }
 
 void CardWidget::clear_color() {

@@ -180,8 +180,9 @@ void TaskWidget::on_rename() {
     task_entry.set_text(task->get_name());
     task_entry.grab_focus();
 
-    spdlog::get("ui")->debug("TaskWidget \"{}\" has entered rename mode",
-                             task->get_name());
+    spdlog::get("ui")->debug(
+        "[TaskWidget] TaskWidget \"{}\" has entered rename mode",
+        task->get_name());
 }
 
 void TaskWidget::off_rename() {
@@ -200,8 +201,9 @@ void TaskWidget::off_rename() {
         is_new = false;
     }
 
-    spdlog::get("ui")->debug("TaskWidget \"{}\" has exited rename mode",
-                             task->get_name());
+    spdlog::get("ui")->debug(
+        "[TaskWidget] TaskWidget \"{}\" has exited rename mode",
+        task->get_name());
 }
 
 void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
@@ -215,20 +217,22 @@ void TaskWidget::on_checkbox() {
         add_css_class("complete-task");
 
         spdlog::get("ui")->debug(
-            "TaskWidget \"{}\" has been marked as complete", task->get_name());
+            "[TaskWidget] TaskWidget \"{}\" has been marked as complete",
+            task->get_name());
     } else {
         task_label.set_markup(task->get_name());
         remove_css_class("complete-task");
 
         spdlog::get("ui")->debug(
-            "TaskWidget \"{}\" has been marked as incomplete",
+            "[TaskWidget] TaskWidget \"{}\" has been marked as incomplete",
             task->get_name());
     }
 }
 
 void TaskWidget::on_convert(CardWidget& card_widget) {
-    spdlog::get("app")->info("Task \"{}\" has been converted to a card",
-                             task->get_name());
+    spdlog::get("ui")->info(
+        "[TaskWidget] Task \"{}\" has been converted into a card",
+        task->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->get_cardlist();
@@ -253,24 +257,27 @@ void TaskWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
-            spdlog::get("ui")->debug("TaskWidget \"{}\" has started dragging",
-                                     task->get_name());
+            spdlog::get("ui")->debug(
+                "[TaskWidget] TaskWidget \"{}\" is being dragged",
+                task->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag,
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
-            spdlog::get("ui")->debug("TaskWidget \"{}\" has cancelled dragging",
-                                     task->get_name());
+            spdlog::get("ui")->debug(
+                "[TaskWidget] TaskWidget \"{}\" dragging has been canceled",
+                task->get_name());
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
-            spdlog::get("ui")->debug("TaskWidget \"{}\" has ended dragging",
-                                     task->get_name());
+            spdlog::get("ui")->debug(
+                "[TaskWidget] TaskWidget \"{}\" stopped being dragged",
+                task->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     add_controller(drag_source_c);
@@ -288,13 +295,15 @@ void TaskWidget::setup_drag_and_drop() {
 
                 if (dropped_taskwidget == this) {
                     spdlog::get("ui")->warn(
-                        "Dropped TaskWidget \"{}\" onto itself",
+                        "[TaskWidget] TaskWidget \"{}\" has been dropped onto "
+                        "itself",
                         task->get_name());
                     return true;
                 }
 
                 spdlog::get("ui")->debug(
-                    "TaskWidget \"{}\" has been dropped on TaskWidget \"{}\"",
+                    "[TaskWidget] TaskWidget \"{}\" has been dropped on "
+                    "TaskWidget \"{}\"",
                     dropped_taskwidget->get_task()->get_name(),
                     task->get_name());
 

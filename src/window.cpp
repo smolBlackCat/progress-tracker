@@ -220,7 +220,8 @@ void ProgressWindow::on_delete_board_mode() {
     app_menu_button_p->set_focusable(false);
     app_menu_button_p->set_sensitive(false);
 
-    spdlog::get("app")->info("User entered delete board mode");
+    spdlog::get("app")->info(
+        "[Progress Window] User entered delete board mode");
 }
 
 void ProgressWindow::off_delete_board_mode() {
@@ -232,7 +233,8 @@ void ProgressWindow::off_delete_board_mode() {
     app_menu_button_p->set_focusable();
     app_menu_button_p->set_sensitive();
 
-    spdlog::get("app")->info("User has left delete board mode");
+    spdlog::get("app")->info(
+        "[Progress Window] User has left delete board mode");
 }
 
 void ProgressWindow::on_main_menu() {
@@ -245,7 +247,8 @@ void ProgressWindow::on_main_menu() {
     if (cur_board && cur_board_entry) board_widget.save();
     boards_grid_p->invalidate_sort();
 
-    spdlog::get("app")->info("Current view changed to board grid");
+    spdlog::get("app")->info(
+        "[Progress Window] Current view changed to board grid");
 }
 
 void ProgressWindow::on_board_view() {
@@ -255,7 +258,8 @@ void ProgressWindow::on_board_view() {
     home_button_p->set_visible();
     add_board_button_p->set_visible(false);
 
-    spdlog::get("app")->info("App view changed to board view");
+    spdlog::get("app")->info(
+        "[Progress Window] App view changed to board view");
 }
 
 void ProgressWindow::delete_selected_boards() {
@@ -268,7 +272,7 @@ void ProgressWindow::delete_selected_boards() {
         boards_grid_p->remove(*cur_child);
     }
 
-    spdlog::get("app")->info("User has deleted {} boards",
+    spdlog::get("app")->info("[Progress Window] User has deleted {} boards",
                              selected_children.size());
 
     off_delete_board_mode();
@@ -285,7 +289,7 @@ void ProgressWindow::show_about_dialog() {
         "translator-credits", _("translator-credits"), "issue-url",
         "https://github.com/smolBlackCat/progress-tracker/issues", "website",
         "https://github.com/smolBlackCat/progress-tracker", NULL);
-    spdlog::get("app")->info("Show about dialog");
+    spdlog::get("app")->info("[Progress Window] Show about dialog");
 }
 
 void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
@@ -295,7 +299,7 @@ void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
 void ProgressWindow::show_shortcuts_dialog() {
     sh_window->set_visible();
 
-    spdlog::get("app")->info("Shortcuts dialog opened");
+    spdlog::get("app")->info("[Progress Window] Shortcuts dialog opened");
 }
 
 void ProgressWindow::setup_menu_button() {
@@ -319,9 +323,9 @@ void ProgressWindow::setup_menu_button() {
 void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
         css_provider->load_from_resource(ProgressWindow::STYLE_DARK_CSS);
-        spdlog::get("ui")->debug("Loaded dark style");
+        spdlog::get("ui")->debug("[Progress Window] Loaded dark style");
     } else {
-        spdlog::get("ui")->debug("Loaded light style");
+        spdlog::get("ui")->debug("[Progress Window] Loaded light style");
         css_provider->load_from_resource(ProgressWindow::STYLE_CSS);
     }
 }
@@ -331,7 +335,8 @@ void ProgressWindow::on_board_loading_done() {
         on_board_view();
         board_widget.set(cur_board, cur_board_entry);
         set_title(cur_board->get_name());
-        spdlog::get("ui")->info("Board widget loaded successfully");
+        spdlog::get("ui")->info(
+            "[Progress Window] Board view loaded successfully");
     } else {
         // cur_board and cur_board_entry are still nullptrs because the loading
         // thread has failed, therefore, go back to the main menu
@@ -341,7 +346,8 @@ void ProgressWindow::on_board_loading_done() {
         cur_board_entry = nullptr;
         on_main_menu();
 
-        spdlog::get("ui")->error("Failed to load board widget");
+        spdlog::get("ui")->error(
+            "[Progress Window] Failed to load board widget");
     }
     add_board_button_p->set_sensitive();
     app_menu_button_p->set_sensitive();

@@ -11,8 +11,8 @@ Item::Item(const std::string& name, xg::Guid uuid) : name{name}, uuid{uuid} {}
 
 void Item::set_name(const std::string& other) {
     if (!name.empty())
-        spdlog::get("core")->info("Item name changed from \"{}\" to \"{}\"",
-                                  name, other);
+        spdlog::get("core")->info("[Item] Item \"{}\" renamed to \"{}\"", name,
+                                  other);
 
     name = other;
     modified = true;

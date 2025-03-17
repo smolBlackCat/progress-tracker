@@ -29,7 +29,7 @@ void Card::set_color(const Color& color) {
     this->color = color;
     modified = true;
 
-    spdlog::get("core")->info("Card \"{}\"'s color set to: {}", name,
+    spdlog::get("core")->info("[Card] Card \"{}\"'s color set to: {}", name,
                               color_to_string(color));
 }
 
@@ -48,7 +48,8 @@ bool Card::get_modified() {
 void Card::set_notes(const std::string& notes) {
     this->notes = notes;
     modified = true;
-    spdlog::get("core")->info("Card \"{}\" notes set to: \"{}\"", name, notes);
+    spdlog::get("core")->info("[Card] Card \"{}\" notes set to: \"{}\"", name,
+                              notes);
 }
 
 double Card::get_completion() const {
@@ -65,8 +66,8 @@ std::shared_ptr<Task> Card::add(const Task& task) {
     for (auto& ctask : tasks) {
         if (task == *ctask) {
             spdlog::get("core")->warn(
-                "Task \"{}\" already exists in card \"{}\"", task.get_name(),
-                name);
+                "[Card] Task \"{}\" already exists in card \"{}\"",
+                task.get_name(), name);
             return nullptr;
         }
     }
@@ -75,7 +76,7 @@ std::shared_ptr<Task> Card::add(const Task& task) {
     tasks.push_back(new_task);
 
     modified = true;
-    spdlog::get("core")->info("Card \"{}\" added task \"{}\"", name,
+    spdlog::get("core")->info("[Card] Card \"{}\" has added task \"{}\"", name,
                               task.get_name());
 
     return new_task;
@@ -86,13 +87,14 @@ bool Card::remove(const Task& task) {
         if (*tasks[i] == task) {
             tasks.erase(tasks.begin() + i);
             modified = true;
-            spdlog::get("core")->info("Card \"{}\" removed task \"{}\"", name,
-                                      task.get_name());
+            spdlog::get("core")->info("[Card] Card \"{}\" removed task \"{}\"",
+                                      name, task.get_name());
             return true;
         }
     }
-    spdlog::get("core")->warn("Card \"{}\" failed to remove task \"{}\"", name,
-                              task.get_name());
+    spdlog::get("core")->warn(
+        "[Card] Card \"{}\" cannot remove Task \"{}\" because it is not there",
+        name, task.get_name());
     return false;
 }
 
@@ -156,7 +158,7 @@ bool Card::past_due_date() {
 void Card::set_due_date(const Date& date) {
     due_date = date;
     modified = true;
-    spdlog::get("core")->info("Card \"{}\" due date set to: {}", name,
+    spdlog::get("core")->info("[Card] Card \"{}\" due date set to: {}", name,
                               std::format("{}", date));
 };
 
@@ -168,10 +170,12 @@ void Card::set_complete(bool complete) {
     if (due_date.ok()) {
         this->complete = complete;
         modified = true;
-        spdlog::get("core")->info("Card \"{}\" completion set to: {}", name,
-                                  complete);
+        spdlog::get("core")->info("[Card] Card \"{}\" marked as {}", name,
+                                  (complete ? "complete" : "incomplete"));
     } else {
-        spdlog::get("core")->warn("Card \"{}\" cannot set complete state",
-                                  name);
+        spdlog::get("core")->warn(
+            "[Card] Card \"{}\" cannot be set as complete because no deadline "
+            "was assigned",
+            name);
     }
 }

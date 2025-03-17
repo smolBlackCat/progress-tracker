@@ -14,8 +14,9 @@ CardList::CardList(const std::string& name, const xg::Guid uuid)
 std::shared_ptr<Card> CardList::add(const Card& card) {
     std::shared_ptr<Card> new_card{new Card{card}};
     if (new_card) {
-        spdlog::get("core")->info("Cardlist \"{}\" added card \"{}\"", name,
-                                  new_card->get_name());
+        spdlog::get("core")->info(
+            "[CardList] Cardlist \"{}\" has added Card \"{}\"", name,
+            new_card->get_name());
         cards.push_back(new_card);
         modified = true;
     }
@@ -27,13 +28,16 @@ bool CardList::remove(const Card& card) {
         if (card == *cards.at(i)) {
             cards.erase(cards.begin() + i);
             modified = true;
-            spdlog::get("core")->info("Cardlist \"{}\" removed Card \"{}\"",
-                                      name, card.get_name());
+            spdlog::get("core")->info(
+                "[CardList] Cardlist \"{}\" removed Card \"{}\"", name,
+                card.get_name());
             return true;
         }
     }
-    spdlog::get("core")->warn("Cardlist \"{}\" failed to remove Card \"{}\"",
-                              name, card.get_name());
+    spdlog::get("core")->warn(
+        "[CardList] Cardlist \"{}\" cannot remove Card \"{}\" because it is "
+        "not there",
+        name, card.get_name());
     return false;
 }
 

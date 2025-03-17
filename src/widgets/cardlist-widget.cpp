@@ -201,7 +201,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
             this->board.set_on_scroll();
 
             spdlog::get("ui")->debug(
-                "CardlistWidget \"{}\" has started dragging",
+                "[CardlistWidget] CardlistWidget \"{}\" is being dragged",
                 this->get_cardlist()->get_name());
         },
         false);
@@ -212,7 +212,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
             this->board.set_on_scroll(false);
 
             spdlog::get("ui")->debug(
-                "CardlistWidget \"{}\" has cancelled dragging",
+                "[CardlistWidget] CardlistWidget \"{}\" dragging has been "
+                "canceled",
                 this->get_cardlist()->get_name());
             return true;
         },
@@ -222,8 +223,9 @@ void ui::CardlistWidget::setup_drag_and_drop() {
             this->set_opacity(1);
             this->board.set_on_scroll(false);
 
-            spdlog::get("ui")->debug("CardlistWidget \"{}\" has ended dragging",
-                                     this->get_cardlist()->get_name());
+            spdlog::get("ui")->debug(
+                "[CardlistWidget] CardlistWidget \"{}\" stopped being draggeed",
+                this->get_cardlist()->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     cardlist_header.add_controller(drag_source_c);
@@ -243,8 +245,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
                 if (dropped_cardlist == this) {
                     spdlog::get("ui")->warn(
-                        "CardlistWidget \"{}\" has been dropped on itself. "
-                        "Nothing happens",
+                        "[CardlistWidget] CardlistWidget \"{}\" has been "
+                        "dropped on itself.",
                         this->get_cardlist()->get_name());
                     this->remove_css_class("cardlist-to-drop");
                     return true;
@@ -256,8 +258,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 this->remove_css_class("cardlist-to-drop");
 
                 spdlog::get("ui")->debug(
-                    "CardlistWidget \"{}\" has been dropped on CardlistWidget "
-                    "\"{}\"",
+                    "[CardlistWidget] CardlistWidget \"{}\" has been dropped "
+                    "on CardlistWidget \"{}\"",
                     dropped_cardlist->get_cardlist()->get_name(),
                     this->get_cardlist()->get_name());
                 return true;
@@ -284,8 +286,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                     this->add(*card_in_dropped);
 
                     spdlog::get("ui")->debug(
-                        "CardWidget \"{}\" has been dropped on CardlistWidget "
-                        "\"{}\"",
+                        "[CardlistWidget] CardWidget \"{}\" has been dropped "
+                        "on CardlistWidget \"{}\"",
                         dropped_card->get_card()->get_name(),
                         this->get_cardlist()->get_name());
                 }
@@ -301,7 +303,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
 void ui::CardlistWidget::remove(ui::CardWidget* card) {
     spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has been removed from CardlistWidget \"{}\"",
+        "[CardlistWidget] CardWidget \"{}\" has been removed from "
+        "CardlistWidget \"{}\"",
         card->get_card()->get_name(), cardlist->get_name());
 
     root.remove(*card);
@@ -333,7 +336,8 @@ ui::CardWidget* ui::CardlistWidget::_add(const std::shared_ptr<Card>& card,
     root.reorder_child_after(add_card_button, *cardwidget);
 
     spdlog::get("ui")->debug(
-        "CardWidget \"{}\" has been added to CardlistWidget \"{}\"",
+        "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
+        "\"{}\"",
         card->get_name(), cardlist->get_name());
 
     return cardwidget;

@@ -62,7 +62,7 @@ public:
      *
      * @param cardlist_p pointer to a new CardlistWidget object (parent).
      */
-    void set_cardlist(ui::CardlistWidget* cardlist_p);
+    void set_cardlist(ui::CardlistWidget* new_parent);
 
     /**
      * @brief Sets this card cover's color.
@@ -136,7 +136,7 @@ protected:
     Glib::RefPtr<Gio::Menu> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
-    ui::CardlistWidget* cardlist_p;
+    ui::CardlistWidget* parent;
     std::shared_ptr<Card> card;
 
     std::string last_complete_tasks_label_css_class = "";
