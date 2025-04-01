@@ -2,11 +2,9 @@
 
 Simple kanban-style task organiser
 
-![GitHub Release][github-release-badge]
-![Flathub Downloads][flatpak-release-badge]
-![GitHub License][github-licence]
-![GitHub Actions Workflow Status][build-status]
-
+[![GitHub Release][github-release-badge]][github-release]
+[![Flathub Downloads][flatpak-release-badge]][progress-flathub]
+[![GitHub License][github-licence]](LICENSE)
 
 ![App Windows](pictures/progress-app-presentation.png)
 
@@ -28,13 +26,13 @@ A debian build is also available. The debian package can be obtained in the
 [releases][github-release] page.
 
 ```sh
-sudo apt install ./progress-tracker-2.0.deb
+sudo apt install ./progress-tracker-1.7.deb
 ```
 
 ### Arch Linux (AUR)
 
-Progress is available on the AUR (Arch User Repository). You can install it using the `yay`
-command-line application:
+Progress is available on the AUR (Arch User Repository). You can install it
+using the `yay` command-line application:
 
 ```sh
 yay -S progress-tracker
@@ -65,7 +63,7 @@ better option.
 - gettext
 - catch2 (optional)
 
-#### Building on Linux
+#### Build (Linux)
 
 1. Install the dependencies
 
@@ -98,16 +96,17 @@ better option.
    sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
    ```
 
-##### Packaging for Linux
+#### Distribution (Linux)
 
-You are also able to create packages to be installed on Linux systems.
-Everything you have to do is to issue `cpack` in the build directory so a Debian
-package and a tarball will be generated. Note that installing from the tarball
-would still require the user to update the schemas manually.
+Issuing the `cpack` command will generate both a tarball and debian package
+containing the application. Install the appropriate package for your system.
 
-#### Building on Windows
+> [!NOTE]
+> The tarball contains the expected FHS structure of a POSIX system. Thus installing is as trivial as moving the files to the correct directories. However, the user will still need to update schemas manually.
 
-There are multiple approaches to building projects on Windows. The approach used
+#### Build (Windows)
+
+The project relies on the MSYS2 environment to build on Windows. The first step
 by this project is setting up a [MSYS2 environment](https://www.msys2.org/) and
 downloading the MSYS dependencies similar to the one listed before. Currently,
 the project build settings support only two environments: UCRT64 and MINGW32.
@@ -147,8 +146,9 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 
 ## Support
 
-If you like what I do and want me to keep doing it, please consider
-supporting me through [PayPal][paypal-link]
+I love doing what I do and do not usually mind if I am getting paid for it or
+not. However, if you feel like this project deserve to grow, you might like to
+donate for the project's maintenance [PayPal][paypal-link]. Thanks for your support!
 
 [paypal-link]: https://www.paypal.com/donate/?hosted_button_id=9E5ELM2GFRU7U
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
