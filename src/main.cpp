@@ -31,11 +31,6 @@ int main(int argc, char* argv[]) {
     bind_textdomain_codeset("progress-tracker", "utf-8");
     textdomain("progress-tracker");
 
-#if WIN32
-    Glib::setenv("GSK_RENDERER", "opengl");
-    spdlog::get("app")->debug("Set GSK_RENDERER to OpenGL");
-#endif
-
     spdlog::get("app")->debug("Current System Locale: {}", sys_locale);
     spdlog::get("app")->debug("Loading locale data from: {}", lc_folder);
     spdlog::get("app")->debug("Progress Boards Location: {}",
