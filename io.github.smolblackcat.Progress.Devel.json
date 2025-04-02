@@ -2,7 +2,7 @@
   "id": "io.github.smolblackcat.Progress.Devel",
   "runtime": "org.gnome.Platform",
   "sdk": "org.gnome.Sdk",
-  "runtime-version": "47",
+  "runtime-version": "48",
   "command": "progress-debug",
   "finish-args": [
     "--socket=fallback-x11",
