@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>@APPLICATION_ID@</id>
   <name>Progress</name>
-  <summary>Kanban-style task organiser</summary>
+  <summary>Kanban board application</summary>
   <developer id="io.github.smolblackcat">
     <name>Gabriel de Moura</name>
   </developer>
@@ -24,27 +24,36 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-light1.png</image>
-      <caption>Board Grid</caption>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-grid-light.png</image>
+      <caption>Separate different contexts into different boards</caption>
     </screenshot>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-light2.png</image>
-      <caption>Board view</caption>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-board-light.png</image>
+      <caption>Editable kanban board</caption>
+    </screenshot>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-card-dialog-light.png</image>
+      <caption>Edit the extra details of a Card</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-dark1.png</image>
-      <caption>Board Grid</caption>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-grid-dark.png</image>
+      <caption>Separate different contexts into different boards</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-dark2.png</image>
-      <caption>Board view</caption>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-board-dark.png</image>
+      <caption>Editable kanban board</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/smolBlackCat/progress-tracker/main/pictures/progress-card-dialog-dark.png</image>
+      <caption>Edit the extra details of a Card</caption>
     </screenshot>
   </screenshots>
 
   <description>
     <p>
-      Progress is a simple application that organises your tasks on a board and
-      allows the user to put them into different card lists across the board.
+        Progress allows the user to organise their tasks concisely into custom
+        kanban boards, which are easily editable with its distinctive
+        drag-and-drop feature.
     </p>
   </description>
   <categories>
@@ -53,6 +62,37 @@
   </categories>
 
   <releases>
+    <release date="2025-??-??" version="1.7.0">
+        <description>
+            <p>What's new in Progress 1.7.0</p>
+            <p>This minor release is actually quite big and important because it
+            adds features that may enable the users to use Progress across more
+            different workflows</p>
+            <ul>
+                <li>Cards have received a revamp, making it more useful
+                for various workflows. The new features include:</li>
+                <ul>
+                    <li>Coloured card covers</li>
+                    <li>Card notes</li>
+                    <li>Deadline settings</li>
+                    <li>Sub-tasks</li>
+                    <li>Dedicated dialog for card editing</li>
+                </ul>
+                <li>UI has been greatly improved</li>
+                    <ul>
+                        <li>Dark mode and light mode styles have improved</li>
+                        <li>Board dialog has received a new UI design</li>
+                    </ul>
+                <li>Applications shortcuts have been introduced. Users can now
+                interact and move cards, card lists and tasks using the
+                keyboard</li>
+                <li>Data model have been updated to be backwards-compatible with
+                boards created by previous Progress versions</li>
+                <li>Drag and drop mechanism have been improved</li>
+                <li>Various bugs and memory leaks have been fixed</li>
+            </ul>
+        </description>
+    </release>
     <release date="2024-07-30" version="1.6.0">
       <description>
         <p>What's new in Progress 1.6.0</p>
