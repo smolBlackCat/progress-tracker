@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:30-0300\n"
+"POT-Creation-Date: 2025-04-03 11:43-0300\n"
 "PO-Revision-Date: 2024-07-10 11:11-0300\n"
 "Last-Translator: Gabriel de Moura <smolblackcat@proton.me>\n"
 "Language-Team: English\n"
@@ -274,6 +274,68 @@ msgstr "Add Spanish translation"
 msgid "First official release of Progress 1.0"
 msgstr "First official release of Progress 1.0"
 
+#: src/window.cpp:22
+msgid "Select the boards to be deleted"
+msgstr "Select the boards to be deleted"
+
+#: src/window.cpp:23
+msgid "Delete"
+msgstr "Delete"
+
+#: src/window.cpp:24
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/window.cpp:287
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © All rights reserved"
+
+#: src/window.cpp:289
+msgid "translator-credits"
+msgstr "Gabriel de Moura"
+
+#: src/window.cpp:343
+msgid "It was not possible to load this board"
+msgstr "It was not possible to load this board"
+
+#: src/dialog/card-dialog.cpp:15
+msgid "Add Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:158
+msgid "New Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:205 src/dialog/card-dialog.cpp:240
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr ""
+
+#: src/dialog/board-dialog.cpp:52
+msgid "Select a file"
+msgstr "Select a file"
+
+#: src/dialog/board-dialog.cpp:57
+msgid "Image Files"
+msgstr "Image Files"
+
+#: src/dialog/create_board_dialog.cpp:11
+msgid "Create New Board"
+msgstr ""
+
+#: src/dialog/create_board_dialog.cpp:23
+#: src/dialog/preferences-board-dialog.cpp:62
+msgid "Empty board names are not allowed"
+msgstr "Empty board names are not allowed"
+
+#: src/dialog/preferences-board-dialog.cpp:16
+msgid "Board Preferences"
+msgstr ""
+
+#: src/dialog/preferences-board-dialog.cpp:17
+msgid "Save"
+msgstr "Save"
+
 #: src/resources/ui/app-window.ui:69
 msgid "Homepage"
 msgstr "Homepage"
@@ -422,10 +484,6 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:63
-msgid "Set Due Date"
-msgstr ""
-
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
 msgstr ""
@@ -438,7 +496,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:138
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:672
 msgid "Notes"
 msgstr ""
 
@@ -446,7 +504,7 @@ msgstr ""
 msgid "Delete Card"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:175
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:118
 msgid "Card Details"
 msgstr ""
 
@@ -466,12 +524,68 @@ msgstr ""
 msgid "Create Board"
 msgstr "Create Board"
 
-#: src/resources/ui/board-dialog.ui:101
+#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:120
 msgid "Set Color"
 msgstr "Set Color"
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
+msgstr ""
+
+#: src/widgets/board-widget.cpp:24
+msgid "Add List"
+msgstr "Add List"
+
+#: src/widgets/board-widget.cpp:50
+msgid "New CardList"
+msgstr "New CardList"
+
+#: src/widgets/card-widget.cpp:84 src/widgets/card-widget.cpp:171
+#: src/widgets/cardlist-widget.cpp:74
+msgid "New Card"
+msgstr "New Card"
+
+#: src/widgets/card-widget.cpp:117 src/widgets/editable-label-header.cpp:79
+#: src/widgets/task-widget.cpp:74
+msgid "Rename"
+msgstr "Rename"
+
+#: src/widgets/card-widget.cpp:121
+msgid "Unset Color"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:122
+msgid "Card Cover"
+msgstr "Card Cover"
+
+#: src/widgets/card-widget.cpp:123 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/task-widget.cpp:75
+msgid "Remove"
+msgstr "Remove"
+
+#: src/widgets/card-widget.cpp:125
+msgid "Card Options"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:396
+msgid "Due: "
+msgstr ""
+
+#: src/widgets/card-widget.cpp:613
+msgid "%1%% complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:623
+msgid "This card is complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:627
+#, c-format
+msgid "This card is due %x"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:631
+msgid "The card is due today"
 msgstr ""
 
 #: src/widgets/card-widget.cpp:641
@@ -492,6 +606,18 @@ msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/widgets/cardlist-widget.cpp:38
+msgid "Add card"
+msgstr "Add card"
+
+#: src/widgets/cardlist-widget.cpp:105
+msgid "New Cardlist"
+msgstr ""
+
+#: src/widgets/task-widget.cpp:76
+msgid "Convert to card"
+msgstr ""
+
 #~ msgid "Kanban-style task organiser"
 #~ msgstr "Kanban-style task organizer"
 
@@ -507,57 +633,6 @@ msgstr[1] ""
 #~ msgstr ""
 #~ "Progress is a simple application that organises your tasks on a board and "
 #~ "allows the user to put them into different card lists across the board."
-
-#~ msgid "Select the boards to be deleted"
-#~ msgstr "Select the boards to be deleted"
-
-#~ msgid "Delete"
-#~ msgstr "Delete"
-
-#~ msgid "Cancel"
-#~ msgstr "Cancel"
-
-#~ msgid "De Moura © All rights reserved"
-#~ msgstr "De Moura © All rights reserved"
-
-#~ msgid "translator-credits"
-#~ msgstr "Gabriel de Moura"
-
-#~ msgid "It was not possible to load this board"
-#~ msgstr "It was not possible to load this board"
-
-#~ msgid "Select a file"
-#~ msgstr "Select a file"
-
-#~ msgid "Image Files"
-#~ msgstr "Image Files"
-
-#~ msgid "Empty board names are not allowed"
-#~ msgstr "Empty board names are not allowed"
-
-#~ msgid "Save"
-#~ msgstr "Save"
-
-#~ msgid "Add List"
-#~ msgstr "Add List"
-
-#~ msgid "New CardList"
-#~ msgstr "New CardList"
-
-#~ msgid "New Card"
-#~ msgstr "New Card"
-
-#~ msgid "Rename"
-#~ msgstr "Rename"
-
-#~ msgid "Card Cover"
-#~ msgstr "Card Cover"
-
-#~ msgid "Remove"
-#~ msgstr "Remove"
-
-#~ msgid "Add card"
-#~ msgstr "Add card"
 
 #~ msgid "Board's name"
 #~ msgstr "Board's name"

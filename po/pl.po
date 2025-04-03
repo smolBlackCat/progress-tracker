@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: adiee 5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:30-0300\n"
+"POT-Creation-Date: 2025-04-03 11:43-0300\n"
 "PO-Revision-Date: 2024-07-18 18:17+0200\n"
 "Last-Translator:  <adiee5@adiee5.ct8.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -271,6 +271,68 @@ msgstr ""
 msgid "First official release of Progress 1.0"
 msgstr ""
 
+#: src/window.cpp:22
+msgid "Select the boards to be deleted"
+msgstr "Wybierz tablice do usunięcie"
+
+#: src/window.cpp:23
+msgid "Delete"
+msgstr "Usuń"
+
+#: src/window.cpp:24
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/window.cpp:287
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Wszelkie prawa zastrzerzone"
+
+#: src/window.cpp:289
+msgid "translator-credits"
+msgstr "Adiee5 <adiee5@adiee5.ct8.pl>"
+
+#: src/window.cpp:343
+msgid "It was not possible to load this board"
+msgstr "Nie udało się załadować tej tablicy"
+
+#: src/dialog/card-dialog.cpp:15
+msgid "Add Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:158
+msgid "New Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:205 src/dialog/card-dialog.cpp:240
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr ""
+
+#: src/dialog/board-dialog.cpp:52
+msgid "Select a file"
+msgstr "Wybierz plik"
+
+#: src/dialog/board-dialog.cpp:57
+msgid "Image Files"
+msgstr "Pliki Obrazkowe"
+
+#: src/dialog/create_board_dialog.cpp:11
+msgid "Create New Board"
+msgstr ""
+
+#: src/dialog/create_board_dialog.cpp:23
+#: src/dialog/preferences-board-dialog.cpp:62
+msgid "Empty board names are not allowed"
+msgstr "Puste nazwy tablic nie są dozwolone"
+
+#: src/dialog/preferences-board-dialog.cpp:16
+msgid "Board Preferences"
+msgstr ""
+
+#: src/dialog/preferences-board-dialog.cpp:17
+msgid "Save"
+msgstr "Zapisz"
+
 #: src/resources/ui/app-window.ui:69
 msgid "Homepage"
 msgstr "Strona Domowa"
@@ -419,10 +481,6 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:63
-msgid "Set Due Date"
-msgstr ""
-
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
 msgstr ""
@@ -435,7 +493,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:138
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:672
 msgid "Notes"
 msgstr ""
 
@@ -443,7 +501,7 @@ msgstr ""
 msgid "Delete Card"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:175
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:118
 msgid "Card Details"
 msgstr ""
 
@@ -463,12 +521,68 @@ msgstr ""
 msgid "Create Board"
 msgstr "Stwórz Tablicę"
 
-#: src/resources/ui/board-dialog.ui:101
+#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:120
 msgid "Set Color"
 msgstr ""
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
+msgstr ""
+
+#: src/widgets/board-widget.cpp:24
+msgid "Add List"
+msgstr "Dodaj Listę"
+
+#: src/widgets/board-widget.cpp:50
+msgid "New CardList"
+msgstr "Nowa Lista Kart"
+
+#: src/widgets/card-widget.cpp:84 src/widgets/card-widget.cpp:171
+#: src/widgets/cardlist-widget.cpp:74
+msgid "New Card"
+msgstr "Nowa Karta"
+
+#: src/widgets/card-widget.cpp:117 src/widgets/editable-label-header.cpp:79
+#: src/widgets/task-widget.cpp:74
+msgid "Rename"
+msgstr "Zmień Nazwę"
+
+#: src/widgets/card-widget.cpp:121
+msgid "Unset Color"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:122
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:123 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/task-widget.cpp:75
+msgid "Remove"
+msgstr "Usuń"
+
+#: src/widgets/card-widget.cpp:125
+msgid "Card Options"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:396
+msgid "Due: "
+msgstr ""
+
+#: src/widgets/card-widget.cpp:613
+msgid "%1%% complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:623
+msgid "This card is complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:627
+#, c-format
+msgid "This card is due %x"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:631
+msgid "The card is due today"
 msgstr ""
 
 #: src/widgets/card-widget.cpp:641
@@ -492,53 +606,17 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#~ msgid "Select the boards to be deleted"
-#~ msgstr "Wybierz tablice do usunięcie"
+#: src/widgets/cardlist-widget.cpp:38
+msgid "Add card"
+msgstr "Dodaj kartę"
 
-#~ msgid "Delete"
-#~ msgstr "Usuń"
+#: src/widgets/cardlist-widget.cpp:105
+msgid "New Cardlist"
+msgstr ""
 
-#~ msgid "Cancel"
-#~ msgstr "Anuluj"
-
-#~ msgid "De Moura © All rights reserved"
-#~ msgstr "De Moura © Wszelkie prawa zastrzerzone"
-
-#~ msgid "translator-credits"
-#~ msgstr "Adiee5 <adiee5@adiee5.ct8.pl>"
-
-#~ msgid "It was not possible to load this board"
-#~ msgstr "Nie udało się załadować tej tablicy"
-
-#~ msgid "Select a file"
-#~ msgstr "Wybierz plik"
-
-#~ msgid "Image Files"
-#~ msgstr "Pliki Obrazkowe"
-
-#~ msgid "Empty board names are not allowed"
-#~ msgstr "Puste nazwy tablic nie są dozwolone"
-
-#~ msgid "Save"
-#~ msgstr "Zapisz"
-
-#~ msgid "Add List"
-#~ msgstr "Dodaj Listę"
-
-#~ msgid "New CardList"
-#~ msgstr "Nowa Lista Kart"
-
-#~ msgid "New Card"
-#~ msgstr "Nowa Karta"
-
-#~ msgid "Rename"
-#~ msgstr "Zmień Nazwę"
-
-#~ msgid "Remove"
-#~ msgstr "Usuń"
-
-#~ msgid "Add card"
-#~ msgstr "Dodaj kartę"
+#: src/widgets/task-widget.cpp:76
+msgid "Convert to card"
+msgstr ""
 
 #~ msgid "Board's name"
 #~ msgstr "Nazwa tablicy"

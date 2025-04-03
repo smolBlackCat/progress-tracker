@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.smolblackcat.Progress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:30-0300\n"
+"POT-Creation-Date: 2025-04-03 11:43-0300\n"
 "PO-Revision-Date: 2024-04-19 13:36+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -272,6 +272,68 @@ msgstr ""
 msgid "First official release of Progress 1.0"
 msgstr ""
 
+#: src/window.cpp:22
+msgid "Select the boards to be deleted"
+msgstr "Silinecek panoları seç"
+
+#: src/window.cpp:23
+msgid "Delete"
+msgstr "Sil"
+
+#: src/window.cpp:24
+msgid "Cancel"
+msgstr "İptal"
+
+#: src/window.cpp:287
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Tüm hakları saklıdır"
+
+#: src/window.cpp:289
+msgid "translator-credits"
+msgstr "Sabri Ünal <yakushabb@gmail.com>"
+
+#: src/window.cpp:343
+msgid "It was not possible to load this board"
+msgstr "Bu pano yüklenemedi"
+
+#: src/dialog/card-dialog.cpp:15
+msgid "Add Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:158
+msgid "New Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:205 src/dialog/card-dialog.cpp:240
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr ""
+
+#: src/dialog/board-dialog.cpp:52
+msgid "Select a file"
+msgstr "Dosya seç"
+
+#: src/dialog/board-dialog.cpp:57
+msgid "Image Files"
+msgstr "Görüntü Dosyaları"
+
+#: src/dialog/create_board_dialog.cpp:11
+msgid "Create New Board"
+msgstr ""
+
+#: src/dialog/create_board_dialog.cpp:23
+#: src/dialog/preferences-board-dialog.cpp:62
+msgid "Empty board names are not allowed"
+msgstr "Boş pano adlarına izin verilmez"
+
+#: src/dialog/preferences-board-dialog.cpp:16
+msgid "Board Preferences"
+msgstr ""
+
+#: src/dialog/preferences-board-dialog.cpp:17
+msgid "Save"
+msgstr "Kaydet"
+
 #: src/resources/ui/app-window.ui:69
 msgid "Homepage"
 msgstr "Ana Sayfa"
@@ -420,10 +482,6 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:63
-msgid "Set Due Date"
-msgstr ""
-
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
 msgstr ""
@@ -436,7 +494,7 @@ msgstr ""
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:138
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:672
 msgid "Notes"
 msgstr ""
 
@@ -444,7 +502,7 @@ msgstr ""
 msgid "Delete Card"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:175
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:118
 msgid "Card Details"
 msgstr ""
 
@@ -464,12 +522,68 @@ msgstr ""
 msgid "Create Board"
 msgstr "Pano Oluştur"
 
-#: src/resources/ui/board-dialog.ui:101
+#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:120
 msgid "Set Color"
 msgstr ""
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
+msgstr ""
+
+#: src/widgets/board-widget.cpp:24
+msgid "Add List"
+msgstr "Liste Ekle"
+
+#: src/widgets/board-widget.cpp:50
+msgid "New CardList"
+msgstr "Yeni CardList"
+
+#: src/widgets/card-widget.cpp:84 src/widgets/card-widget.cpp:171
+#: src/widgets/cardlist-widget.cpp:74
+msgid "New Card"
+msgstr "Yeni Kart"
+
+#: src/widgets/card-widget.cpp:117 src/widgets/editable-label-header.cpp:79
+#: src/widgets/task-widget.cpp:74
+msgid "Rename"
+msgstr "Yeniden Adlandır"
+
+#: src/widgets/card-widget.cpp:121
+msgid "Unset Color"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:122
+msgid "Card Cover"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:123 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/task-widget.cpp:75
+msgid "Remove"
+msgstr "Kaldır"
+
+#: src/widgets/card-widget.cpp:125
+msgid "Card Options"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:396
+msgid "Due: "
+msgstr ""
+
+#: src/widgets/card-widget.cpp:613
+msgid "%1%% complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:623
+msgid "This card is complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:627
+#, c-format
+msgid "This card is due %x"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:631
+msgid "The card is due today"
 msgstr ""
 
 #: src/widgets/card-widget.cpp:641
@@ -487,6 +601,18 @@ msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] ""
 
+#: src/widgets/cardlist-widget.cpp:38
+msgid "Add card"
+msgstr "Kart ekle"
+
+#: src/widgets/cardlist-widget.cpp:105
+msgid "New Cardlist"
+msgstr ""
+
+#: src/widgets/task-widget.cpp:76
+msgid "Convert to card"
+msgstr ""
+
 #~ msgid "Kanban-style task organiser"
 #~ msgstr "Kanban tarzı görev düzenleyici"
 
@@ -503,54 +629,6 @@ msgstr[0] ""
 #~ "İlerleme, görevlerinizi pano üzerinde düzenleyen ve kullanıcının bunları "
 #~ "pano üzerinde farklı kart listelerine koymasını sağlayan basit bir "
 #~ "uygulamadır."
-
-#~ msgid "Select the boards to be deleted"
-#~ msgstr "Silinecek panoları seç"
-
-#~ msgid "Delete"
-#~ msgstr "Sil"
-
-#~ msgid "Cancel"
-#~ msgstr "İptal"
-
-#~ msgid "De Moura © All rights reserved"
-#~ msgstr "De Moura © Tüm hakları saklıdır"
-
-#~ msgid "translator-credits"
-#~ msgstr "Sabri Ünal <yakushabb@gmail.com>"
-
-#~ msgid "It was not possible to load this board"
-#~ msgstr "Bu pano yüklenemedi"
-
-#~ msgid "Select a file"
-#~ msgstr "Dosya seç"
-
-#~ msgid "Image Files"
-#~ msgstr "Görüntü Dosyaları"
-
-#~ msgid "Empty board names are not allowed"
-#~ msgstr "Boş pano adlarına izin verilmez"
-
-#~ msgid "Save"
-#~ msgstr "Kaydet"
-
-#~ msgid "Add List"
-#~ msgstr "Liste Ekle"
-
-#~ msgid "New CardList"
-#~ msgstr "Yeni CardList"
-
-#~ msgid "New Card"
-#~ msgstr "Yeni Kart"
-
-#~ msgid "Rename"
-#~ msgstr "Yeniden Adlandır"
-
-#~ msgid "Remove"
-#~ msgstr "Kaldır"
-
-#~ msgid "Add card"
-#~ msgstr "Kart ekle"
 
 #~ msgid "Board's name"
 #~ msgstr "Pano adı"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:30-0300\n"
+"POT-Creation-Date: 2025-04-03 11:43-0300\n"
 "PO-Revision-Date: 2024-02-10 12:25-0300\n"
 "Last-Translator: Gabriel de Moura <moura@moura>\n"
 "Language-Team: Brazilian Portuguese <ldpbr-"
@@ -277,6 +277,68 @@ msgstr "Tradução em espanhol foi adicionada"
 msgid "First official release of Progress 1.0"
 msgstr "Primeiro lançamento oficial do Progress 1.0"
 
+#: src/window.cpp:22
+msgid "Select the boards to be deleted"
+msgstr "Selecione os quadros a serem deletados"
+
+#: src/window.cpp:23
+msgid "Delete"
+msgstr "Deletar"
+
+#: src/window.cpp:24
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/window.cpp:287
+msgid "De Moura © All rights reserved"
+msgstr "De Moura © Todos os direitos reservados"
+
+#: src/window.cpp:289
+msgid "translator-credits"
+msgstr "Gabriel de Moura <smolblackcat@proton.me>"
+
+#: src/window.cpp:343
+msgid "It was not possible to load this board"
+msgstr "Não foi possível carregar este quadro"
+
+#: src/dialog/card-dialog.cpp:15
+msgid "Add Task"
+msgstr "Adicionar Tarefa"
+
+#: src/dialog/card-dialog.cpp:158
+msgid "New Task"
+msgstr "Nova Tarefa"
+
+#: src/dialog/card-dialog.cpp:205 src/dialog/card-dialog.cpp:240
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr "Marcar Prazo"
+
+#: src/dialog/board-dialog.cpp:52
+msgid "Select a file"
+msgstr "Selecione um Arquivo"
+
+#: src/dialog/board-dialog.cpp:57
+msgid "Image Files"
+msgstr "Arquivos de Imagem"
+
+#: src/dialog/create_board_dialog.cpp:11
+msgid "Create New Board"
+msgstr "Criar Novo Quadro"
+
+#: src/dialog/create_board_dialog.cpp:23
+#: src/dialog/preferences-board-dialog.cpp:62
+msgid "Empty board names are not allowed"
+msgstr "Nomes de quadro vazios não são permitidos"
+
+#: src/dialog/preferences-board-dialog.cpp:16
+msgid "Board Preferences"
+msgstr "Configurações do Quadro"
+
+#: src/dialog/preferences-board-dialog.cpp:17
+msgid "Save"
+msgstr "Salvar"
+
 #: src/resources/ui/app-window.ui:69
 msgid "Homepage"
 msgstr "Página Inicial"
@@ -428,10 +490,6 @@ msgstr "Título do Cartão"
 msgid "Deadline"
 msgstr "Prazo"
 
-#: src/resources/ui/card-details-dialog.ui:63
-msgid "Set Due Date"
-msgstr "Marcar Prazo"
-
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
 msgstr "Remover Prazo"
@@ -444,7 +502,7 @@ msgstr "Marcar cartão como concluído"
 msgid "Checklist"
 msgstr "Lista de Tarefas"
 
-#: src/resources/ui/card-details-dialog.ui:138
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:672
 msgid "Notes"
 msgstr "Anotações"
 
@@ -452,7 +510,7 @@ msgstr "Anotações"
 msgid "Delete Card"
 msgstr "Apagar Cartão"
 
-#: src/resources/ui/card-details-dialog.ui:175
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:118
 msgid "Card Details"
 msgstr "Detalhes do Cartão"
 
@@ -472,13 +530,69 @@ msgstr "Clique para selecionar um plano de fundo para o quadro"
 msgid "Create Board"
 msgstr "Criar Quadro"
 
-#: src/resources/ui/board-dialog.ui:101
+#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:120
 msgid "Set Color"
 msgstr "Selecionar Cor"
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
 msgstr "Selecionar Imagem"
+
+#: src/widgets/board-widget.cpp:24
+msgid "Add List"
+msgstr "Adicionar Lista"
+
+#: src/widgets/board-widget.cpp:50
+msgid "New CardList"
+msgstr "Nova lista de cartões"
+
+#: src/widgets/card-widget.cpp:84 src/widgets/card-widget.cpp:171
+#: src/widgets/cardlist-widget.cpp:74
+msgid "New Card"
+msgstr "Novo cartão"
+
+#: src/widgets/card-widget.cpp:117 src/widgets/editable-label-header.cpp:79
+#: src/widgets/task-widget.cpp:74
+msgid "Rename"
+msgstr "Renomear"
+
+#: src/widgets/card-widget.cpp:121
+msgid "Unset Color"
+msgstr "Remover Cor"
+
+#: src/widgets/card-widget.cpp:122
+msgid "Card Cover"
+msgstr "Capa do Cartão"
+
+#: src/widgets/card-widget.cpp:123 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/task-widget.cpp:75
+msgid "Remove"
+msgstr "Remover"
+
+#: src/widgets/card-widget.cpp:125
+msgid "Card Options"
+msgstr "Opções do Cartão"
+
+#: src/widgets/card-widget.cpp:396
+msgid "Due: "
+msgstr "Prazo: "
+
+#: src/widgets/card-widget.cpp:613
+msgid "%1%% complete"
+msgstr "%1%% completo"
+
+#: src/widgets/card-widget.cpp:623
+msgid "This card is complete"
+msgstr "Este cartão está concluído"
+
+#: src/widgets/card-widget.cpp:627
+#, c-format
+msgid "This card is due %x"
+msgstr "O prazo para este cartão é %x"
+
+#: src/widgets/card-widget.cpp:631
+msgid "The card is due today"
+msgstr "O cartão é para hoje"
 
 #: src/widgets/card-widget.cpp:641
 msgid "This card is past due date %1 day ago"
@@ -498,6 +612,18 @@ msgid_plural "This card is past due date %1 years ago"
 msgstr[0] "Este cartão passou do prazo a %1 ano atrás"
 msgstr[1] "Este cartão passou do prazo a %1 anos atrás"
 
+#: src/widgets/cardlist-widget.cpp:38
+msgid "Add card"
+msgstr "Adicionar cartão"
+
+#: src/widgets/cardlist-widget.cpp:105
+msgid "New Cardlist"
+msgstr "Nova Lista de Cartões"
+
+#: src/widgets/task-widget.cpp:76
+msgid "Convert to card"
+msgstr "Converter para cartão"
+
 #~ msgid "Kanban-style task organiser"
 #~ msgstr "Organizador de tarefas no estilo kanban"
 
@@ -513,97 +639,6 @@ msgstr[1] "Este cartão passou do prazo a %1 anos atrás"
 #~ msgstr ""
 #~ "Progress é uma aplicação simples que organiza suas tarefas em um quadro e "
 #~ "permite ao usuário colocá-las em diferentes listas de cartões pelo quadro."
-
-#~ msgid "Select the boards to be deleted"
-#~ msgstr "Selecione os quadros a serem deletados"
-
-#~ msgid "Delete"
-#~ msgstr "Deletar"
-
-#~ msgid "Cancel"
-#~ msgstr "Cancelar"
-
-#~ msgid "De Moura © All rights reserved"
-#~ msgstr "De Moura © Todos os direitos reservados"
-
-#~ msgid "translator-credits"
-#~ msgstr "Gabriel de Moura <smolblackcat@proton.me>"
-
-#~ msgid "It was not possible to load this board"
-#~ msgstr "Não foi possível carregar este quadro"
-
-#~ msgid "Add Task"
-#~ msgstr "Adicionar Tarefa"
-
-#~ msgid "New Task"
-#~ msgstr "Nova Tarefa"
-
-#~ msgid "Select a file"
-#~ msgstr "Selecione um Arquivo"
-
-#~ msgid "Image Files"
-#~ msgstr "Arquivos de Imagem"
-
-#~ msgid "Create New Board"
-#~ msgstr "Criar Novo Quadro"
-
-#~ msgid "Empty board names are not allowed"
-#~ msgstr "Nomes de quadro vazios não são permitidos"
-
-#~ msgid "Board Preferences"
-#~ msgstr "Configurações do Quadro"
-
-#~ msgid "Save"
-#~ msgstr "Salvar"
-
-#~ msgid "Add List"
-#~ msgstr "Adicionar Lista"
-
-#~ msgid "New CardList"
-#~ msgstr "Nova lista de cartões"
-
-#~ msgid "New Card"
-#~ msgstr "Novo cartão"
-
-#~ msgid "Rename"
-#~ msgstr "Renomear"
-
-#~ msgid "Unset Color"
-#~ msgstr "Remover Cor"
-
-#~ msgid "Card Cover"
-#~ msgstr "Capa do Cartão"
-
-#~ msgid "Remove"
-#~ msgstr "Remover"
-
-#~ msgid "Card Options"
-#~ msgstr "Opções do Cartão"
-
-#~ msgid "Due: "
-#~ msgstr "Prazo: "
-
-#~ msgid "%1%% complete"
-#~ msgstr "%1%% completo"
-
-#~ msgid "This card is complete"
-#~ msgstr "Este cartão está concluído"
-
-#, c-format
-#~ msgid "This card is due %x"
-#~ msgstr "O prazo para este cartão é %x"
-
-#~ msgid "The card is due today"
-#~ msgstr "O cartão é para hoje"
-
-#~ msgid "Add card"
-#~ msgstr "Adicionar cartão"
-
-#~ msgid "New Cardlist"
-#~ msgstr "Nova Lista de Cartões"
-
-#~ msgid "Convert to card"
-#~ msgstr "Converter para cartão"
 
 #~ msgid "_Progress"
 #~ msgstr "Progresso"
