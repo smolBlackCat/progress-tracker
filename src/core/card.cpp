@@ -35,6 +35,13 @@ void Card::set_color(const Color& color) {
 
 const std::string& Card::get_notes() const { return notes; }
 
+void Card::set_modified(bool modified) {
+    Item::set_modified(modified);
+    for (auto& task : tasks) {
+        task->set_modified(modified);
+    }
+}
+
 bool Card::get_modified() {
     for (auto& task : tasks) {
         if (task->get_modified()) {

@@ -38,6 +38,8 @@ public:
      */
     bool remove(const Card& card);
 
+    void set_modified(bool modified) override;
+
     bool get_modified() override;
 
     /**
