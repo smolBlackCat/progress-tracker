@@ -6,6 +6,7 @@
 #include "board-widget.h"
 #include "card-widget.h"
 #include "glib.h"
+#include "gtkmm/shortcuttrigger.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -89,6 +90,13 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 
     auto shortcut_controller = Gtk::ShortcutController::create();
     shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>R"),
+        Gtk::CallbackAction::create(
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                this->cardlist_header.to_editing_mode();
+                return true;
+            })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
         Gtk::ShortcutTrigger::parse_string("<Control>N"),
         Gtk::CallbackAction::create(

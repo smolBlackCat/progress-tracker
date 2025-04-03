@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-10 22:46-0300\n"
+"POT-Creation-Date: 2025-04-03 11:30-0300\n"
 "PO-Revision-Date: 2024-07-10 11:12-0300\n"
 "Last-Translator: Gabriel de Moura <smolblackcat@proton.me>\n"
 "Language-Team: English (British) <(nothing)>\n"
@@ -31,57 +31,130 @@ msgid "_Kanban;Todo;Progress;"
 msgstr "Kanban;Todo;Progress;"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
-msgid "Kanban-style task organiser"
-msgstr "Kanban-style task organiser"
+msgid "Kanban board application"
+msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:7
 msgid "Gabriel de Moura"
 msgstr "Gabriel de Moura"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:28
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:36
-msgid "Board Grid"
-msgstr "Board Grid"
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:40
+msgid "Separate different contexts into different boards"
+msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:32
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:40
-msgid "Board view"
-msgstr "Board View"
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:44
+msgid "Editable kanban board"
+msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:45
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:36
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:48
+msgid "Edit the extra details of a Card"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:53
 msgid ""
-"Progress is a simple application that organises your tasks on a board and "
-"allows the user to put them into different card lists across the board."
-msgstr ""
-"Progress is a simple application that organises your tasks on a board and "
-"allows the user to put them into different card lists across the board."
-
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:58
-msgid "What's new in Progress 1.6.0"
-msgstr ""
-
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:60
-msgid "Added Polish Translation"
-msgstr ""
-
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:61
-msgid "Fixed rendering artifact (Windows)"
+"Progress allows the user to organise their tasks concisely into custom "
+"kanban boards, which are easily editable with its distinctive drag-and-drop "
+"feature."
 msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:67
+msgid "What's new in Progress 1.7.0"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:68
+msgid ""
+"This minor release is actually quite big and important because it adds "
+"features that may enable the users to use Progress across more different "
+"workflows"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:72
+msgid ""
+"Cards have received a revamp, making it more useful for various workflows. "
+"The new features include:"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:75
+msgid "Coloured card covers"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:76
+msgid "Card notes"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:77
+msgid "Deadline settings"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:78
+msgid "Sub-tasks"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:79
+msgid "Dedicated dialog for card editing"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:81
+msgid "UI has been greatly improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:83
+msgid "Dark mode and light mode styles have improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:84
+msgid "Board dialog has received a new UI design"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:86
+msgid ""
+"Applications shortcuts have been introduced. Users can now interact and move "
+"cards, card lists and tasks using the keyboard"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:89
+msgid ""
+"Data model have been updated to be backwards-compatible with boards created "
+"by previous Progress versions"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:91
+msgid "Drag and drop mechanism have been improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:92
+msgid "Various bugs and memory leaks have been fixed"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:98
+msgid "What's new in Progress 1.6.0"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:100
+msgid "Added Polish Translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:101
+msgid "Fixed rendering artifact (Windows)"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:107
 msgid "What's new in Progress 1.5.2"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:69
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:109
 msgid ""
 "Fix bug where application would crash after dropping a cardlist onto itself"
 msgstr ""
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:76
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:116
 msgid "What's new in Progress 1.5.1"
 msgstr "What's new in Progress 1.5.1"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:78
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:118
 msgid ""
 "Fix bug where the board's background was set only if the board's name was "
 "also modified"
@@ -89,15 +162,15 @@ msgstr ""
 "Fix bug where the board's background was set only if the board's name was "
 "also modified"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:85
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:125
 msgid "What's new in Progress 1.5.0"
 msgstr "What's new in Progress 1.5.0"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:87
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:127
 msgid "Board buttons will now appear in the order of modification"
 msgstr "Board buttons will now appear in the order of modification"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:88
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:128
 msgid ""
 "Preferences Board Dialog will only generate a new name file if the board's "
 "name was changed"
@@ -105,163 +178,101 @@ msgstr ""
 "Preferences Board Dialogue will only generate a new name file if the board's "
 "name was changed"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:95
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:135
 msgid "What's new in Progress 1.4.1"
 msgstr "What's new in Progress 1.4.1"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:97
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:137
 msgid "Locale directory resolution optimised"
 msgstr "Locale directory resolution optimised"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:103
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:143
 msgid "What's new in Progress 1.4"
 msgstr "What's new in Progress 1.4"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:105
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:145
 msgid "Spanish translation has been updated"
 msgstr "Spanish translation has been updated"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:111
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:151
 msgid "What's new in Progress 1.3"
 msgstr "What's new in Progress 1.3"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:113
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:153
 msgid "Italian translation has been updated"
 msgstr "Italian translation has been updated"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:114
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:154
 msgid "Russian Translation has been added"
 msgstr "Russian Translation has been added"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:115
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:155
 msgid "Ukranian Translation has been added"
 msgstr "Ukranian Translation has been added"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:116
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:156
 msgid "Card widgets have gotten an UI rework"
 msgstr "Card widgets have gotten an UI rework"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:117
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:157
 msgid "A cancel button has been added to cancel creation and renaming"
 msgstr "A cancel button has been added to cancel creation and renaming"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:123
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:163
 msgid "The current minor releases brings some additions and improvements"
 msgstr "The current minor releases brings some additions and improvements"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:125
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:165
 msgid "Utilise Adwaita About Dialogs"
 msgstr "Utilise Adwaita About Dialogues"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:126
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:166
 msgid "Added Bulgarian Translation"
 msgstr "Added Bulgarian Translation"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:127
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:167
 msgid "Added Turkish Translation"
 msgstr "Added Turkish Translation"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:128
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:168
 msgid "Progress will not fail to start in case the boards are corrupted"
 msgstr "Progress will not fail to start in case the boards are corrupted"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:129
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:169
 msgid "Added tooltips"
 msgstr "Added tooltips"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:135
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:175
 msgid "Bug Fixes and Improvements"
 msgstr "Bug Fixes and Improvements"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:137
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:177
 msgid "Board grid UI enhance"
 msgstr "Board grid UI enhance"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:138
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:178
 msgid "Fix segmentation fault error when moving cards onto themselves"
 msgstr "Fix segmentation fault error when moving cards onto themselves"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:139
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:179
 msgid "Progress is better integrated on GNOME systems"
 msgstr "Progress is better integrated on GNOME systems"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:140
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:180
 msgid "Add Dutch translation"
 msgstr "Add Dutch translation"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:141
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:181
 msgid "Add Italian translation"
 msgstr "Add Italian translation"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:142
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:182
 msgid "Add Spanish translation"
 msgstr "Add Spanish translation"
 
-#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:148
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:188
 msgid "First official release of Progress 1.0"
 msgstr "First official release of Progress 1.0"
-
-#: src/window.cpp:22
-msgid "Select the boards to be deleted"
-msgstr "Select the boards to be deleted"
-
-#: src/window.cpp:23
-msgid "Delete"
-msgstr "Delete"
-
-#: src/window.cpp:24
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/window.cpp:283
-msgid "De Moura © All rights reserved"
-msgstr "De Moura © All rights reserved"
-
-#: src/window.cpp:285
-msgid "translator-credits"
-msgstr "Gabriel de Moura"
-
-#: src/window.cpp:338
-msgid "It was not possible to load this board"
-msgstr "It was not possible to load this board"
-
-#: src/dialog/card-dialog.cpp:15
-msgid "Add Task"
-msgstr "Add Task"
-
-#: src/dialog/card-dialog.cpp:127
-msgid "New Task"
-msgstr "New Task"
-
-#: src/dialog/card-dialog.cpp:167 src/dialog/card-dialog.cpp:201
-#: src/resources/ui/card-details-dialog.ui:74
-msgid "Set Due Date"
-msgstr "Set Due Date"
-
-#: src/dialog/board-dialog.cpp:51
-msgid "Select a file"
-msgstr "Select a file"
-
-#: src/dialog/board-dialog.cpp:56
-msgid "Image Files"
-msgstr "Image Files"
-
-#: src/dialog/create_board_dialog.cpp:11
-msgid "Create New Board"
-msgstr "Create New Board"
-
-#: src/dialog/create_board_dialog.cpp:23
-#: src/dialog/preferences-board-dialog.cpp:63
-msgid "Empty board names are not allowed"
-msgstr "Empty board names are not allowed"
-
-#: src/dialog/preferences-board-dialog.cpp:16
-msgid "Board Preferences"
-msgstr "Board Preferences"
-
-#: src/dialog/preferences-board-dialog.cpp:17
-msgid "Save"
-msgstr "Save"
 
 #: src/resources/ui/app-window.ui:69
 msgid "Homepage"
@@ -368,66 +379,74 @@ msgid "Cardlist Shortcuts"
 msgstr "Cardlist Shortcuts"
 
 #: src/resources/ui/app-window.ui:300
+msgid "Rename the focused cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:309
 msgid "Add a new cardlist next to the focused cardlist"
 msgstr "Add a new cardlist next to the focused cardlist"
 
-#: src/resources/ui/app-window.ui:309
+#: src/resources/ui/app-window.ui:318
 msgid "Deletes cardlist from board"
 msgstr "Deletes cardlist from board"
 
-#: src/resources/ui/app-window.ui:320
+#: src/resources/ui/app-window.ui:329
 msgid "Move cardlist across the board"
 msgstr "Move cardlist across the board"
 
-#: src/resources/ui/app-window.ui:330
+#: src/resources/ui/app-window.ui:339
 msgid "Task Shortcuts"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:338
+#: src/resources/ui/app-window.ui:347
 msgid "Rename task"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:347
+#: src/resources/ui/app-window.ui:356
 msgid "Delete task from card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:358
+#: src/resources/ui/app-window.ui:367
 msgid "Convert task to card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:369
+#: src/resources/ui/app-window.ui:378
 msgid "Move task across the checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:45
+#: src/resources/ui/card-details-dialog.ui:39
 msgid "Card Title"
 msgstr "Card Title"
 
-#: src/resources/ui/card-details-dialog.ui:63
+#: src/resources/ui/card-details-dialog.ui:55
 msgid "Deadline"
 msgstr "Deadline"
 
-#: src/resources/ui/card-details-dialog.ui:93
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr "Set Due Date"
+
+#: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
 msgstr "Unset Due Date"
 
-#: src/resources/ui/card-details-dialog.ui:121
+#: src/resources/ui/card-details-dialog.ui:91
 msgid "Mark this card complete"
 msgstr "Mark this card complete"
 
-#: src/resources/ui/card-details-dialog.ui:140
+#: src/resources/ui/card-details-dialog.ui:108
 msgid "Checklist"
 msgstr "Checklist"
 
-#: src/resources/ui/card-details-dialog.ui:172 src/widgets/card-widget.cpp:659
+#: src/resources/ui/card-details-dialog.ui:138
 msgid "Notes"
 msgstr "Notes"
 
-#: src/resources/ui/card-details-dialog.ui:202
+#: src/resources/ui/card-details-dialog.ui:164
 msgid "Delete Card"
 msgstr "Delete Card"
 
-#: src/resources/ui/card-details-dialog.ui:212 src/widgets/card-widget.cpp:114
+#: src/resources/ui/card-details-dialog.ui:175
 msgid "Card Details"
 msgstr "Card Details"
 
@@ -447,7 +466,7 @@ msgstr "Click to set a board background"
 msgid "Create Board"
 msgstr "Create Board"
 
-#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:116
+#: src/resources/ui/board-dialog.ui:101
 msgid "Set Color"
 msgstr "Set Colour"
 
@@ -455,91 +474,130 @@ msgstr "Set Colour"
 msgid "Set Image"
 msgstr "Set Image"
 
-#: src/widgets/board-widget.cpp:23
-msgid "Add List"
-msgstr "Add List"
-
-#: src/widgets/board-widget.cpp:49
-msgid "New CardList"
-msgstr "New CardList"
-
-#: src/widgets/card-widget.cpp:83 src/widgets/card-widget.cpp:161
-#: src/widgets/cardlist-widget.cpp:73
-msgid "New Card"
-msgstr "New Card"
-
-#: src/widgets/card-widget.cpp:113 src/widgets/editable-label-header.cpp:76
-#: src/widgets/task-widget.cpp:74
-msgid "Rename"
-msgstr "Rename"
-
-#: src/widgets/card-widget.cpp:117
-msgid "Unset Color"
-msgstr "Unset Colour"
-
-#: src/widgets/card-widget.cpp:118
-msgid "Card Cover"
-msgstr "Card Cover"
-
-#: src/widgets/card-widget.cpp:119 src/widgets/cardlist-widget.cpp:54
-#: src/widgets/task-widget.cpp:75
-msgid "Remove"
-msgstr "Remove"
-
-#: src/widgets/card-widget.cpp:121
-msgid "Card Options"
-msgstr "Card Options"
-
-#: src/widgets/card-widget.cpp:393
-msgid "Due: "
-msgstr "Due: "
-
-#: src/widgets/card-widget.cpp:600
-msgid "%1%% complete"
-msgstr "%1%% complete"
-
-#: src/widgets/card-widget.cpp:610
-msgid "This card is complete"
-msgstr "This card is complete"
-
-#: src/widgets/card-widget.cpp:614
-#, c-format
-msgid "This card is due %x"
-msgstr "This card is due %x"
-
-#: src/widgets/card-widget.cpp:618
-msgid "The card is due today"
-msgstr "The card is due today"
-
-#: src/widgets/card-widget.cpp:628
+#: src/widgets/card-widget.cpp:641
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] "This card is past due date %1 day ago"
 msgstr[1] "This card is past due date %1 days ago"
 
-#: src/widgets/card-widget.cpp:639
+#: src/widgets/card-widget.cpp:652
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] "This card is past due date %1 month ago"
 msgstr[1] "This card is past due date %1 months ago"
 
-#: src/widgets/card-widget.cpp:649
+#: src/widgets/card-widget.cpp:662
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] "This card is past due date %1 year ago"
 msgstr[1] "This card is past due date %1 years ago"
 
-#: src/widgets/cardlist-widget.cpp:37
-msgid "Add card"
-msgstr "Add card"
+#~ msgid "Kanban-style task organiser"
+#~ msgstr "Kanban-style task organiser"
 
-#: src/widgets/cardlist-widget.cpp:97
-msgid "New Cardlist"
-msgstr "New Cardlist"
+#~ msgid "Board Grid"
+#~ msgstr "Board Grid"
 
-#: src/widgets/task-widget.cpp:76
-msgid "Convert to card"
-msgstr "Convert to card"
+#~ msgid "Board view"
+#~ msgstr "Board View"
+
+#~ msgid ""
+#~ "Progress is a simple application that organises your tasks on a board and "
+#~ "allows the user to put them into different card lists across the board."
+#~ msgstr ""
+#~ "Progress is a simple application that organises your tasks on a board and "
+#~ "allows the user to put them into different card lists across the board."
+
+#~ msgid "Select the boards to be deleted"
+#~ msgstr "Select the boards to be deleted"
+
+#~ msgid "Delete"
+#~ msgstr "Delete"
+
+#~ msgid "Cancel"
+#~ msgstr "Cancel"
+
+#~ msgid "De Moura © All rights reserved"
+#~ msgstr "De Moura © All rights reserved"
+
+#~ msgid "translator-credits"
+#~ msgstr "Gabriel de Moura"
+
+#~ msgid "It was not possible to load this board"
+#~ msgstr "It was not possible to load this board"
+
+#~ msgid "Add Task"
+#~ msgstr "Add Task"
+
+#~ msgid "New Task"
+#~ msgstr "New Task"
+
+#~ msgid "Select a file"
+#~ msgstr "Select a file"
+
+#~ msgid "Image Files"
+#~ msgstr "Image Files"
+
+#~ msgid "Create New Board"
+#~ msgstr "Create New Board"
+
+#~ msgid "Empty board names are not allowed"
+#~ msgstr "Empty board names are not allowed"
+
+#~ msgid "Board Preferences"
+#~ msgstr "Board Preferences"
+
+#~ msgid "Save"
+#~ msgstr "Save"
+
+#~ msgid "Add List"
+#~ msgstr "Add List"
+
+#~ msgid "New CardList"
+#~ msgstr "New CardList"
+
+#~ msgid "New Card"
+#~ msgstr "New Card"
+
+#~ msgid "Rename"
+#~ msgstr "Rename"
+
+#~ msgid "Unset Color"
+#~ msgstr "Unset Colour"
+
+#~ msgid "Card Cover"
+#~ msgstr "Card Cover"
+
+#~ msgid "Remove"
+#~ msgstr "Remove"
+
+#~ msgid "Card Options"
+#~ msgstr "Card Options"
+
+#~ msgid "Due: "
+#~ msgstr "Due: "
+
+#~ msgid "%1%% complete"
+#~ msgstr "%1%% complete"
+
+#~ msgid "This card is complete"
+#~ msgstr "This card is complete"
+
+#, c-format
+#~ msgid "This card is due %x"
+#~ msgstr "This card is due %x"
+
+#~ msgid "The card is due today"
+#~ msgstr "The card is due today"
+
+#~ msgid "Add card"
+#~ msgstr "Add card"
+
+#~ msgid "New Cardlist"
+#~ msgstr "New Cardlist"
+
+#~ msgid "Convert to card"
+#~ msgstr "Convert to card"
 
 #~ msgid "Board's name"
 #~ msgstr "Board's name"

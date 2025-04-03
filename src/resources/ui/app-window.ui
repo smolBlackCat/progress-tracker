@@ -293,6 +293,15 @@
               <property name="view">board-view</property>
               <child>
                 <object class="GtkShortcutsShortcut">
+                  <property name="accelerator">&lt;Control&gt;R</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Rename the focused cardlist</property>
+                </object>
+              </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;N</property>
                   <property
                                     name="title"
