@@ -349,6 +349,15 @@
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
+                  <property name="accelerator">&lt;Control&gt;N</property>
+                  <property
+                                    name="title"
+                                    translatable="yes"
+                                >Add new task next to focused task</property>
+                </object>
+              </child>
+              <child>
+                <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;Delete</property>
                   <property
                                     name="title"

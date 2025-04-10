@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: https://github.com/smolBlackCat/progress-tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:43-0300\n"
+"POT-Creation-Date: 2025-04-06 15:34-0300\n"
 "PO-Revision-Date: 2024-04-28 21:10+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: volkov <volkovissocool@gmail.com>\n"
@@ -463,14 +463,18 @@ msgid "Rename task"
 msgstr ""
 
 #: src/resources/ui/app-window.ui:356
+msgid "Add new task next to focused task"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:365
 msgid "Delete task from card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:367
+#: src/resources/ui/app-window.ui:376
 msgid "Convert task to card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:378
+#: src/resources/ui/app-window.ui:387
 msgid "Move task across the checklist"
 msgstr ""
 

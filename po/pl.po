@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: adiee 5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:43-0300\n"
+"POT-Creation-Date: 2025-04-06 15:34-0300\n"
 "PO-Revision-Date: 2024-07-18 18:17+0200\n"
 "Last-Translator:  <adiee5@adiee5.ct8.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -462,14 +462,18 @@ msgid "Rename task"
 msgstr ""
 
 #: src/resources/ui/app-window.ui:356
+msgid "Add new task next to focused task"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:365
 msgid "Delete task from card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:367
+#: src/resources/ui/app-window.ui:376
 msgid "Convert task to card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:378
+#: src/resources/ui/app-window.ui:387
 msgid "Move task across the checklist"
 msgstr ""
 

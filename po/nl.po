@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 11:43-0300\n"
+"POT-Creation-Date: 2025-04-06 15:34-0300\n"
 "PO-Revision-Date: 2024-03-28 17:47+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -463,14 +463,18 @@ msgid "Rename task"
 msgstr ""
 
 #: src/resources/ui/app-window.ui:356
+msgid "Add new task next to focused task"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:365
 msgid "Delete task from card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:367
+#: src/resources/ui/app-window.ui:376
 msgid "Convert task to card"
 msgstr ""
 
-#: src/resources/ui/app-window.ui:378
+#: src/resources/ui/app-window.ui:387
 msgid "Move task across the checklist"
 msgstr ""
 
