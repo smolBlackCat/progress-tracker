@@ -5,6 +5,8 @@
 #include <guid.hpp>
 #include <string>
 
+#include "modifiable.h"
+
 extern const std::shared_ptr<spdlog::logger> core_logger;
 
 enum class ReorderingType {
@@ -18,7 +20,7 @@ enum class ReorderingType {
  *
  * @brief Base class for representing items of a Kanban-style todo list.
  */
-class Item {
+class Item : public Modifiable {
 public:
     /**
      * @brief Base class Constructor.
@@ -38,21 +40,11 @@ public:
     virtual void set_name(const std::string& other);
 
     /**
-     * @brief Sets modified state
-     */
-    virtual void set_modified(bool modified);
-
-    /**
      * @brief Gets the name of the object.
      *
      * @returns String as the name of the object.
      */
     virtual const std::string& get_name() const;
-
-    /**
-     * @brief Produces true if the Item object was modified.
-     */
-    virtual bool get_modified();
 
     /**
      * @brief Gets the object's ID.
@@ -66,5 +58,4 @@ public:
 protected:
     std::string name;
     xg::Guid uuid;
-    bool modified = false;
 };

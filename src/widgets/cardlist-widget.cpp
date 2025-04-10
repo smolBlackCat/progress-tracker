@@ -76,7 +76,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 
     cardlist_header.insert_at_start(*this);
 
-    for (auto& card : cardlist_refptr->get_cards()) {
+    for (auto& card : cardlist_refptr->get_data()) {
         _add(card);
     }
 
@@ -321,7 +321,7 @@ void ui::CardlistWidget::remove(ui::CardWidget* card) {
 }
 
 ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
-    return _add(cardlist->add(card), editing_mode);
+    return _add(cardlist->append(card), editing_mode);
 }
 
 const std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist() {

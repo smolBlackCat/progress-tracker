@@ -94,7 +94,7 @@ Board BoardBackend::load() {
             board.last_modified =
                 std::chrono::floor<std::chrono::seconds>(lm_filepath);
 
-            board.modified = false;
+            board.set_modified(false);
             return board;
         }
         case BackendType::CALDAV:
@@ -230,11 +230,11 @@ void BoardBackend::load_cardlists(Board& board) {
                 auto task_element = card_element->FirstChildElement("task");
                 while (task_element) {
                     auto task_element_uuid = task_element->Attribute("uuid");
-                    cur_card.add(Task{task_element->Attribute("name"),
-                                      task_element_uuid
-                                          ? xg::Guid{task_element_uuid}
-                                          : xg::newGuid(),
-                                      task_element->BoolAttribute("done")});
+                    cur_card.append(Task{task_element->Attribute("name"),
+                                         task_element_uuid
+                                             ? xg::Guid{task_element_uuid}
+                                             : xg::newGuid(),
+                                         task_element->BoolAttribute("done")});
                     task_element = task_element->NextSiblingElement("task");
                 }
 
@@ -247,11 +247,11 @@ void BoardBackend::load_cardlists(Board& board) {
 
                 cur_card.set_modified(false);
 
-                cur_cardlist.add(cur_card);
+                cur_cardlist.append(cur_card);
                 card_element = card_element->NextSiblingElement("card");
             }
             cur_cardlist.set_modified(false);
-            board.add(cur_cardlist);
+            board.append(cur_cardlist);
 
             list_element = list_element->NextSiblingElement("list");
         }
@@ -277,13 +277,13 @@ bool BoardBackend::save_xml(Board& board) {
     board_element->SetAttribute("uuid", std::string(board.get_id()).c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto& cardlist : board.get_cardlists()) {
+    for (auto& cardlist : board.get_data()) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
         list_element->SetAttribute("uuid", cardlist->get_id().str().c_str());
         cardlist->set_modified(false);
 
-        for (auto& card : cardlist->get_cards()) {
+        for (auto& card : cardlist->get_data()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
             card_element->SetAttribute("uuid", card->get_id().str().c_str());
@@ -298,7 +298,7 @@ bool BoardBackend::save_xml(Board& board) {
             }
 
             // Add tasks
-            for (auto& task : card->get_tasks()) {
+            for (auto& task : card->get_data()) {
                 tinyxml2::XMLElement* task_element = doc->NewElement("task");
                 task_element->SetAttribute("name", task->get_name().c_str());
                 task_element->SetAttribute("done", task->get_done());
@@ -347,11 +347,15 @@ bool BoardBackend::save_nextcloud(Board& board) { return false; }
 
 const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
-Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
+Board::Board(BoardBackend& backend)
+    : Item{""}, ItemContainer{}, backend{backend} {}
 
 Board::Board(const std::string& name, const std::string& background,
              const xg::Guid uuid, const BoardBackend& backend)
-    : Item{name, uuid}, background{background}, backend{backend} {
+    : Item{name, uuid},
+      ItemContainer{},
+      background{background},
+      backend{backend} {
     if (Board::get_background_type(background) == BackgroundType::INVALID) {
         spdlog::get("core")->warn(
             "Invalid background type: {}. Falling back to default", background);
@@ -384,113 +388,25 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
         } break;
     }
 
-    modified = modify ? modify : modified;
+    set_modified(modify ? modify : Item::modified);
 
     return bg_type;
 }
 
-const std::string& Board::get_background() const { return background; }
-
-std::shared_ptr<CardList> Board::add(const CardList& cardlist) {
+std::shared_ptr<CardList> Board::append(const CardList& cardlist) {
     if (fully_loaded) {
-        for (auto& ccardlist : cardlists) {
-            if (*ccardlist == cardlist) {
-                spdlog::get("core")->warn(
-                    "[Board] Cardlist \"{}\" already exists in board \"{}\"",
-                    cardlist.get_name(), name);
-                return nullptr;
-            }
-        }
-
-        try {
-            std::shared_ptr<CardList> new_cardlist =
-                std::make_shared<CardList>(cardlist);
-            cardlists.push_back(new_cardlist);
-            modified = true;
-            spdlog::get("core")->info(
-                "[Board] Board \"{}\" added cardlist \"{}\"", name,
-                cardlist.get_name());
-            return new_cardlist;
-        } catch (std::bad_alloc& err) {
-            return nullptr;
-        }
+        return ItemContainer::append(cardlist);
     }
 
-    spdlog::get("core")->warn(
-        "[Board] Board \"{}\" cannot add cardlist \"{}\" because it is not "
-        "loaded yet",
-        name, cardlist.get_name());
     return nullptr;
 }
 
-bool Board::remove(const CardList& cardlist) {
-    if (fully_loaded) {
-        for (size_t i = 0; i < cardlists.size(); i++) {
-            if (cardlist == (*cardlists.at(i))) {
-                cardlists.erase(cardlists.begin() + i);
-                modified = true;
-                spdlog::get("core")->info(
-                    "[Board] Board \"{}\" removed cardlist \"{}\"", name,
-                    cardlist.get_name());
-                return true;
-            }
-        }
-    }
-
-    spdlog::get("core")->warn(
-        "[Board] Board \"{}\" cannot remove cardlist \"{}\" because it is not "
-        "loaded yet",
-        name, cardlist.get_name());
-    return false;
-}
+const std::string& Board::get_background() const { return background; }
 
 ReorderingType Board::reorder(const CardList& next, const CardList& sibling) {
     if (fully_loaded) {
-        ssize_t next_i = -1;
-        ssize_t sibling_i = -1;
-
-        ssize_t c = 0;
-        for (auto& cardlist : cardlists) {
-            if (*cardlist == next) {
-                next_i = c;
-            } else if (*cardlist == sibling) {
-                sibling_i = c;
-            }
-            c++;
-        }
-
-        bool any_absent = next_i == -1 || sibling_i == -1;
-        bool is_same = next_i == sibling_i;
-
-        if (any_absent || is_same) {
-            spdlog::get("core")->warn(
-                "[Board] Cannot reorder cardlists: same references or missing");
-            return ReorderingType::INVALID;
-        }
-
-        std::shared_ptr<CardList> next_v = cardlists[next_i];
-        cardlists.erase(cardlists.begin() + next_i);
-
-        ReorderingType reordering;
-        if (next_i > sibling_i) {
-            // Down to up reordering
-            cardlists.insert(
-                cardlists.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
-            reordering = ReorderingType::DOWNUP;
-            spdlog::get("core")->info(
-                "[Board] CardList \"{}\" was inserted before CardList \"{}\"",
-                next.get_name(), sibling.get_name());
-        } else if (next_i < sibling_i) {
-            // Up to down reordering
-            cardlists.insert(cardlists.begin() + sibling_i, next_v);
-            reordering = ReorderingType::UPDOWN;
-            spdlog::get("core")->info(
-                "[Board] CardList \"{}\" was inserted after CardList \"{}\"",
-                next.get_name(), sibling.get_name());
-        }
-
-        modified = true;
-
+        ReorderingType reordering = ItemContainer::reorder(next, sibling);
+        set_modified(!(reordering == ReorderingType::INVALID));
         return reordering;
     }
     return ReorderingType::INVALID;
@@ -515,10 +431,6 @@ void Board::load() {
     spdlog::get("core")->info("[Board] Board \"{}\" fully loaded", name);
 }
 
-const std::vector<std::shared_ptr<CardList>>& Board::get_cardlists() {
-    return cardlists;
-}
-
 void Board::set_modified(bool modified) {
     if (fully_loaded) {
         Item::set_modified(modified);
@@ -534,21 +446,15 @@ void Board::set_modified(bool modified) {
         name);
 }
 
+bool Board::get_modified() const {
+    return Item::get_modified() || ItemContainer::get_modified();
+}
+
 time_point<system_clock, seconds> Board::get_last_modified() const {
     return last_modified;
 }
 
 bool Board::is_loaded() { return fully_loaded; }
-
-bool Board::get_modified() {
-    for (auto& cardlist : cardlists) {
-        if (cardlist->get_modified()) {
-            modified = true;
-            break;
-        }
-    }
-    return modified;
-}
 
 BackgroundType Board::get_background_type(const std::string& background) {
     std::regex rgba_r{"rgba\\(\\d{1,3},\\d{1,3},\\d{1,3},\\d\\)"};

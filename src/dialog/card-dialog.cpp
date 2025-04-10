@@ -123,7 +123,7 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
     }
 
     card_title_entry->set_text(card_ptr->get_name());
-    for (auto& task : card_ptr->get_tasks()) {
+    for (auto& task : card_ptr->get_data()) {
         _add_task(task);
     }
     notes_textbuffer->set_text(card_ptr->get_notes());
@@ -155,7 +155,7 @@ void CardDetailsDialog::update_due_date_label() {
 CardWidget* CardDetailsDialog::get_card_widget() { return cur_card_widget; }
 
 void CardDetailsDialog::on_add_task() {
-    _add_task(cur_card_widget->get_card()->add(Task{_("New Task")}), true);
+    _add_task(cur_card_widget->get_card()->append(Task{_("New Task")}), true);
     cur_card_widget->update_complete_tasks();
 }
 

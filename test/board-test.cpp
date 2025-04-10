@@ -287,12 +287,12 @@ TEST_CASE("Board late loading", "[Board]") {
     CHECK(!board.get_modified());
 
     CHECK(!board.is_loaded());
-    CHECK(board.get_cardlists().empty());
+    CHECK(board.get_data().empty());
 
     board.load();
 
     CHECK(board.is_loaded());
-    CHECK(board.get_cardlists().size() == 10);
+    CHECK(board.get_data().size() == 10);
 
     filesystem::remove("test-board.xml");
 }
@@ -308,20 +308,20 @@ TEST_CASE("Adding Cardlists to a Board", "[Board]") {
     CardList cardlist1{"TODO"};
     CardList cardlist2{"TODO"};
 
-    auto added_cardlist = board.add(cardlist1);
-    auto added_cardlist2 = board.add(cardlist2);
+    auto added_cardlist = board.append(cardlist1);
+    auto added_cardlist2 = board.append(cardlist2);
 
     REQUIRE(added_cardlist);
     REQUIRE(added_cardlist2);
 
     // We're trying to add the exact same cardlist again. Don't and return
     // nullptr
-    CHECK(!board.add(cardlist1));
+    CHECK(!board.append(cardlist1));
 
     CHECK(board.get_modified());
-    CHECK(board.get_cardlists().size() == 2);
-    CHECK(*board.get_cardlists()[0] == cardlist1);
-    CHECK(*board.get_cardlists()[1] == cardlist2);
+    CHECK(board.get_data().size() == 2);
+    CHECK(*board.get_data()[0] == cardlist1);
+    CHECK(*board.get_data()[1] == cardlist2);
 }
 
 TEST_CASE("Removing cardlists of a Board", "[Board]") {
@@ -330,15 +330,15 @@ TEST_CASE("Removing cardlists of a Board", "[Board]") {
 
     CardList cardlist1{"Something else to be done"};
 
-    board.add(cardlist1);
+    board.append(cardlist1);
     board.set_modified(false);
 
-    CHECK(board.remove(cardlist1));
+    board.remove(cardlist1);
     CHECK(board.get_modified());
 
     board.set_modified(false);
 
-    CHECK(!board.remove(cardlist1));
+    board.remove(cardlist1);
     CHECK(!board.get_modified());
 }
 
@@ -346,11 +346,11 @@ TEST_CASE("Reordering Cardlists", "Board") {
     Board board =
         BoardBackend{BackendType::LOCAL}.create("Progress", "file.png");
 
-    auto cardlist1 = board.add(CardList{"CardList 1"});
-    auto cardlist2 = board.add(CardList{"CardList 2"});
-    auto cardlist3 = board.add(CardList{"CardList 3"});
+    auto cardlist1 = board.append(CardList{"CardList 1"});
+    auto cardlist2 = board.append(CardList{"CardList 2"});
+    auto cardlist3 = board.append(CardList{"CardList 3"});
 
-    auto& cardlists = board.get_cardlists();
+    auto& cardlists = board.get_data();
 
     board.set_modified(false);
 
@@ -426,8 +426,8 @@ TEST_CASE("Saving new boards") {
 
     CardList cardlist{"Things to do"};
     Card card{"Computer Science", Color{123, 456, 123, 1}};
-    cardlist.add(card);
-    board.add(cardlist);
+    cardlist.append(card);
+    board.append(cardlist);
 
     board.save();
 

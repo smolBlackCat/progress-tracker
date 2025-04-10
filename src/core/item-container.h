@@ -1,0 +1,86 @@
+#pragma once
+
+#include <memory>
+#include <type_traits>
+#include <vector>
+
+#include "item.h"
+
+/**
+ * @brief ItemContainer is a template class that implements a set of behaviours
+ * pertinent to container of items.
+ */
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+class ItemContainer : public Modifiable {
+public:
+    ItemContainer();
+    ~ItemContainer();
+
+    /**
+     * @brief Appends an item to the container.
+     *
+     * @details The method roughly takes a copy of the given object and wraps it
+     * in a shared pointer so it can be easily managed without worrying about
+     * reference invalidation.
+     *
+     * @param item The item to append.
+     *
+     * @return A shared pointer to the appended item.
+     */
+    virtual std::shared_ptr<T> append(const T& item);
+
+    /**
+     * @brief Removes an item from the container.
+     *
+     * @details The method attempts to remove the corresponding shared_ptr
+     * holding the same value given. When the item is not found, the method
+     * does nothing.
+     *
+     * @param item The item to remove.
+     */
+    virtual void remove(const T& item);
+
+    /**
+     * @brief Inserts an item after a sibling item.
+     *
+     * @param item The item to insert.
+     * @param sibling The sibling item after which to insert the item.
+     */
+    virtual std::shared_ptr<T> insert_after(const T& item, const T& sibling);
+
+    /**
+     * @brief Inserts an item before a sibling item.
+     *
+     * @param item The item to insert.
+     * @param sibling The sibling item before which to insert the item.
+     */
+    virtual std::shared_ptr<T> insert_before(const T& item, const T& sibling);
+
+    /**
+     * @brief Reorders an item and sibling item.
+     *
+     * @details The reordering performed depends on whether the item in next
+     * comes before or after the sibling item. If the item in next comes before
+     * the sibling item, the item is moved to the position before the sibling
+     * item. If the item in next comes after the sibling item, the item is moved
+     * to the position after the sibling item.
+     *
+     * @param next The item to reorder.
+     * @param sibling The sibling item after or before which to reorder the
+     * item.
+     */
+    virtual ReorderingType reorder(const T& next, const T& sibling);
+
+    /**
+     * @brief Returns a reference to the container's data.
+     *
+     * @return A reference to the container's data.
+     */
+    virtual std::vector<std::shared_ptr<T>>& get_data();
+
+    bool get_modified() const override;
+
+protected:
+    std::vector<std::shared_ptr<T>> data;
+};

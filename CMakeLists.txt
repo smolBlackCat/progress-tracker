@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # General Settings
 option(DEVELOPMENT "Build the application in development mode" ON)
 option(FLATPAK "Defines whether the application is a flatpak distribution" OFF)
+option(BUILD_TESTS "Build the tests" ON)
+option(BUILD_APP "Build the application" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
     if(DEVELOPMENT)
@@ -32,7 +34,6 @@ find_program(GLIB_COMPILE_SCHEMAS NAMES glib-compile-schemas REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
-
 # Crossuid dependency
 add_subdirectory(subprojects/crossguid)
 
@@ -50,10 +51,13 @@ elseif (WIN32)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(po)
-add_subdirectory(data)
 
-if(Catch2_FOUND AND DEVELOPMENT)
+if (BUILD_APP)
+    add_subdirectory(po)
+    add_subdirectory(data)
+endif()
+
+if(Catch2_FOUND AND BUILD_TESTS)
     add_subdirectory(test)
     include(CTest)
     add_test(NAME TestBoard COMMAND test/board-test)

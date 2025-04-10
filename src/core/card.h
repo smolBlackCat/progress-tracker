@@ -1,10 +1,9 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
-#include <vector>
 
 #include "colorable.h"
+#include "item-container.h"
 #include "item.h"
 #include "task.h"
 
@@ -14,7 +13,7 @@ typedef std::chrono::year_month_day Date;
  * @brief Represents a kanban card that may or may not be contained within a
  * CardList object
  */
-class Card : public Colorable, public Item {
+class Card : public Colorable, public Item, public ItemContainer<Task> {
 public:
     /**
      * @brief Card constructor
@@ -50,9 +49,9 @@ public:
      */
     const std::string& get_notes() const;
 
-    void set_modified(bool modified) override;
+    void set_modified(bool modified = true) override;
 
-    bool get_modified() override;
+    bool get_modified() const;
 
     /**
      * @brief Update the notes associated with this card
@@ -70,37 +69,6 @@ public:
      * completed at all
      */
     double get_completion() const;
-
-    /**
-     * @brief Adds a task to this card.
-     *
-     * @param task Task object to be added
-     *
-     * @return a smart pointer to the the added Task object. nullptr will may be
-     * returned if the caller is trying to add a Task that is already in the
-     * Card
-     */
-    std::shared_ptr<Task> add(const Task& task);
-
-    /**
-     * @brief Removes a Task object
-     *
-     * @param task Reference to an identical task object in tasks
-     *
-     * @return True when the object is removed. False is returned if task is not
-     * in tasks
-     */
-    bool remove(const Task& task);
-
-    /**
-     * @brief Access the underlying Task collection
-     */
-    std::vector<std::shared_ptr<Task>> const& get_tasks();
-
-    /**
-     * @brief Put task "next" after task "sibling"
-     */
-    ReorderingType reorder(const Task& next, const Task& sibling);
 
     /**
      * @brief Returns true if this card is past due date and the date is valid,
@@ -136,7 +104,6 @@ public:
 
 protected:
     std::string notes;
-    std::vector<std::shared_ptr<Task>> tasks;
     Date due_date;
     bool complete;
 };

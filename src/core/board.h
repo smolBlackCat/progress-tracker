@@ -6,6 +6,7 @@
 #include <string>
 
 #include "cardlist.h"
+#include "item-container.h"
 #include "item.h"
 
 enum class BackgroundType { COLOR, IMAGE, INVALID };
@@ -81,7 +82,7 @@ protected:
 /**
  * @brief Kanban Board
  */
-class Board : public Item {
+class Board : public Item, public ItemContainer<CardList> {
 public:
     Board() = delete;
     Board(const std::string& name, const std::string& background,
@@ -107,38 +108,20 @@ public:
      */
     BackgroundType set_background(const std::string& other, bool modify = true);
 
+    std::shared_ptr<CardList> append(const CardList& cardlist) override;
+
+    /**
+     * @brief Reorders cardlist "next" after cardlist "sibling"
+     */
+    ReorderingType reorder(const CardList& next,
+                           const CardList& sibling) override;
+
     /**
      * @brief Returns the current background value
      *
      * @returns The background value
      */
     const std::string& get_background() const;
-
-    /**
-     * @brief Adds a CardList object to the board by copying the contents to a
-     * dynamic allocated space. Repeated exact same Cardlists are not allowed
-     *
-     * @param cardlist CardList object
-     *
-     * @returns a CardList pointer to the newly allocated object. nullptr may be
-     * returned if the cardlist to be added is already in cardlists
-     */
-    std::shared_ptr<CardList> add(const CardList& cardlist);
-
-    /**
-     * @brief Removes a CardList object from the board and free the allocated
-     * space linked to the cardlist object.
-     *
-     * @returns True if the CardList object is removed from the board.
-     *          False is returned if the CardList object requested to be
-     *          removed isn't in the board.
-     */
-    bool remove(const CardList& cardlist);
-
-    /**
-     * @brief Reorders cardlist "next" after cardlist "sibling"
-     */
-    ReorderingType reorder(const CardList& next, const CardList& sibling);
 
     /**
      * @brief Saves the board using the backend functionality
@@ -150,22 +133,11 @@ public:
      */
     void load();
 
-    /**
-     * @brief Access the underlying cardlists collection
-     */
-    const std::vector<std::shared_ptr<CardList>>& get_cardlists();
-
     void set_modified(bool modified) override;
 
-    time_point<system_clock, seconds> get_last_modified() const;
+    bool get_modified() const;
 
-    /**
-     * @brief Returns true if the board was modified in some way, otherwise
-     * False.
-     *
-     * @returns Boolean indicating if the board was modified.
-     */
-    bool get_modified() override;
+    time_point<system_clock, seconds> get_last_modified() const;
 
     /**
      * @brief Returns true if the cardlists are loaded, otherwise false.

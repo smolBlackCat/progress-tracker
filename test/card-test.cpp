@@ -35,30 +35,31 @@ TEST_CASE("Card operations", "[Card]") {
         Task task2("Task2", true);
         Task task3("Task3");
 
-        auto taskPtr1 = card.add(task1);
-        auto taskPtr2 = card.add(task2);
-        auto taskPtr3 = card.add(task3);
+        auto taskPtr1 = card.append(task1);
+        auto taskPtr2 = card.append(task2);
+        auto taskPtr3 = card.append(task3);
 
-        REQUIRE(!card.add(task1));
+        REQUIRE(!card.append(task1));
 
-        REQUIRE(card.get_tasks().size() == 3);
+        REQUIRE(card.get_data().size() == 3);
         REQUIRE(*taskPtr1 == task1);
         REQUIRE(*taskPtr2 == task2);
         REQUIRE(*taskPtr3 == task3);
 
-        REQUIRE(card.remove(task2) == true);
-        REQUIRE(card.get_tasks().size() == 2);
+        card.remove(task2);
+        REQUIRE(card.get_data().size() == 2);
 
-        REQUIRE(card.remove(task2) ==
-                false);  // Removing again should return false
+        // It won't change the value
+        card.remove(task2);
+        REQUIRE(card.get_data().size() == 2);
     }
 
     SECTION("Task completion") {
         Task task1("Task1", true);   // Completed task
         Task task2("Task2", false);  // Incomplete task
 
-        card.add(task1);
-        auto task2_sptr = card.add(task2);
+        card.append(task1);
+        auto task2_sptr = card.append(task2);
 
         double completion = card.get_completion();
         REQUIRE(completion ==
@@ -70,7 +71,7 @@ TEST_CASE("Card operations", "[Card]") {
                 100.0);  // Both tasks are now done, so 100% completion
 
         Task task3("Task3", false);  // New incomplete task
-        card.add(task3);
+        card.append(task3);
 
         completion = card.get_completion();
         REQUIRE(int(completion) ==
@@ -134,13 +135,13 @@ TEST_CASE("Task reordering (up-down)", "[Card]") {
     Task task2{"MacOS"};
     Task task3{"Debian"};
 
-    card1.add(task1);
-    card1.add(task2);
-    card1.add(task3);
+    card1.append(task1);
+    card1.append(task2);
+    card1.append(task3);
 
     card1.set_modified(false);
 
-    auto& card1_tasks = card1.get_tasks();
+    auto& card1_tasks = card1.get_data();
 
     REQUIRE(task1 == *card1_tasks[0]);
     REQUIRE(task2 == *card1_tasks[1]);
@@ -162,13 +163,13 @@ TEST_CASE("Task Reordering (down-up)", "[Card]") {
     Task task2{"MacOS"};
     Task task3{"Debian"};
 
-    auto task1_p = card1.add(task1);
-    auto task2_p = card1.add(task2);
-    auto task3_p = card1.add(task3);
+    auto task1_p = card1.append(task1);
+    auto task2_p = card1.append(task2);
+    auto task3_p = card1.append(task3);
 
     card1.set_modified(false);
 
-    auto& tasks = card1.get_tasks();
+    auto& tasks = card1.get_data();
 
     REQUIRE(task1_p == tasks[0]);
     REQUIRE(task2_p == tasks[1]);
