@@ -27,10 +27,11 @@ std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
 template <typename T>
     requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
 void ItemContainer<T>::remove(const T& item) {
-    for (size_t i = 0; i < data.size(); i++) {
-        if (item == *data.at(i)) {
-            data.erase(data.begin() + i);
+    for (auto it = data.begin(); it != data.end(); it++) {
+        if (item == *(*it)) {
+            data.erase(it);
             set_modified();
+            return;
         }
     }
 }
