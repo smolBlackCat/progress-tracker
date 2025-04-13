@@ -84,6 +84,18 @@ protected:
  */
 class Board : public Item {
 public:
+    /**
+     * @brief Returns the type of a given background
+     *
+     * @returns a BackgroundType enum informing the background's type
+     */
+    static BackgroundType get_background_type(const std::string& background);
+
+    // Black colour
+    static const std::string BACKGROUND_DEFAULT;
+
+    friend BoardBackend;
+
     Board() = delete;
     Board(const std::string& name, const std::string& background,
           const BoardBackend& backend);
@@ -93,8 +105,12 @@ public:
 
     ~Board();
 
-    friend BoardBackend;
+    /**
+     * @brief Load the remaining data (cardlists)
+     */
+    void load();
 
+    // FIXME: set_background naturally modifies a board
     /**
      * @brief Changes the background information of the board. If the given
      *        background is BackgroundType::INVALID, then the background will
@@ -116,25 +132,15 @@ public:
     const std::string& get_background() const;
 
     /**
-     * @brief Returns the container of the board
-     *
-     * @returns The container reference of the board
+     * @brief Get last modification time in seconds
      */
-    ItemContainer<CardList>* container();
-
-    /**
-     * @brief Saves the board using the backend functionality
-     */
-    bool save();
-
-    /**
-     * @brief Load the remaining data (cardlists)
-     */
-    void load();
-
-    bool get_modified() const override;
-
     time_point<system_clock, seconds> get_last_modified() const;
+
+    /**
+     * @brief Returns true if either the board data or the board's container has
+     * been modified
+     */
+    bool get_modified() const override;
 
     /**
      * @brief Returns true if the cardlists are loaded, otherwise false.
@@ -142,13 +148,18 @@ public:
     bool is_loaded();
 
     /**
-     * @brief Returns the type of a given background
+     * @brief Saves the board using the backend functionality
      *
-     * @returns a BackgroundType enum informing the background's type
+     * @returns True if the board was successfully saved
      */
-    static BackgroundType get_background_type(const std::string& background);
+    bool save();
 
-    static const std::string BACKGROUND_DEFAULT;
+    /**
+     * @brief Returns the container of the board
+     *
+     * @returns The container reference of the board
+     */
+    ItemContainer<CardList>* container();
 
     BoardBackend backend;
 

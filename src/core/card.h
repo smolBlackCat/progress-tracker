@@ -17,20 +17,41 @@ class Card : public Colorable, public Item {
 public:
     /**
      * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param date deadline date of the card
+     * @param complete completion status of the card
+     * @param color color of the card
      */
     Card(const std::string& name, const Date& date, bool complete = false,
          const Color& color = NO_COLOR);
 
+    /**
+     * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param date deadline date of the card
+     * @param uuid unique identifier of the card
+     * @param complete completion status of the card
+     * @param color color of the card
+     */
     Card(const std::string& name, const Date& date, const xg::Guid uuid,
          bool complete = false, const Color& color = NO_COLOR);
 
     /**
      * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param color color of the card
      */
     Card(const std::string& name, const Color& color = NO_COLOR);
 
     /**
      * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param uuid unique identifier of the card
+     * @param color color of the card
      */
     Card(const std::string& name, const xg::Guid uuid,
          const Color& color = NO_COLOR);
@@ -45,18 +66,30 @@ public:
     void set_color(const Color& rgb) override;
 
     /**
-     * @brief Return the notes associated with this card
-     */
-    const std::string& get_notes() const;
-
-    bool get_modified() const override;
-
-    /**
      * @brief Update the notes associated with this card
      *
      * @param notes The new notes
      */
     void set_notes(const std::string& notes);
+
+    /**
+     * @brief Sets a new due date to this card. This method will not modify due
+     * date if the given date is not valid
+     */
+    void set_due_date(const Date& date);
+
+    /**
+     * @brief Sets the complete state of this card. This method does nothing
+     * whenever the due date set is not valid
+     *
+     * @param complete bool value
+     */
+    void set_complete(bool complete);
+
+    /**
+     * @brief Return the notes associated with this card
+     */
+    const std::string& get_notes() const;
 
     /**
      * @brief Calculate the completion of this card given that it has extra
@@ -69,21 +102,21 @@ public:
     double get_completion() const;
 
     /**
+     * @brief Returns card's due date
+     */
+    Date get_due_date() const;
+
+    /**
+     * @brief Produces true if the card information has been modified or the
+     * card's container has been modified
+     */
+    bool get_modified() const override;
+
+    /**
      * @brief Returns true if this card is past due date and the date is valid,
      * else false is returned
      */
     bool past_due_date();
-
-    /**
-     * @brief Sets a new due date to this card. This method will not modify due
-     * date if the given date is not valid
-     */
-    void set_due_date(const Date& date);
-
-    /**
-     * @brief Returns card's due date
-     */
-    Date get_due_date() const;
 
     /**
      * @brief Return true if the card is complete or an invalid due date is set.
@@ -93,13 +126,9 @@ public:
     bool get_complete() const;
 
     /**
-     * @brief Sets the complete state of this card. This method does nothing
-     * whenever the due date set is not valid
-     *
-     * @param complete bool value
+     * @brief Returns a reference to the container of tasks associated with this
+     * card
      */
-    void set_complete(bool complete);
-
     ItemContainer<Task>& container();
 
 protected:

@@ -15,7 +15,7 @@ template <typename T>
 class ItemContainer : public Modifiable {
 public:
     ItemContainer();
-    ~ItemContainer();
+    virtual ~ItemContainer() = default;
 
     /**
      * @brief Appends an item to the container.
@@ -69,6 +69,8 @@ public:
      * @param next The item to reorder.
      * @param sibling The sibling item after or before which to reorder the
      * item.
+     *
+     * @return The type of reordering performed.
      */
     virtual ReorderingType reorder(const T& next, const T& sibling);
 
@@ -78,15 +80,31 @@ public:
      * @return A reference to the container's data.
      */
     std::vector<std::shared_ptr<T>>& get_data();
+
+    /**
+     * @brief Returns a const reference to the container's data.
+     *
+     * @return A const reference to the container's data.
+     */
     const std::vector<std::shared_ptr<T>>& get_data() const;
+
+    /**
+     * @brief Returns the container's modified state.
+     *
+     * The container is considered modified if the following conditions are met:
+     * - Operations that naturally modify the container's data. (e.g., adding,
+     * removing, reordering etc.)
+     * - The container's items have been directly modified.
+     *
+     * @return True if the container has been modified, false otherwise.
+     */
+    bool get_modified() const override;
 
     std::vector<std::shared_ptr<T>>::iterator begin();
     std::vector<std::shared_ptr<T>>::iterator end();
 
     std::vector<std::shared_ptr<T>>::const_iterator begin() const;
     std::vector<std::shared_ptr<T>>::const_iterator end() const;
-
-    bool get_modified() const override;
 
 protected:
     std::vector<std::shared_ptr<T>> data;

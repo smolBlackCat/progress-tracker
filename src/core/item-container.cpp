@@ -8,10 +8,6 @@ ItemContainer<T>::ItemContainer() : Modifiable{}, data() {}
 
 template <typename T>
     requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
-ItemContainer<T>::~ItemContainer() {}
-
-template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
 std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
     for (auto& i_item : data) {
         if (*i_item == item) {
