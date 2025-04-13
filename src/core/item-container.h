@@ -77,7 +77,14 @@ public:
      *
      * @return A reference to the container's data.
      */
-    virtual std::vector<std::shared_ptr<T>>& get_data();
+    std::vector<std::shared_ptr<T>>& get_data();
+    const std::vector<std::shared_ptr<T>>& get_data() const;
+
+    std::vector<std::shared_ptr<T>>::iterator begin();
+    std::vector<std::shared_ptr<T>>::iterator end();
+
+    std::vector<std::shared_ptr<T>>::const_iterator begin() const;
+    std::vector<std::shared_ptr<T>>::const_iterator end() const;
 
     bool get_modified() const override;
 

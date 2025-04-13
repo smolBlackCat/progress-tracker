@@ -9,24 +9,24 @@ TEST_CASE("CardList operations", "[CardList]") {
 
     SECTION("Add Card") {
         Card card1("Card1");
-        auto addedCard1 = cardList.append(card1);
+        auto addedCard1 = cardList.container().append(card1);
 
         REQUIRE(addedCard1 != nullptr);
         REQUIRE(*addedCard1 == card1);
-        REQUIRE(cardList.get_data().size() == 1);
+        REQUIRE(cardList.container().get_data().size() == 1);
         REQUIRE(cardList.get_modified() == true);
     }
 
     SECTION("Remove Card") {
         Card card1("Card1");
         Card card2("Card2");
-        cardList.append(card1);
-        cardList.append(card2);
+        cardList.container().append(card1);
+        cardList.container().append(card2);
 
-        cardList.remove(card1);
-        REQUIRE(cardList.get_data().size() == 1);
+        cardList.container().remove(card1);
+        REQUIRE(cardList.container().get_data().size() == 1);
 
-        cardList.remove(card1);
+        cardList.container().remove(card1);
         REQUIRE(cardList.get_modified() == true);
     }
 
@@ -35,19 +35,20 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card2("Card2");
         Card card3("Card3");
 
-        auto cardPtr1 = cardList.append(card1);
-        auto cardPtr2 = cardList.append(card2);
-        auto cardPtr3 = cardList.append(card3);
+        auto cardPtr1 = cardList.container().append(card1);
+        auto cardPtr2 = cardList.container().append(card2);
+        auto cardPtr3 = cardList.container().append(card3);
 
-        REQUIRE(*cardList.get_data().at(0) == card1);
-        REQUIRE(*cardList.get_data().at(1) == card2);
-        REQUIRE(*cardList.get_data().at(2) == card3);
+        REQUIRE(*cardList.container().get_data().at(0) == card1);
+        REQUIRE(*cardList.container().get_data().at(1) == card2);
+        REQUIRE(*cardList.container().get_data().at(2) == card3);
 
-        cardList.reorder(card3, card1);  // Place card3 in card1's position
+        cardList.container().reorder(card3,
+                                     card1);  // Place card3 in card1's position
 
-        REQUIRE(*cardList.get_data().at(0) == card3);
-        REQUIRE(*cardList.get_data().at(1) == card1);
-        REQUIRE(*cardList.get_data().at(2) == card2);
+        REQUIRE(*cardList.container().get_data().at(0) == card3);
+        REQUIRE(*cardList.container().get_data().at(1) == card1);
+        REQUIRE(*cardList.container().get_data().at(2) == card2);
 
         REQUIRE(cardList.get_modified() == true);
     }
@@ -57,19 +58,20 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card2("Card2");
         Card card3("Card3");
 
-        auto cardPtr1 = cardList.append(card1);
-        auto cardPtr2 = cardList.append(card2);
-        auto cardPtr3 = cardList.append(card3);
+        auto cardPtr1 = cardList.container().append(card1);
+        auto cardPtr2 = cardList.container().append(card2);
+        auto cardPtr3 = cardList.container().append(card3);
 
-        REQUIRE(*cardList.get_data().at(0) == card1);
-        REQUIRE(*cardList.get_data().at(1) == card2);
-        REQUIRE(*cardList.get_data().at(2) == card3);
+        REQUIRE(*cardList.container().get_data().at(0) == card1);
+        REQUIRE(*cardList.container().get_data().at(1) == card2);
+        REQUIRE(*cardList.container().get_data().at(2) == card3);
 
-        cardList.reorder(card1, card3);  // Place card3 in card1's position
+        cardList.container().reorder(card1,
+                                     card3);  // Place card3 in card1's position
 
-        REQUIRE(*cardList.get_data().at(0) == card2);
-        REQUIRE(*cardList.get_data().at(1) == card3);
-        REQUIRE(*cardList.get_data().at(2) == card1);
+        REQUIRE(*cardList.container().get_data().at(0) == card2);
+        REQUIRE(*cardList.container().get_data().at(1) == card3);
+        REQUIRE(*cardList.container().get_data().at(2) == card1);
 
         REQUIRE(cardList.get_modified() == true);
     }
@@ -79,20 +81,20 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card2("Card2");
         Card card3("Card3");
 
-        auto cardPtr1 = cardList.append(card1);
-        auto cardPtr2 = cardList.append(card2);
-        auto cardPtr3 = cardList.append(card3);
+        auto cardPtr1 = cardList.container().append(card1);
+        auto cardPtr2 = cardList.container().append(card2);
+        auto cardPtr3 = cardList.container().append(card3);
 
-        REQUIRE(*cardList.get_data().at(0) == card1);
-        REQUIRE(*cardList.get_data().at(1) == card2);
-        REQUIRE(*cardList.get_data().at(2) == card3);
+        REQUIRE(*cardList.container().get_data().at(0) == card1);
+        REQUIRE(*cardList.container().get_data().at(1) == card2);
+        REQUIRE(*cardList.container().get_data().at(2) == card3);
 
         // Cards will simply exchange places
-        cardList.reorder(card2, card1);
+        cardList.container().reorder(card2, card1);
 
-        REQUIRE(*cardList.get_data().at(0) == card2);
-        REQUIRE(*cardList.get_data().at(1) == card1);
-        REQUIRE(*cardList.get_data().at(2) == card3);
+        REQUIRE(*cardList.container().get_data().at(0) == card2);
+        REQUIRE(*cardList.container().get_data().at(1) == card1);
+        REQUIRE(*cardList.container().get_data().at(2) == card3);
 
         REQUIRE(cardList.get_modified() == true);
     }
@@ -101,10 +103,11 @@ TEST_CASE("CardList operations", "[CardList]") {
         Card card1("Card1");
         Card card2("Card2");
 
-        auto cardPtr1 = cardList.append(card1);
+        auto cardPtr1 = cardList.container().append(card1);
         cardList.set_modified(false);
+        cardList.container().set_modified(false);
 
-        cardList.reorder(card1, card2);
+        cardList.container().reorder(card1, card2);
 
         REQUIRE(!cardList.get_modified());
     }
@@ -112,7 +115,7 @@ TEST_CASE("CardList operations", "[CardList]") {
     SECTION("Modified flag with internal card modification") {
         Card card1("Card1");
 
-        auto cardPtr1 = cardList.append(card1);
+        auto cardPtr1 = cardList.container().append(card1);
         REQUIRE(cardList.get_modified());
 
         cardList.get_modified();  // Reset the flag

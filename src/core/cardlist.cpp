@@ -6,16 +6,11 @@
 #include "guid.hpp"
 
 CardList::CardList(const std::string& name)
-    : Item{name, xg::newGuid()}, ItemContainer{}, cards{} {}
+    : Item{name, xg::newGuid()}, cards{} {}
 
 CardList::CardList(const std::string& name, const xg::Guid uuid)
-    : Item{name, uuid}, ItemContainer{}, cards{} {}
+    : Item{name, uuid}, cards{} {}
 
-void CardList::set_modified(bool modified) {
-    Item::set_modified(modified);
-    ItemContainer::set_modified(modified);
-}
+bool CardList::get_modified() const { return modified || cards.get_modified(); }
 
-bool CardList::get_modified() const {
-    return Item::get_modified() || ItemContainer::get_modified();
-}
+ItemContainer<Card>& CardList::container() { return cards; }

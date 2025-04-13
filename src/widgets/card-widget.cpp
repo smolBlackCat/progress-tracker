@@ -319,7 +319,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         update_due_date();
     }
 
-    if (!card->get_data().empty()) {
+    if (!card->container().get_data().empty()) {
         update_complete_tasks();
     }
 
@@ -358,19 +358,20 @@ std::shared_ptr<Card> CardWidget::get_card() { return card; }
 CardlistWidget const* CardWidget::get_cardlist_widget() const { return parent; }
 
 void CardWidget::update_complete_tasks() {
-    if (card->get_data().empty()) {
+    if (card->container().get_data().empty()) {
         complete_tasks_label.set_label("");
         complete_tasks_label.set_visible(false);
     } else {
         complete_tasks_label.set_visible();
         // FIXME: Do not use float for simple integer addition
         float n_complete_tasks =
-            std::accumulate(card->get_data().begin(), card->get_data().end(), 0,
+            std::accumulate(card->container().get_data().begin(),
+                            card->container().get_data().end(), 0,
                             [](int acc, const std::shared_ptr<Task>& task) {
                                 return task->get_done() ? ++acc : acc;
                             });
-        complete_tasks_label.set_label(
-            std::format("{}/{}", n_complete_tasks, card->get_data().size()));
+        complete_tasks_label.set_label(std::format(
+            "{}/{}", n_complete_tasks, card->container().get_data().size()));
 
         // Silences warning about deleting empty css classes
         update_complete_tasks_style(n_complete_tasks);
@@ -430,14 +431,14 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
         complete_tasks_label.remove_css_class(
             last_complete_tasks_label_css_class);
 
-    if (n_complete_tasks == card->get_data().size()) {
+    if (n_complete_tasks == card->container().get_data().size()) {
         last_complete_tasks_label_css_class =
             "complete-tasks-indicator-complete";
-    } else if (n_complete_tasks < card->get_data().size() / 2.0F ||
-               card->get_data().size() == 1) {
+    } else if (n_complete_tasks < card->container().get_data().size() / 2.0F ||
+               card->container().get_data().size() == 1) {
         last_complete_tasks_label_css_class =
             "complete-tasks-indicator-incomplete";
-    } else if (n_complete_tasks >= card->get_data().size() / 2.0F) {
+    } else if (n_complete_tasks >= card->container().get_data().size() / 2.0F) {
         last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
     }
     complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
@@ -609,7 +610,7 @@ std::string CardWidget::create_details_text() const {
 
     std::ostringstream details_text;
 
-    if (!card->get_data().empty()) {
+    if (!card->container().get_data().empty()) {
         details_text << Glib::ustring::compose(_("%1%% complete"),
                                                card->get_completion())
                      << "\n\n";

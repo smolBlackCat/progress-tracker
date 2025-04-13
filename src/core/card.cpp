@@ -7,16 +7,13 @@
 
 Card::Card(const std::string& name, const Date& date, bool complete,
            const Color& color)
-    : Item{name, xg::newGuid()},
-      ItemContainer{},
-      complete{complete},
-      due_date{date} {
+    : Item{name, xg::newGuid()}, complete{complete}, due_date{date} {
     this->color = color;
 }
 
 Card::Card(const std::string& name, const Date& date, const xg::Guid uuid,
            bool complete, const Color& color)
-    : Item{name}, ItemContainer{}, complete{complete}, due_date{date} {
+    : Item{name}, complete{complete}, due_date{date} {
     this->color = color;
 }
 
@@ -38,16 +35,7 @@ void Card::set_color(const Color& color) {
 
 const std::string& Card::get_notes() const { return notes; }
 
-void Card::set_modified(bool modified) {
-    Item::set_modified(modified);
-    for (auto& task : data) {
-        task->set_modified(modified);
-    }
-}
-
-bool Card::get_modified() const {
-    return Item::get_modified() || ItemContainer::get_modified();
-}
+bool Card::get_modified() const { return modified || tasks.get_modified(); }
 
 void Card::set_notes(const std::string& notes) {
     this->notes = notes;
@@ -58,12 +46,12 @@ void Card::set_notes(const std::string& notes) {
 
 double Card::get_completion() const {
     double tasks_completed_n =
-        std::accumulate(data.begin(), data.end(), 0,
+        std::accumulate(tasks.begin(), tasks.end(), 0,
                         [](double acc, std::shared_ptr<Task> value) {
                             return value->get_done() ? acc + 1 : acc;
                         });
 
-    return (tasks_completed_n * 100) / data.size();
+    return (tasks_completed_n * 100) / tasks.get_data().size();
 }
 
 bool Card::past_due_date() {
@@ -97,3 +85,5 @@ void Card::set_complete(bool complete) {
             name);
     }
 }
+
+ItemContainer<Task>& Card::container() { return tasks; }

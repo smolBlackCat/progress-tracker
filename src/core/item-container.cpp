@@ -109,11 +109,42 @@ std::vector<std::shared_ptr<T>>& ItemContainer<T>::get_data() {
 
 template <typename T>
     requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+const std::vector<std::shared_ptr<T>>& ItemContainer<T>::get_data() const {
+    return data;
+}
+
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+std::vector<std::shared_ptr<T>>::iterator ItemContainer<T>::begin() {
+    return data.begin();
+}
+
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+std::vector<std::shared_ptr<T>>::iterator ItemContainer<T>::end() {
+    return data.end();
+}
+
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+std::vector<std::shared_ptr<T>>::const_iterator ItemContainer<T>::begin()
+    const {
+    return data.begin();
+}
+
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+std::vector<std::shared_ptr<T>>::const_iterator ItemContainer<T>::end() const {
+    return data.end();
+}
+
+template <typename T>
+    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
 bool ItemContainer<T>::get_modified() const {
     for (auto& item : data) {
         if (item->get_modified()) return true;
     }
-    return false;
+    return modified;
 }
 
 template class ItemContainer<CardList>;

@@ -86,7 +86,7 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
 
         board->load();
         set_background(board->get_background(), false);
-        for (auto& cardlist : board->get_data()) {
+        for (auto& cardlist : board->container()->get_data()) {
             _add_cardlist(cardlist, false);
         }
 
@@ -124,7 +124,7 @@ bool ui::BoardWidget::save(bool free) {
 
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
                                                   bool editing_mode) {
-    return _add_cardlist(board->append(cardlist), editing_mode);
+    return _add_cardlist(board->container()->append(cardlist), editing_mode);
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
@@ -135,7 +135,7 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_widgets, &cardlist);
 
-    board->remove(*cardlist.get_cardlist());
+    board->container()->remove(*cardlist.get_cardlist());
 
     return true;
 }
@@ -143,7 +143,7 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
     ReorderingType reordering =
-        board->reorder(*next.get_cardlist(), *sibling.get_cardlist());
+        board->container()->reorder(*next.get_cardlist(), *sibling.get_cardlist());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {

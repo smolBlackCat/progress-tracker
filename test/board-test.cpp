@@ -287,12 +287,12 @@ TEST_CASE("Board late loading", "[Board]") {
     CHECK(!board.get_modified());
 
     CHECK(!board.is_loaded());
-    CHECK(board.get_data().empty());
+    CHECK(!board.container());
 
     board.load();
 
     CHECK(board.is_loaded());
-    CHECK(board.get_data().size() == 10);
+    CHECK(board.container()->get_data().size() == 10);
 
     filesystem::remove("test-board.xml");
 }
@@ -308,20 +308,20 @@ TEST_CASE("Adding Cardlists to a Board", "[Board]") {
     CardList cardlist1{"TODO"};
     CardList cardlist2{"TODO"};
 
-    auto added_cardlist = board.append(cardlist1);
-    auto added_cardlist2 = board.append(cardlist2);
+    auto added_cardlist = board.container()->append(cardlist1);
+    auto added_cardlist2 = board.container()->append(cardlist2);
 
     REQUIRE(added_cardlist);
     REQUIRE(added_cardlist2);
 
     // We're trying to add the exact same cardlist again. Don't and return
     // nullptr
-    CHECK(!board.append(cardlist1));
+    CHECK(!board.container()->append(cardlist1));
 
     CHECK(board.get_modified());
-    CHECK(board.get_data().size() == 2);
-    CHECK(*board.get_data()[0] == cardlist1);
-    CHECK(*board.get_data()[1] == cardlist2);
+    CHECK(board.container()->get_data().size() == 2);
+    CHECK(*board.container()->get_data()[0] == cardlist1);
+    CHECK(*board.container()->get_data()[1] == cardlist2);
 }
 
 TEST_CASE("Removing cardlists of a Board", "[Board]") {
@@ -330,15 +330,16 @@ TEST_CASE("Removing cardlists of a Board", "[Board]") {
 
     CardList cardlist1{"Something else to be done"};
 
-    board.append(cardlist1);
+    board.container()->append(cardlist1);
     board.set_modified(false);
 
-    board.remove(cardlist1);
+    board.container()->remove(cardlist1);
     CHECK(board.get_modified());
 
     board.set_modified(false);
+    board.container()->set_modified(false);
 
-    board.remove(cardlist1);
+    board.container()->remove(cardlist1);
     CHECK(!board.get_modified());
 }
 
@@ -346,16 +347,17 @@ TEST_CASE("Reordering Cardlists", "Board") {
     Board board =
         BoardBackend{BackendType::LOCAL}.create("Progress", "file.png");
 
-    auto cardlist1 = board.append(CardList{"CardList 1"});
-    auto cardlist2 = board.append(CardList{"CardList 2"});
-    auto cardlist3 = board.append(CardList{"CardList 3"});
+    auto cardlist1 = board.container()->append(CardList{"CardList 1"});
+    auto cardlist2 = board.container()->append(CardList{"CardList 2"});
+    auto cardlist3 = board.container()->append(CardList{"CardList 3"});
 
-    auto& cardlists = board.get_data();
+    auto& cardlists = board.container()->get_data();
 
     board.set_modified(false);
+    board.container()->set_modified(false);
 
     SECTION("Reordering using the same object references") {
-        board.reorder(*cardlist1, *cardlist1);
+        board.container()->reorder(*cardlist1, *cardlist1);
 
         // Because we're trying to reorder the same thing, no reordering is
         // done, thus no modification either
@@ -365,10 +367,8 @@ TEST_CASE("Reordering Cardlists", "Board") {
         CHECK(!board.get_modified());
     }
 
-    board.set_modified(false);
-
     SECTION("Reordering with one absent cardlist") {
-        board.reorder(*cardlist1, CardList{"nobody here"});
+        board.container()->reorder(*cardlist1, CardList{"nobody here"});
 
         // Trying to reorder a cardlist with an absent one does nothing exactly
         // since there's no other card to complete the operation
@@ -378,10 +378,8 @@ TEST_CASE("Reordering Cardlists", "Board") {
         CHECK(!board.get_modified());
     }
 
-    board.set_modified(false);
-
     SECTION("Reordering where sibling and next are already sibling and next") {
-        board.reorder(*cardlist3, *cardlist2);
+        board.container()->reorder(*cardlist3, *cardlist2);
 
         // Because cardlist3 is already next to cardlist2, They'll just exchange
         // places
@@ -391,10 +389,8 @@ TEST_CASE("Reordering Cardlists", "Board") {
         CHECK(board.get_modified());
     }
 
-    board.set_modified(false);
-
     SECTION("Reordering case 1") {
-        board.reorder(*cardlist1, *cardlist3);
+        board.container()->reorder(*cardlist1, *cardlist3);
 
         // Cardlist1 will be placed after cardlist 3, ths cardlist1 will be the
         // last element and a modification is registered
@@ -404,10 +400,8 @@ TEST_CASE("Reordering Cardlists", "Board") {
         CHECK(board.get_modified());
     }
 
-    board.set_modified(false);
-
     SECTION("Reordering case 2") {
-        board.reorder(*cardlist3, *cardlist1);
+        board.container()->reorder(*cardlist3, *cardlist1);
 
         // Cardlist 3 will be placed in the Cardlist 1 position, thus being the
         // first item
@@ -426,8 +420,8 @@ TEST_CASE("Saving new boards") {
 
     CardList cardlist{"Things to do"};
     Card card{"Computer Science", Color{123, 456, 123, 1}};
-    cardlist.append(card);
-    board.append(cardlist);
+    cardlist.container().append(card);
+    board.container()->append(cardlist);
 
     board.save();
 

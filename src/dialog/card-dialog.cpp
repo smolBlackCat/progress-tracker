@@ -64,7 +64,7 @@ CardDetailsDialog::~CardDetailsDialog() {}
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
-    card->remove(*task.get_task());
+    card->container().remove(*task.get_task());
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
     cur_card_widget->update_complete_tasks();
@@ -77,8 +77,9 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
-    ReorderingType reordering = cur_card_widget->get_card()->reorder(
-        *next.get_task(), *sibling.get_task());
+    ReorderingType reordering =
+        cur_card_widget->get_card()->container().reorder(*next.get_task(),
+                                                         *sibling.get_task());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {
@@ -123,7 +124,7 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
     }
 
     card_title_entry->set_text(card_ptr->get_name());
-    for (auto& task : card_ptr->get_data()) {
+    for (auto& task : card_ptr->container()) {
         _add_task(task);
     }
     notes_textbuffer->set_text(card_ptr->get_notes());
@@ -155,7 +156,9 @@ void CardDetailsDialog::update_due_date_label() {
 CardWidget* CardDetailsDialog::get_card_widget() { return cur_card_widget; }
 
 void CardDetailsDialog::on_add_task() {
-    _add_task(cur_card_widget->get_card()->append(Task{_("New Task")}), true);
+    _add_task(
+        cur_card_widget->get_card()->container().append(Task{_("New Task")}),
+        true);
     cur_card_widget->update_complete_tasks();
 }
 

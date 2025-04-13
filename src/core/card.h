@@ -13,7 +13,7 @@ typedef std::chrono::year_month_day Date;
  * @brief Represents a kanban card that may or may not be contained within a
  * CardList object
  */
-class Card : public Colorable, public Item, public ItemContainer<Task> {
+class Card : public Colorable, public Item {
 public:
     /**
      * @brief Card constructor
@@ -49,9 +49,7 @@ public:
      */
     const std::string& get_notes() const;
 
-    void set_modified(bool modified = true) override;
-
-    bool get_modified() const;
+    bool get_modified() const override;
 
     /**
      * @brief Update the notes associated with this card
@@ -102,8 +100,11 @@ public:
      */
     void set_complete(bool complete);
 
+    ItemContainer<Task>& container();
+
 protected:
     std::string notes;
+    ItemContainer<Task> tasks;
     Date due_date;
     bool complete;
 };

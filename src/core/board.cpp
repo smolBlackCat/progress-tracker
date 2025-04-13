@@ -230,11 +230,11 @@ void BoardBackend::load_cardlists(Board& board) {
                 auto task_element = card_element->FirstChildElement("task");
                 while (task_element) {
                     auto task_element_uuid = task_element->Attribute("uuid");
-                    cur_card.append(Task{task_element->Attribute("name"),
-                                         task_element_uuid
-                                             ? xg::Guid{task_element_uuid}
-                                             : xg::newGuid(),
-                                         task_element->BoolAttribute("done")});
+                    cur_card.container().append(
+                        Task{task_element->Attribute("name"),
+                             task_element_uuid ? xg::Guid{task_element_uuid}
+                                               : xg::newGuid(),
+                             task_element->BoolAttribute("done")});
                     task_element = task_element->NextSiblingElement("task");
                 }
 
@@ -247,11 +247,11 @@ void BoardBackend::load_cardlists(Board& board) {
 
                 cur_card.set_modified(false);
 
-                cur_cardlist.append(cur_card);
+                cur_cardlist.container().append(cur_card);
                 card_element = card_element->NextSiblingElement("card");
             }
             cur_cardlist.set_modified(false);
-            board.append(cur_cardlist);
+            board.container()->append(cur_cardlist);
 
             list_element = list_element->NextSiblingElement("list");
         }
@@ -277,13 +277,20 @@ bool BoardBackend::save_xml(Board& board) {
     board_element->SetAttribute("uuid", std::string(board.get_id()).c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto& cardlist : board.get_data()) {
+    auto maybe_container = board.container();
+    if (!maybe_container) {
+        spdlog::get("core")->warn(
+            "[BoardBackend] Board \"{}\" has not been initialised",
+            board.get_name());
+        return false;
+    }
+
+    for (auto& cardlist : *maybe_container) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
         list_element->SetAttribute("uuid", cardlist->get_id().str().c_str());
-        cardlist->set_modified(false);
 
-        for (auto& card : cardlist->get_data()) {
+        for (auto& card : cardlist->container()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
             card_element->SetAttribute("uuid", card->get_id().str().c_str());
@@ -298,7 +305,7 @@ bool BoardBackend::save_xml(Board& board) {
             }
 
             // Add tasks
-            for (auto& task : card->get_data()) {
+            for (auto& task : card->container()) {
                 tinyxml2::XMLElement* task_element = doc->NewElement("task");
                 task_element->SetAttribute("name", task->get_name().c_str());
                 task_element->SetAttribute("done", task->get_done());
@@ -306,6 +313,7 @@ bool BoardBackend::save_xml(Board& board) {
                                            task->get_id().str().c_str());
 
                 card_element->InsertEndChild(task_element);
+                task->set_modified(false);
             }
 
             tinyxml2::XMLElement* notes_element = doc->NewElement("notes");
@@ -314,10 +322,14 @@ bool BoardBackend::save_xml(Board& board) {
 
             list_element->InsertEndChild(card_element);
             card->set_modified(false);
+            card->container().set_modified(false);
         }
         board_element->InsertEndChild(list_element);
+        cardlist->set_modified(false);
+        cardlist->container().set_modified(false);
     }
     board.set_modified(false);
+    board.container()->set_modified(false);
 
     std::filesystem::path p{settings["filepath"]};
     if (p.has_parent_path() && !std::filesystem::exists(p.parent_path())) {
@@ -347,15 +359,11 @@ bool BoardBackend::save_nextcloud(Board& board) { return false; }
 
 const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
-Board::Board(BoardBackend& backend)
-    : Item{""}, ItemContainer{}, backend{backend} {}
+Board::Board(BoardBackend& backend) : Item{""}, backend{backend} {}
 
 Board::Board(const std::string& name, const std::string& background,
              const xg::Guid uuid, const BoardBackend& backend)
-    : Item{name, uuid},
-      ItemContainer{},
-      background{background},
-      backend{backend} {
+    : Item{name, uuid}, background{background}, backend{backend} {
     if (Board::get_background_type(background) == BackgroundType::INVALID) {
         spdlog::get("core")->warn(
             "Invalid background type: {}. Falling back to default", background);
@@ -369,6 +377,7 @@ Board::Board(const std::string& name, const std::string& background,
 
 Board::~Board() {}
 
+// FIXME: This method naturally modifies the item object
 BackgroundType Board::set_background(const std::string& other, bool modify) {
     BackgroundType bg_type = Board::get_background_type(other);
 
@@ -393,24 +402,7 @@ BackgroundType Board::set_background(const std::string& other, bool modify) {
     return bg_type;
 }
 
-std::shared_ptr<CardList> Board::append(const CardList& cardlist) {
-    if (fully_loaded) {
-        return ItemContainer::append(cardlist);
-    }
-
-    return nullptr;
-}
-
 const std::string& Board::get_background() const { return background; }
-
-ReorderingType Board::reorder(const CardList& next, const CardList& sibling) {
-    if (fully_loaded) {
-        ReorderingType reordering = ItemContainer::reorder(next, sibling);
-        set_modified(!(reordering == ReorderingType::INVALID));
-        return reordering;
-    }
-    return ReorderingType::INVALID;
-}
 
 bool Board::save() {
     bool success = backend.save(*this);
@@ -425,29 +417,22 @@ bool Board::save() {
     return success;
 }
 
+ItemContainer<CardList>* Board::container() {
+    if (fully_loaded) {
+        return &cardlists;
+    }
+
+    return nullptr;
+}
+
 void Board::load() {
     backend.load_cardlists(*this);
 
     spdlog::get("core")->info("[Board] Board \"{}\" fully loaded", name);
 }
 
-void Board::set_modified(bool modified) {
-    if (fully_loaded) {
-        Item::set_modified(modified);
-
-        for (auto& cardlist : cardlists) {
-            cardlist->set_modified(modified);
-        }
-    }
-
-    spdlog::get("core")->warn(
-        "[Board] Board \"{}\" cannot set modified because it is not fully "
-        "loaded",
-        name);
-}
-
 bool Board::get_modified() const {
-    return Item::get_modified() || ItemContainer::get_modified();
+    return modified || cardlists.get_modified();
 }
 
 time_point<system_clock, seconds> Board::get_last_modified() const {

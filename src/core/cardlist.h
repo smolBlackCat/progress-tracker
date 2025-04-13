@@ -1,16 +1,12 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "card.h"
-#include "item-container.h"
 #include "item.h"
 
 /**
  * @brief Represents a list of cards within a kanban board
  */
-class CardList : public Item, public ItemContainer<Card> {
+class CardList : public Item {
 public:
     /**
      * @brief CardList constructor;
@@ -19,9 +15,10 @@ public:
 
     CardList(const std::string& name, const xg::Guid uuid);
 
-    void set_modified(bool modified) override;
-    bool get_modified() const;
+    bool get_modified() const override;
+
+    ItemContainer<Card>& container();
 
 protected:
-    std::vector<std::shared_ptr<Card>> cards;
+    ItemContainer<Card> cards;
 };

@@ -82,7 +82,7 @@ protected:
 /**
  * @brief Kanban Board
  */
-class Board : public Item, public ItemContainer<CardList> {
+class Board : public Item {
 public:
     Board() = delete;
     Board(const std::string& name, const std::string& background,
@@ -108,20 +108,19 @@ public:
      */
     BackgroundType set_background(const std::string& other, bool modify = true);
 
-    std::shared_ptr<CardList> append(const CardList& cardlist) override;
-
-    /**
-     * @brief Reorders cardlist "next" after cardlist "sibling"
-     */
-    ReorderingType reorder(const CardList& next,
-                           const CardList& sibling) override;
-
     /**
      * @brief Returns the current background value
      *
      * @returns The background value
      */
     const std::string& get_background() const;
+
+    /**
+     * @brief Returns the container of the board
+     *
+     * @returns The container reference of the board
+     */
+    ItemContainer<CardList>* container();
 
     /**
      * @brief Saves the board using the backend functionality
@@ -133,9 +132,7 @@ public:
      */
     void load();
 
-    void set_modified(bool modified) override;
-
-    bool get_modified() const;
+    bool get_modified() const override;
 
     time_point<system_clock, seconds> get_last_modified() const;
 
@@ -157,7 +154,7 @@ public:
 
 protected:
     std::string background;
-    std::vector<std::shared_ptr<CardList>> cardlists;
+    ItemContainer<CardList> cardlists;
     time_point<system_clock, seconds> last_modified;
 
     bool fully_loaded = false;

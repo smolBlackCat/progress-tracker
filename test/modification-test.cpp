@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 
-#include <catch2/catch_test_macros.hpp>
-
 #include <core/board.h>
 #include <core/card.h>
 #include <core/cardlist.h>
 #include <core/item.h>
 #include <core/task.h>
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Item set name marks modified", "[Item]") {
     Item item("initial name");
@@ -33,17 +33,18 @@ TEST_CASE("CardList add card marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     REQUIRE_FALSE(cardlist.get_modified());
     Card card("initial card", NO_COLOR);
-    cardlist.append(card);
+    cardlist.container().append(card);
     REQUIRE(cardlist.get_modified());
 }
 
 TEST_CASE("CardList remove card marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card("initial card", NO_COLOR);
-    cardlist.append(card);
+    cardlist.container().append(card);
+    cardlist.container().set_modified(false);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.remove(card);
+    cardlist.container().remove(card);
     REQUIRE(cardlist.get_modified());
 }
 
@@ -51,21 +52,23 @@ TEST_CASE("CardList reorder cards marks modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card1("card1", NO_COLOR);
     Card card2("card2", NO_COLOR);
-    cardlist.append(card1);
-    cardlist.append(card2);
+    cardlist.container().append(card1);
+    cardlist.container().append(card2);
+    cardlist.container().set_modified(false);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.reorder(card1, card2);
+    cardlist.container().reorder(card1, card2);
     REQUIRE(cardlist.get_modified());
 }
 
 TEST_CASE("CardList modify card marks cardlist modified", "[CardList]") {
     CardList cardlist("initial cardlist");
     Card card("initial card", NO_COLOR);
-    cardlist.append(card);
+    cardlist.container().append(card);
+    cardlist.container().set_modified(false);
     cardlist.set_modified(false);
     REQUIRE_FALSE(cardlist.get_modified());
-    cardlist.get_data().at(0)->set_name("new card name");
+    cardlist.container().get_data().at(0)->set_name("new card name");
     REQUIRE(cardlist.get_modified());
 }
 
@@ -78,7 +81,7 @@ TEST_CASE("Card add task marks modified", "[Card]") {
     Card card("initial card", NO_COLOR);
     REQUIRE_FALSE(card.get_modified());
     Task task("initial task");
-    card.append(task);
+    card.container().append(task);
     REQUIRE(card.get_modified());
 }
 
@@ -99,10 +102,13 @@ TEST_CASE("Card set notes marks modified", "[Card]") {
 TEST_CASE("Card modify task marks card modified", "[Card]") {
     Card card("initial card", NO_COLOR);
     Task task("initial task");
-    card.append(task);
+
+    card.container().append(task);
     card.set_modified(false);
+    card.container().set_modified(false);
+
     REQUIRE_FALSE(card.get_modified());
-    card.get_data().at(0)->set_done(true);
+    card.container().get_data().at(0)->set_done(true);
     REQUIRE(card.get_modified());
 }
 
