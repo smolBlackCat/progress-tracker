@@ -25,8 +25,12 @@ protected:
     void on_startup() override;
     void on_activate() override;
 
+    /**
+     * @brief Load Progress boards
+     */
+    void load_boards();
+
     ProgressWindow* main_window = nullptr;
     Glib::RefPtr<Gio::Settings> progress_settings;
 };
 }  // namespace ui
-

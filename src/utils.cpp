@@ -19,7 +19,7 @@ std::string locale_folder() {
     return std::filesystem::path(LOCALE_FOLDER).string();
 }
 
-std::string progress_boards_folder() {
+std::string progress_boards_folder_old() {
 #ifdef FLATPAK
     return std::string{std::getenv("XDG_CONFIG_HOME")} + BOARDS_FOLDER;
 #elif WIN32
@@ -30,6 +30,17 @@ std::string progress_boards_folder() {
 #endif
 }
 
+std::string progress_boards_folder() {
+#ifdef FLATPAK
+    return std::string{std::getenv("XDG_DATA_HOME")} + BOARDS_FOLDER;
+#elif WIN32
+    return std::string{std::getenv("APPDATA")} + BOARDS_FOLDER_WIN32;
+#else
+    return std::string{std::getenv("HOME")} +
+           std::format("/.local/share{}", BOARDS_FOLDER);
+#endif
+}
+
 std::string format_basename(std::string basename) {
     std::transform(
         basename.begin(), basename.end(), basename.begin(),
@@ -37,7 +48,8 @@ std::string format_basename(std::string basename) {
     return basename;
 }
 
-// Not reliable(???)
+// FIXME: Despite this working, it is not reliable because we're then limiting
+// ourselves to a range of only 1000 different filenames
 std::string gen_unique_filename(const std::string& base) {
     std::string boards_dir = progress_boards_folder();
     std::string filename = "";

@@ -48,6 +48,7 @@ void ui::Application::on_startup() {
                                   window_height);
     }
 
+    std::string old_app_dir = progress_boards_folder_old();
     std::string app_dir = progress_boards_folder();
 
     if (!std::filesystem::exists(app_dir)) {
@@ -56,25 +57,24 @@ void ui::Application::on_startup() {
                 "Failed to create Progress Boards folder");
         }
     } else {
-        spdlog::get("core")->info("Loading boards from local storage");
+        load_boards();
+    }
+
+    // Moves all boards from old directory to new directory
+    if (std::filesystem::exists(old_app_dir)) {
+        spdlog::get("app")->warn(
+            "Old Progress Boards folder exists. Migrating boards");
         for (const auto& dir_entry :
-             std::filesystem::directory_iterator(app_dir)) {
-            std::string board_filename = dir_entry.path().string();
-            if (board_filename.ends_with(".xml")) {
-                try {
-                    main_window->add_local_board(BoardBackend{
-                        BackendType::LOCAL, std::map<std::string, std::string>{
-                                                {"filepath", board_filename}}});
-                } catch (std::invalid_argument& err) {
-                    // TODO: Add code keeping track of how many failures to
-                    // load boards
-                    spdlog::get("app")->error("Failed to load board: {}",
-                                              err.what());
-                }
+             std::filesystem::directory_iterator(old_app_dir)) {
+            if (dir_entry.path().string().ends_with(".xml")) {
+                std::filesystem::rename(dir_entry.path(),
+                                        app_dir / dir_entry.path().filename());
             }
         }
-        spdlog::get("app")->info("Local boards have been successfully loaded",
-                                 app_dir);
+        load_boards();
+        std::filesystem::remove_all(old_app_dir);
+        spdlog::get("app")->info(
+            "Old Progress Boards folder has been migrated");
     }
 
     add_window(*main_window);
@@ -84,4 +84,26 @@ void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
     spdlog::get("app")->info("Application initialised");
+}
+
+void ui::Application::load_boards() {
+    const std::string app_dir = progress_boards_folder();
+    spdlog::get("core")->info("Loading boards from local storage");
+    for (const auto& dir_entry : std::filesystem::directory_iterator(app_dir)) {
+        std::string board_filename = dir_entry.path().string();
+        if (board_filename.ends_with(".xml")) {
+            try {
+                main_window->add_local_board(BoardBackend{
+                    BackendType::LOCAL, std::map<std::string, std::string>{
+                                            {"filepath", board_filename}}});
+            } catch (std::invalid_argument& err) {
+                // TODO: Add code keeping track of how many failures to
+                // load boards
+                spdlog::get("app")->error("Failed to load board: {}",
+                                          err.what());
+            }
+        }
+    }
+    spdlog::get("app")->info("Local boards have been successfully loaded",
+                             app_dir);
 }

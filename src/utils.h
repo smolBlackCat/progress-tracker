@@ -1,12 +1,16 @@
 #include <core/colorable.h>
 
-#include <cstdint>
 #include <string>
 
 /**
  * @brief Returns Progress locale folder
  */
 std::string locale_folder();
+
+/**
+ * @brief Old Progress boards folder path. Used mainly for migration purposes.
+ */
+std::string progress_boards_folder_old();
 
 /**
  * @brief Progress boards folder path
