@@ -16,6 +16,8 @@ std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
     }
 
     data.push_back(std::make_shared<T>(item));
+    spdlog::get("core")->info("[ItemContainer] Item \"{}\" has been added",
+                              item.get_name());
     set_modified();
     return data.back();
 }
@@ -26,6 +28,9 @@ void ItemContainer<T>::remove(const T& item) {
     for (auto it = data.begin(); it != data.end(); it++) {
         if (item == *(*it)) {
             data.erase(it);
+            spdlog::get("core")->info(
+                "[ItemContainer] Item \"{}\" has been removed",
+                item.get_name());
             set_modified();
             return;
         }
@@ -67,7 +72,7 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
 
     if (any_absent || is_same) {
         spdlog::get("core")->warn(
-            "[Board] Cannot reorder cardlists: same references or missing");
+            "[ItemContainer] Cannot reorder items: same references or missing");
         return ReorderingType::INVALID;
     }
 
@@ -80,7 +85,7 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
         data.insert(data.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
         reordering = ReorderingType::DOWNUP;
         spdlog::get("core")->info(
-            "[Board] CardList \"{}\" was inserted before CardList \"{}\"",
+            "[ItemContainer] Item \"{}\" was inserted before Item \"{}\"",
             next.get_name(), sibling.get_name());
         set_modified();
         return reordering;
@@ -89,7 +94,7 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
         data.insert(data.begin() + sibling_i, next_v);
         reordering = ReorderingType::UPDOWN;
         spdlog::get("core")->info(
-            "[Board] CardList \"{}\" was inserted after CardList \"{}\"",
+            "[ItemContainer] Item \"{}\" was inserted after Item \"{}\"",
             next.get_name(), sibling.get_name());
         set_modified();
         return reordering;
