@@ -7,8 +7,10 @@
 
 #include <chrono>
 #include <numeric>
+#include <tuple>
 
 #include "cardlist-widget.h"
+#include "core/colorable.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
 #include "window.h"
@@ -31,6 +33,97 @@ namespace ui {
 CardInit::CardInit()
     : Glib::ExtraClassInit(card_class_init, nullptr, card_init) {}
 
+const std::map<const char*, const char*> CardWidget::CardPopover::CARD_COLORS =
+    {{"Red", "#a51d2d"},   {"Orange", "#c64600"}, {"Yellow", "#e5a50a"},
+     {"Green", "#26a269"}, {"Blue", "#1a5fb4"},   {"Purple", "#200941"}};
+
+CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
+    : Gtk::Popover{}, root{Gtk::Orientation::VERTICAL} {
+    set_has_arrow(false);
+    set_child(root);
+    set_position(Gtk::PositionType::BOTTOM);
+
+    const std::vector<std::pair<const char*, std::function<void()>>>
+        button_actions = {{"Rename",
+                           [this, card_widget] {
+                               card_widget->on_rename();
+                               this->popdown();
+                           }},
+                          {"Card Details",
+                           [this, card_widget] {
+                               card_widget->open_card_details_dialog();
+                               this->popdown();
+                           }},
+                          {"Remove", [this, card_widget] {
+                               card_widget->remove_from_parent();
+                               this->popdown();
+                           }}};
+
+    for (const auto& [label, action] : button_actions) {
+        auto button = Gtk::make_managed<Gtk::Button>(_(label));
+        button->set_has_frame(false);
+        button->signal_clicked().connect(action);
+        root.append(*button);
+
+        action_buttons[label] = button;
+    }
+
+    // Setup Colors Radio
+    Gtk::Box color_box{Gtk::Orientation::HORIZONTAL};
+
+    Gtk::CheckButton* prev = Gtk::make_managed<Gtk::CheckButton>();
+    prev->set_tooltip_text(_("Unset Color"));
+    prev->signal_toggled().connect(
+        sigc::mem_fun(*card_widget, &CardWidget::clear_color));
+    color_box.append(*prev);
+
+    // In this current context, no colour whatsoever means an invisible color.
+    // This helps the popover check if a colour has been set
+    color_buttons["Unset"] = std::make_tuple(prev, "rgba(0,0,0,0)");
+
+    for (const auto& [label, color] : CARD_COLORS) {
+        auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
+
+        // This will require us to manually define translatable strings for
+        // color labels
+        checkbutton->set_tooltip_text(_(label));
+        checkbutton->signal_toggled().connect(
+            color_setting_thunk(card_widget, Gdk::RGBA{color}));
+        checkbutton->add_css_class(label);
+        checkbutton->add_css_class("accent-color-btn");
+        color_box.append(*checkbutton);
+        checkbutton->set_group(*prev);
+        prev = checkbutton;
+
+        color_buttons[label] = std::make_tuple(checkbutton, color);
+    }
+    root.insert_child_after(color_box, *action_buttons["Card Details"]);
+    root.insert_child_after(
+        *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
+        *action_buttons["Card Details"]);
+    root.insert_child_after(
+        *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
+        color_box);
+}
+
+void CardWidget::CardPopover::set_selected_color(CardWidget* card,
+                                                 Gdk::RGBA color) {
+    for (const auto& [label, colour_tuple] : color_buttons) {
+        if (Gdk::RGBA(std::get<1>(colour_tuple)) == card->get_color()) {
+            // Select the Checkbutton pointer refering to this colour and set it
+            // as active
+            std::get<0>(colour_tuple)->set_active(true);
+            return;
+        }
+    }
+    std::get<0>(color_buttons["Unset"])->set_active(true);
+}
+
+std::function<void()> CardWidget::CardPopover::color_setting_thunk(
+    CardWidget* card, Gdk::RGBA color) {
+    return std::function<void()>([card, color]() { card->set_color(color); });
+}
+
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
@@ -47,11 +140,11 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
       due_date_label{},
       card_entry{},
       card_menu_button{},
-      popover_menu{},
+      card_menu_popover{this},
+      card_menu_popover2{this},
       key_controller{Gtk::EventControllerKey::create()},
       click_controller{Gtk::GestureClick::create()},
       focus_controller{Gtk::EventControllerFocus::create()},
-      card_menu_model{Gio::Menu::create()},
       color_dialog{Gtk::ColorDialog::create()} {
     // Setup Widgets
     root_box.set_spacing(4);
@@ -111,16 +204,10 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     card_menu_button.set_halign(Gtk::Align::CENTER);
     card_menu_button.set_has_frame(false);
     card_menu_button.set_icon_name("view-more-horizontal-symbolic");
-    card_menu_button.set_menu_model(card_menu_model);
     card_menu_button.set_can_focus(false);
+    card_menu_button.set_popover(card_menu_popover);
 
-    card_menu_model->append(_("Rename"), "card.rename");
-    card_menu_model->append(_("Card Details"), "card.details");
-    auto card_cover_submenu = Gio::Menu::create();
-    card_cover_submenu->append(_("Set Color"), "card.set-color");
-    card_cover_submenu->append(_("Unset Color"), "card.unset-color");
-    card_menu_model->append_submenu(_("Card Cover"), card_cover_submenu);
-    card_menu_model->append(_("Remove"), "card.remove");
+    card_menu_popover2.set_parent(root_box);
 
     card_menu_button.set_tooltip_text(_("Card Options"));
     card_menu_button.set_valign(Gtk::Align::CENTER);
@@ -136,25 +223,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         on_rename();  // Open card on rename mode by default whenever a new card
                       // is created
     }
-
-    auto card_actions = Gio::SimpleActionGroup::create();
-    card_actions->add_action("rename", [this]() {
-        // Interacting with the popover may cause the card to lose focus thus
-        // we need to disable and the enable it again before the rename
-        this->card_entry.remove_controller(focus_controller);
-        this->on_rename();
-        this->card_entry.add_controller(focus_controller);
-    });
-
-    card_actions->add_action(
-        "details", sigc::mem_fun(*this, &CardWidget::open_card_details_dialog));
-    card_actions->add_action(
-        "set-color", sigc::mem_fun(*this, &CardWidget::open_color_dialog));
-    card_actions->add_action("unset-color",
-                             sigc::mem_fun(*this, &CardWidget::clear_color));
-    card_actions->add_action(
-        "remove", sigc::mem_fun(*this, &CardWidget::remove_from_parent));
-    card_menu_button.insert_action_group("card", card_actions);
 
     card_cover_revealer.property_child_revealed().signal_changed().connect(
         [this]() {
@@ -258,10 +326,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
             })));
     this->add_controller(shortcut_controller);
 
-    popover_menu.set_parent(root_box);
-    popover_menu.set_menu_model(card_menu_model);
-    popover_menu.insert_action_group("card", card_actions);
-
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (card_entry_revealer.get_child_revealed()) {
@@ -285,8 +349,9 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         [this](int n_pressed, double x, double y) {
             auto clicked = this->click_controller->get_current_button();
             if (clicked == GDK_BUTTON_SECONDARY && n_pressed >= 1) {
-                this->popover_menu.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
-                this->popover_menu.popup();
+                this->card_menu_popover2.set_pointing_to(
+                    Gdk::Rectangle(x, y, 0, 0));
+                this->card_menu_popover2.popup();
             } else if (n_pressed >= 1 &&
                        !card_entry_revealer.get_child_revealed() &&
                        clicked == GDK_BUTTON_PRIMARY) {
@@ -306,15 +371,22 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
 
     if (card->is_color_set()) {
         Color card_color = card->get_color();
-        _set_color(Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
-                             static_cast<float>(std::get<1>(card_color)) / 255,
-                             static_cast<float>(std::get<2>(card_color)) / 255,
-                             std::get<3>(card_color)});
+        Gdk::RGBA card_color_rgba =
+            Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
+                      static_cast<float>(std::get<1>(card_color)) / 255,
+                      static_cast<float>(std::get<2>(card_color)) / 255,
+                      std::get<3>(card_color)};
+
+        _set_color(card_color_rgba);
+        card_menu_popover.set_selected_color(this, card_color_rgba);
 
         if (!is_new) {
             card->set_modified(false);
         }
+    } else {
+        card_menu_popover.set_selected_color(this, Gdk::RGBA{});
     }
+
     if (card->get_due_date().ok()) {
         update_due_date();
     }
@@ -354,6 +426,12 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
 }
 
 std::shared_ptr<Card> CardWidget::get_card() { return card; }
+
+const Gdk::RGBA CardWidget::get_color() const {
+    Color color = card->get_color();
+
+    return Gdk::RGBA(color_to_string(color));
+}
 
 CardlistWidget const* CardWidget::get_cardlist_widget() const { return parent; }
 
@@ -559,9 +637,11 @@ void CardWidget::open_card_details_dialog() {
 }
 
 void CardWidget::on_rename() {
+    card_entry.remove_controller(focus_controller);
     card_entry_revealer.set_reveal_child(true);
     card_label.set_visible(false);
     card_entry.grab_focus();
+    card_entry.add_controller(focus_controller);
 
     spdlog::get("ui")->debug(
         "[CardWidget] CardWidget \"{}\" has entered rename mode",

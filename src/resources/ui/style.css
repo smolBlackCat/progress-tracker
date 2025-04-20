@@ -119,3 +119,44 @@ task:focus {
     padding: 4px;
     box-shadow: 0 0 2px @card_shade_color;
 }
+
+.accent-color-btn radio {
+  all: unset;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  min-width: 14px;
+  min-height: 14px;
+  color: @light_1;
+}
+
+.accent-color-btn radio:checked {
+    border: 2px solid @dark_1;
+}
+
+.accent-color-btn radio:hover {
+  filter: brightness(1.2);
+}
+
+.Red radio {
+    background-color: #a51d2d;
+}
+
+.Green radio {
+    background-color: #26a269;
+}
+
+.Blue radio {
+    background-color: #1a5fb4;
+}
+
+.Yellow radio {
+    background-color: #e5a50a;
+}
+
+.Orange radio {
+    background-color: #c64600;
+}
+
+.Purple radio {
+    background-color: #200941;
+}

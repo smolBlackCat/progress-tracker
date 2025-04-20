@@ -23,6 +23,8 @@ public:
     CardInit();
 };
 
+class CardPopover;
+
 /**
  * @brief Widget that represents a single card.
  */
@@ -80,6 +82,13 @@ public:
     std::shared_ptr<Card> get_card();
 
     /**
+     * @brief Retrieves the color of this card.
+     *
+     * @return Gdk::RGBA object representing the color.
+     */
+    const Gdk::RGBA get_color() const;
+
+    /**
      * @brief Retrieves the CardlistWidget from which this widget is associated
      * with.
      *
@@ -121,6 +130,54 @@ public:
     std::string create_details_text() const;
 
 protected:
+    /** @brief Implements the card's popover menu
+     *
+     * The current implemented options are:
+     * - Rename card
+     * - Card Details
+     * - A colour selection radiobutton group
+     * - Delete card
+     */
+    class CardPopover : public Gtk::Popover {
+    public:
+        const static std::map<const char*, const char*> CARD_COLORS;
+
+        /**
+         * @brief Constructor for CardPopover class.
+         *
+         * @param card The card widget to set the color for.
+         */
+        CardPopover(CardWidget* card);
+
+        /**
+         * @brief Marks one of the color radio buttons as selected. If a color
+         * that does not belong to CARD_COLORS, this call is ignored.
+         *
+         * @param card The card widget to set the color for.
+         * @param color The color to set.
+         */
+        void set_selected_color(CardWidget* card, Gdk::RGBA color);
+
+    protected:
+        /**
+         * @brief Helper method for creating a color setting closure to set the
+         * color of the card widget.
+         *
+         * @param card The card widget to set the color for.
+         * @param color The color to set.
+         * @return A closure that sets the color of the card widget.
+         */
+        std::function<void()> color_setting_thunk(CardWidget* card,
+                                                  Gdk::RGBA color);
+
+        Gtk::Box root;
+        std::map<const char*, Gtk::Button*> action_buttons;
+        std::map<const char*, std::tuple<Gtk::CheckButton*, const char*>>
+            color_buttons;
+    };
+
+    friend class CardPopover;
+
     bool is_new;
     Gtk::Box root_box;
     Gtk::Revealer card_cover_revealer, card_entry_revealer;
@@ -128,12 +185,11 @@ protected:
     Gtk::Label card_label, complete_tasks_label, due_date_label;
     Gtk::Entry card_entry;
     Gtk::MenuButton card_menu_button;
-    Gtk::PopoverMenu popover_menu;
+    CardPopover card_menu_popover, card_menu_popover2;
 
     Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
-    Glib::RefPtr<Gio::Menu> card_menu_model;
     Glib::RefPtr<Gtk::ColorDialog> color_dialog;
 
     ui::CardlistWidget* parent;
