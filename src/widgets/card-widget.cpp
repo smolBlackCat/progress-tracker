@@ -106,7 +106,7 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     for (const auto& [key, color_pair] : CARD_COLORS) {
         auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
 
-        checkbutton->set_tooltip_text(color_pair.first);
+        checkbutton->set_tooltip_text(_(color_pair.first));
         sigc::connection color_setting_cnn =
             checkbutton->signal_toggled().connect(color_setting_thunk(
                 card_widget, checkbutton, Gdk::RGBA{color_pair.second}));

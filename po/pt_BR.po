@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 15:34-0300\n"
+"POT-Creation-Date: 2025-04-28 10:51-0300\n"
 "PO-Revision-Date: 2024-02-10 12:25-0300\n"
 "Last-Translator: Gabriel de Moura <moura@moura>\n"
 "Language-Team: Brazilian Portuguese <ldpbr-"
@@ -305,11 +305,11 @@ msgstr "Não foi possível carregar este quadro"
 msgid "Add Task"
 msgstr "Adicionar Tarefa"
 
-#: src/dialog/card-dialog.cpp:158
+#: src/dialog/card-dialog.cpp:160
 msgid "New Task"
 msgstr "Nova Tarefa"
 
-#: src/dialog/card-dialog.cpp:205 src/dialog/card-dialog.cpp:240
+#: src/dialog/card-dialog.cpp:208 src/dialog/card-dialog.cpp:243
 #: src/resources/ui/card-details-dialog.ui:63
 msgid "Set Due Date"
 msgstr "Marcar Prazo"
@@ -506,7 +506,7 @@ msgstr "Marcar cartão como concluído"
 msgid "Checklist"
 msgstr "Lista de Tarefas"
 
-#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:672
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:808
 msgid "Notes"
 msgstr "Anotações"
 
@@ -514,7 +514,7 @@ msgstr "Anotações"
 msgid "Delete Card"
 msgstr "Apagar Cartão"
 
-#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:118
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:69
 msgid "Card Details"
 msgstr "Detalhes do Cartão"
 
@@ -534,7 +534,7 @@ msgstr "Clique para selecionar um plano de fundo para o quadro"
 msgid "Create Board"
 msgstr "Criar Quadro"
 
-#: src/resources/ui/board-dialog.ui:101 src/widgets/card-widget.cpp:120
+#: src/resources/ui/board-dialog.ui:101
 msgid "Set Color"
 msgstr "Selecionar Cor"
 
@@ -542,75 +542,95 @@ msgstr "Selecionar Cor"
 msgid "Set Image"
 msgstr "Selecionar Imagem"
 
-#: src/widgets/board-widget.cpp:24
+#: src/widgets/board-widget.cpp:23
 msgid "Add List"
 msgstr "Adicionar Lista"
 
-#: src/widgets/board-widget.cpp:50
+#: src/widgets/board-widget.cpp:49
 msgid "New CardList"
 msgstr "Nova lista de cartões"
 
-#: src/widgets/card-widget.cpp:84 src/widgets/card-widget.cpp:171
-#: src/widgets/cardlist-widget.cpp:74
-msgid "New Card"
-msgstr "Novo cartão"
+#: src/widgets/card-widget.cpp:38
+msgid "Red"
+msgstr "Vermelho"
 
-#: src/widgets/card-widget.cpp:117 src/widgets/editable-label-header.cpp:79
+#: src/widgets/card-widget.cpp:39
+msgid "Orange"
+msgstr "Laranja"
+
+#: src/widgets/card-widget.cpp:40
+msgid "Yellow"
+msgstr "Amarelo"
+
+#: src/widgets/card-widget.cpp:41
+msgid "Green"
+msgstr "Verde"
+
+#: src/widgets/card-widget.cpp:42
+msgid "Blue"
+msgstr "Azul"
+
+#: src/widgets/card-widget.cpp:43
+msgid "Purple"
+msgstr "Roxo"
+
+#: src/widgets/card-widget.cpp:64 src/widgets/editable-label-header.cpp:79
 #: src/widgets/task-widget.cpp:74
 msgid "Rename"
 msgstr "Renomear"
 
-#: src/widgets/card-widget.cpp:121
-msgid "Unset Color"
-msgstr "Remover Cor"
-
-#: src/widgets/card-widget.cpp:122
-msgid "Card Cover"
-msgstr "Capa do Cartão"
-
-#: src/widgets/card-widget.cpp:123 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/card-widget.cpp:74 src/widgets/cardlist-widget.cpp:55
 #: src/widgets/task-widget.cpp:75
 msgid "Remove"
 msgstr "Remover"
 
-#: src/widgets/card-widget.cpp:125
+#: src/widgets/card-widget.cpp:92
+msgid "Unset Color"
+msgstr "Remover Cor"
+
+#: src/widgets/card-widget.cpp:235 src/widgets/card-widget.cpp:297
+#: src/widgets/cardlist-widget.cpp:74
+msgid "New Card"
+msgstr "Novo cartão"
+
+#: src/widgets/card-widget.cpp:270
 msgid "Card Options"
 msgstr "Opções do Cartão"
 
-#: src/widgets/card-widget.cpp:396
+#: src/widgets/card-widget.cpp:526
 msgid "Due: "
 msgstr "Prazo: "
 
-#: src/widgets/card-widget.cpp:613
+#: src/widgets/card-widget.cpp:749
 msgid "%1%% complete"
 msgstr "%1%% completo"
 
-#: src/widgets/card-widget.cpp:623
+#: src/widgets/card-widget.cpp:759
 msgid "This card is complete"
 msgstr "Este cartão está concluído"
 
-#: src/widgets/card-widget.cpp:627
+#: src/widgets/card-widget.cpp:763
 #, c-format
 msgid "This card is due %x"
 msgstr "O prazo para este cartão é %x"
 
-#: src/widgets/card-widget.cpp:631
+#: src/widgets/card-widget.cpp:767
 msgid "The card is due today"
 msgstr "O cartão é para hoje"
 
-#: src/widgets/card-widget.cpp:641
+#: src/widgets/card-widget.cpp:777
 msgid "This card is past due date %1 day ago"
 msgid_plural "This card is past due date %1 days ago"
 msgstr[0] "Este cartão passou do prazo a %1 dia atrás"
 msgstr[1] "Este cartão passou do prazo a %1 dias atrás"
 
-#: src/widgets/card-widget.cpp:652
+#: src/widgets/card-widget.cpp:788
 msgid "This card is past due date %1 month ago"
 msgid_plural "This card is past due date %1 months ago"
 msgstr[0] "Este cartão passou do prazo a %1 mês atrás"
 msgstr[1] "Este cartão passou do prazo a %1 meses atrás"
 
-#: src/widgets/card-widget.cpp:662
+#: src/widgets/card-widget.cpp:798
 msgid "This card is past due date %1 year ago"
 msgid_plural "This card is past due date %1 years ago"
 msgstr[0] "Este cartão passou do prazo a %1 ano atrás"
@@ -627,6 +647,9 @@ msgstr "Nova Lista de Cartões"
 #: src/widgets/task-widget.cpp:76
 msgid "Convert to card"
 msgstr "Converter para cartão"
+
+#~ msgid "Card Cover"
+#~ msgstr "Capa do Cartão"
 
 #~ msgid "Kanban-style task organiser"
 #~ msgstr "Organizador de tarefas no estilo kanban"
