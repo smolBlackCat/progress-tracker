@@ -120,6 +120,12 @@ task:focus {
     box-shadow: 0 0 2px @card_shade_color;
 }
 
+/*
+ * Original CSS by Vlad Krupinskii <mrvladus@yandex.ru>
+ * Source: https://github.com/mrvladus/Errands
+ * License: MIT License (https://opensource.org/licenses/MIT)
+ */
+
 .accent-color-btn radio {
   all: unset;
   border: 2px solid transparent;
