@@ -100,8 +100,8 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
         // color labels
         checkbutton->set_tooltip_text(_(label));
         sigc::connection color_setting_cnn =
-            checkbutton->signal_toggled().connect(
-                color_setting_thunk(card_widget, Gdk::RGBA{color}));
+            checkbutton->signal_toggled().connect(color_setting_thunk(
+                card_widget, checkbutton, Gdk::RGBA{color}));
         checkbutton->add_css_class(label);
         checkbutton->add_css_class("accent-color-btn");
         color_box.append(*checkbutton);
@@ -140,17 +140,27 @@ void CardWidget::CardPopover::disable_color_signals() {
     for (auto& [color_label, data] : color_buttons) {
         std::get<2>(data).block();
     }
+
+    spdlog::get("ui")->debug("[CardPopover] Color signals disabled");
 }
 
 void CardWidget::CardPopover::enable_color_signals() {
     for (auto& [color_label, data] : color_buttons) {
         std::get<2>(data).unblock();
     }
+
+    spdlog::get("ui")->debug("[CardPopover] Color signals enabled");
 }
 
 std::function<void()> CardWidget::CardPopover::color_setting_thunk(
-    CardWidget* card, Gdk::RGBA color) {
-    return std::function<void()>([card, color]() { card->set_color(color); });
+    CardWidget* card, Gtk::CheckButton* checkbutton, Gdk::RGBA color) {
+    return std::function<void()>([card, checkbutton, color]() {
+        if (checkbutton->get_active()) {
+            card->set_color(color);
+            spdlog::get("ui")->debug("[CardPopover] Set color to {}",
+                                     color.to_string().c_str());
+        }
+    });
 }
 
 void CardWidget::CardPopover::mass_color_select(CardWidget* key_card_widget,
@@ -159,6 +169,9 @@ void CardWidget::CardPopover::mass_color_select(CardWidget* key_card_widget,
     for (auto& popover : popovers) {
         popover->set_selected_color(color, false);
     }
+
+    spdlog::get("ui")->debug("[CardPopover] Set color to {} for all popovers",
+                             color.to_string().c_str());
 }
 
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
@@ -462,12 +475,6 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
 }
 
 std::shared_ptr<Card> CardWidget::get_card() { return card; }
-
-const Gdk::RGBA CardWidget::get_color() const {
-    Color color = card->get_color();
-
-    return Gdk::RGBA(color_to_string(color));
-}
 
 CardlistWidget const* CardWidget::get_cardlist_widget() const { return parent; }
 

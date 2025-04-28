@@ -80,13 +80,6 @@ public:
     std::shared_ptr<Card> get_card();
 
     /**
-     * @brief Retrieves the color of this card.
-     *
-     * @return Gdk::RGBA object representing the color.
-     */
-    const Gdk::RGBA get_color() const;
-
-    /**
      * @brief Retrieves the CardlistWidget from which this widget is associated
      * with.
      *
@@ -184,6 +177,7 @@ protected:
          * @return A closure that sets the color of the card widget.
          */
         std::function<void()> color_setting_thunk(CardWidget* card,
+                                                  Gtk::CheckButton* checkbutton,
                                                   Gdk::RGBA color);
         CardWidget* card_widget;
         Gtk::Box root;
