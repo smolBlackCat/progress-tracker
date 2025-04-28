@@ -90,8 +90,12 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
 
     Gtk::CheckButton* prev = Gtk::make_managed<Gtk::CheckButton>();
     prev->set_tooltip_text(_("Unset Color"));
-    sigc::connection unset_color_cnn = prev->signal_toggled().connect(
-        sigc::mem_fun(*card_widget, &CardWidget::clear_color));
+    sigc::connection unset_color_cnn =
+        prev->signal_toggled().connect([prev, card_widget]() {
+            if (prev->get_active()) {
+                card_widget->clear_color();
+            }
+        });
     color_box.append(*prev);
 
     // In this current context, no colour whatsoever means an invisible color.
@@ -707,6 +711,8 @@ void CardWidget::off_rename() {
 void CardWidget::clear_color() {
     card_cover_revealer.set_reveal_child(false);
     card->set_color(NO_COLOR);
+
+    CardWidget::CardPopover::mass_color_select(this, Gdk::RGBA{});
 }
 
 void CardWidget::on_confirm_changes() {
