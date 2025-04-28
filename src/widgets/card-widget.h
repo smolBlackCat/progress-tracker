@@ -131,7 +131,8 @@ protected:
      */
     class CardPopover : public Gtk::Popover {
     public:
-        const static std::map<const char*, const char*> CARD_COLORS;
+        const static std::map<const char*, std::pair<const char*, const char*>>
+            CARD_COLORS;
 
         /**
          * @brief Updates all CardPopover instances color

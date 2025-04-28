@@ -143,26 +143,26 @@ task:focus {
   filter: brightness(1.2);
 }
 
-.Red radio {
+.red radio {
     background-color: #a51d2d;
 }
 
-.Green radio {
+.green radio {
     background-color: #26a269;
 }
 
-.Blue radio {
+.blue radio {
     background-color: #1a5fb4;
 }
 
-.Yellow radio {
+.yellow radio {
     background-color: #e5a50a;
 }
 
-.Orange radio {
+.orange radio {
     background-color: #c64600;
 }
 
-.Purple radio {
+.purple radio {
     background-color: #200941;
 }

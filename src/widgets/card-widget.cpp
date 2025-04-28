@@ -33,9 +33,14 @@ namespace ui {
 CardInit::CardInit()
     : Glib::ExtraClassInit(card_class_init, nullptr, card_init) {}
 
-const std::map<const char*, const char*> CardWidget::CardPopover::CARD_COLORS =
-    {{"Red", "#a51d2d"},   {"Orange", "#c64600"}, {"Yellow", "#e5a50a"},
-     {"Green", "#26a269"}, {"Blue", "#1a5fb4"},   {"Purple", "#200941"}};
+const std::map<const char*, std::pair<const char*, const char*>>
+    CardWidget::CardPopover::CARD_COLORS = {
+        {"red", {_("Red"), "#a51d2d"}},
+        {"orange", {_("Orange"), "#c64600"}},
+        {"yellow", {_("Yellow"), "#e5a50a"}},
+        {"green", {_("Green"), "#26a269"}},
+        {"blue", {_("Blue"), "#1a5fb4"}},
+        {"purple", {_("Purple"), "#200941"}}};
 
 std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
     CardWidget::CardPopover::card_popovers{};
@@ -54,29 +59,30 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     set_child(root);
     set_position(Gtk::PositionType::BOTTOM);
 
-    const std::vector<std::pair<const char*, std::function<void()>>>
-        button_actions = {{"Rename",
+    const std::vector<
+        std::tuple<const char*, const char*, std::function<void()>>>
+        button_actions = {{"rename", _("Rename"),
                            [this, card_widget] {
                                card_widget->on_rename();
                                this->popdown();
                            }},
-                          {"Card Details",
+                          {"card-details", _("Card Details"),
                            [this, card_widget] {
                                card_widget->open_card_details_dialog();
                                this->popdown();
                            }},
-                          {"Remove", [this, card_widget] {
+                          {"remove", _("Remove"), [this, card_widget] {
                                card_widget->remove_from_parent();
                                this->popdown();
                            }}};
 
-    for (const auto& [label, action] : button_actions) {
-        auto button = Gtk::make_managed<Gtk::Button>(_(label));
+    for (const auto& [key, label, action] : button_actions) {
+        auto button = Gtk::make_managed<Gtk::Button>(label);
         button->set_has_frame(false);
         button->signal_clicked().connect(action);
         root.append(*button);
 
-        action_buttons[label] = button;
+        action_buttons[key] = button;
     }
 
     // Setup Colors Radio
@@ -93,28 +99,26 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     color_buttons["Unset"] =
         std::make_tuple(prev, "rgba(0,0,0,0)", unset_color_cnn);
 
-    for (const auto& [label, color] : CARD_COLORS) {
+    for (const auto& [key, color_pair] : CARD_COLORS) {
         auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
 
-        // This will require us to manually define translatable strings for
-        // color labels
-        checkbutton->set_tooltip_text(_(label));
+        checkbutton->set_tooltip_text(color_pair.first);
         sigc::connection color_setting_cnn =
             checkbutton->signal_toggled().connect(color_setting_thunk(
-                card_widget, checkbutton, Gdk::RGBA{color}));
-        checkbutton->add_css_class(label);
+                card_widget, checkbutton, Gdk::RGBA{color_pair.second}));
+        checkbutton->add_css_class(key);
         checkbutton->add_css_class("accent-color-btn");
         color_box.append(*checkbutton);
         checkbutton->set_group(*prev);
         prev = checkbutton;
 
-        color_buttons[label] =
-            std::make_tuple(checkbutton, color, color_setting_cnn);
+        color_buttons[color_pair.first] =
+            std::make_tuple(checkbutton, color_pair.second, color_setting_cnn);
     }
-    root.insert_child_after(color_box, *action_buttons["Card Details"]);
+    root.insert_child_after(color_box, *action_buttons["card-details"]);
     root.insert_child_after(
         *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
-        *action_buttons["Card Details"]);
+        *action_buttons["card-details"]);
     root.insert_child_after(
         *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
         color_box);
