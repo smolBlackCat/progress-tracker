@@ -37,8 +37,19 @@ const std::map<const char*, const char*> CardWidget::CardPopover::CARD_COLORS =
     {{"Red", "#a51d2d"},   {"Orange", "#c64600"}, {"Yellow", "#e5a50a"},
      {"Green", "#26a269"}, {"Blue", "#1a5fb4"},   {"Purple", "#200941"}};
 
+std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
+    CardWidget::CardPopover::card_popovers{};
+
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
-    : Gtk::Popover{}, root{Gtk::Orientation::VERTICAL} {
+    : Gtk::Popover{},
+      card_widget{card_widget},
+      root{Gtk::Orientation::VERTICAL} {
+    if (!card_popovers.contains(card_widget)) {
+        card_popovers[card_widget] = std::vector<CardPopover*>{this};
+    } else {
+        card_popovers[card_widget].push_back(this);
+    }
+
     set_has_arrow(false);
     set_child(root);
     set_position(Gtk::PositionType::BOTTOM);
@@ -73,13 +84,14 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
 
     Gtk::CheckButton* prev = Gtk::make_managed<Gtk::CheckButton>();
     prev->set_tooltip_text(_("Unset Color"));
-    prev->signal_toggled().connect(
+    sigc::connection unset_color_cnn = prev->signal_toggled().connect(
         sigc::mem_fun(*card_widget, &CardWidget::clear_color));
     color_box.append(*prev);
 
     // In this current context, no colour whatsoever means an invisible color.
     // This helps the popover check if a colour has been set
-    color_buttons["Unset"] = std::make_tuple(prev, "rgba(0,0,0,0)");
+    color_buttons["Unset"] =
+        std::make_tuple(prev, "rgba(0,0,0,0)", unset_color_cnn);
 
     for (const auto& [label, color] : CARD_COLORS) {
         auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
@@ -87,15 +99,17 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
         // This will require us to manually define translatable strings for
         // color labels
         checkbutton->set_tooltip_text(_(label));
-        checkbutton->signal_toggled().connect(
-            color_setting_thunk(card_widget, Gdk::RGBA{color}));
+        sigc::connection color_setting_cnn =
+            checkbutton->signal_toggled().connect(
+                color_setting_thunk(card_widget, Gdk::RGBA{color}));
         checkbutton->add_css_class(label);
         checkbutton->add_css_class("accent-color-btn");
         color_box.append(*checkbutton);
         checkbutton->set_group(*prev);
         prev = checkbutton;
 
-        color_buttons[label] = std::make_tuple(checkbutton, color);
+        color_buttons[label] =
+            std::make_tuple(checkbutton, color, color_setting_cnn);
     }
     root.insert_child_after(color_box, *action_buttons["Card Details"]);
     root.insert_child_after(
@@ -106,22 +120,45 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
         color_box);
 }
 
-void CardWidget::CardPopover::set_selected_color(CardWidget* card,
-                                                 Gdk::RGBA color) {
-    for (const auto& [label, colour_tuple] : color_buttons) {
-        if (Gdk::RGBA(std::get<1>(colour_tuple)) == card->get_color()) {
+void CardWidget::CardPopover::set_selected_color(Gdk::RGBA color,
+                                                 bool trigger) {
+    if (!trigger) disable_color_signals();
+    for (auto& [label, colour_tuple] : color_buttons) {
+        if (Gdk::RGBA(std::get<1>(colour_tuple)) == color) {
             // Select the Checkbutton pointer refering to this colour and set it
             // as active
             std::get<0>(colour_tuple)->set_active(true);
+            if (!trigger) enable_color_signals();
             return;
         }
     }
+    if (!trigger) enable_color_signals();
     std::get<0>(color_buttons["Unset"])->set_active(true);
+}
+
+void CardWidget::CardPopover::disable_color_signals() {
+    for (auto& [color_label, data] : color_buttons) {
+        std::get<2>(data).block();
+    }
+}
+
+void CardWidget::CardPopover::enable_color_signals() {
+    for (auto& [color_label, data] : color_buttons) {
+        std::get<2>(data).unblock();
+    }
 }
 
 std::function<void()> CardWidget::CardPopover::color_setting_thunk(
     CardWidget* card, Gdk::RGBA color) {
     return std::function<void()>([card, color]() { card->set_color(color); });
+}
+
+void CardWidget::CardPopover::mass_color_select(CardWidget* key_card_widget,
+                                                Gdk::RGBA color) {
+    std::vector<CardPopover*> popovers = card_popovers[key_card_widget];
+    for (auto& popover : popovers) {
+        popover->set_selected_color(color, false);
+    }
 }
 
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
@@ -371,20 +408,19 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
 
     if (card->is_color_set()) {
         Color card_color = card->get_color();
-        Gdk::RGBA card_color_rgba =
-            Gdk::RGBA{static_cast<float>(std::get<0>(card_color)) / 255,
-                      static_cast<float>(std::get<1>(card_color)) / 255,
-                      static_cast<float>(std::get<2>(card_color)) / 255,
-                      std::get<3>(card_color)};
+        Gdk::RGBA card_color_rgba = Gdk::RGBA{color_to_string(card_color)};
 
         _set_color(card_color_rgba);
-        card_menu_popover.set_selected_color(this, card_color_rgba);
+
+        card_menu_popover.set_selected_color(card_color_rgba, false);
+        card_menu_popover2.set_selected_color(card_color_rgba, false);
 
         if (!is_new) {
             card->set_modified(false);
         }
     } else {
-        card_menu_popover.set_selected_color(this, Gdk::RGBA{});
+        card_menu_popover.set_selected_color(Gdk::RGBA{}, false);
+        card_menu_popover2.set_selected_color(Gdk::RGBA{}, false);
     }
 
     if (card->get_due_date().ok()) {
@@ -680,6 +716,8 @@ void CardWidget::set_color(const Gdk::RGBA& color) {
     card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
                           color.get_blue() * 255, 1.0});
     _set_color(color);
+
+    CardWidget::CardPopover::mass_color_select(this, color);
 
     spdlog::get("ui")->debug("CardWidget \"{}\" has set color to {}",
                              card->get_name(), color.to_string().c_str());

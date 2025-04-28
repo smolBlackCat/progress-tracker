@@ -23,8 +23,6 @@ public:
     CardInit();
 };
 
-class CardPopover;
-
 /**
  * @brief Widget that represents a single card.
  */
@@ -143,6 +141,12 @@ protected:
         const static std::map<const char*, const char*> CARD_COLORS;
 
         /**
+         * @brief Updates all CardPopover instances color
+         */
+        static void mass_color_select(CardWidget* key_card_widget,
+                                      Gdk::RGBA color);
+
+        /**
          * @brief Constructor for CardPopover class.
          *
          * @param card The card widget to set the color for.
@@ -153,12 +157,24 @@ protected:
          * @brief Marks one of the color radio buttons as selected. If a color
          * that does not belong to CARD_COLORS, this call is ignored.
          *
-         * @param card The card widget to set the color for.
          * @param color The color to set.
+         * @param trigger Whether to trigger the color change signal.
          */
-        void set_selected_color(CardWidget* card, Gdk::RGBA color);
+        void set_selected_color(Gdk::RGBA color, bool trigger = true);
+
+        /**
+         * @brief Disable this card popover colour setting signals
+         */
+        void disable_color_signals();
+
+        /**
+         * @brief Enable this card popover colour setting signals
+         */
+        void enable_color_signals();
 
     protected:
+        static std::map<CardWidget*, std::vector<CardPopover*>> card_popovers;
+
         /**
          * @brief Helper method for creating a color setting closure to set the
          * color of the card widget.
@@ -169,10 +185,11 @@ protected:
          */
         std::function<void()> color_setting_thunk(CardWidget* card,
                                                   Gdk::RGBA color);
-
+        CardWidget* card_widget;
         Gtk::Box root;
         std::map<const char*, Gtk::Button*> action_buttons;
-        std::map<const char*, std::tuple<Gtk::CheckButton*, const char*>>
+        std::map<const char*,
+                 std::tuple<Gtk::CheckButton*, const char*, sigc::connection>>
             color_buttons;
     };
 
