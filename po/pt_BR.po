@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-28 10:51-0300\n"
+"POT-Creation-Date: 2025-05-01 09:12-0300\n"
 "PO-Revision-Date: 2024-02-10 12:25-0300\n"
 "Last-Translator: Gabriel de Moura <moura@moura>\n"
 "Language-Team: Brazilian Portuguese <ldpbr-"
@@ -33,7 +33,7 @@ msgstr "Kanban;Todo;Progress;Tarefas;Progresso;Listas;"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
 msgid "Kanban board application"
-msgstr ""
+msgstr "Aplicação de gerenciamento de quadros kanban"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:7
 msgid "Gabriel de Moura"
@@ -42,17 +42,17 @@ msgstr "Gabriel de Moura"
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:28
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:40
 msgid "Separate different contexts into different boards"
-msgstr ""
+msgstr "Separe diferentes contextos em diferentes quadros"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:32
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:44
 msgid "Editable kanban board"
-msgstr ""
+msgstr "Quadro kanban editável"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:36
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:48
 msgid "Edit the extra details of a Card"
-msgstr ""
+msgstr "Edite detalhes adicionais de uma cartão"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:53
 msgid ""
@@ -60,75 +60,83 @@ msgid ""
 "kanban boards, which are easily editable with its distinctive drag-and-drop "
 "feature."
 msgstr ""
+"Progress permite que o usuário organize suas tarefas de forma concisa em "
+"quadros kanban personalizados, que são facilmente editáveis com sua "
+"funcionalidade drag-and-drop."
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:67
 msgid "What's new in Progress 1.7.0"
-msgstr ""
+msgstr "O que há de novo no Progress 1.7.0"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:68
 msgid ""
 "This minor release is actually quite big and important because it adds "
 "features that may enable the users to use Progress across more different "
 "workflows"
-msgstr ""
+msgstr "Esta pequena atualização é realmente grande e importante porque adiciona "
+"funcionalidades que podem habilitar os usuários a usar o Progress em mais "
+"diferentes fluxos de trabalho"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:72
 msgid ""
 "Cards have received a revamp, making it more useful for various workflows. "
 "The new features include:"
-msgstr ""
+msgstr "Cartões receberam uma grande atualização, tornando-os mais "
+"úteis para diversos fluxos de trabalho. As novas funcionalidades incluem:"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:75
 msgid "Coloured card covers"
-msgstr ""
+msgstr "Capas de cartões coloridas"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:76
 msgid "Card notes"
-msgstr ""
+msgstr "Notas de cartão"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:77
 msgid "Deadline settings"
-msgstr ""
+msgstr "Configurações de prazo"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:78
 msgid "Sub-tasks"
-msgstr ""
+msgstr "Sub-tarefas"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:79
 msgid "Dedicated dialog for card editing"
-msgstr ""
+msgstr "Diálogo dedicado para edição de cartões"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:81
 msgid "UI has been greatly improved"
-msgstr ""
+msgstr "Interface de usuário foi melhorado significativamente"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:83
 msgid "Dark mode and light mode styles have improved"
-msgstr ""
+msgstr "Modos escuro e claro foram melhorados"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:84
 msgid "Board dialog has received a new UI design"
-msgstr ""
+msgstr "Diálogo de quadro recebeu um novo design de interface"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:86
 msgid ""
 "Applications shortcuts have been introduced. Users can now interact and move "
 "cards, card lists and tasks using the keyboard"
-msgstr ""
+msgstr "Atalhos de aplicativos foram introduzidos. Os usuários agora podem "
+"interagir e mover cartões, listas de cartões e tarefas usando o teclado"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:89
 msgid ""
 "Data model have been updated to be backwards-compatible with boards created "
 "by previous Progress versions"
-msgstr ""
+msgstr "Modelo de dados foi atualizado para ser compatível com quadros criados "
+"por versões anteriores do Progress"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:91
 msgid "Drag and drop mechanism have been improved"
-msgstr ""
+msgstr "Mecanismo de arrastar e soltar foi melhorado"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:92
 msgid "Various bugs and memory leaks have been fixed"
-msgstr ""
+msgstr "Bugs e vazamentos de memória foram corrigidos"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:98
 msgid "What's new in Progress 1.6.0"
@@ -432,11 +440,11 @@ msgstr "Definir cor"
 
 #: src/resources/ui/app-window.ui:260
 msgid "Deletes current focused card"
-msgstr "Deleta o cartão focado atualmente"
+msgstr "Deleta o cartão em foco"
 
 #: src/resources/ui/app-window.ui:271
 msgid "Reorder card within cardlist"
-msgstr "Reordenar cartão dentro da lista de cartões"
+msgstr "Reordena cartão dentro da lista de cartões"
 
 #: src/resources/ui/app-window.ui:282
 msgid "Moves a card to previous or next cardlist"
@@ -448,11 +456,11 @@ msgstr "Atalhos de Lista de Cartões"
 
 #: src/resources/ui/app-window.ui:300
 msgid "Rename the focused cardlist"
-msgstr "Renomear a lista de cartões focada"
+msgstr "Renomeia a lista de cartões em foco"
 
 #: src/resources/ui/app-window.ui:309
 msgid "Add a new cardlist next to the focused cardlist"
-msgstr "Adicionar uma nova lista de cartões ao lado da lista de cartões focada"
+msgstr "Adiciona uma nova lista de cartões ao lado da lista de cartões em foco"
 
 #: src/resources/ui/app-window.ui:318
 msgid "Deletes cardlist from board"
@@ -468,11 +476,11 @@ msgstr "Atalhos de Tarefa"
 
 #: src/resources/ui/app-window.ui:347
 msgid "Rename task"
-msgstr "Renomea a tarefa"
+msgstr "Renomeia a tarefa"
 
 #: src/resources/ui/app-window.ui:356
 msgid "Add new task next to focused task"
-msgstr ""
+msgstr "Adiciona nova tarefa ao lado da tarefa em foco"
 
 #: src/resources/ui/app-window.ui:365
 msgid "Delete task from card"
@@ -502,11 +510,11 @@ msgstr "Remover Prazo"
 msgid "Mark this card complete"
 msgstr "Marcar cartão como concluído"
 
-#: src/resources/ui/card-details-dialog.ui:108
+#: src/resources/ui/card-details-dialog.ui:108 src/widgets/card-widget.cpp:841
 msgid "Checklist"
 msgstr "Lista de Tarefas"
 
-#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:808
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:861
 msgid "Notes"
 msgstr "Anotações"
 
@@ -514,7 +522,7 @@ msgstr "Anotações"
 msgid "Delete Card"
 msgstr "Apagar Cartão"
 
-#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:69
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:71
 msgid "Card Details"
 msgstr "Detalhes do Cartão"
 
@@ -550,91 +558,104 @@ msgstr "Adicionar Lista"
 msgid "New CardList"
 msgstr "Nova lista de cartões"
 
-#: src/widgets/card-widget.cpp:38
+#: src/widgets/card-widget.cpp:40
 msgid "Red"
 msgstr "Vermelho"
 
-#: src/widgets/card-widget.cpp:39
+#: src/widgets/card-widget.cpp:41
 msgid "Orange"
 msgstr "Laranja"
 
-#: src/widgets/card-widget.cpp:40
+#: src/widgets/card-widget.cpp:42
 msgid "Yellow"
 msgstr "Amarelo"
 
-#: src/widgets/card-widget.cpp:41
+#: src/widgets/card-widget.cpp:43
 msgid "Green"
 msgstr "Verde"
 
-#: src/widgets/card-widget.cpp:42
+#: src/widgets/card-widget.cpp:44
 msgid "Blue"
 msgstr "Azul"
 
-#: src/widgets/card-widget.cpp:43
+#: src/widgets/card-widget.cpp:45
 msgid "Purple"
 msgstr "Roxo"
 
-#: src/widgets/card-widget.cpp:64 src/widgets/editable-label-header.cpp:79
+#: src/widgets/card-widget.cpp:66 src/widgets/editable-label-header.cpp:79
 #: src/widgets/task-widget.cpp:74
 msgid "Rename"
 msgstr "Renomear"
 
-#: src/widgets/card-widget.cpp:74 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/card-widget.cpp:76 src/widgets/cardlist-widget.cpp:55
 #: src/widgets/task-widget.cpp:75
 msgid "Remove"
 msgstr "Remover"
 
-#: src/widgets/card-widget.cpp:92
+#: src/widgets/card-widget.cpp:94
 msgid "Unset Color"
 msgstr "Remover Cor"
 
-#: src/widgets/card-widget.cpp:235 src/widgets/card-widget.cpp:297
+#: src/widgets/card-widget.cpp:237 src/widgets/card-widget.cpp:299
 #: src/widgets/cardlist-widget.cpp:74
 msgid "New Card"
 msgstr "Novo cartão"
 
-#: src/widgets/card-widget.cpp:270
+#: src/widgets/card-widget.cpp:272
 msgid "Card Options"
 msgstr "Opções do Cartão"
 
-#: src/widgets/card-widget.cpp:526
+#: src/widgets/card-widget.cpp:528
 msgid "Due: "
 msgstr "Prazo: "
 
-#: src/widgets/card-widget.cpp:749
+#: src/widgets/card-widget.cpp:752
 msgid "%1%% complete"
 msgstr "%1%% completo"
 
-#: src/widgets/card-widget.cpp:759
+#: src/widgets/card-widget.cpp:764
 msgid "This card is complete"
 msgstr "Este cartão está concluído"
 
-#: src/widgets/card-widget.cpp:763
-#, c-format
-msgid "This card is due %x"
-msgstr "O prazo para este cartão é %x"
+#: src/widgets/card-widget.cpp:774
+msgid "<b>%1 day</b> remaining"
+msgid_plural "<b>%1 days</b> remaining"
+msgstr[0] "<b>%1 dia</b> restante"
+msgstr[1] "<b>%1 dias</b> restantes"
 
-#: src/widgets/card-widget.cpp:767
+#: src/widgets/card-widget.cpp:783
+msgid "<b>%1 month</b> remaining"
+msgid_plural "<b>%1 months</b> remaining"
+msgstr[0] "<b>%1 mês</b> restante"
+msgstr[1] "<b>%1 meses</b> restantes"
+
+#: src/widgets/card-widget.cpp:793
+msgid "<b>%1 year</b> remaining"
+msgid_plural "<b>%1 years</b> remaining"
+msgstr[0] "<b>%1 ano</b> restante"
+msgstr[1] "<b>%1 anos</b> restantes"
+
+#: src/widgets/card-widget.cpp:799
 msgid "The card is due today"
 msgstr "O cartão é para hoje"
 
-#: src/widgets/card-widget.cpp:777
-msgid "This card is past due date %1 day ago"
-msgid_plural "This card is past due date %1 days ago"
-msgstr[0] "Este cartão passou do prazo a %1 dia atrás"
-msgstr[1] "Este cartão passou do prazo a %1 dias atrás"
+#: src/widgets/card-widget.cpp:809
+msgid "This card is past due date <b>%1 day ago</b>"
+msgid_plural "This card is past due date <b>%1 days ago</b>"
+msgstr[0] "Este cartão está atrasado há <b>%1 dia</b>"
+msgstr[1] "Este cartão está atrasado há <b>%1 dias</b>"
 
-#: src/widgets/card-widget.cpp:788
-msgid "This card is past due date %1 month ago"
-msgid_plural "This card is past due date %1 months ago"
-msgstr[0] "Este cartão passou do prazo a %1 mês atrás"
-msgstr[1] "Este cartão passou do prazo a %1 meses atrás"
+#: src/widgets/card-widget.cpp:820
+msgid "This card is past due date <b>%1 month</b> ago"
+msgid_plural "This card is past due date <b>%1 months</b> ago"
+msgstr[0] "Este cartão está atrasado há <b>%1 mês</b>"
+msgstr[1] "Este cartão está atrasado há <b>%1 meses</b>"
 
-#: src/widgets/card-widget.cpp:798
-msgid "This card is past due date %1 year ago"
-msgid_plural "This card is past due date %1 years ago"
-msgstr[0] "Este cartão passou do prazo a %1 ano atrás"
-msgstr[1] "Este cartão passou do prazo a %1 anos atrás"
+#: src/widgets/card-widget.cpp:831
+msgid "This card is past due date <b>%1 year</b> ago"
+msgid_plural "This card is past due date <b>%1 years</b> ago"
+msgstr[0] "Este cartão está atrasado há <b>%1 ano</b>"
+msgstr[1] "Este cartão está atrasado há <b>%1 anos</b>"
 
 #: src/widgets/cardlist-widget.cpp:38
 msgid "Add card"
@@ -647,6 +668,25 @@ msgstr "Nova Lista de Cartões"
 #: src/widgets/task-widget.cpp:76
 msgid "Convert to card"
 msgstr "Converter para cartão"
+
+#, c-format
+#~ msgid "This card is due %x"
+#~ msgstr "O prazo para este cartão é %x"
+
+#~ msgid "This card is past due date %1 day ago"
+#~ msgid_plural "This card is past due date %1 days ago"
+#~ msgstr[0] "Este cartão passou do prazo a %1 dia atrás"
+#~ msgstr[1] "Este cartão passou do prazo a %1 dias atrás"
+
+#~ msgid "This card is past due date %1 month ago"
+#~ msgid_plural "This card is past due date %1 months ago"
+#~ msgstr[0] "Este cartão passou do prazo a %1 mês atrás"
+#~ msgstr[1] "Este cartão passou do prazo a %1 meses atrás"
+
+#~ msgid "This card is past due date %1 year ago"
+#~ msgid_plural "This card is past due date %1 years ago"
+#~ msgstr[0] "Este cartão passou do prazo a %1 ano atrás"
+#~ msgstr[1] "Este cartão passou do prazo a %1 anos atrás"
 
 #~ msgid "Card Cover"
 #~ msgstr "Capa do Cartão"

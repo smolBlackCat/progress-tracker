@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-28 10:51-0300\n"
+"POT-Creation-Date: 2025-05-01 09:12-0300\n"
 "PO-Revision-Date: 2024-05-10 20:17-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -492,11 +492,11 @@ msgstr ""
 msgid "Mark this card complete"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:108
+#: src/resources/ui/card-details-dialog.ui:108 src/widgets/card-widget.cpp:841
 msgid "Checklist"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:808
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:861
 msgid "Notes"
 msgstr ""
 
@@ -504,7 +504,7 @@ msgstr ""
 msgid "Delete Card"
 msgstr ""
 
-#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:69
+#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:71
 msgid "Card Details"
 msgstr ""
 
@@ -540,89 +540,102 @@ msgstr "Añadir lista"
 msgid "New CardList"
 msgstr "Nueva lista de tarjetas"
 
-#: src/widgets/card-widget.cpp:38
+#: src/widgets/card-widget.cpp:40
 msgid "Red"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:39
+#: src/widgets/card-widget.cpp:41
 msgid "Orange"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:40
+#: src/widgets/card-widget.cpp:42
 msgid "Yellow"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:41
+#: src/widgets/card-widget.cpp:43
 msgid "Green"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:42
+#: src/widgets/card-widget.cpp:44
 msgid "Blue"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:43
+#: src/widgets/card-widget.cpp:45
 msgid "Purple"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:64 src/widgets/editable-label-header.cpp:79
+#: src/widgets/card-widget.cpp:66 src/widgets/editable-label-header.cpp:79
 #: src/widgets/task-widget.cpp:74
 msgid "Rename"
 msgstr "Renombrar"
 
-#: src/widgets/card-widget.cpp:74 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/card-widget.cpp:76 src/widgets/cardlist-widget.cpp:55
 #: src/widgets/task-widget.cpp:75
 msgid "Remove"
 msgstr "Eliminar"
 
-#: src/widgets/card-widget.cpp:92
+#: src/widgets/card-widget.cpp:94
 msgid "Unset Color"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:235 src/widgets/card-widget.cpp:297
+#: src/widgets/card-widget.cpp:237 src/widgets/card-widget.cpp:299
 #: src/widgets/cardlist-widget.cpp:74
 msgid "New Card"
 msgstr "Nueva tarjeta"
 
-#: src/widgets/card-widget.cpp:270
+#: src/widgets/card-widget.cpp:272
 msgid "Card Options"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:526
+#: src/widgets/card-widget.cpp:528
 msgid "Due: "
 msgstr ""
 
-#: src/widgets/card-widget.cpp:749
+#: src/widgets/card-widget.cpp:752
 msgid "%1%% complete"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:759
+#: src/widgets/card-widget.cpp:764
 msgid "This card is complete"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:763
-#, c-format
-msgid "This card is due %x"
-msgstr ""
+#: src/widgets/card-widget.cpp:774
+msgid "<b>%1 day</b> remaining"
+msgid_plural "<b>%1 days</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/widgets/card-widget.cpp:767
+#: src/widgets/card-widget.cpp:783
+msgid "<b>%1 month</b> remaining"
+msgid_plural "<b>%1 months</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:793
+msgid "<b>%1 year</b> remaining"
+msgid_plural "<b>%1 years</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:799
 msgid "The card is due today"
 msgstr ""
 
-#: src/widgets/card-widget.cpp:777
-msgid "This card is past due date %1 day ago"
-msgid_plural "This card is past due date %1 days ago"
+#: src/widgets/card-widget.cpp:809
+msgid "This card is past due date <b>%1 day ago</b>"
+msgid_plural "This card is past due date <b>%1 days ago</b>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card-widget.cpp:788
-msgid "This card is past due date %1 month ago"
-msgid_plural "This card is past due date %1 months ago"
+#: src/widgets/card-widget.cpp:820
+msgid "This card is past due date <b>%1 month</b> ago"
+msgid_plural "This card is past due date <b>%1 months</b> ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/widgets/card-widget.cpp:798
-msgid "This card is past due date %1 year ago"
-msgid_plural "This card is past due date %1 years ago"
+#: src/widgets/card-widget.cpp:831
+msgid "This card is past due date <b>%1 year</b> ago"
+msgid_plural "This card is past due date <b>%1 years</b> ago"
 msgstr[0] ""
 msgstr[1] ""
 
