@@ -6,6 +6,8 @@
 #include <utils.h>
 
 #include <chrono>
+#include <iomanip>
+#include <ios>
 #include <numeric>
 #include <tuple>
 
@@ -452,7 +454,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         update_complete_tasks();
     }
 
-    set_tooltip_text(create_details_text());
+    set_tooltip_markup(create_details_text());
     setup_drag_and_drop();
 }
 
@@ -746,8 +748,11 @@ std::string CardWidget::create_details_text() const {
     std::ostringstream details_text;
 
     if (!card->container().get_data().empty()) {
-        details_text << Glib::ustring::compose(_("%1%% complete"),
-                                               card->get_completion())
+        details_text << Glib::ustring::compose(
+                            _("%1%% complete"),
+                            Glib::ustring::format(std::fixed,
+                                                  std::setprecision(2),
+                                                  card->get_completion()))
                      << "\n\n";
     }
 
@@ -758,15 +763,42 @@ std::string CardWidget::create_details_text() const {
         if (card->get_complete()) {
             details_text << _("This card is complete") << "\n\n";
         } else if (card_due_date > cur_date) {
-            auto due_date_tm = system_clock::to_time_t(sys_days(card_due_date));
-            char date_info[100];
-            strftime(date_info, 100, _("This card is due %x"),
-                     std::gmtime(&due_date_tm));
-            details_text << std::string{date_info} << "\n\n";
+            auto now = sys_days(cur_date);
+            auto days = sys_days(card_due_date);
+            auto delta_days = (days - now).count();
+
+            if (delta_days < 30) {
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "<b>%1 day</b> remaining",
+                               "<b>%1 days</b> remaining", delta_days)),
+                           delta_days)
+                    << "\n\n";
+            } else if (delta_days > 30 && delta_days < 365) {
+                long months_from_delta =
+                    delta_days / 30;  // Assume every month has 30 days
+                details_text
+                    << Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
+                                                  "<b>%1 month</b> remaining",
+                                                  "<b>%1 months</b> remaining",
+                                                  months_from_delta)),
+                                              months_from_delta)
+                    << "\n\n";
+            } else if (delta_days >= 365) {
+                long years_from_delta = delta_days / 365;  // Ignore leap years
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "<b>%1 year</b> remaining",
+                               "<b>%1 years</b> remaining", years_from_delta)),
+                           years_from_delta)
+                    << "\n\n";
+            }
         } else if (card_due_date == cur_date) {
             details_text << _("The card is due today") << "\n\n";
         } else {
-            auto now = sys_days(floor<days>(system_clock::now()));
+            auto now = sys_days(cur_date);
             auto days = sys_days(card_due_date);
             auto delta_days = -(days - now).count();
 
@@ -774,8 +806,8 @@ std::string CardWidget::create_details_text() const {
                 details_text
                     << Glib::ustring::compose(
                            Glib::locale_to_utf8(ngettext(
-                               "This card is past due date %1 day ago",
-                               "This card is past due date %1 days ago",
+                               "This card is past due date <b>%1 day ago</b>",
+                               "This card is past due date <b>%1 days ago</b>",
                                delta_days)),
                            delta_days)
                     << "\n\n";
@@ -785,8 +817,9 @@ std::string CardWidget::create_details_text() const {
                 details_text
                     << Glib::ustring::compose(
                            Glib::locale_to_utf8(ngettext(
-                               "This card is past due date %1 month ago",
-                               "This card is past due date %1 months ago",
+                               "This card is past due date <b>%1 month</b> ago",
+                               "This card is past due date <b>%1 months</b> "
+                               "ago",
                                months_from_delta)),
                            months_from_delta)
                     << "\n\n";
@@ -795,8 +828,8 @@ std::string CardWidget::create_details_text() const {
                 details_text
                     << Glib::ustring::compose(
                            Glib::locale_to_utf8(ngettext(
-                               "This card is past due date %1 year ago",
-                               "This card is past due date %1 years ago",
+                               "This card is past due date <b>%1 year</b> ago",
+                               "This card is past due date <b>%1 years</b> ago",
                                years_from_delta)),
                            years_from_delta)
                     << "\n\n";
@@ -804,8 +837,30 @@ std::string CardWidget::create_details_text() const {
         }
     }
 
+    if (!card->container().get_data().empty()) {
+        details_text << "<b>" << _("Checklist") << "</b>" << ":\n";
+        int c = 0;
+        const int max_visible = 5;
+        for (const auto& task : card->container()) {
+            if (c == max_visible) {
+                details_text << "\n...";
+                break;
+            }
+
+            details_text << (task->get_done() ? "- [X] " : "- [ ] ")
+                         << task->get_name();
+            if (c < max_visible - 1) {
+                details_text << "\n";
+            }
+            c++;
+        }
+        details_text << "\n\n";
+    }
+
     if (!card->get_notes().empty()) {
-        details_text << _("Notes") << ":\n" << card->get_notes() << "\n\n";
+        details_text << "<b>" << _("Notes") << "</b>" << ":\n"
+                     << Glib::ustring{card->get_notes()}.truncate_middle(150)
+                     << "\n\n";
     }
 
     std::string final_text = details_text.str();

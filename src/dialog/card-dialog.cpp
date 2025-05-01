@@ -180,7 +180,7 @@ void CardDetailsDialog::on_save() {
         card->set_notes(new_notes);
     }
 
-    cur_card_widget->set_tooltip_text(cur_card_widget->create_details_text());
+    cur_card_widget->set_tooltip_markup(cur_card_widget->create_details_text());
 
     spdlog::get("ui")->info(
         "[CardDetailsDialog] Card dialog has saved changes made to Card \"{}\"",
