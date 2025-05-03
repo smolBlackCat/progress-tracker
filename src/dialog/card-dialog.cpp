@@ -62,6 +62,14 @@ CardDetailsDialog::CardDetailsDialog()
 
 CardDetailsDialog::~CardDetailsDialog() {}
 
+TaskWidget* CardDetailsDialog::add_task(const Task& task) {
+    TaskWidget* task_widget =
+        _add_task(cur_card_widget->get_card()->container().append(task), true);
+    cur_card_widget->update_complete_tasks();
+
+    return task_widget;
+}
+
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
     card->container().remove(*task.get_task());
@@ -249,8 +257,8 @@ void CardDetailsDialog::clear() {
         "[CardDetailsDialog] Card Dialog has been cleared");
 }
 
-void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
-                                  bool is_new) {
+TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
+                                         bool is_new) {
     auto task_widget =
         Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
     tasks_box->append(*task_widget);
@@ -260,5 +268,7 @@ void CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
     spdlog::get("ui")->debug(
         "[CardDetailsDialog] TaskWidget \"{}\" has been added to the checklist",
         task->get_name());
+
+    return task_widget;
 }
 }  // namespace ui

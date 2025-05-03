@@ -38,6 +38,8 @@ public:
      */
     ~CardDetailsDialog();
 
+    TaskWidget* add_task(const Task& task);
+
     /**
      * @brief Removes a TaskWidget from the checklist area of the dialog.
      *
@@ -142,8 +144,10 @@ private:
      *
      * @param task Shared pointer to the Task object.
      * @param is_new Boolean flag indicating if this is a new task.
+     *
+     * @return Pointer to the newly added TaskWidget.
      */
-    void _add_task(const std::shared_ptr<Task> task, bool is_new = false);
+    TaskWidget* _add_task(const std::shared_ptr<Task> task, bool is_new = false);
 };
 
 }  // namespace ui

@@ -126,6 +126,15 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
                 return true;
             })));
     shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+        Gtk::ShortcutTrigger::parse_string("<Control>N"),
+        Gtk::CallbackAction::create([&card_details_dialog, this](
+                                        Gtk::Widget&,
+                                        const Glib::VariantBase&) {
+            auto new_task = card_details_dialog.add_task(Task{_("New Task")});
+            card_details_dialog.reorder_task_widget(*new_task, *this);
+            return true;
+        })));
+    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
         Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
         Gtk::CallbackAction::create(
             [this](Gtk::Widget&, const Glib::VariantBase&) {
