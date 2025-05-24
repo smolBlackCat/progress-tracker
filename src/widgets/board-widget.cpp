@@ -186,7 +186,7 @@ void ui::BoardWidget::set_background(const std::string& background,
                                      bool modify) {
     // Reseting background is the approach to ensure that a background is set
     // even when background turns invalid for whatever reason
-    BackgroundType bg_type = board->set_background(background, modify);
+    BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
