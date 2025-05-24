@@ -1,126 +1,156 @@
-#define CATCH_CONFIG_MAIN
+#include "core/cardlist.h"
 
-#include <core/cardlist.h>
+#include "core/item.h"
+#define CATCH_CONFIG_MAIN
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("CardList operations", "[CardList]") {
-    CardList cardList("MyCardList");
+TEST_CASE("CardList Instantiation", "[CardList]") {
+    CardList cardlist{"TODO"};
 
-    SECTION("Add Card") {
-        Card card1("Card1");
-        auto addedCard1 = cardList.container().append(card1);
+    REQUIRE_FALSE(cardlist.modified());
 
-        REQUIRE(addedCard1 != nullptr);
-        REQUIRE(*addedCard1 == card1);
-        REQUIRE(cardList.container().get_data().size() == 1);
-        REQUIRE(cardList.get_modified() == true);
+    CHECK(cardlist.get_name() == "TODO");
+    CHECK(cardlist.container().get_data().size() == 0);
+}
+
+TEST_CASE("Signal Emission", "[CardList]") {
+    CardList cardlist{"TODO"};
+
+    bool name_changed, appended_item, removed_item, reordered_item;
+    name_changed = appended_item = removed_item = reordered_item = false;
+
+    cardlist.signal_name_changed().connect(
+        [&name_changed]() { name_changed = true; });
+    cardlist.container().signal_append().connect(
+        [&appended_item](std::shared_ptr<Card>) { appended_item = true; });
+    cardlist.container().signal_remove().connect(
+        [&removed_item](std::shared_ptr<Card>) { removed_item = true; });
+    cardlist.container().signal_reorder().connect(
+        [&reordered_item](std::shared_ptr<Card>, std::shared_ptr<Card>,
+                          ReorderingType) { reordered_item = true; });
+
+    SECTION("Name Changing") {
+        cardlist.set_name("DOING");
+
+        CHECK(name_changed);
     }
 
-    SECTION("Remove Card") {
-        Card card1("Card1");
-        Card card2("Card2");
-        cardList.container().append(card1);
-        cardList.container().append(card2);
+    SECTION("Name Changing from copy") {
+        CardList another_one{cardlist};
 
-        cardList.container().remove(card1);
-        REQUIRE(cardList.container().get_data().size() == 1);
+        another_one.set_name("DOING");
+        REQUIRE(another_one.get_name() != cardlist.get_name());
 
-        cardList.container().remove(card1);
-        REQUIRE(cardList.get_modified() == true);
+        CHECK(name_changed);
     }
 
-    SECTION("Reorder Cards down-up") {
-        Card card1("Card1");
-        Card card2("Card2");
-        Card card3("Card3");
+    SECTION("Appending Items") {
+        cardlist.container().append(Card{"Chores"});
 
-        auto cardPtr1 = cardList.container().append(card1);
-        auto cardPtr2 = cardList.container().append(card2);
-        auto cardPtr3 = cardList.container().append(card3);
-
-        REQUIRE(*cardList.container().get_data().at(0) == card1);
-        REQUIRE(*cardList.container().get_data().at(1) == card2);
-        REQUIRE(*cardList.container().get_data().at(2) == card3);
-
-        cardList.container().reorder(card3,
-                                     card1);  // Place card3 in card1's position
-
-        REQUIRE(*cardList.container().get_data().at(0) == card3);
-        REQUIRE(*cardList.container().get_data().at(1) == card1);
-        REQUIRE(*cardList.container().get_data().at(2) == card2);
-
-        REQUIRE(cardList.get_modified() == true);
+        CHECK(appended_item);
     }
 
-    SECTION("Reorder Cards up-down") {
-        Card card1("Card1");
-        Card card2("Card2");
-        Card card3("Card3");
+    SECTION("Appending Repeating Items") {
+        Card chores_card{"Chores"};
+        cardlist.container().append(chores_card);
 
-        auto cardPtr1 = cardList.container().append(card1);
-        auto cardPtr2 = cardList.container().append(card2);
-        auto cardPtr3 = cardList.container().append(card3);
+        appended_item = false;
 
-        REQUIRE(*cardList.container().get_data().at(0) == card1);
-        REQUIRE(*cardList.container().get_data().at(1) == card2);
-        REQUIRE(*cardList.container().get_data().at(2) == card3);
+        cardlist.container().append(chores_card);
 
-        cardList.container().reorder(card1,
-                                     card3);  // Place card3 in card1's position
-
-        REQUIRE(*cardList.container().get_data().at(0) == card2);
-        REQUIRE(*cardList.container().get_data().at(1) == card3);
-        REQUIRE(*cardList.container().get_data().at(2) == card1);
-
-        REQUIRE(cardList.get_modified() == true);
+        CHECK_FALSE(appended_item);
     }
 
-    SECTION("Reordering Cards that are already in order") {
-        Card card1("Card1");
-        Card card2("Card2");
-        Card card3("Card3");
+    SECTION("Removing Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+        auto card2 = cardlist.container().append(Card{"More Chores"});
 
-        auto cardPtr1 = cardList.container().append(card1);
-        auto cardPtr2 = cardList.container().append(card2);
-        auto cardPtr3 = cardList.container().append(card3);
-
-        REQUIRE(*cardList.container().get_data().at(0) == card1);
-        REQUIRE(*cardList.container().get_data().at(1) == card2);
-        REQUIRE(*cardList.container().get_data().at(2) == card3);
-
-        // Cards will simply exchange places
-        cardList.container().reorder(card2, card1);
-
-        REQUIRE(*cardList.container().get_data().at(0) == card2);
-        REQUIRE(*cardList.container().get_data().at(1) == card1);
-        REQUIRE(*cardList.container().get_data().at(2) == card3);
-
-        REQUIRE(cardList.get_modified() == true);
+        cardlist.container().remove(*card);
+        CHECK(removed_item);
     }
 
-    SECTION("Reorder Cards invalid arguments") {
-        Card card1("Card1");
-        Card card2("Card2");
-
-        auto cardPtr1 = cardList.container().append(card1);
-        cardList.set_modified(false);
-        cardList.container().set_modified(false);
-
-        cardList.container().reorder(card1, card2);
-
-        REQUIRE(!cardList.get_modified());
+    SECTION("Removing Non-Existing Items") {
+        cardlist.container().remove(Card{"Chores"});
+        CHECK_FALSE(removed_item);
     }
 
-    SECTION("Modified flag with internal card modification") {
-        Card card1("Card1");
+    SECTION("Reordering Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+        auto card2 = cardlist.container().append(Card{"More Chores"});
 
-        auto cardPtr1 = cardList.container().append(card1);
-        REQUIRE(cardList.get_modified());
+        cardlist.container().reorder(*card, *card2);
+        CHECK(reordered_item);
+    }
 
-        cardList.get_modified();  // Reset the flag
-        cardPtr1->set_modified(true);
-        REQUIRE(cardList.get_modified() ==
-                true);  // Should return true because internal card was modified
+    SECTION("Reordering Non-Present Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+
+        cardlist.container().reorder(*card, Card{"nobody here"});
+        CHECK_FALSE(reordered_item);
+    }
+}
+
+TEST_CASE("Modification State", "[CardList]") {
+    CardList cardlist{"TODO"};
+
+    bool name_changed, appended_item, removed_item, reordered_item;
+    name_changed = appended_item = removed_item = reordered_item = false;
+
+    cardlist.signal_name_changed().connect(
+        [&name_changed]() { name_changed = true; });
+    cardlist.container().signal_append().connect(
+        [&appended_item](std::shared_ptr<Card>) { appended_item = true; });
+    cardlist.container().signal_remove().connect(
+        [&removed_item](std::shared_ptr<Card>) { removed_item = true; });
+    cardlist.container().signal_reorder().connect(
+        [&reordered_item](std::shared_ptr<Card>, std::shared_ptr<Card>,
+                          ReorderingType) { reordered_item = true; });
+
+    SECTION("Name Changing") {
+        cardlist.set_name("DOING");
+
+        CHECK(cardlist.modified());
+    }
+
+    SECTION("Appending Items") {
+        REQUIRE_FALSE(cardlist.modified());
+
+        cardlist.container().append(Card{"Chores"});
+
+        CHECK(cardlist.modified());
+    }
+
+    SECTION("Removing Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+        auto card2 = cardlist.container().append(Card{"More Chores"});
+
+        cardlist.container().modify(false);
+
+        cardlist.container().remove(*card);
+        CHECK(cardlist.modified());
+    }
+
+    SECTION("Removing Non-Existing Items") {
+        cardlist.container().remove(Card{"Chores"});
+        CHECK_FALSE(cardlist.modified());
+    }
+
+    SECTION("Reordering Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+        auto card2 = cardlist.container().append(Card{"More Chores"});
+
+        cardlist.container().modify(false);
+
+        cardlist.container().reorder(*card, *card2);
+        CHECK(cardlist.modified());
+    }
+
+    SECTION("Reordering Non-Preset Items") {
+        auto card = cardlist.container().append(Card{"Chores"});
+        cardlist.container().modify(false);
+
+        cardlist.container().reorder(*card, Card{"nobody here"});
+        CHECK_FALSE(cardlist.modified());
     }
 }

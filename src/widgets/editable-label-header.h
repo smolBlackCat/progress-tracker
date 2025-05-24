@@ -48,9 +48,9 @@ public:
      */
     void exit_editing_mode();
 
-    sigc::signal<void(const std::string&)>& signal_on_confirm();
+    sigc::signal<void(std::string)>& signal_on_confirm();
 
-    sigc::signal<void(const std::string&)>& signal_on_cancel();
+    sigc::signal<void(std::string)>& signal_on_cancel();
 
 protected:
     Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
@@ -70,8 +70,8 @@ protected:
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
 
-    sigc::signal<void(const std::string&)> on_confirm_signal;
-    sigc::signal<void(const std::string&)> on_cancel_signal;
+    sigc::signal<void(std::string)> on_confirm_signal;
+    sigc::signal<void(std::string)> on_cancel_signal;
 
     /**
      * @brief Updates the label

@@ -7,13 +7,13 @@
 
 Card::Card(const std::string& name, const Date& date, bool complete,
            const Color& color)
-    : Item{name, xg::newGuid()}, complete{complete}, due_date{date} {
+    : Item{name, xg::newGuid()}, m_complete{complete}, m_due_date{date} {
     this->color = color;
 }
 
 Card::Card(const std::string& name, const Date& date, const xg::Guid uuid,
            bool complete, const Color& color)
-    : Item{name}, complete{complete}, due_date{date} {
+    : Item{name, uuid}, m_complete{complete}, m_due_date{date} {
     this->color = color;
 }
 
@@ -25,59 +25,72 @@ Card::Card(const std::string& name, const xg::Guid uuid, const Color& color)
 
 Card::~Card() {}
 
+void Card::set_name(const std::string& name) {
+    Item::set_name(name);
+    modify();
+}
+
 void Card::set_color(const Color& color) {
     this->color = color;
-    set_modified();
+    modify();
 
     spdlog::get("core")->info("[Card] Card \"{}\"'s color set to: {}", name,
                               color_to_string(color));
+
+    color_signal.emit(color, this->color);
 }
 
-const std::string& Card::get_notes() const { return notes; }
+const std::string& Card::get_notes() const { return m_notes; }
 
-bool Card::get_modified() const { return modified || tasks.get_modified(); }
+bool Card::modified() const { return m_modified || m_tasks.modified(); }
 
 void Card::set_notes(const std::string& notes) {
-    this->notes = notes;
-    set_modified();
+    this->m_notes = notes;
+    modify();
     spdlog::get("core")->info("[Card] Card \"{}\" notes set to: \"{}\"", name,
                               notes);
+    notes_signal.emit(m_notes, notes);
 }
 
 double Card::get_completion() const {
     double tasks_completed_n =
-        std::accumulate(tasks.begin(), tasks.end(), 0,
+        std::accumulate(m_tasks.begin(), m_tasks.end(), 0,
                         [](double acc, std::shared_ptr<Task> value) {
                             return value->get_done() ? acc + 1 : acc;
                         });
 
-    return (tasks_completed_n * 100) / tasks.get_data().size();
+    return (tasks_completed_n * 100) / m_tasks.get_data().size();
 }
 
 bool Card::past_due_date() {
     using namespace std::chrono;
 
     Date today = year_month_day{std::chrono::floor<days>(system_clock::now())};
-    return (due_date.ok()) && today > due_date;
+    return (m_due_date.ok()) && today > m_due_date;
 };
 
 void Card::set_due_date(const Date& date) {
-    due_date = date;
-    set_modified(true);
+    m_due_date = date;
+    modify();
     spdlog::get("core")->info("[Card] Card \"{}\" due date set to: {}", name,
                               std::format("{}", date));
+
+    due_date_signal.emit(date, m_due_date);
 };
 
-Date Card::get_due_date() const { return due_date; };
+void Card::modify(bool m) { m_modified = m; }
 
-bool Card::get_complete() const { return due_date.ok() ? complete : true; }
+Date Card::get_due_date() const { return m_due_date; };
+
+bool Card::get_complete() const { return m_due_date.ok() ? m_complete : true; }
 
 void Card::set_complete(bool complete) {
-    if (due_date.ok()) {
-        this->complete = complete;
-        set_modified(true);
+    if (m_due_date.ok()) {
+        this->m_complete = complete;
+        modify();
         spdlog::get("core")->info("[Card] Card \"{}\" marked as {}", name,
                                   (complete ? "complete" : "incomplete"));
+        complete_signal.emit(m_complete);
     } else {
         spdlog::get("core")->warn(
             "[Card] Card \"{}\" cannot be set as complete because no deadline "
@@ -86,4 +99,16 @@ void Card::set_complete(bool complete) {
     }
 }
 
-ItemContainer<Task>& Card::container() { return tasks; }
+ItemContainer<Task>& Card::container() { return m_tasks; }
+
+sigc::signal<void(Color, Color)>& Card::signal_color() { return color_signal; }
+
+sigc::signal<void(std::string, std::string)>& Card::signal_notes() {
+    return notes_signal;
+}
+
+sigc::signal<void(Date, Date)>& Card::signal_due_date() {
+    return due_date_signal;
+}
+
+sigc::signal<void(bool)>& Card::signal_complete() { return complete_signal; }

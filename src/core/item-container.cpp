@@ -3,62 +3,65 @@
 #include "cardlist.h"
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
-ItemContainer<T>::ItemContainer() : Modifiable{}, data() {}
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+ItemContainer<T>::ItemContainer() : m_data() {}
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
-    for (auto& i_item : data) {
+    for (auto& i_item : m_data) {
         if (*i_item == item) {
             return nullptr;
         }
     }
 
-    data.push_back(std::make_shared<T>(item));
+    auto new_item = std::make_shared<T>(item);
+    m_data.push_back(std::make_shared<T>(item));
     spdlog::get("core")->info("[ItemContainer] Item \"{}\" has been added",
                               item.get_name());
-    set_modified();
-    return data.back();
+    modify();
+    on_append_signal.emit(new_item);
+    return m_data.back();
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 void ItemContainer<T>::remove(const T& item) {
-    for (auto it = data.begin(); it != data.end(); it++) {
+    for (auto it = m_data.begin(); it != m_data.end(); it++) {
         if (item == *(*it)) {
-            data.erase(it);
+            m_data.erase(it);
             spdlog::get("core")->info(
                 "[ItemContainer] Item \"{}\" has been removed",
                 item.get_name());
-            set_modified();
+            modify();
+            on_remove_signal.emit(*it);
             return;
         }
     }
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::shared_ptr<T> ItemContainer<T>::insert_after(const T& item,
                                                   const T& sibling) {
     return nullptr;
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::shared_ptr<T> ItemContainer<T>::insert_before(const T& item,
                                                    const T& sibling) {
     return nullptr;
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 
     ssize_t c = 0;
-    for (auto& item : data) {
+    for (auto& item : m_data) {
         if (*item == next) {
             next_i = c;
         } else if (*item == sibling) {
@@ -76,76 +79,105 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
         return ReorderingType::INVALID;
     }
 
-    std::shared_ptr<T> next_v = data[next_i];
-    data.erase(data.begin() + next_i);
+    std::shared_ptr<T> next_v = m_data[next_i];
+    std::shared_ptr<T> sibling_v = m_data[sibling_i];
+
+    m_data.erase(m_data.begin() + next_i);
 
     ReorderingType reordering;
     if (next_i > sibling_i) {
         // Down to up reordering
-        data.insert(data.begin() + (sibling_i == 0 ? 0 : sibling_i), next_v);
+        m_data.insert(m_data.begin() + (sibling_i == 0 ? 0 : sibling_i),
+                      next_v);
         reordering = ReorderingType::DOWNUP;
         spdlog::get("core")->info(
             "[ItemContainer] Item \"{}\" was inserted before Item \"{}\"",
             next.get_name(), sibling.get_name());
-        set_modified();
+        modify();
+        on_reorder_signal.emit(next_v, sibling_v, reordering);
         return reordering;
     } else if (next_i < sibling_i) {
         // Up to down reordering
-        data.insert(data.begin() + sibling_i, next_v);
+        m_data.insert(m_data.begin() + sibling_i, next_v);
         reordering = ReorderingType::UPDOWN;
         spdlog::get("core")->info(
             "[ItemContainer] Item \"{}\" was inserted after Item \"{}\"",
             next.get_name(), sibling.get_name());
-        set_modified();
+        modify();
+        on_reorder_signal.emit(next_v, sibling_v, reordering);
         return reordering;
     }
     return ReorderingType::INVALID;
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::vector<std::shared_ptr<T>>& ItemContainer<T>::get_data() {
-    return data;
+    return m_data;
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 const std::vector<std::shared_ptr<T>>& ItemContainer<T>::get_data() const {
-    return data;
+    return m_data;
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::vector<std::shared_ptr<T>>::iterator ItemContainer<T>::begin() {
-    return data.begin();
+    return m_data.begin();
 }
-
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::vector<std::shared_ptr<T>>::iterator ItemContainer<T>::end() {
-    return data.end();
+    return m_data.end();
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::vector<std::shared_ptr<T>>::const_iterator ItemContainer<T>::begin()
     const {
-    return data.begin();
+    return m_data.begin();
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::vector<std::shared_ptr<T>>::const_iterator ItemContainer<T>::end() const {
-    return data.end();
+    return m_data.end();
 }
 
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
-bool ItemContainer<T>::get_modified() const {
-    for (auto& item : data) {
-        if (item->get_modified()) return true;
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+void ItemContainer<T>::modify(bool m) {
+    m_modified = m;
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+bool ItemContainer<T>::modified() const {
+    for (auto& item : m_data) {
+        if (item->modified()) return true;
     }
-    return modified;
+    return m_modified;
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+sigc::signal<void(std::shared_ptr<T>)>& ItemContainer<T>::signal_append() {
+    return on_append_signal;
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+sigc::signal<void(std::shared_ptr<T>)>& ItemContainer<T>::signal_remove() {
+    return on_remove_signal;
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+sigc::signal<void(std::shared_ptr<T>, std::shared_ptr<T>, ReorderingType)>&
+ItemContainer<T>::signal_reorder() {
+    return on_reorder_signal;
 }
 
 template class ItemContainer<CardList>;

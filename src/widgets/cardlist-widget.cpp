@@ -55,17 +55,15 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     cardlist_header.add_option_button(_("Remove"), "remove", [this]() {
         this->board.remove_cardlist(*this);
     });
-    cardlist_header.signal_on_confirm().connect(
-        [this](const std::string& label) {
-            this->cardlist->set_name(label);
-            this->is_new = false;
-        });
-    cardlist_header.signal_on_cancel().connect(
-        [this](const std::string& label) {
-            if (this->is_new) {
-                this->board.remove_cardlist(*this);
-            }
-        });
+    cardlist_header.signal_on_confirm().connect([this](std::string label) {
+        this->cardlist->set_name(label);
+        this->is_new = false;
+    });
+    cardlist_header.signal_on_cancel().connect([this](std::string label) {
+        if (this->is_new) {
+            this->board.remove_cardlist(*this);
+        }
+    });
     cardlist_header.set_margin_bottom(15);
 
     add_card_button.set_valign(Gtk::Align::CENTER);

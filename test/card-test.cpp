@@ -4,183 +4,266 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Card operations", "[Card]") {
-    // Creating a dummy color for testing
-    Color red{255, 0, 0, 1};  // Solid red color
+TEST_CASE("Card Instantiation", "[Card]") {
+    auto card = Card{"Computer Science"};
 
-    Card card("MyCard");
+    REQUIRE_FALSE(card.modified());
 
-    SECTION("Color operations") {
-        REQUIRE(card.is_color_set() == false);
+    CHECK(card.get_name() == "Computer Science");
+    CHECK(card.get_notes() == "");
+    CHECK(card.get_due_date() == Date{});  // means unset
+    CHECK(card.get_complete() == true);    // Questionable
+}
 
-        card.set_color(red);
-        REQUIRE(card.get_color() == red);
-        REQUIRE(card.is_color_set() == true);
+TEST_CASE("Signal Emission", "[Card]") {
+    auto card = Card{"Software Engineering"};
 
-        card.set_color(NO_COLOR);
-        REQUIRE(card.is_color_set() == false);
+    bool name_changed, notes_changed, color_changed, due_changed,
+        complete_changed, appended, removed, reordered;
+    name_changed = notes_changed = color_changed = due_changed =
+        complete_changed = appended = removed = reordered = false;
+
+    card.signal_name_changed().connect(
+        [&name_changed]() { name_changed = true; });
+
+    card.signal_color().connect(
+        [&color_changed](Color, Color) { color_changed = true; });
+
+    card.signal_notes().connect(
+        [&notes_changed](std::string, std::string) { notes_changed = true; });
+
+    card.signal_due_date().connect(
+        [&due_changed](Date, Date) { due_changed = true; });
+
+    card.signal_complete().connect(
+        [&complete_changed](bool) { complete_changed = true; });
+
+    card.container().signal_append().connect(
+        [&appended](std::shared_ptr<Task>) { appended = true; });
+
+    card.container().signal_remove().connect(
+        [&removed](std::shared_ptr<Task>) { removed = true; });
+
+    card.container().signal_reorder().connect(
+        [&reordered](std::shared_ptr<Task>, std::shared_ptr<Task>,
+                     ReorderingType) { reordered = true; });
+
+    SECTION("Name Changing") {
+        card.set_name("Operating Systems");
+
+        CHECK(name_changed);
     }
 
-    SECTION("Notes operations") {
-        REQUIRE(card.get_notes().empty());
+    SECTION("Notes Setting") {
+        card.set_notes(
+            "Key feature of modern operating systems is their "
+            "multitasking capability");
 
-        std::string notes = "This is a test note.";
-        card.set_notes(notes);
-
-        REQUIRE(card.get_notes() == notes);
+        CHECK(notes_changed);
     }
 
-    SECTION("Task management") {
-        Task task1("Task1");
-        Task task2("Task2", true);
-        Task task3("Task3");
+    SECTION("Colour Setting") {
+        card.set_color(Color{32, 192, 12, 0.6});
 
-        auto taskPtr1 = card.container().append(task1);
-        auto taskPtr2 = card.container().append(task2);
-        auto taskPtr3 = card.container().append(task3);
-
-        REQUIRE(!card.container().append(task1));
-
-        REQUIRE(card.container().get_data().size() == 3);
-        REQUIRE(*taskPtr1 == task1);
-        REQUIRE(*taskPtr2 == task2);
-        REQUIRE(*taskPtr3 == task3);
-
-        card.container().remove(task2);
-        REQUIRE(card.container().get_data().size() == 2);
-
-        // It won't change the value
-        card.container().remove(task2);
-        REQUIRE(card.container().get_data().size() == 2);
+        CHECK(color_changed);
     }
 
-    SECTION("Task completion") {
-        Task task1("Task1", true);   // Completed task
-        Task task2("Task2", false);  // Incomplete task
+    SECTION("Due Date Setting") {
+        card.set_due_date(Date(std::chrono::year(2012), std::chrono::month(12),
+                               std::chrono::day(12)));
+        CHECK(due_changed);
+    }
+
+    SECTION("Complete State") {
+        card.set_due_date(Date(std::chrono::year(1998), std::chrono::month(9),
+                               std::chrono::day(7)));
+        card.set_complete(true);
+
+        CHECK(complete_changed);
+    }
+
+    SECTION("Complete State: No due time set") {
+        card.set_complete(true);
+
+        CHECK_FALSE(complete_changed);
+    }
+
+    SECTION("Appending Tasks") {
+        card.container().append(Task{"nobody here"});
+
+        CHECK(appended);
+    }
+
+    SECTION("Appending Repeating Tasks") {
+        Task task{"I should not be added twice because of my ID"};
+        card.container().append(task);
+        card.container().modify(false);
+        appended = false;
+
+        card.container().append(task);
+        CHECK_FALSE(appended);
+    }
+
+    SECTION("Removing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
 
         card.container().append(task1);
-        auto task2_sptr = card.container().append(task2);
+        card.container().append(task2);
+        card.container().modify(false);
 
-        double completion = card.get_completion();
-        REQUIRE(completion ==
-                50.0);  // 1 out of 2 tasks are done, so 50% completion
+        card.container().remove(task1);
 
-        task2_sptr->set_done(true);
-        completion = card.get_completion();
-        REQUIRE(completion ==
-                100.0);  // Both tasks are now done, so 100% completion
-
-        Task task3("Task3", false);  // New incomplete task
-        card.container().append(task3);
-
-        completion = card.get_completion();
-        REQUIRE(int(completion) ==
-                66);  // 2 out of 3 tasks are done, so ~66% completion
+        CHECK(removed);
     }
 
-    SECTION("Setting Due dates to Card objects") {
-        Card card_with_due_date{"Uni assignment"};
-        Date date_now = std::chrono::floor<std::chrono::days>(
-            std::chrono::system_clock::now());
+    SECTION("Removing Non-Existing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
 
-        Date past_due_date = date_now - std::chrono::months(2);
-        Date n_past_due_date =
-            std::chrono::sys_days(past_due_date + std::chrono::months{0});
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
 
-        card_with_due_date.set_due_date(
-            n_past_due_date);  // Regardless of today's date, this card is
-                               // always past the due date
+        card.container().remove(Task{"I don't belong here"});
 
-        CHECK(card_with_due_date.get_modified());
-        REQUIRE(card_with_due_date.past_due_date());
-
-        Date in_time_due_date = date_now + std::chrono::months(5);
-        card_with_due_date.set_due_date(in_time_due_date);
-        REQUIRE(!card_with_due_date.past_due_date());
-
-        card_with_due_date.set_due_date(Date{});
-        // When the date is invalid it simply
-        // means that no date was set
-        REQUIRE(!card_with_due_date.past_due_date());
+        CHECK_FALSE(removed);
     }
 
-    SECTION("Marking Cards as complete only if a Card has a due date") {
-        Card rouxls_kard{"Worms"};
+    SECTION("Reordering Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
 
-        REQUIRE(rouxls_kard
-                    .get_complete());  // Because no date was set, assume this
-                                       // card is in an already complete state
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
 
-        Date now_date = std::chrono::floor<std::chrono::days>(
-            std::chrono::system_clock::now());
-        rouxls_kard.set_due_date(now_date);
-        REQUIRE(rouxls_kard.get_modified());
+        card.container().reorder(task1, task2);
 
-        rouxls_kard.set_modified(false);
+        CHECK(reordered);
+    }
 
-        // Since a due date was set, it means that card expects to be completed
-        // before the due date arrives
-        REQUIRE(!rouxls_kard.get_complete());
-        REQUIRE(!rouxls_kard.get_modified());
-        rouxls_kard.set_complete(true);
-        REQUIRE(rouxls_kard.get_modified());
-        REQUIRE(rouxls_kard.get_complete());
+    SECTION("Reordering Non-Existing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
+
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
+
+        card.container().reorder(task1, Task{"I should not be here"});
+
+        CHECK_FALSE(reordered);
     }
 }
 
-TEST_CASE("Task reordering (up-down)", "[Card]") {
-    Card card1{"Operating Systems"};
+TEST_CASE("Modification State", "[Card]") {
+    auto card = Card{"Software Engineering"};
 
-    Task task1{"Windows"};
-    Task task2{"MacOS"};
-    Task task3{"Debian"};
+    SECTION("Name Changing") {
+        card.set_name("Operating Systems");
 
-    card1.container().append(task1);
-    card1.container().append(task2);
-    card1.container().append(task3);
+        CHECK(card.modified());
+    }
 
-    card1.set_modified(false);
+    SECTION("Notes Setting") {
+        card.set_notes(
+            "Key feature of modern operating systems is their "
+            "multitasking capability");
 
-    auto& card1_tasks = card1.container().get_data();
+        CHECK(card.modified());
+    }
 
-    REQUIRE(task1 == *card1_tasks[0]);
-    REQUIRE(task2 == *card1_tasks[1]);
-    REQUIRE(task3 == *card1_tasks[2]);
+    SECTION("Colour Setting") {
+        card.set_color(Color{32, 192, 12, 0.6});
 
-    card1.container().reorder(task1,
-                              task3);  // Moves "Windows" task after "Debian"
+        CHECK(card.modified());
+    }
 
-    CHECK(task2 == *card1_tasks[0]);
-    CHECK(task3 == *card1_tasks[1]);
-    CHECK(task1 == *card1_tasks[2]);
+    SECTION("Due Date Setting") {
+        card.set_due_date(Date(std::chrono::year(2012), std::chrono::month(12),
+                               std::chrono::day(12)));
+        CHECK(card.modified());
+    }
 
-    REQUIRE(card1.get_modified());
-}
+    SECTION("Complete State") {
+        card.set_due_date(Date(std::chrono::year(1998), std::chrono::month(9),
+                               std::chrono::day(7)));
+        card.set_complete(true);
 
-TEST_CASE("Task Reordering (down-up)", "[Card]") {
-    Card card1{"Operating Systems"};
+        CHECK(card.modified());
+    }
 
-    Task task1{"Windows"};
-    Task task2{"MacOS"};
-    Task task3{"Debian"};
+    SECTION("Complete State: No due time set") {
+        card.set_complete(true);
 
-    auto task1_p = card1.container().append(task1);
-    auto task2_p = card1.container().append(task2);
-    auto task3_p = card1.container().append(task3);
+        CHECK_FALSE(card.modified());
+    }
 
-    card1.set_modified(false);
+    SECTION("Appending Tasks") {
+        card.container().append(Task{"nobody here"});
 
-    auto& tasks = card1.container().get_data();
+        CHECK(card.modified());
+    }
 
-    REQUIRE(task1_p == tasks[0]);
-    REQUIRE(task2_p == tasks[1]);
-    REQUIRE(task3_p == tasks[2]);
+    SECTION("Appending Repeating Tasks") {
+        Task task{"I should not be added twice because of my ID"};
+        card.container().append(task);
+        card.container().modify(false);
 
-    card1.container().reorder(task2, task1);
+        card.container().append(task);
+        CHECK_FALSE(card.modified());
+    }
 
-    CHECK(task2 == *tasks[0]);
-    CHECK(task1 == *tasks[1]);
-    CHECK(task3 == *tasks[2]);
+    SECTION("Removing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
 
-    REQUIRE(card1.get_modified());
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
+
+        card.container().remove(task1);
+
+        CHECK(card.modified());
+    }
+
+    SECTION("Removing Non-Existing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
+
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
+
+        card.container().remove(Task{"I don't belong here"});
+
+        CHECK_FALSE(card.modified());
+    }
+
+    SECTION("Reordering Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
+
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
+
+        card.container().reorder(task1, task2);
+
+        CHECK(card.modified());
+    }
+
+    SECTION("Reordering Non-Existing Tasks") {
+        Task task1{"Cleanup home system"};
+        Task task2{"Remove dirt from the tubes"};
+
+        card.container().append(task1);
+        card.container().append(task2);
+        card.container().modify(false);
+
+        card.container().reorder(task1, Task{"I should not be here"});
+
+        CHECK_FALSE(card.modified());
+    }
 }

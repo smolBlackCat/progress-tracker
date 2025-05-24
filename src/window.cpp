@@ -10,7 +10,6 @@
 #include <widgets/board-card-button.h>
 #include <widgets/card-widget.h>
 
-#include <filesystem>
 #include <format>
 #include <thread>
 
@@ -46,9 +45,11 @@ DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
 
 ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                const Glib::RefPtr<Gtk::Builder>& b,
-                               Glib::RefPtr<Gio::Settings>& progress_settings)
+                               Glib::RefPtr<Gio::Settings>& progress_settings,
+                               BoardManager& manager)
     : Gtk::ApplicationWindow{cobject},
-      board_widget{},
+      m_manager{manager},
+      board_widget{manager},
       delete_boards_bar{*this},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
@@ -103,7 +104,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         Gtk::CallbackAction::create([this](Gtk::Widget&,
                                            const Glib::VariantBase&) {
             if (app_stack_p->get_visible_child_name() == "board-grid-page") {
-                auto create_board_dialog = CreateBoardDialog::create(*this);
+                auto create_board_dialog = CreateBoardDialog::create(m_manager);
                 create_board_dialog->open(*this);
             }
 
@@ -138,7 +139,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     home_button_p->signal_clicked().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
     add_board_button_p->signal_clicked().connect([this]() {
-        auto create_board_dialog = CreateBoardDialog::create(*this);
+        auto create_board_dialog = CreateBoardDialog::create(m_manager);
 
         create_board_dialog->open(*this);
     });
@@ -158,6 +159,13 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         }
     });
 
+    m_manager.signal_add_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::add_board_handler));
+    m_manager.signal_remove_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::remove_board_handler));
+    m_manager.signal_save_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::save_board_handler));
+
     sh_window->set_application(this->get_application());
 
     delete_boards_bar.set_halign(Gtk::Align::CENTER);
@@ -170,13 +178,36 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
 
 ProgressWindow::~ProgressWindow() {}
 
-void ProgressWindow::add_local_board(BoardBackend board_backend) {
-    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_backend);
+void ProgressWindow::add_board_handler(LocalBoard board_entry) {
+    add_local_board_entry(board_entry);
+    boards_grid_p->invalidate_sort();
+}
+
+// FIXME: We could actually keep track of the boardcardbuttons added instead of
+// searching linearly. This may be optmised to an amortised O(1)
+void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
+    for (Widget* fb_child : boards_grid_p->get_children()) {
+        BoardCardButton* cur = static_cast<BoardCardButton*>(
+            static_cast<Gtk::FlowBoxChild*>(fb_child)->get_child());
+
+        if (cur->get_board() == board_entry.board) {
+            boards_grid_p->remove(*cur);
+        }
+    }
+}
+
+void ProgressWindow::save_board_handler(LocalBoard board) {
+    boards_grid_p->invalidate_sort();
+}
+
+void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
+    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_entry);
     auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
     fb_child_p->set_child(*board_card_button);
     fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
-    board_card_button->signal_clicked().connect([this, board_card_button,
+    board_card_button->signal_clicked().connect([this, board_entry,
+                                                 board_card_button,
                                                  fb_child_p]() {
         if (!this->on_delete_mode) {
             app_stack_p->set_visible_child("loading-page",
@@ -184,13 +215,13 @@ void ProgressWindow::add_local_board(BoardBackend board_backend) {
             add_board_button_p->set_sensitive(false);
             app_menu_button_p->set_sensitive(false);
 
-            std::thread{[this, board_card_button]() {
+            std::thread{[this, board_entry, &board_card_button]() {
                 spdlog::get("app")->debug(
                     "Starting helper thread to load board");
                 try {
                     this->cur_board_entry = board_card_button;
-                    this->cur_board = std::make_shared<Board>(
-                        board_card_button->get_backend().load());
+                    this->cur_board =
+                        this->m_manager.local_open(board_entry.filename);
                 } catch (std::invalid_argument& err) {
                     this->cur_board = nullptr;
                     spdlog::get("app")->error("Failed to load board: {}",
@@ -245,7 +276,6 @@ void ProgressWindow::on_main_menu() {
     add_board_button_p->set_visible();
     set_title("Progress");
     if (cur_board && cur_board_entry) board_widget.save();
-    boards_grid_p->invalidate_sort();
 
     spdlog::get("app")->info(
         "[Progress Window] Current view changed to board grid");
@@ -262,14 +292,13 @@ void ProgressWindow::on_board_view() {
         "[Progress Window] App view changed to board view");
 }
 
+// FIXME: This super inefficient because we're running at almost O(n²)
 void ProgressWindow::delete_selected_boards() {
     auto selected_children = boards_grid_p->get_selected_children();
     for (auto& child : selected_children) {
         ui::BoardCardButton* cur_child =
             (ui::BoardCardButton*)child->get_child();
-        std::filesystem::remove(
-            cur_child->get_backend().get_attribute("filepath"));
-        boards_grid_p->remove(*cur_child);
+        m_manager.local_remove(cur_child->get_board());
     }
 
     spdlog::get("app")->info("[Progress Window] User has deleted {} boards",
@@ -338,7 +367,7 @@ void ProgressWindow::on_board_loading_done() {
         spdlog::get("ui")->info(
             "[Progress Window] Board view loaded successfully");
     } else {
-        // cur_board and cur_board_entry are still nullptrs because the loading
+        // cur_board are still nullptrs because the loading
         // thread has failed, therefore, go back to the main menu
         Gtk::AlertDialog::create(_("It was not possible to load this board"))
             ->show(*this);

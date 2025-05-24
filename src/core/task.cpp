@@ -4,16 +4,27 @@
 #include <spdlog/spdlog.h>
 
 Task::Task(const std::string& name, bool done)
-    : Item{name, xg::newGuid()}, done{done} {}
+    : Item{name, xg::newGuid()}, m_done{done} {}
 
 Task::Task(const std::string& name, const xg::Guid uuid, bool done)
-    : Item{name, uuid}, done{done} {}
+    : Item{name, uuid}, m_done{done} {}
 
-bool Task::get_done() const { return done; }
+bool Task::get_done() const { return m_done; }
+
+bool Task::modified() const { return m_modified; }
+
+void Task::set_name(const std::string& name) {
+    Item::set_name(name);
+    modify();
+}
 
 void Task::set_done(bool done) {
-    this->done = done;
-    modified = true;
+    m_done = done;
+    m_modified = true;
     spdlog::get("core")->info("[Task] Task \"{}\" marked as {}", name,
                               (done ? "done" : "undone"));
 }
+
+void Task::modify(bool m) { m_modified = m; }
+
+sigc::signal<void(bool)>& Task::signal_done() { return done_signal; }

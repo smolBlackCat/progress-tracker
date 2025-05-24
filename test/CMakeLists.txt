@@ -1,17 +1,12 @@
-add_executable(cardlist-test cardlist-test.cpp)
-add_executable(board-test board-test.cpp)
-add_executable(card-test card-test.cpp)
-add_executable(modification-test modification-test.cpp)
-add_executable(colorable-test colorable-test.cpp)
-
 list(APPEND TEST_EXECUTABLES
     board-test
     cardlist-test
     card-test
-    modification-test
-    colorable-test)
+    colorable-test
+    board-manager-test)
 
 foreach(EXECUTABLE ${TEST_EXECUTABLES})
+    add_executable(${EXECUTABLE} ${EXECUTABLE}.cpp)
     target_link_libraries(${EXECUTABLE} PRIVATE libcore)
     target_link_libraries(${EXECUTABLE} PRIVATE Catch2::Catch2WithMain)
     target_link_libraries(${EXECUTABLE} PRIVATE ${TINYXML2})

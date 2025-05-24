@@ -5,12 +5,20 @@
 
 #include "guid.hpp"
 
-CardList::CardList(const std::string& name)
-    : Item{name, xg::newGuid()}, cards{} {}
+CardList::CardList(const std::string& name) : CardList{name, xg::newGuid()} {}
 
 CardList::CardList(const std::string& name, const xg::Guid uuid)
     : Item{name, uuid}, cards{} {}
 
-bool CardList::get_modified() const { return modified || cards.get_modified(); }
+void CardList::set_name(const std::string& name) {
+    Item::set_name(name);
+    modify();
+}
+
+CardList::~CardList() {}
+
+void CardList::modify(bool m) { m_modified = m; }
+
+bool CardList::modified() const { return m_modified || cards.modified(); }
 
 ItemContainer<Card>& CardList::container() { return cards; }

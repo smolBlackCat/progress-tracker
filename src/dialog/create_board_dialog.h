@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/board-manager.h>
 #include <gtkmm.h>
 #include <window.h>
 
@@ -26,7 +27,7 @@ public:
      *
      * @return Pointer to a CreateBoardDialog instance.
      */
-    static CreateBoardDialog* create(ProgressWindow& board_creator);
+    static CreateBoardDialog* create(BoardManager& board_creator);
 
     /**
      * @brief Handles the footer button click action.
@@ -43,7 +44,7 @@ protected:
      * @param board_creator Reference to the ProgressWindow responsible for
      * creating the board.
      */
-    CreateBoardDialog(ProgressWindow& board_creator);
+    CreateBoardDialog(BoardManager& board_creator);
 
     /**
      * @brief Creates a new board.
@@ -53,8 +54,7 @@ protected:
      */
     void create_board();
 
-    ProgressWindow& board_creator;  ///< Reference to the ProgressWindow
-                                    ///< responsible for creating the board.
+    BoardManager& m_manager;
 };
 
 }  // namespace ui

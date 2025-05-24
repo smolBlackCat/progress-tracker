@@ -4,8 +4,6 @@
 #include <spdlog/spdlog.h>
 #include <utils.h>
 
-#include <filesystem>
-
 #include "adwaita.h"
 
 namespace ui {
@@ -56,6 +54,8 @@ void PreferencesBoardDialog::on_footer_button_click() { on_save_changes(); }
 
 void PreferencesBoardDialog::on_save_changes() {
     std::string new_name = board_title_entry->get_text();
+    parent->set_title(new_name);
+    board_widget.set_name(new_name);
 
     if (new_name.empty()) {
         auto message_dialog =
@@ -77,25 +77,6 @@ void PreferencesBoardDialog::on_save_changes() {
             // Report probable corruption
         }
     }
-
-    const std::string& previous_name = board_widget.get_name();
-    if (previous_name != new_name) {
-        spdlog::get("ui")->debug(
-            "[PreferencesBoardDialog] Renaming detected. Replacing board "
-            "definition files");
-
-        board_widget.set_name(new_name);
-        parent->set_title(new_name);
-        auto& board_backend = board_widget.get_board()->backend;
-        if (board_backend.get_type() == BackendType::LOCAL) {
-            std::string previous_filepath =
-                board_backend.get_attribute("filepath");
-            board_backend.set_attribute("filepath",
-                                        gen_unique_filename(new_name));
-            std::filesystem::remove(previous_filepath);
-        }
-    }
-
     board_widget.save(false);
 
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));

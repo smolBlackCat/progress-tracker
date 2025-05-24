@@ -5,11 +5,11 @@
 extern const std::shared_ptr<spdlog::logger> core_logger =
     spdlog::stdout_color_mt("core");
 
-Item::Item(const std::string& name)
-    : Modifiable{}, name{name}, uuid{xg::newGuid()} {}
+Item::Item(const std::string& name) : Item{name, xg::newGuid()} {}
 
-Item::Item(const std::string& name, xg::Guid uuid)
-    : Modifiable{}, name{name}, uuid{uuid} {}
+Item::Item(const std::string& name, xg::Guid uuid) : name{name}, uuid{uuid} {}
+
+Item::~Item() {}
 
 void Item::set_name(const std::string& other) {
     if (!name.empty())
@@ -17,13 +17,15 @@ void Item::set_name(const std::string& other) {
                                   other);
 
     name = other;
-    set_modified();
+    name_changed.emit();
 }
 
-const std::string& Item::get_name() const { return name; }
+std::string Item::get_name() const { return name; }
 
 bool Item::operator==(const Item& item) const {
     return item.get_name() == name && item.uuid == uuid;
 }
 
 xg::Guid Item::get_id() const { return uuid; }
+
+sigc::signal<void()>& Item::signal_name_changed() { return name_changed; }

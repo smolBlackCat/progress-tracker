@@ -439,7 +439,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         card_menu_popover2.set_selected_color(card_color_rgba, false);
 
         if (!is_new) {
-            card->set_modified(false);
+            card->modify(false);
         }
     } else {
         card_menu_popover.set_selected_color(Gdk::RGBA{}, false);
@@ -775,7 +775,7 @@ std::string CardWidget::create_details_text() const {
                                "<b>%1 days</b> remaining", delta_days)),
                            delta_days)
                     << "\n\n";
-            } else if (delta_days > 30 && delta_days < 365) {
+            } else if (delta_days >= 30 && delta_days < 365) {
                 long months_from_delta =
                     delta_days / 30;  // Assume every month has 30 days
                 details_text
@@ -811,7 +811,7 @@ std::string CardWidget::create_details_text() const {
                                delta_days)),
                            delta_days)
                     << "\n\n";
-            } else if (delta_days > 30 && delta_days < 365) {
+            } else if (delta_days >= 30 && delta_days < 365) {
                 long months_from_delta =
                     delta_days / 30;  // Assume every month has 30 days
                 details_text
@@ -849,7 +849,8 @@ std::string CardWidget::create_details_text() const {
 
             details_text << (task->get_done() ? "- [X] " : "- [ ] ")
                          << task->get_name();
-            if (c < max_visible - 1) {
+            if (c < max_visible - 1 &&
+                task != card->container().get_data().back()) {
                 details_text << "\n";
             }
             c++;

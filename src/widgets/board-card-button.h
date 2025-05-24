@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/board.h>
+#include <core/board-manager.h>
 #include <gtkmm.h>
 
 #include <chrono>
@@ -26,17 +26,7 @@ public:
      * @throws std::invalid_argument if it is not possible to load information
      * about a board
      */
-    BoardCardButton(BoardBackend& boardbackend);
-
-    /**
-     * @brief Gets the last modification time of the Board
-     */
-    time_point<system_clock, seconds> get_last_modified() const;
-
-    /**
-     * @brief Sets a new backend to present information from a Board
-     */
-    void update(const Board& board);
+    BoardCardButton(LocalBoard board_entry);
 
     /**
      * @brief Updates the button's title
@@ -48,10 +38,12 @@ public:
      */
     void set_background(const std::string& background);
 
+    const std::shared_ptr<Board> get_board() const;
+
     /**
-     * @brief Gets a copy of the backend used to load information about a board
+     * @brief Gets the last modification time of the Board
      */
-    BoardBackend get_backend() const;
+    time_point<system_clock, seconds> get_last_modified() const;
 
     std::strong_ordering operator<=>(const BoardCardButton& other) const;
 
@@ -59,7 +51,6 @@ private:
     Gtk::Box root_box;
     Gtk::Image board_thumbnail;
     Gtk::Label board_name;
-    time_point<system_clock, seconds> last_modified;
-    BoardBackend board_backend;
+    LocalBoard local_board_entry;
 };
 }  // namespace ui

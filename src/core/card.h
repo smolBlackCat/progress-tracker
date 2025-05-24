@@ -5,6 +5,7 @@
 #include "colorable.h"
 #include "item-container.h"
 #include "item.h"
+#include "modifiable.h"
 #include "task.h"
 
 typedef std::chrono::year_month_day Date;
@@ -13,7 +14,7 @@ typedef std::chrono::year_month_day Date;
  * @brief Represents a kanban card that may or may not be contained within a
  * CardList object
  */
-class Card : public Colorable, public Item {
+class Card : public Colorable, public Item, public Modifiable {
 public:
     /**
      * @brief Card constructor
@@ -58,6 +59,8 @@ public:
 
     ~Card() override;
 
+    void set_name(const std::string& name) override;
+
     /**
      * @brief Sets the card's cover color
      *
@@ -86,6 +89,8 @@ public:
      */
     void set_complete(bool complete);
 
+    void modify(bool m = true) override;
+
     /**
      * @brief Return the notes associated with this card
      */
@@ -110,7 +115,7 @@ public:
      * @brief Produces true if the card information has been modified or the
      * card's container has been modified
      */
-    bool get_modified() const override;
+    bool modified() const override;
 
     /**
      * @brief Returns true if this card is past due date and the date is valid,
@@ -131,9 +136,22 @@ public:
      */
     ItemContainer<Task>& container();
 
+    sigc::signal<void(Color, Color)>& signal_color();
+    sigc::signal<void(std::string, std::string)>& signal_notes();
+    sigc::signal<void(Date, Date)>& signal_due_date();
+    sigc::signal<void(bool)>& signal_complete();
+
 protected:
-    std::string notes;
-    ItemContainer<Task> tasks;
-    Date due_date;
-    bool complete;
+    std::string m_notes;
+    ItemContainer<Task> m_tasks;
+    Date m_due_date;
+    bool m_complete;
+    bool m_modified = false;
+
+    // Signals
+    sigc::signal<void(Color, Color)> color_signal;  // f(old_colour, new_colour)
+    sigc::signal<void(std::string, std::string)>
+        notes_signal;                                // f(old_notes, new_notes)
+    sigc::signal<void(Date, Date)> due_date_signal;  // f(old_date, new_date)
+    sigc::signal<void(bool)> complete_signal;        // f(cur_state)
 };

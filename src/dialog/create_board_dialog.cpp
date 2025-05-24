@@ -2,16 +2,15 @@
 
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
-#include <utils.h>
 
 namespace ui {
-CreateBoardDialog::CreateBoardDialog(ProgressWindow& board_creator)
-    : BoardDialog{}, board_creator{board_creator} {
+CreateBoardDialog::CreateBoardDialog(BoardManager& board_creator)
+    : BoardDialog{}, m_manager{board_creator} {
     adw_dialog_set_title(ADW_DIALOG(board_dialog->gobj()),
                          _("Create New Board"));
 }
 
-CreateBoardDialog* CreateBoardDialog::create(ProgressWindow& board_creator) {
+CreateBoardDialog* CreateBoardDialog::create(BoardManager& board_creator) {
     return new CreateBoardDialog(board_creator);
 }
 
@@ -25,10 +24,6 @@ void CreateBoardDialog::create_board() {
         return;
     }
 
-    BoardBackend backend{BackendType::LOCAL};
-    backend.set_attribute("filepath",
-                          gen_unique_filename(board_title_entry->get_text()));
-
     switch (bg_type) {
         case BackgroundType::COLOR: {
             // Not a clean solution, we have to rely on calculation everytime
@@ -36,15 +31,11 @@ void CreateBoardDialog::create_board() {
             auto rgb_string = std::format(
                 "rgb({},{},{})", (int)(rgba.get_red() * 255),
                 (int)(rgba.get_green() * 255), (int)(rgba.get_blue() * 255));
-            Board board =
-                backend.create(board_title_entry->get_text(), rgb_string);
-            board.save();
+            m_manager.local_add(board_title_entry->get_text(), rgb_string);
             break;
         }
         case BackgroundType::IMAGE: {
-            Board board =
-                backend.create(board_title_entry->get_text(), image_filename);
-            board.save();
+            m_manager.local_add(board_title_entry->get_text(), image_filename);
             break;
         }
         default: {
@@ -53,7 +44,6 @@ void CreateBoardDialog::create_board() {
         }
     }
 
-    board_creator.add_local_board(backend);
     spdlog::get("ui")->info(
         "[CreateBoardDialog] Dialog has created a new board successfully");
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));

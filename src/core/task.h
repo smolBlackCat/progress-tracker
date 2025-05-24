@@ -1,11 +1,12 @@
 #pragma once
 
 #include "item.h"
+#include "modifiable.h"
 
 /**
  * @brief Class representing an extra task associated with a card
  */
-class Task : public Item {
+class Task : public Item, public Modifiable {
 public:
     /**
      * @brief Task constructor
@@ -24,6 +25,8 @@ public:
      */
     Task(const std::string& name, const xg::Guid uuid, bool done = false);
 
+    void set_name(const std::string& name) override;
+
     /**
      * @brief Set the done attribute to this card. Calling this method with no
      * arguments mark this task as done by default
@@ -31,10 +34,26 @@ public:
     void set_done(bool done = true);
 
     /**
+     * @brief Sets this task as modified
+     */
+    void modify(bool m = true) override;
+
+    /**
      * @brief Returns true if the card is marked as done, otherwise false
      */
     bool get_done() const;
 
+    /**
+     * @brief Returns the Task's modified state
+     */
+    bool modified() const override;
+
+    sigc::signal<void(bool)>& signal_done();
+
 protected:
-    bool done;
+    bool m_done;
+    bool m_modified = false;
+
+    // Signals
+    sigc::signal<void(bool)> done_signal;
 };

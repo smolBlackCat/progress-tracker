@@ -3,8 +3,8 @@
 #include <libintl.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-#include <utils.h>
 
+#include <filesystem>
 #include <locale>
 
 /**
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
         auto cur_loc = std::locale::global(std::locale::classic());
     }
 
-    const std::string lc_folder = locale_folder();
+    const std::string lc_folder = std::filesystem::path(LOCALE_FOLDER).string();
 
     bindtextdomain("progress-tracker", lc_folder.c_str());
     bind_textdomain_codeset("progress-tracker", "utf-8");
@@ -33,8 +33,6 @@ int main(int argc, char* argv[]) {
 
     spdlog::get("app")->debug("Current System Locale: {}", sys_locale);
     spdlog::get("app")->debug("Loading locale data from: {}", lc_folder);
-    spdlog::get("app")->debug("Progress Boards Location: {}",
-                              progress_boards_folder());
 
     auto app = ui::Application::create();
     int code = app->run(argc, argv);

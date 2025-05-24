@@ -5,10 +5,20 @@ file(GLOB_RECURSE CORE_SOURCES "core/*.cpp")
 add_library(libcore STATIC ${CORE_SOURCES})
 target_link_libraries(libcore PRIVATE ${TINYXML2})
 target_link_libraries(libcore PRIVATE crossguid)
+target_link_libraries(libcore PUBLIC ${SIGCXX_LIBRARIES})
 target_link_libraries(libcore PUBLIC spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 
+target_link_directories(libcore PUBLIC ${SIGCXX_LIBRARY_DIRS})
+
+target_include_directories(libcore PRIVATE
+    /usr/include/sigc++-3.0
+    /usr/lib/x86_64-linux-gnu/sigc++-3.0/include)
 target_include_directories(libcore PRIVATE ${TINYXML2_INCLUDE_DIRS})
-target_include_directories(libcore PUBLIC ${CMAKE_SOURCE_DIR}/subprojects/crossguid/include/crossguid/)
+target_include_directories(libcore
+    PUBLIC ${CMAKE_SOURCE_DIR}/subprojects/crossguid/include/crossguid/)
+target_include_directories(libcore PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+target_compile_options(libcore PUBLIC ${SIGCXX_CFLAGS})
 
 if (BUILD_APP)
     file(GLOB_RECURSE WIDGET_SOURCES "widgets/*.cpp" "widgets/*.h")

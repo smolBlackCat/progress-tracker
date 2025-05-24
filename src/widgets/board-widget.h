@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/board.h>
+#include <core/board-manager.h>
 #include <gtkmm.h>
 
 #include <memory>
@@ -29,15 +29,13 @@ class CardlistWidget;
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
-    static constexpr unsigned int SAVE_INTERVAL =
-        1000 * 10;  ///< Interval for auto-saving the board in milliseconds
-    static constexpr int SCROLL_SPEED_FACTOR =
-        6;  ///< Factor to control the scroll speed
+    static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
+    static constexpr int SCROLL_SPEED_FACTOR = 6;
 
     /**
      * @brief Constructs a BoardWidget object.
      */
-    BoardWidget();
+    BoardWidget(BoardManager& manager);
 
     /**
      * @brief Sets and updates the board widget.
@@ -66,7 +64,7 @@ public:
      * @param free indicates whether to clear the board after saving
      * @return true if the save operation was successful, false otherwise
      */
-    bool save(bool free = true);
+    void save(bool free = true);
 
     /**
      * @brief Adds a new CardlistWidget widget based on the CardList object.
@@ -110,7 +108,7 @@ public:
      *
      * @return reference to the background string
      */
-    const std::string& get_background() const;
+    std::string get_background() const;
 
     /**
      * @brief Updates board's name, reflecting those changes to the application
@@ -125,7 +123,7 @@ public:
      *
      * @return reference to the board's name string
      */
-    const std::string& get_name() const;
+    std::string get_name() const;
 
     /**
      * @brief Returns true if the board is set up to horizontally scroll
@@ -149,7 +147,7 @@ public:
      */
     std::shared_ptr<Board> get_board() const;
 
-private:
+protected:
     /**
      * @brief Sets up automatic scrolling for every time the users drags either
      * cards or cardlists across the screen the BoardWidget will scroll as
@@ -163,25 +161,22 @@ private:
     CardlistWidget* _add_cardlist(const std::shared_ptr<CardList>& cardlist,
                                   bool editing_mode = false);
 
-#ifdef WIN32
-    Gtk::Overlay overlay;     ///< Overlay widget for Windows platform
-    Gtk::Picture picture;     ///< Picture widget for Windows platform
-    Gtk::ScrolledWindow scr;  ///< ScrolledWindow widget for Windows platform
-#endif
+    BoardManager& m_manager;
+    std::vector<sigc::connection> connections;
 
-    Gtk::Box root;           ///< Root container for the board widget
-    Gtk::Button add_button;  ///< Button to add new card lists
-    std::shared_ptr<Board> board =
-        nullptr;  ///< Pointer to the current board object
-    BoardCardButton* board_card_button =
-        nullptr;  ///< Pointer to the BoardCardButton that opened this board
-    Glib::RefPtr<Gtk::CssProvider>
-        css_provider_refptr;  ///< CSS provider for styling the widget
-    std::vector<ui::CardlistWidget*>
-        cardlist_widgets;  ///< Vector holding pointers to CardlistWidget objects
-    double x, y;          ///< Cursor Position
-    bool on_scroll =
-        false;  ///< Flag indicating whether horizontal scrolling is enabled
+#ifdef WIN32
+    Gtk::Overlay overlay;
+    Gtk::Picture picture;
+    Gtk::ScrolledWindow scr;
+#endif
+    Gtk::Box root;
+    Gtk::Button add_button;
+    std::shared_ptr<Board> board = nullptr;
+    BoardCardButton* board_card_button = nullptr;
+    Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
+    std::vector<ui::CardlistWidget*> cardlist_widgets;
+    double x, y;
+    bool on_scroll = false;
 };
 
 }  // namespace ui

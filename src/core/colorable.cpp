@@ -4,9 +4,16 @@
 
 std::string color_to_string(const Color& color) {
     std::ostringstream oss{};
-    oss << "rgb(" << std::to_string(std::get<0>(color)) << ","
-        << std::to_string(std::get<1>(color)) << ","
-        << std::to_string(std::get<2>(color)) << ")";
+    if (std::get<3>(color) == 1.0f) {
+        oss << "rgb(" << std::to_string(std::get<0>(color)) << ","
+            << std::to_string(std::get<1>(color)) << ","
+            << std::to_string(std::get<2>(color)) << ")";
+    } else {
+        oss << "rgba(" << std::to_string(std::get<0>(color)) << ","
+            << std::to_string(std::get<1>(color)) << ","
+            << std::to_string(std::get<2>(color)) << ","
+            << std::to_string(std::get<3>(color)) << ")";
+    }
 
     return oss.str();
 }
@@ -22,12 +29,14 @@ uint32_t rgb_to_hex(const Color& color) {
 
 Color string_to_color(const std::string& str) {
     // Check the basic format
-    if (str.size() < 10 || str.substr(0, 4) != "rgb(" || str.back() != ')') {
-        return NO_COLOR;
-    }
+    bool is_rgba = str.substr(0, 5) == "rgba(";
+    // if (str.size() < 10 || !(str.substr(0, 4) == "rgb(" && is_rgba) ||
+    //     str.back() != ')') {
+    //     return NO_COLOR;
+    // }
 
     // Extract the numbers as substrings
-    size_t start = 4;  // Skip "rgb("
+    size_t start = is_rgba ? 5 : 4;  // Skip "rgb( or rgba("
     size_t end = str.find(',', start);
     if (end == std::string::npos) return NO_COLOR;
     int r = std::stoi(str.substr(start, end - start));
@@ -37,16 +46,32 @@ Color string_to_color(const std::string& str) {
     if (end == std::string::npos) return NO_COLOR;
     int g = std::stoi(str.substr(start, end - start));
 
-    start = end + 1;
-    end = str.find(')', start);
-    if (end == std::string::npos) return NO_COLOR;
-    int b = std::stoi(str.substr(start, end - start));
+    int b;
+    float a;
+    if (is_rgba) {
+        start = end + 1;
+        end = str.find(',', start);
+        if (end == std::string::npos) return NO_COLOR;
+        b = std::stoi(str.substr(start, end - start));
+
+        start = end + 1;
+        end = str.find(')', start);
+        if (end == std::string::npos) return NO_COLOR;
+        a = std::stof(str.substr(start, end - start));
+    } else {
+        start = end + 1;
+        end = str.find(')', start);
+        if (end == std::string::npos) return NO_COLOR;
+        b = std::stoi(str.substr(start, end - start));
+        a = 1.0f;
+    }
 
     // Ensure values are in the 0-255 range
-    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 ||
+        a > 1) {
         return NO_COLOR;
     }
 
     return {static_cast<uint8_t>(r), static_cast<uint8_t>(g),
-            static_cast<uint8_t>(b), 1.0f};
+            static_cast<uint8_t>(b), a};
 }

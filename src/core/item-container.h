@@ -5,13 +5,14 @@
 #include <vector>
 
 #include "item.h"
+#include "modifiable.h"
 
 /**
  * @brief ItemContainer is a template class that implements a set of behaviours
  * pertinent to container of items.
  */
 template <typename T>
-    requires std::is_copy_constructible_v<T> && std::is_base_of_v<Item, T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 class ItemContainer : public Modifiable {
 public:
     ItemContainer();
@@ -88,6 +89,8 @@ public:
      */
     const std::vector<std::shared_ptr<T>>& get_data() const;
 
+    void modify(bool m = true) override;
+
     /**
      * @brief Returns the container's modified state.
      *
@@ -98,7 +101,7 @@ public:
      *
      * @return True if the container has been modified, false otherwise.
      */
-    bool get_modified() const override;
+    bool modified() const override;
 
     std::vector<std::shared_ptr<T>>::iterator begin();
     std::vector<std::shared_ptr<T>>::iterator end();
@@ -106,6 +109,18 @@ public:
     std::vector<std::shared_ptr<T>>::const_iterator begin() const;
     std::vector<std::shared_ptr<T>>::const_iterator end() const;
 
+    sigc::signal<void(std::shared_ptr<T>)>& signal_append();
+    sigc::signal<void(std::shared_ptr<T>)>& signal_remove();
+    sigc::signal<void(std::shared_ptr<T>, std::shared_ptr<T>, ReorderingType)>&
+    signal_reorder();
+
 protected:
-    std::vector<std::shared_ptr<T>> data;
+    std::vector<std::shared_ptr<T>> m_data;
+    bool m_modified = false;
+
+    // Signals
+    sigc::signal<void(std::shared_ptr<T>)> on_append_signal;
+    sigc::signal<void(std::shared_ptr<T>)> on_remove_signal;
+    sigc::signal<void(std::shared_ptr<T>, std::shared_ptr<T>, ReorderingType)>
+        on_reorder_signal;
 };

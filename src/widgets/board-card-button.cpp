@@ -4,16 +4,13 @@
 
 #include <string>
 
-ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
+ui::BoardCardButton::BoardCardButton(LocalBoard board_entry)
     : Button{},
       root_box{Gtk::Orientation::VERTICAL},
       board_thumbnail{},
       board_name{},
-      last_modified{},
-      board_backend{boardbackend} {
-    auto board = boardbackend.load();
-
-    set_name_(board.get_name());
+      local_board_entry{board_entry} {
+    set_name_(board_entry.board->get_name());
     set_valign(Gtk::Align::CENTER);
     set_halign(Gtk::Align::CENTER);
     set_has_frame(false);
@@ -23,11 +20,14 @@ ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
     board_name.set_valign(Gtk::Align::CENTER);
     board_name.set_vexpand(false);
 
-    set_background(board.get_background());
+    set_background(board_entry.board->get_background());
     board_thumbnail.set_size_request(256, 256);
     board_thumbnail.set_margin_top(10);
 
-    last_modified = board.get_last_modified();
+    local_board_entry.board->signal_name_changed().connect(
+        [this]() { set_name_(local_board_entry.board->get_name()); });
+    local_board_entry.board->signal_background().connect(
+        [this](std::string background) { set_background(background); });
 
     root_box.set_spacing(4);
     root_box.append(board_thumbnail);
@@ -37,20 +37,11 @@ ui::BoardCardButton::BoardCardButton(BoardBackend& boardbackend)
 
 time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
     const {
-    return last_modified;
+    return local_board_entry.board->get_last_modified();
 }
 
-void ui::BoardCardButton::update(const Board& board) {
-    this->board_backend = board.backend;
-
-    last_modified = board.get_last_modified();
-    set_name_(board.get_name());
-    set_background(board.get_background());
-
-    spdlog::get("ui")->debug(
-        "[BoardCardButton] Entry button for Board \"{}\" widget has been "
-        "updated",
-        board.get_name());
+const std::shared_ptr<Board> ui::BoardCardButton::get_board() const {
+    return local_board_entry.board;
 }
 
 void ui::BoardCardButton::set_name_(const std::string& name) {
@@ -90,9 +81,7 @@ void ui::BoardCardButton::set_background(const std::string& background) {
     }
 }
 
-BoardBackend ui::BoardCardButton::get_backend() const { return board_backend; }
-
 std::strong_ordering ui::BoardCardButton::operator<=>(
     const BoardCardButton& other) const {
-    return last_modified <=> other.get_last_modified();
+    return this->get_last_modified() <=> other.get_last_modified();
 }

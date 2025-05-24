@@ -7,14 +7,16 @@
 #include <format>
 
 #include "cardlist-widget.h"
+#include "core/colorable.h"
 
 /**
  * TODO: High memory is allocated in setting background, mainly when the
  * background image is high. Should I try to compress it?
  */
-ui::BoardWidget::BoardWidget()
+ui::BoardWidget::BoardWidget(BoardManager& manager)
     : Gtk::ScrolledWindow{},
       root{Gtk::Orientation::HORIZONTAL},
+      m_manager{manager},
 #ifdef WIN32
       picture{},
       scr{},
@@ -69,6 +71,7 @@ ui::BoardWidget::BoardWidget()
             if (this->board) {
                 for (auto& cardlist : this->cardlist_widgets) {
                     for (auto& card : cardlist->get_card_widgets()) {
+                        card->set_tooltip_markup(card->create_details_text());
                         card->update_due_date_label_style();
                     }
                 }
@@ -84,9 +87,8 @@ void ui::BoardWidget::set(std::shared_ptr<Board>& board,
         this->board = board;
         this->board_card_button = board_card_button;
 
-        board->load();
         set_background(board->get_background(), false);
-        for (auto& cardlist : board->container()->get_data()) {
+        for (auto& cardlist : board->container()) {
             _add_cardlist(cardlist, false);
         }
 
@@ -107,24 +109,26 @@ void ui::BoardWidget::clear() {
         cardlist_widgets.clear();
     }
 
+    std::for_each(connections.begin(), connections.end(),
+                  [](auto& connection) { connection.disconnect(); });
+    connections.clear();
+
     spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
 
-bool ui::BoardWidget::save(bool free) {
-    bool success;
-    if (board->get_modified()) {
-        success = board->save();
-        board_card_button->update(*board);
+void ui::BoardWidget::save(bool free) {
+    if (board->modified()) {
+        m_manager.local_save(board);
     }
+
     if (free) {
         clear();
     }
-    return success;
 }
 
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
                                                   bool editing_mode) {
-    return _add_cardlist(board->container()->append(cardlist), editing_mode);
+    return _add_cardlist(board->container().append(cardlist), editing_mode);
 }
 
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
@@ -135,15 +139,15 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     root.remove(cardlist);
     std::erase(cardlist_widgets, &cardlist);
 
-    board->container()->remove(*cardlist.get_cardlist());
+    board->container().remove(*cardlist.get_cardlist());
 
     return true;
 }
 
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
-    ReorderingType reordering =
-        board->container()->reorder(*next.get_cardlist(), *sibling.get_cardlist());
+    ReorderingType reordering = board->container().reorder(
+        *next.get_cardlist(), *sibling.get_cardlist());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {
@@ -208,16 +212,18 @@ void ui::BoardWidget::set_background(const std::string& background,
                                      bool modify) {
     // Reseting background is the approach to ensure that a background is set
     // even when background turns invalid for whatever reason
-    BackgroundType bg_type = board->set_background(background, modify);
+    BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
+            board->set_background(string_to_color(background));
             break;
         }
         case BackgroundType::IMAGE: {
             css_provider_refptr->load_from_data(
                 std::format(CSS_FORMAT_FILE, background));
+            board->set_background(background);
             break;
         }
         case BackgroundType::INVALID: {
@@ -229,7 +235,7 @@ void ui::BoardWidget::set_background(const std::string& background,
 }
 #endif
 
-const std::string& ui::BoardWidget::get_background() const {
+std::string ui::BoardWidget::get_background() const {
     return board->get_background();
 }
 
@@ -239,9 +245,7 @@ void ui::BoardWidget::set_name(const std::string& board_name) {
     }
 }
 
-const std::string& ui::BoardWidget::get_name() const {
-    return board->get_name();
-}
+std::string ui::BoardWidget::get_name() const { return board->get_name(); }
 
 bool ui::BoardWidget::get_on_scroll() const { return on_scroll; }
 

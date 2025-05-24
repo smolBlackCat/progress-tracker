@@ -2,6 +2,7 @@
 
 #include <glibmm.h>
 #include <gtkmm/application.h>
+#include <core/board-manager.h>
 
 #include "window.h"
 
@@ -25,11 +26,7 @@ protected:
     void on_startup() override;
     void on_activate() override;
 
-    /**
-     * @brief Load Progress boards
-     */
-    void load_boards();
-
+    BoardManager m_manager;
     ProgressWindow* main_window = nullptr;
     Glib::RefPtr<Gio::Settings> progress_settings;
 };

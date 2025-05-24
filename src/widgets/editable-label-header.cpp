@@ -129,12 +129,12 @@ void EditableLabelHeader::exit_editing_mode() {
     menu_button.set_visible();
 }
 
-sigc::signal<void(const std::string&)>&
+sigc::signal<void(std::string)>&
 EditableLabelHeader::signal_on_confirm() {
     return on_confirm_signal;
 }
 
-sigc::signal<void(const std::string&)>&
+sigc::signal<void(std::string)>&
 EditableLabelHeader::signal_on_cancel() {
     return on_cancel_signal;
 }
