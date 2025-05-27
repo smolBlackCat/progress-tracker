@@ -404,18 +404,18 @@ void BoardManager::__local_save(LocalBoard& local) {
         std::filesystem::create_directories(p.parent_path());
     }
 
-    auto lm_filepath = std::chrono::clock_cast<std::chrono::system_clock,
-                                               std::chrono::file_clock>(
-        std::filesystem::last_write_time(p));
-    board->m_last_modified =
-        std::chrono::floor<std::chrono::seconds>(lm_filepath);
-
     bool success =
         doc->SaveFile(local.filename.c_str()) == tinyxml2::XML_SUCCESS;
     if (success) {
         spdlog::get("core")->debug(
             "[BoardManager] BoardManager has saved Board \"{}\" to: {}",
             board->get_name(), local.filename);
+
+        auto lm_filepath = std::chrono::clock_cast<std::chrono::system_clock,
+                                                   std::chrono::file_clock>(
+            std::filesystem::last_write_time(p));
+        board->m_last_modified =
+            std::chrono::floor<std::chrono::seconds>(lm_filepath);
     } else {
         spdlog::get("core")->error(
             "[BoardManager] Failed to save board \"{}\" to: {}",
