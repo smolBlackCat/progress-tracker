@@ -3,19 +3,11 @@
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
-#include <utils.h>
+#include <window.h>
 
-#include <chrono>
-#include <iomanip>
-#include <ios>
 #include <numeric>
-#include <tuple>
 
 #include "cardlist-widget.h"
-#include "core/colorable.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
-#include "window.h"
 
 extern "C" {
 static void card_class_init(void* g_class, void* data) {
@@ -30,6 +22,9 @@ static void card_init(GTypeInstance* instance, void* g_class) {
     gtk_widget_set_receives_default(GTK_WIDGET(instance), TRUE);
 }
 }
+
+using ButtonAction =
+    std::tuple<const char*, const char*, std::function<void()>>;
 
 namespace ui {
 CardInit::CardInit()
@@ -47,6 +42,17 @@ const std::map<const char*, std::pair<const char*, const char*>>
 std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
     CardWidget::CardPopover::card_popovers{};
 
+void CardWidget::CardPopover::mass_color_select(CardWidget* key,
+                                                Gdk::RGBA color) {
+    const std::vector<CardPopover*>& popovers = card_popovers[key];
+    for (const auto& popover : popovers) {
+        popover->set_selected_color(color, false);
+    }
+
+    spdlog::get("ui")->debug("[CardPopover] Set color to {} for all popovers",
+                             color.to_string().c_str());
+}
+
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     : Gtk::Popover{},
       card_widget{card_widget},
@@ -61,22 +67,21 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     set_child(root);
     set_position(Gtk::PositionType::BOTTOM);
 
-    const std::vector<
-        std::tuple<const char*, const char*, std::function<void()>>>
-        button_actions = {{"rename", _("Rename"),
-                           [this, card_widget] {
-                               card_widget->on_rename();
-                               this->popdown();
-                           }},
-                          {"card-details", _("Card Details"),
-                           [this, card_widget] {
-                               card_widget->open_card_details_dialog();
-                               this->popdown();
-                           }},
-                          {"remove", _("Remove"), [this, card_widget] {
-                               card_widget->remove_from_parent();
-                               this->popdown();
-                           }}};
+    const std::array<ButtonAction, 3> button_actions = {
+        ButtonAction{"rename", _("Rename"),
+                     [this, card_widget] {
+                         card_widget->on_rename();
+                         this->popdown();
+                     }},
+        ButtonAction{"card-details", _("Card Details"),
+                     [this, card_widget] {
+                         card_widget->open_card_details_dialog();
+                         this->popdown();
+                     }},
+        ButtonAction{"remove", _("Remove"), [this, card_widget] {
+                         card_widget->remove_from_parent();
+                         this->popdown();
+                     }}};
 
     for (const auto& [key, label, action] : button_actions) {
         auto button = Gtk::make_managed<Gtk::Button>(label);
@@ -95,7 +100,7 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     sigc::connection unset_color_cnn =
         prev->signal_toggled().connect([prev, card_widget]() {
             if (prev->get_active()) {
-                card_widget->clear_color();
+                card_widget->get_card()->set_color(NO_COLOR);
             }
         });
     color_box.append(*prev);
@@ -121,13 +126,9 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
         color_buttons[color_pair.first] =
             std::make_tuple(checkbutton, color_pair.second, color_setting_cnn);
     }
-    root.insert_child_after(color_box, *action_buttons["card-details"]);
-    root.insert_child_after(
-        *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
-        *action_buttons["card-details"]);
-    root.insert_child_after(
-        *Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL),
-        color_box);
+    auto frame = Gtk::make_managed<Gtk::Frame>();
+    frame->set_child(color_box);
+    root.insert_child_after(*frame, *action_buttons["card-details"]);
 }
 
 void CardWidget::CardPopover::set_selected_color(Gdk::RGBA color,
@@ -166,22 +167,33 @@ std::function<void()> CardWidget::CardPopover::color_setting_thunk(
     CardWidget* card, Gtk::CheckButton* checkbutton, Gdk::RGBA color) {
     return std::function<void()>([card, checkbutton, color]() {
         if (checkbutton->get_active()) {
-            card->set_color(color);
+            card->set_cover_color(color);
             spdlog::get("ui")->debug("[CardPopover] Set color to {}",
                                      color.to_string().c_str());
         }
     });
 }
 
-void CardWidget::CardPopover::mass_color_select(CardWidget* key_card_widget,
-                                                Gdk::RGBA color) {
-    std::vector<CardPopover*> popovers = card_popovers[key_card_widget];
-    for (auto& popover : popovers) {
-        popover->set_selected_color(color, false);
-    }
+const std::array<std::string, 3> CardWidget::DATE_LABEL_CSS_CLASSES = {
+    "due-date-complete",
+    "past-due-date",
+    "due-date",
+};
 
-    spdlog::get("ui")->debug("[CardPopover] Set color to {} for all popovers",
-                             color.to_string().c_str());
+const std::array<std::string, 3> CardWidget::TASKS_LABEL_CSS_CLASSES = {
+    "complete-tasks-indicator-complete",
+    "complete-tasks-indicator-almost",
+    "complete-tasks-indicator-incomplete",
+};
+
+inline std::string format_date_str(Date date) {
+    const std::time_t time =
+        std::chrono::system_clock::to_time_t(std::chrono::sys_days(date));
+
+    char date_str[30];
+    std::strftime(date_str, sizeof(date_str), "%d %b, %Y", std::gmtime(&time));
+
+    return date_str;
 }
 
 CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
@@ -290,100 +302,101 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                 this->card_cover_picture.set_paintable(nullptr);
         });
 
+    due_date_label.property_label().signal_changed().connect(
+        sigc::mem_fun(*this, &CardWidget::update_due_date_label));
+
+    card->signal_color().connect(
+        sigc::mem_fun(*this, &CardWidget::color_handler));
+    card->signal_due_date().connect(
+        sigc::mem_fun(*this, &CardWidget::due_date_handler));
+    card->signal_complete().connect(
+        sigc::track_object([this](bool) { update_due_date_label(); }, *this));
+    card->container().signal_append().connect(
+        sigc::mem_fun(*this, &CardWidget::on_append_handle));
+    card->container().signal_remove().connect(
+        sigc::mem_fun(*this, &CardWidget::on_remove_handle));
+
+    using CardShortcut =
+        std::pair<const char*,
+                  std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
+
+    const std::array<CardShortcut, 9> card_shortcuts = {
+        {{"<Control>N",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              auto new_card = parent->add(Card{_("New Card")}, true);
+              parent->reorder(*new_card, *this);
+              return true;
+          }},
+         {"<Control>D",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->open_card_details_dialog();
+              return true;
+          }},
+         {"<Control>R",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->on_rename();
+              return true;
+          }},
+         {"<Control><Shift>C",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->open_color_dialog();
+              return true;
+          }},
+         {"<Control>Delete",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->remove_from_parent();
+              return true;
+          }},
+         {"<Control>Up",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              CardWidget* previous_card =
+                  static_cast<CardWidget*>(this->get_prev_sibling());
+              if (previous_card) {
+                  this->parent->reorder(*previous_card, *this);
+              }
+              return true;
+          }},
+         {"<Control>Down",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              Widget* next = this->get_next_sibling();
+              if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
+                                              Gtk::Button::get_type())) {
+                  this->parent->reorder(*this, *static_cast<CardWidget*>(next));
+              }
+              return true;
+          }},
+         {"<Control>Left",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              CardlistWidget* prev_parent = static_cast<CardlistWidget*>(
+                  this->parent->get_prev_sibling());
+              if (prev_parent) {
+                  this->remove_from_parent();
+                  auto this_card = prev_parent->add(*this->card);
+                  this_card->grab_focus();
+              }
+              return true;
+          }},
+         {"<Control>Right", [this](Gtk::Widget&, const Glib::VariantBase&) {
+              Widget* next_parent = this->parent->get_next_sibling();
+              if (!G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
+                                              Gtk::Button::get_type())) {
+                  CardlistWidget* next_cardlist =
+                      static_cast<CardlistWidget*>(next_parent);
+                  this->remove_from_parent();
+                  auto this_card = next_cardlist->add(*this->card);
+                  this_card->grab_focus();
+              }
+              return true;
+          }}}};
+
     auto shortcut_controller = Gtk::ShortcutController::create();
     shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>N"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                auto new_card = parent->add(Card{_("New Card")}, true);
-                parent->reorder(*new_card, *this);
 
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>D"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->open_card_details_dialog();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>R"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->on_rename();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control><Shift>C"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->open_color_dialog();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->remove_from_parent();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Up"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                CardWidget* previous_card =
-                    static_cast<CardWidget*>(this->get_prev_sibling());
-                if (previous_card) {
-                    this->parent->reorder(*previous_card, *this);
-                }
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Down"),
-        Gtk::CallbackAction::create([this](Gtk::Widget&,
-                                           const Glib::VariantBase&) {
-            Widget* next = this->get_next_sibling();
-
-            if (!(G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
-                                             Gtk::Button::get_type()))) {
-                this->parent->reorder(*this, *static_cast<CardWidget*>(next));
-            }
-            return true;
-        })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Left"),
-        Gtk::CallbackAction::create([this](Gtk::Widget&,
-                                           const Glib::VariantBase&) {
-            CardlistWidget* prev_parent =
-                static_cast<CardlistWidget*>(this->parent->get_prev_sibling());
-
-            if (prev_parent) {
-                this->remove_from_parent();
-                auto this_card = prev_parent->add(*this->card);
-                this_card->grab_focus();
-            }
-
-            return true;
-        })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Right"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                Widget* next_parent = this->parent->get_next_sibling();
-
-                if (!(G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
-                                                 Gtk::Button::get_type()))) {
-                    CardlistWidget* next_cardlist =
-                        static_cast<CardlistWidget*>(next_parent);
-                    this->remove_from_parent();
-                    auto this_card = next_cardlist->add(*this->card);
-                    this_card->grab_focus();
-                }
-
-                return true;
-            })));
+    for (const auto& [keybinding, callback] : card_shortcuts) {
+        shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+            Gtk::ShortcutTrigger::parse_string(keybinding),
+            Gtk::CallbackAction::create(callback)));
+    }
     this->add_controller(shortcut_controller);
 
     key_controller->signal_key_released().connect(
@@ -431,27 +444,27 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
 
     if (card->is_color_set()) {
         Color card_color = card->get_color();
-        Gdk::RGBA card_color_rgba = Gdk::RGBA{color_to_string(card_color)};
+        Gdk::RGBA card_color_rgba = Gdk::RGBA{
+            std::get<0>(card_color) / 255.0F, std::get<1>(card_color) / 255.0F,
+            std::get<2>(card_color) / 255.0F, std::get<3>(card_color)};
 
-        _set_color(card_color_rgba);
+        __set_cover_color(card_color_rgba);
 
         card_menu_popover.set_selected_color(card_color_rgba, false);
         card_menu_popover2.set_selected_color(card_color_rgba, false);
-
-        if (!is_new) {
-            card->modify(false);
-        }
     } else {
         card_menu_popover.set_selected_color(Gdk::RGBA{}, false);
         card_menu_popover2.set_selected_color(Gdk::RGBA{}, false);
     }
 
-    if (card->get_due_date().ok()) {
-        update_due_date();
+    const Date card_date = card->get_due_date();
+    if (card_date.ok()) {
+        due_date_label.set_label(_("Due: ") + format_date_str(card_date));
     }
 
     if (!card->container().get_data().empty()) {
-        update_complete_tasks();
+        complete_tasks_label.set_visible();
+        update_complete_tasks_label();
     }
 
     set_tooltip_markup(create_details_text());
@@ -463,116 +476,238 @@ void CardWidget::set_title(const std::string& label) {
     card_entry.set_text(label);
 }
 
-std::string CardWidget::get_title() const { return card_label.get_label(); }
-
-void CardWidget::remove_from_parent() {
-    if (parent) {
-        parent->remove(this);
-    }
-}
-
 void CardWidget::set_cardlist(CardlistWidget* new_parent) {
     if (new_parent) {
         if (this->parent) {
             spdlog::get("ui")->debug(
                 "[CardWidget] CardWidget \"{}\" changed parents: "
                 "(CardlistWidget \"{}\") -> (CardlistWidget \"{}\")",
-                card->get_name(), this->parent->get_cardlist()->get_name(),
-                new_parent->get_cardlist()->get_name());
+                card->get_name(), this->parent->cardlist()->get_name(),
+                new_parent->cardlist()->get_name());
         }
         this->parent = new_parent;
     }
+}
+
+void CardWidget::set_cover_color(const Gdk::RGBA& color) {
+    card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
+                          color.get_blue() * 255, 1.0});
+
+    spdlog::get("ui")->debug("[CardWidget] CardWidget \"{}\" has set color: {}",
+                             card->get_name(), color.to_string().c_str());
+}
+
+void CardWidget::remove_from_parent() {
+    if (parent) {
+        parent->remove(*this);
+    }
+}
+
+void CardWidget::update_due_date_label() {
+    if (card->get_due_date().ok()) {
+        std::string css_class;
+
+        if (card->get_complete())
+            css_class = "due-date-complete";
+        else if (card->past_due_date())
+            css_class = "past-due-date";
+        else
+            css_class = "due-date";
+
+        for (const auto& css : DATE_LABEL_CSS_CLASSES) {
+            if (css == css_class)
+                due_date_label.add_css_class(css_class);
+            else if (due_date_label.has_css_class(css))
+                due_date_label.remove_css_class(css);
+        }
+    }
+}
+
+void CardWidget::update_complete_tasks_label() {
+    float n_complete_tasks =
+        std::accumulate(card->container().get_data().begin(),
+                        card->container().get_data().end(), 0,
+                        [](int acc, const std::shared_ptr<Task>& task) {
+                            return task->get_done() ? ++acc : acc;
+                        });
+    complete_tasks_label.set_label(std::format(
+        "{}/{}", n_complete_tasks, card->container().get_data().size()));
+    update_complete_tasks_style(n_complete_tasks);
+}
+
+std::string CardWidget::get_title() const { return card_label.get_label(); }
+
+std::string CardWidget::create_details_text() const {
+    using namespace std::chrono;
+
+    std::ostringstream details_text;
+
+    if (!card->container().get_data().empty()) {
+        details_text << Glib::ustring::compose(
+                            _("%1%% complete"),
+                            Glib::ustring::format(std::fixed,
+                                                  std::setprecision(2),
+                                                  card->get_completion()))
+                     << "\n\n";
+    }
+
+    auto card_due_date = card->get_due_date();
+    if (card_due_date.ok()) {
+        auto sys_clock_now = sys_days(floor<days>(system_clock::now()));
+        Date cur_date = Date{sys_clock_now};
+        if (card->get_complete()) {
+            details_text << _("This card is complete") << "\n\n";
+        } else if (card_due_date == cur_date) {
+            details_text << _("The card is due today") << "\n\n";
+        } else if (!card->past_due_date()) {
+            auto now = sys_days(cur_date);
+            auto days = sys_days(card_due_date);
+            auto delta_days = (days - now).count();
+
+            if (delta_days < 30) {
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "<b>%1 day</b> remaining",
+                               "<b>%1 days</b> remaining", delta_days)),
+                           delta_days)
+                    << "\n\n";
+            } else if (delta_days >= 30 && delta_days < 365) {
+                long months_from_delta =
+                    delta_days / 30;  // Assume every month has 30 days
+                details_text
+                    << Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
+                                                  "<b>%1 month</b> remaining",
+                                                  "<b>%1 months</b> remaining",
+                                                  months_from_delta)),
+                                              months_from_delta)
+                    << "\n\n";
+            } else if (delta_days >= 365) {
+                long years_from_delta = delta_days / 365;  // Ignore leap years
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "<b>%1 year</b> remaining",
+                               "<b>%1 years</b> remaining", years_from_delta)),
+                           years_from_delta)
+                    << "\n\n";
+            }
+        } else {
+            auto now = sys_days(cur_date);
+            auto days = sys_days(card_due_date);
+            auto delta_days = -(days - now).count();
+
+            if (delta_days < 30) {
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date <b>%1 day ago</b>",
+                               "This card is past due date <b>%1 days ago</b>",
+                               delta_days)),
+                           delta_days)
+                    << "\n\n";
+            } else if (delta_days >= 30 && delta_days < 365) {
+                long months_from_delta =
+                    delta_days / 30;  // Assume every month has 30 days
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date <b>%1 month</b> ago",
+                               "This card is past due date <b>%1 months</b> "
+                               "ago",
+                               months_from_delta)),
+                           months_from_delta)
+                    << "\n\n";
+            } else if (delta_days >= 365) {
+                long years_from_delta = delta_days / 365;  // Ignore leap years
+                details_text
+                    << Glib::ustring::compose(
+                           Glib::locale_to_utf8(ngettext(
+                               "This card is past due date <b>%1 year</b> ago",
+                               "This card is past due date <b>%1 years</b> ago",
+                               years_from_delta)),
+                           years_from_delta)
+                    << "\n\n";
+            }
+        }
+    }
+
+    if (!card->container().get_data().empty()) {
+        details_text << "<b>" << _("Checklist") << "</b>" << ":\n";
+        int c = 0;
+        const int max_visible = 5;
+        for (const auto& task : card->container()) {
+            if (c == max_visible) {
+                details_text << "\n...";
+                break;
+            }
+
+            details_text << (task->get_done() ? "- [X] " : "- [ ] ")
+                         << task->get_name();
+            if (c < max_visible - 1 &&
+                task != card->container().get_data().back()) {
+                details_text << "\n";
+            }
+            c++;
+        }
+        details_text << "\n\n";
+    }
+
+    if (!card->get_notes().empty()) {
+        details_text << "<b>" << _("Notes") << "</b>" << ":\n"
+                     << Glib::ustring{card->get_notes()}.truncate_middle(150);
+    }
+
+    std::string final_text = details_text.str();
+
+    if (!final_text.empty()) {
+        final_text.resize(final_text.size() - 2);
+    }
+
+    return final_text;
 }
 
 std::shared_ptr<Card> CardWidget::get_card() { return card; }
 
 CardlistWidget const* CardWidget::get_cardlist_widget() const { return parent; }
 
-void CardWidget::update_complete_tasks() {
-    if (card->container().get_data().empty()) {
-        complete_tasks_label.set_label("");
-        complete_tasks_label.set_visible(false);
-    } else {
-        complete_tasks_label.set_visible();
-        // FIXME: Do not use float for simple integer addition
-        float n_complete_tasks =
-            std::accumulate(card->container().get_data().begin(),
-                            card->container().get_data().end(), 0,
-                            [](int acc, const std::shared_ptr<Task>& task) {
-                                return task->get_done() ? ++acc : acc;
-                            });
-        complete_tasks_label.set_label(std::format(
-            "{}/{}", n_complete_tasks, card->container().get_data().size()));
-
-        // Silences warning about deleting empty css classes
-        update_complete_tasks_style(n_complete_tasks);
-    }
-
-    spdlog::get("ui")->debug(
-        "[CardWidget] CardWidget \"{}\"'s complete tasks label has been "
-        "updated",
-        card->get_name());
+void CardWidget::on_append_handle(std::shared_ptr<Task> task) {
+    complete_tasks_label.set_visible();
+    update_complete_tasks_label();
 }
 
-void CardWidget::update_due_date() {
-    if (card->get_due_date().ok()) {
+void CardWidget::on_remove_handle(std::shared_ptr<Task> task) {
+    if (card->container().get_data().empty()) {
+        complete_tasks_label.set_visible(false);
+    } else {
+        update_complete_tasks_label();
+    }
+}
+
+void CardWidget::due_date_handler(Date old, Date new_) {
+    if (new_.ok()) {
         due_date_label.set_visible();
 
-        auto sys_days = std::chrono::sys_days(card->get_due_date());
-        std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
-
-        char date_str[100];
-        std::strftime(date_str, sizeof(date_str), "%d %b, %Y",
-                      std::gmtime(&time));
-
-        due_date_label.set_label(_("Due: ") + Glib::ustring{date_str});
-
-        update_due_date_label_style();
+        due_date_label.set_label(_("Due: ") + format_date_str(new_));
     } else {
         due_date_label.set_visible(false);
     }
 
-    spdlog::get("ui")->debug(
-        "[CardWidget] CardWidget \"{}\"'s due date label has been updated",
-        card->get_name());
+    spdlog::get("ui")->debug(std::format(
+        "[CardWidget] CardWidget \"{}\"'s due date label update: {} -> {}",
+        card->get_name(), old, new_));
 }
 
-void CardWidget::update_due_date_label_style() {
-    // We will only update the due date label style if the card has a due date
-    if (card->get_due_date().ok()) {
-        auto date_now = Date{std::chrono::floor<std::chrono::days>(
-            std::chrono::system_clock::now())};
-        auto date_in_card = card->get_due_date();
-        due_date_label.remove_css_class(last_due_date_label_css_class);
-
-        if (card->get_complete()) {
-            last_due_date_label_css_class = "due-date-complete";
-        } else if (date_in_card < date_now) {
-            last_due_date_label_css_class = "past-due-date";
-        } else {
-            last_due_date_label_css_class = "due-date";
-        }
-
-        due_date_label.add_css_class(last_due_date_label_css_class);
+void CardWidget::color_handler(Color old, Color new_) {
+    if (new_ != NO_COLOR) {
+        Gdk::RGBA c(float(std::get<0>(new_)) / 255,
+                    float(std::get<1>(new_)) / 255,
+                    float(std::get<2>(new_)) / 255, float(std::get<3>(new_)));
+        __set_cover_color(c);
+        CardWidget::CardPopover::mass_color_select(this, c);
+    } else {
+        __clear_cover_color();
     }
-}
-
-void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
-    if (!last_complete_tasks_label_css_class.empty())
-        complete_tasks_label.remove_css_class(
-            last_complete_tasks_label_css_class);
-
-    if (n_complete_tasks == card->container().get_data().size()) {
-        last_complete_tasks_label_css_class =
-            "complete-tasks-indicator-complete";
-    } else if (n_complete_tasks < card->container().get_data().size() / 2.0F ||
-               card->container().get_data().size() == 1) {
-        last_complete_tasks_label_css_class =
-            "complete-tasks-indicator-incomplete";
-    } else if (n_complete_tasks >= card->container().get_data().size() / 2.0F) {
-        last_complete_tasks_label_css_class = "complete-tasks-indicator-almost";
-    }
-    complete_tasks_label.add_css_class(last_complete_tasks_label_css_class);
 }
 
 void CardWidget::setup_drag_and_drop() {
@@ -643,7 +778,7 @@ void CardWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                if (this->parent->is_child(dropped_card)) {
+                if (this->parent->is_child(*dropped_card)) {
                     this->parent->reorder(*dropped_card, *this);
                 } else {
                     auto card_from_dropped = dropped_card->get_card();
@@ -670,7 +805,7 @@ void CardWidget::open_color_dialog() {
         *static_cast<Gtk::Window*>(get_root()),
         [this](const Glib::RefPtr<Gio::AsyncResult>& result) {
             try {
-                set_color(color_dialog->choose_rgba_finish(result));
+                set_cover_color(color_dialog->choose_rgba_finish(result));
             } catch (Gtk::DialogError& err) {
                 spdlog::get("ui")->warn(
                     "[CardWidget] CardWidget \"{}\" has failed to set color: "
@@ -710,13 +845,6 @@ void CardWidget::off_rename() {
         card->get_name());
 }
 
-void CardWidget::clear_color() {
-    card_cover_revealer.set_reveal_child(false);
-    card->set_color(NO_COLOR);
-
-    CardWidget::CardPopover::mass_color_select(this, Gdk::RGBA{});
-}
-
 void CardWidget::on_confirm_changes() {
     if (card_entry.get_text().compare(card_label.get_label()) != 0) {
         card->set_name(card_entry.get_text());
@@ -731,149 +859,28 @@ void CardWidget::on_cancel_changes() {
     }
 }
 
-void CardWidget::set_color(const Gdk::RGBA& color) {
-    card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
-                          color.get_blue() * 255, 1.0});
-    _set_color(color);
+void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
+    std::string css_class;
+    const float threshold = card->container().get_data().size() / 2.0F;
 
-    CardWidget::CardPopover::mass_color_select(this, color);
-
-    spdlog::get("ui")->debug("CardWidget \"{}\" has set color to {}",
-                             card->get_name(), color.to_string().c_str());
-}
-
-std::string CardWidget::create_details_text() const {
-    using namespace std::chrono;
-
-    std::ostringstream details_text;
-
-    if (!card->container().get_data().empty()) {
-        details_text << Glib::ustring::compose(
-                            _("%1%% complete"),
-                            Glib::ustring::format(std::fixed,
-                                                  std::setprecision(2),
-                                                  card->get_completion()))
-                     << "\n\n";
+    if (n_complete_tasks == card->container().get_data().size()) {
+        css_class = "complete-tasks-indicator-complete";
+    } else if (n_complete_tasks < threshold) {
+        css_class = "complete-tasks-indicator-incomplete";
+    } else if (n_complete_tasks >= threshold) {
+        css_class = "complete-tasks-indicator-almost";
     }
 
-    auto card_due_date = card->get_due_date();
-    if (card_due_date.ok()) {
-        auto sys_clock_now = sys_days(floor<days>(system_clock::now()));
-        Date cur_date = Date{sys_clock_now};
-        if (card->get_complete()) {
-            details_text << _("This card is complete") << "\n\n";
-        } else if (card_due_date > cur_date) {
-            auto now = sys_days(cur_date);
-            auto days = sys_days(card_due_date);
-            auto delta_days = (days - now).count();
-
-            if (delta_days < 30) {
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "<b>%1 day</b> remaining",
-                               "<b>%1 days</b> remaining", delta_days)),
-                           delta_days)
-                    << "\n\n";
-            } else if (delta_days >= 30 && delta_days < 365) {
-                long months_from_delta =
-                    delta_days / 30;  // Assume every month has 30 days
-                details_text
-                    << Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
-                                                  "<b>%1 month</b> remaining",
-                                                  "<b>%1 months</b> remaining",
-                                                  months_from_delta)),
-                                              months_from_delta)
-                    << "\n\n";
-            } else if (delta_days >= 365) {
-                long years_from_delta = delta_days / 365;  // Ignore leap years
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "<b>%1 year</b> remaining",
-                               "<b>%1 years</b> remaining", years_from_delta)),
-                           years_from_delta)
-                    << "\n\n";
-            }
-        } else if (card_due_date == cur_date) {
-            details_text << _("The card is due today") << "\n\n";
-        } else {
-            auto now = sys_days(cur_date);
-            auto days = sys_days(card_due_date);
-            auto delta_days = -(days - now).count();
-
-            if (delta_days < 30) {
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 day ago</b>",
-                               "This card is past due date <b>%1 days ago</b>",
-                               delta_days)),
-                           delta_days)
-                    << "\n\n";
-            } else if (delta_days >= 30 && delta_days < 365) {
-                long months_from_delta =
-                    delta_days / 30;  // Assume every month has 30 days
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 month</b> ago",
-                               "This card is past due date <b>%1 months</b> "
-                               "ago",
-                               months_from_delta)),
-                           months_from_delta)
-                    << "\n\n";
-            } else if (delta_days >= 365) {
-                long years_from_delta = delta_days / 365;  // Ignore leap years
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 year</b> ago",
-                               "This card is past due date <b>%1 years</b> ago",
-                               years_from_delta)),
-                           years_from_delta)
-                    << "\n\n";
-            }
+    for (const auto& css : TASKS_LABEL_CSS_CLASSES) {
+        if (css == css_class) {
+            complete_tasks_label.add_css_class(css_class);
+        } else if (complete_tasks_label.has_css_class(css)) {
+            complete_tasks_label.remove_css_class(css);
         }
     }
-
-    if (!card->container().get_data().empty()) {
-        details_text << "<b>" << _("Checklist") << "</b>" << ":\n";
-        int c = 0;
-        const int max_visible = 5;
-        for (const auto& task : card->container()) {
-            if (c == max_visible) {
-                details_text << "\n...";
-                break;
-            }
-
-            details_text << (task->get_done() ? "- [X] " : "- [ ] ")
-                         << task->get_name();
-            if (c < max_visible - 1 &&
-                task != card->container().get_data().back()) {
-                details_text << "\n";
-            }
-            c++;
-        }
-        details_text << "\n\n";
-    }
-
-    if (!card->get_notes().empty()) {
-        details_text << "<b>" << _("Notes") << "</b>" << ":\n"
-                     << Glib::ustring{card->get_notes()}.truncate_middle(150)
-                     << "\n\n";
-    }
-
-    std::string final_text = details_text.str();
-
-    if (!final_text.empty()) {
-        final_text.resize(final_text.size() - 2);
-    }
-
-    return final_text;
 }
 
-void CardWidget::_set_color(const Gdk::RGBA& color) {
+void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
     color_frame_pixbuf->fill(rgb_to_hex(card->get_color()));
@@ -885,6 +892,15 @@ void CardWidget::_set_color(const Gdk::RGBA& color) {
     card_cover_picture.set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     card_cover_revealer.set_reveal_child(true);
+}
+
+void CardWidget::__clear_cover_color() {
+    card_cover_revealer.set_reveal_child(false);
+
+    CardWidget::CardPopover::mass_color_select(this, Gdk::RGBA{});
+
+    spdlog::get("ui")->debug("[CardWidget] CardWidget \"{}\" has cleared color",
+                             card->get_name());
 }
 
 void CardWidget::cleanup() { root_box.unparent(); }

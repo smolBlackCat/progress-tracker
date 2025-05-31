@@ -30,8 +30,8 @@ TaskInit::TaskInit()
     : Glib::ExtraClassInit{task_class_init, nullptr, task_init} {}
 
 TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
-                       CardWidget& card_widget, std::shared_ptr<Task> task,
-                       bool is_new)
+                       CardWidget& card_widget,
+                       const std::shared_ptr<Task>& task, bool is_new)
     : Glib::ObjectBase{"TaskWidget"},
       TaskInit{},
       BaseItem{Gtk::Orientation::HORIZONTAL, 3},
@@ -39,8 +39,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
       task{task},
       menu_model{Gio::Menu::create()},
       group{Gio::SimpleActionGroup::create()},
-      popover_menu{menu_model},
       is_new{is_new} {
+    popover_menu.set_menu_model(menu_model);
     set_margin_start(5);
     set_margin_end(5);
 
@@ -116,61 +116,62 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         sigc::mem_fun(*this, &TaskWidget::off_rename));
     task_entry.add_controller(focus_controller);
 
+    using TaskShortcut =
+        std::pair<const char*,
+                  std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
+
+    const std::array<TaskShortcut, 6> task_shortcuts = {
+        {{"<Control>R",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              on_rename();
+              return true;
+          }},
+         {"<Control>N",
+          [&card_details_dialog, this](Gtk::Widget&, const Glib::VariantBase&) {
+              auto new_task = card_details_dialog.add_task(Task{_("New Task")});
+              card_details_dialog.reorder_task_widget(*new_task, *this);
+              return true;
+          }},
+         {"<Control>Delete",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              on_remove();
+              return true;
+          }},
+         {"<Control><Shift>C",
+          [this, &card_widget](Gtk::Widget&, const Glib::VariantBase&) {
+              on_convert(card_widget);
+              return true;
+          }},
+         {"<Control>Up",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              Gtk::Widget* previous = this->get_prev_sibling();
+              if (previous) {
+                  TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
+                  this->card_details_dialog.reorder_task_widget(prev_task,
+                                                                *this);
+              }
+              return true;
+          }},
+         {"<Control>Down", [this](Gtk::Widget&, const Glib::VariantBase&) {
+              Gtk::Widget* next = this->get_next_sibling();
+              if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
+                                              Gtk::Button::get_type())) {
+                  TaskWidget& next_task = *static_cast<TaskWidget*>(next);
+                  this->card_details_dialog.reorder_task_widget(*this,
+                                                                next_task);
+              }
+              return true;
+          }}}};
+
     auto shortcut_controller = Gtk::ShortcutController::create();
     shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>R"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                on_rename();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>N"),
-        Gtk::CallbackAction::create([&card_details_dialog, this](
-                                        Gtk::Widget&,
-                                        const Glib::VariantBase&) {
-            auto new_task = card_details_dialog.add_task(Task{_("New Task")});
-            card_details_dialog.reorder_task_widget(*new_task, *this);
-            return true;
-        })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                on_remove();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control><Shift>C"),
-        Gtk::CallbackAction::create(
-            [this, &card_widget](Gtk::Widget&, const Glib::VariantBase&) {
-                on_convert(card_widget);
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Up"),
-        Gtk::CallbackAction::create([this](Gtk::Widget&,
-                                           const Glib::VariantBase&) {
-            Gtk::Widget* previous = this->get_prev_sibling();
-            if (previous) {
-                TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
-                this->card_details_dialog.reorder_task_widget(prev_task, *this);
-            }
-            return true;
-        })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Down"),
-        Gtk::CallbackAction::create([this](Gtk::Widget&,
-                                           const Glib::VariantBase&) {
-            Gtk::Widget* next = this->get_next_sibling();
-            if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
-                                            Gtk::Button::get_type())) {
-                TaskWidget& next_task = *static_cast<TaskWidget*>(next);
-                this->card_details_dialog.reorder_task_widget(*this, next_task);
-            }
-            return true;
-        })));
+
+    for (const auto& [keybinding, callback] : task_shortcuts) {
+        shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+            Gtk::ShortcutTrigger::parse_string(keybinding),
+            Gtk::CallbackAction::create(callback)));
+    }
+
     add_controller(shortcut_controller);
 
     setup_drag_and_drop();
@@ -215,12 +216,8 @@ void TaskWidget::off_rename() {
         task->get_name());
 }
 
-void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
-
-void TaskWidget::on_checkbox() {
-    this->task->set_done(task_checkbutton.get_active());
-    this->card_details_dialog.get_card_widget()->update_complete_tasks();
-    if (task_checkbutton.get_active()) {
+void TaskWidget::done_handler(bool done) {
+    if (done) {
         task_label.set_markup(
             Glib::ustring::compose("<s>%1</s>", task->get_name()));
         add_css_class("complete-task");
@@ -238,13 +235,20 @@ void TaskWidget::on_checkbox() {
     }
 }
 
+void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
+
+void TaskWidget::on_checkbox() {
+    this->task->set_done(task_checkbutton.get_active());
+    card_details_dialog.get_card_widget()->update_complete_tasks_label();
+}
+
 void TaskWidget::on_convert(CardWidget& card_widget) {
     spdlog::get("ui")->info(
         "[TaskWidget] Task \"{}\" has been converted into a card",
         task->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
-    auto cardlist_model = cardlist_widget->get_cardlist();
+    auto cardlist_model = cardlist_widget->cardlist();
     auto task_as_card = cardlist_widget->add(Card{task->get_name()});
 
     cardlist_widget->reorder(*task_as_card, card_widget);

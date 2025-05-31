@@ -147,7 +147,8 @@ private:
      *
      * @return Pointer to the newly added TaskWidget.
      */
-    TaskWidget* _add_task(const std::shared_ptr<Task> task, bool is_new = false);
+    TaskWidget* _add_task(const std::shared_ptr<Task>& task,
+                          bool is_new = false);
 };
 
 }  // namespace ui

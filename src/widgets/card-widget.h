@@ -28,6 +28,10 @@ public:
  */
 class CardWidget : public CardInit, public BaseItem {
 public:
+    const static std::array<std::string, 3> TASKS_LABEL_CSS_CLASSES;
+
+    const static std::array<std::string, 3> DATE_LABEL_CSS_CLASSES;
+
     /**
      * @brief Constructs a CardWidget object.
      *
@@ -46,18 +50,6 @@ public:
     void set_title(const std::string& label);
 
     /**
-     * @brief Retrieves the title of the card.
-     *
-     * @return the card's title string.
-     */
-    std::string get_title() const;
-
-    /**
-     * @brief Removes itself from the associated CardlistWidget object.
-     */
-    void remove_from_parent();
-
-    /**
      * @brief Sets a new parent to this card.
      *
      * @param cardlist_p pointer to a new CardlistWidget object (parent).
@@ -69,7 +61,39 @@ public:
      *
      * @param color rgba object representing the color.
      */
-    void set_color(const Gdk::RGBA& color);
+    void set_cover_color(const Gdk::RGBA& color);
+
+    /**
+     * @brief Removes itself from the associated CardlistWidget object.
+     */
+    void remove_from_parent();
+
+    /**
+     * @brief Changes the due date label color depending on the card's
+     * situation. Red if it is past due date, green if it is complete and plain
+     * color if it is due but not yet complete.
+     */
+    void update_due_date_label();
+
+    /**
+     * @brief Updates the label informing the number of complete tasks for this
+     * card.
+     */
+    void update_complete_tasks_label();
+
+    /**
+     * @brief Retrieves the title of the card.
+     *
+     * @return the card's title string.
+     */
+    std::string get_title() const;
+
+    /**
+     * @brief Helper method for creating a tooltip text for the card widget.
+     *
+     * @return the tooltip text string.
+     */
+    std::string create_details_text() const;
 
     /**
      * @brief Retrieves the underlying Card object from which this widget
@@ -86,39 +110,6 @@ public:
      * @return pointer to the associated CardlistWidget.
      */
     CardlistWidget const* get_cardlist_widget() const;
-
-    /**
-     * @brief Updates the label informing the amount of tasks complete.
-     */
-    void update_complete_tasks();
-
-    /**
-     * @brief Updates the label informing the due date for this card.
-     */
-    void update_due_date();
-
-    /**
-     * @brief Changes the due date label color depending on the card's
-     * situation. Red if it is past due date, green if it is complete and plain
-     * color if it is due but not yet complete.
-     */
-    void update_due_date_label_style();
-
-    /**
-     * @brief Changes the complete tasks label color depending on the amount of
-     * tasks complete. Green if all tasks are complete, Yellow if half of the
-     * tasks are complete and Red if less than half of the tasks are complete.
-     *
-     * @param n_complete_tasks number of completed tasks.
-     */
-    void update_complete_tasks_style(unsigned long n_complete_tasks);
-
-    /**
-     * @brief Helper method for creating a tooltip text for the card widget.
-     *
-     * @return the tooltip text string.
-     */
-    std::string create_details_text() const;
 
 protected:
     /** @brief Implements the card's popover menu
@@ -207,8 +198,33 @@ protected:
     ui::CardlistWidget* parent;
     std::shared_ptr<Card> card;
 
-    std::string last_complete_tasks_label_css_class = "";
-    std::string last_due_date_label_css_class = "due-date";
+    /**
+     * @brief Handles the task appending event. It updates the tasks complete
+     * label
+     *
+     * @param task shared pointer to the task being appended.
+     */
+    void on_append_handle(std::shared_ptr<Task> task);
+
+    /**
+     * @brief Handles the task removal event
+     *
+     * @param task shared pointer to the task being removed.
+     */
+    void on_remove_handle(std::shared_ptr<Task> task);
+
+    /**
+     * @brief Updates the label informing the due date for this card.
+     */
+    void due_date_handler(Date old, Date new_);
+
+    /**
+     * @brief Handles the color change event.
+     *
+     * @param old_color old color.
+     * @param new_color new color.
+     */
+    void color_handler(Color old, Color new_);
 
     /**
      * @brief Sets up drag and drop functionality for the card widget.
@@ -246,14 +262,23 @@ protected:
     void on_cancel_changes();
 
     /**
+     * @brief Changes the complete tasks label color depending on the amount of
+     * tasks complete. Green if all tasks are complete, Yellow if half of the
+     * tasks are complete and Red if less than half of the tasks are complete.
+     *
+     * @param n_complete_tasks number of completed tasks.
+     */
+    void update_complete_tasks_style(unsigned long n_complete_tasks);
+
+    /**
      * @brief Sets the card's color
      */
-    void _set_color(const Gdk::RGBA& color);
+    void __set_cover_color(const Gdk::RGBA& color);
 
     /**
      * @brief Clears the card cover color.
      */
-    void clear_color();
+    void __clear_cover_color();
 
     void cleanup() override;
 };

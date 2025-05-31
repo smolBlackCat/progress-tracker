@@ -3,25 +3,9 @@
 #include <core/board-manager.h>
 #include <gtkmm.h>
 
-#include <memory>
-#include <vector>
-
 #include "board-card-button.h"
 
-#define CSS_FORMAT \
-    "#board-root {transition-property: background-image, background-color;}"
-#define CSS_FORMAT_FILE                                                       \
-    "#board-root {{transition-property: background-image, background-color; " \
-    "background-size: cover;"                                                 \
-    "background-repeat: no-repeat;"                                           \
-    "background-image: url(\"file:{}\");}}"
-#define CSS_FORMAT_RGB                                                        \
-    "#board-root {{transition-property: background-image, background-color; " \
-    "background-color: {};}}"
-
 namespace ui {
-
-class ProgressWindow;
 class CardlistWidget;
 
 /**
@@ -29,6 +13,20 @@ class CardlistWidget;
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
+    static constexpr const char* CSS_FORMAT =
+        "#board-root {transition-property: background-image, "
+        "background-color;}";
+    static constexpr const char* CSS_FORMAT_FILE =
+        "#board-root {{transition-property: background-image, "
+        "background-color; "
+        "background-size: cover;"
+        "background-repeat: no-repeat;"
+        "background-image: url(\"file:{}\");}}";
+    static constexpr const char* CSS_FORMAT_RGB =
+        "#board-root {{transition-property: background-image, "
+        "background-color; "
+        "background-color: {};}}";
+
     static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
@@ -47,13 +45,15 @@ public:
      * @details Essentially, what this method does is cleaning the previous
      *          settings existent within the widget, if there is one, and
      *          setting a new board to the widget. It also dynamically sets
-     *          every aspect of the board: background and its cards and lists.
+     *          every aspect of the board: background and its cards and
+     * lists.
      */
-    void set(std::shared_ptr<Board>& board, BoardCardButton* board_card_button);
+    void set(const std::shared_ptr<Board>& board,
+             BoardCardButton* const board_card_button);
 
     /**
-     * @brief Cleans the BoardWidget to an empty state, that is, there will be
-     *        no pointer to a board object and also the information on
+     * @brief Cleans the BoardWidget to an empty state, that is, there will
+     * be no pointer to a board object and also the information on
      *        background and cardlist objects are also deleted.
      */
     void clear();
@@ -61,17 +61,16 @@ public:
     /**
      * @brief Saves the contents edited in the Board class.
      *
-     * @param free indicates whether to clear the board after saving
-     * @return true if the save operation was successful, false otherwise
+     * @param clear indicates whether to clear the board after saving
      */
-    void save(bool free = true);
+    void save(bool clear = true);
 
     /**
      * @brief Adds a new CardlistWidget widget based on the CardList object.
      *
      * @param cardlist CardList object
-     * @param editing_mode bool indicating whether the cardlist is completely
-     * new (has not been loaded from a file) or not
+     * @param editing_mode bool indicating whether the cardlist is
+     * completely new (has not been loaded from a file) or not
      * @return pointer to the newly added CardlistWidget
      */
     ui::CardlistWidget* add_cardlist(const CardList& cardlist,
@@ -81,7 +80,8 @@ public:
      * @brief Removes a CardlistWidget widget.
      *
      * @param cardlist reference to the cardlist to be removed.
-     * @return true if the cardlist was successfully removed, false otherwise
+     * @return true if the cardlist was successfully removed, false
+     * otherwise
      */
     bool remove_cardlist(ui::CardlistWidget& cardlist);
 
@@ -96,12 +96,10 @@ public:
     /**
      * @brief Sets the Board background
      *
-     * @param background string referring to a background, either a colour code
-     * or a filename
-     * @param modify boolean indicating whether the inner board object will
-     * count this operation as a modification. Default is true
+     * @param background string referring to a background, either a colour
+     * code or a filename
      */
-    void set_background(const std::string& background, bool modify = true);
+    void set_background(const std::string& background);
 
     /**
      * @brief Retrieves the background string
@@ -111,8 +109,8 @@ public:
     std::string get_background() const;
 
     /**
-     * @brief Updates board's name, reflecting those changes to the application
-     * window
+     * @brief Updates board's name, reflecting those changes to the
+     * application window
      *
      * @param board_name new name for the board
      */
@@ -133,10 +131,11 @@ public:
     bool get_on_scroll() const;
 
     /**
-     * @brief Describes whether the board should be able to scroll horizontally
+     * @brief Describes whether the board should be able to scroll
+     * horizontally
      *
-     * @param scroll boolean indicating whether horizontal scrolling should be
-     * enabled
+     * @param scroll boolean indicating whether horizontal scrolling should
+     * be enabled
      */
     void set_on_scroll(bool scroll = true);
 
@@ -149,9 +148,9 @@ public:
 
 protected:
     /**
-     * @brief Sets up automatic scrolling for every time the users drags either
-     * cards or cardlists across the screen the BoardWidget will scroll as
-     * needed.
+     * @brief Sets up automatic scrolling for every time the users drags
+     * either cards or cardlists across the screen the BoardWidget will
+     * scroll as needed.
      */
     void setup_auto_scrolling();
 
@@ -161,8 +160,10 @@ protected:
     CardlistWidget* _add_cardlist(const std::shared_ptr<CardList>& cardlist,
                                   bool editing_mode = false);
 
+    void __set_background(const std::string& background);
+
     BoardManager& m_manager;
-    std::vector<sigc::connection> connections;
+    std::vector<sigc::connection> m_connections;
 
 #ifdef WIN32
     Gtk::Overlay overlay;

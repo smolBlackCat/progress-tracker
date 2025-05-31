@@ -22,7 +22,8 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
       scr{},
       overlay{},
 #endif
-      add_button{_("Add List")} {
+      add_button{_("Add List")},
+      css_provider_refptr{Gtk::CssProvider::create()} {
 
 #ifdef WIN32
     set_child(overlay);
@@ -42,7 +43,6 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     root.set_spacing(25);
     root.set_margin(10);
 
-    css_provider_refptr = Gtk::CssProvider::create();
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider_refptr, GTK_STYLE_PROVIDER_PRIORITY_USER);
     css_provider_refptr->load_from_data(CSS_FORMAT);
@@ -70,9 +70,9 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
         [this]() {
             if (this->board) {
                 for (auto& cardlist : this->cardlist_widgets) {
-                    for (auto& card : cardlist->get_card_widgets()) {
+                    for (auto& card : cardlist->cards()) {
                         card->set_tooltip_markup(card->create_details_text());
-                        card->update_due_date_label_style();
+                        card->update_due_date_label();
                     }
                 }
             }
@@ -81,16 +81,19 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
         BoardWidget::SAVE_INTERVAL * 6);
 }
 
-void ui::BoardWidget::set(std::shared_ptr<Board>& board,
-                          BoardCardButton* board_card_button) {
+void ui::BoardWidget::set(const std::shared_ptr<Board>& board,
+                          BoardCardButton* const board_card_button) {
     if (board && board_card_button) {
         this->board = board;
         this->board_card_button = board_card_button;
 
-        set_background(board->get_background(), false);
+        __set_background(board->get_background());
         for (auto& cardlist : board->container()) {
             _add_cardlist(cardlist, false);
         }
+
+        m_connections.emplace_back(board->signal_background().connect(
+            sigc::mem_fun(*this, &BoardWidget::__set_background)));
 
         spdlog::get("ui")->debug("[BoardWidget] Board \"{}\" has been set",
                                  board->get_name());
@@ -109,9 +112,9 @@ void ui::BoardWidget::clear() {
         cardlist_widgets.clear();
     }
 
-    std::for_each(connections.begin(), connections.end(),
+    std::for_each(m_connections.begin(), m_connections.end(),
                   [](auto& connection) { connection.disconnect(); });
-    connections.clear();
+    m_connections.clear();
 
     spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
@@ -134,12 +137,12 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
 bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
     spdlog::get("ui")->debug(
         "[BoardWidget] CardlistWidget \"{}\" has been removed",
-        cardlist.get_cardlist()->get_name());
+        cardlist.cardlist()->get_name());
 
     root.remove(cardlist);
     std::erase(cardlist_widgets, &cardlist);
 
-    board->container().remove(*cardlist.get_cardlist());
+    board->container().remove(*cardlist.cardlist());
 
     return true;
 }
@@ -147,7 +150,7 @@ bool ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
                                        CardlistWidget& sibling) {
     ReorderingType reordering = board->container().reorder(
-        *next.get_cardlist(), *sibling.get_cardlist());
+        *next.cardlist(), *sibling.cardlist());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {
@@ -161,8 +164,8 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
             spdlog::get("ui")->debug(
                 "[BoardWidget] CardListWidget \"{}\" was inserted before "
                 "CardListWidget \"{}\"",
-                next.get_cardlist()->get_name(),
-                sibling.get_cardlist()->get_name());
+                next.cardlist()->get_name(),
+                sibling.cardlist()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
@@ -170,8 +173,8 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
             spdlog::get("ui")->debug(
                 "[BoardWidget] CardListWidget \"{}\" was inserted after "
                 "CardListWidget \"{}\"",
-                next.get_cardlist()->get_name(),
-                sibling.get_cardlist()->get_name());
+                next.cardlist()->get_name(),
+                sibling.cardlist()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
@@ -181,59 +184,14 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
     }
 }
 
-#ifdef WIN32
-void ui::BoardWidget::set_background(const std::string& background,
-                                     bool modify) {
-    // Reseting background is the approach to ensure that a background is set
-    // even when background turns invalid for whatever reason
+void ui::BoardWidget::set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
-    switch (bg_type) {
-        case BackgroundType::COLOR: {
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_RGB, background));
-            picture.set_visible(false);
-            break;
-        }
-        case BackgroundType::IMAGE: {
-            picture.set_filename(background);
-            picture.set_visible(true);
-            break;
-        }
-        case BackgroundType::INVALID: {
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
-            picture.set_visible(false);
-            break;
-        }
+    if (bg_type == BackgroundType::COLOR) {
+        board->set_background(string_to_color(background));
+    } else if (bg_type == BackgroundType::IMAGE) {
+        board->set_background(background);
     }
 }
-#else
-void ui::BoardWidget::set_background(const std::string& background,
-                                     bool modify) {
-    // Reseting background is the approach to ensure that a background is set
-    // even when background turns invalid for whatever reason
-    BackgroundType bg_type = Board::get_background_type(background);
-    switch (bg_type) {
-        case BackgroundType::COLOR: {
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_RGB, background));
-            board->set_background(string_to_color(background));
-            break;
-        }
-        case BackgroundType::IMAGE: {
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_FILE, background));
-            board->set_background(background);
-            break;
-        }
-        case BackgroundType::INVALID: {
-            css_provider_refptr->load_from_data(
-                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
-            break;
-        }
-    }
-}
-#endif
 
 std::string ui::BoardWidget::get_background() const {
     return board->get_background();
@@ -311,3 +269,50 @@ ui::CardlistWidget* ui::BoardWidget::_add_cardlist(
 
     return new_cardlist;
 }
+#ifdef WIN32
+
+void ui::BoardWidget::__set_background(const std::string& background) {
+    BackgroundType bg_type = Board::get_background_type(background);
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, background));
+            picture.set_visible(false);
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            picture.set_filename(background);
+            picture.set_visible(true);
+            break;
+        }
+        case BackgroundType::INVALID: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+            picture.set_visible(false);
+            break;
+        }
+    }
+}
+#else
+
+void ui::BoardWidget::__set_background(const std::string& background) {
+    BackgroundType bg_type = Board::get_background_type(background);
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, background));
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_FILE, background));
+            break;
+        }
+        case BackgroundType::INVALID: {
+            css_provider_refptr->load_from_data(
+                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+            break;
+        }
+    }
+}
+#endif

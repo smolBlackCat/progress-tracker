@@ -38,7 +38,6 @@ CardDetailsDialog::CardDetailsDialog()
     checkbutton->signal_toggled().connect([this]() {
         this->cur_card_widget->get_card()->set_complete(
             this->checkbutton->get_active());
-        this->cur_card_widget->update_due_date_label_style();
     });
 
     calendar->signal_day_selected().connect(
@@ -65,7 +64,6 @@ CardDetailsDialog::~CardDetailsDialog() {}
 TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     TaskWidget* task_widget =
         _add_task(cur_card_widget->get_card()->container().append(task), true);
-    cur_card_widget->update_complete_tasks();
 
     return task_widget;
 }
@@ -75,7 +73,6 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     card->container().remove(*task.get_task());
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
-    cur_card_widget->update_complete_tasks();
 
     spdlog::get("ui")->debug(
         "[CardDetailsDialog] TaskWidget \"{}\" removed from the Card dialog "
@@ -167,7 +164,6 @@ void CardDetailsDialog::on_add_task() {
     _add_task(
         cur_card_widget->get_card()->container().append(Task{_("New Task")}),
         true);
-    cur_card_widget->update_complete_tasks();
 }
 
 void CardDetailsDialog::on_save() {
@@ -216,7 +212,6 @@ void CardDetailsDialog::on_unset_due_date() {
     date_menubutton->set_label(_("Set Due Date"));
     card_ptr->set_due_date(Date{});
     checkbutton_revealer->set_reveal_child(false);
-    cur_card_widget->update_due_date();
 
     spdlog::get("ui")->debug(
         "[CardDetailsDialog] Card dialog has unset due date");
@@ -234,7 +229,6 @@ void CardDetailsDialog::on_set_due_date() {
                          day{static_cast<unsigned int>(d)}};
     card_ptr->set_due_date(new_date);
     checkbutton_revealer->set_reveal_child(true);
-    cur_card_widget->update_due_date();
     update_due_date_label();
 
     spdlog::get("ui")->debug("Card Dialog has set due date");
@@ -257,7 +251,7 @@ void CardDetailsDialog::clear() {
         "[CardDetailsDialog] Card Dialog has been cleared");
 }
 
-TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task> task,
+TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
                                          bool is_new) {
     auto task_widget =
         Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);

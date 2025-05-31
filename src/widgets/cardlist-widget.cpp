@@ -5,8 +5,6 @@
 
 #include "board-widget.h"
 #include "card-widget.h"
-#include "glib.h"
-#include "gtkmm/shortcuttrigger.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -29,19 +27,19 @@ struct CardlistPayload {
 ui::CardlistInit::CardlistInit()
     : Glib::ExtraClassInit(cardlist_class_init, nullptr, cardlist_init) {}
 
-ui::CardlistWidget::CardlistWidget(BoardWidget& board,
-                                   std::shared_ptr<CardList> cardlist_refptr,
-                                   bool is_new)
+ui::CardlistWidget::CardlistWidget(
+    BoardWidget& board, const std::shared_ptr<CardList>& cardlist_refptr,
+    bool is_new)
     : Glib::ObjectBase{"CardlistWidget"},
       CardlistInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
       add_card_button{_("Add card")},
       root{Gtk::Orientation::VERTICAL},
-      card_widgets{},
+      m_cards{},
       board{board},
-      cardlist{cardlist_refptr},
+      m_cardlist{cardlist_refptr},
       is_new{is_new},
-      cardlist_header{cardlist_refptr->get_name(), "title-2", "title-2"},
+      header{cardlist_refptr->get_name(), "title-2", "title-2"},
       scr_window{} {
     set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
     add_css_class("cardlist");
@@ -50,21 +48,20 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     setup_drag_and_drop();
 
     if (is_new) {
-        cardlist_header.to_editing_mode();
+        header.to_editing_mode();
     }
-    cardlist_header.add_option_button(_("Remove"), "remove", [this]() {
-        this->board.remove_cardlist(*this);
-    });
-    cardlist_header.signal_on_confirm().connect([this](std::string label) {
-        this->cardlist->set_name(label);
+    header.add_option_button(_("Remove"), "remove",
+                             [this]() { this->board.remove_cardlist(*this); });
+    header.signal_on_confirm().connect([this](std::string label) {
+        this->m_cardlist->set_name(label);
         this->is_new = false;
     });
-    cardlist_header.signal_on_cancel().connect([this](std::string label) {
+    header.signal_on_cancel().connect([this](std::string label) {
         if (this->is_new) {
             this->board.remove_cardlist(*this);
         }
     });
-    cardlist_header.set_margin_bottom(15);
+    header.set_margin_bottom(15);
 
     add_card_button.set_valign(Gtk::Align::CENTER);
     add_card_button.set_hexpand(true);
@@ -72,7 +69,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
         [this]() { this->add(Card{_("New Card")}, true); });
     root.append(add_card_button);
 
-    cardlist_header.insert_at_start(*this);
+    header.insert_at_start(*this);
 
     for (auto& card : cardlist_refptr->container().get_data()) {
         _add(card);
@@ -85,59 +82,57 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
     scr_window.set_size_request(CARDLIST_MAX_WIDTH, -1);
     scr_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
     scr_window.insert_at_end(*this);
+    using CardListShortcut =
+        std::pair<const char*,
+                  std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
+
+    const std::array<CardListShortcut, 5> cardlist_shortcuts = {
+        {{"<Control>R",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->header.to_editing_mode();
+              return true;
+          }},
+         {"<Control>N",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              auto n_cardlist =
+                  this->board.add_cardlist(CardList{_("New Cardlist")}, true);
+              this->board.reorder_cardlist(*n_cardlist, *this);
+              return true;
+          }},
+         {"<Control>Delete",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              this->board.remove_cardlist(*this);
+              return true;
+          }},
+         {"<Control>Left",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              CardlistWidget* previous_cardlist =
+                  static_cast<CardlistWidget*>(this->get_prev_sibling());
+              if (previous_cardlist) {
+                  this->board.reorder_cardlist(*previous_cardlist, *this);
+              }
+              return true;
+          }},
+         {"<Control>Right", [this](Gtk::Widget&, const Glib::VariantBase&) {
+              Widget* maybe_cardlist = this->get_next_sibling();
+              if (!G_TYPE_CHECK_INSTANCE_TYPE(maybe_cardlist->gobj(),
+                                              Gtk::Button::get_type())) {
+                  CardlistWidget* cardlist_widget =
+                      static_cast<CardlistWidget*>(maybe_cardlist);
+                  this->board.reorder_cardlist(*this, *cardlist_widget);
+              }
+              return true;
+          }}}};
 
     auto shortcut_controller = Gtk::ShortcutController::create();
     shortcut_controller->set_scope(Gtk::ShortcutScope::LOCAL);
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>R"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->cardlist_header.to_editing_mode();
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>N"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                auto n_cardlist =
-                    this->board.add_cardlist(CardList{_("New Cardlist")}, true);
 
-                this->board.reorder_cardlist(*n_cardlist, *this);
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Delete"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                this->board.remove_cardlist(*this);
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Left"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                CardlistWidget* previous_cardlist =
-                    static_cast<CardlistWidget*>(this->get_prev_sibling());
+    for (const auto& [keybinding, callback] : cardlist_shortcuts) {
+        shortcut_controller->add_shortcut(Gtk::Shortcut::create(
+            Gtk::ShortcutTrigger::parse_string(keybinding),
+            Gtk::CallbackAction::create(callback)));
+    }
 
-                if (previous_cardlist) {
-                    this->board.reorder_cardlist(*previous_cardlist, *this);
-                }
-                return true;
-            })));
-    shortcut_controller->add_shortcut(Gtk::Shortcut::create(
-        Gtk::ShortcutTrigger::parse_string("<Control>Right"),
-        Gtk::CallbackAction::create(
-            [this](Gtk::Widget&, const Glib::VariantBase&) {
-                Widget* maybe_cardlist = this->get_next_sibling();
-
-                if (!G_TYPE_CHECK_INSTANCE_TYPE(maybe_cardlist->gobj(),
-                                                Gtk::Button::get_type())) {
-                    CardlistWidget* cardlist_widget =
-                        static_cast<CardlistWidget*>(maybe_cardlist);
-                    this->board.reorder_cardlist(*this, *cardlist_widget);
-                }
-                return true;
-            })));
     add_controller(shortcut_controller);
 
     auto drop_motion_controller = Gtk::DropControllerMotion::create();
@@ -153,7 +148,7 @@ ui::CardlistWidget::CardlistWidget(BoardWidget& board,
 void ui::CardlistWidget::reorder(ui::CardWidget& next,
                                  ui::CardWidget& sibling) {
     ReorderingType reordering =
-        cardlist->container().reorder(*next.get_card(), *sibling.get_card());
+        m_cardlist->container().reorder(*next.get_card(), *sibling.get_card());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {
@@ -185,8 +180,8 @@ void ui::CardlistWidget::reorder(ui::CardWidget& next,
     }
 }
 
-const std::vector<ui::CardWidget*>& ui::CardlistWidget::get_card_widgets() {
-    return card_widgets;
+const std::vector<ui::CardWidget*>& ui::CardlistWidget::cards() {
+    return m_cards;
 }
 
 void ui::CardlistWidget::setup_drag_and_drop() {
@@ -208,7 +203,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" is being dragged",
-                this->get_cardlist()->get_name());
+                this->cardlist()->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -220,7 +215,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" dragging has been "
                 "canceled",
-                this->get_cardlist()->get_name());
+                this->cardlist()->get_name());
             return true;
         },
         false);
@@ -231,10 +226,10 @@ void ui::CardlistWidget::setup_drag_and_drop() {
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" stopped being draggeed",
-                this->get_cardlist()->get_name());
+                this->cardlist()->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
-    cardlist_header.add_controller(drag_source_c);
+    header.add_controller(drag_source_c);
 
     auto drop_target_cardlist = Gtk::DropTarget::create(
         Glib::Value<CardlistPayload>::value_type(), Gdk::DragAction::MOVE);
@@ -253,7 +248,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                     spdlog::get("ui")->warn(
                         "[CardlistWidget] CardlistWidget \"{}\" has been "
                         "dropped on itself.",
-                        this->get_cardlist()->get_name());
+                        this->cardlist()->get_name());
                     this->remove_css_class("cardlist-to-drop");
                     return true;
                 }
@@ -266,8 +261,8 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 spdlog::get("ui")->debug(
                     "[CardlistWidget] CardlistWidget \"{}\" has been dropped "
                     "on CardlistWidget \"{}\"",
-                    dropped_cardlist->get_cardlist()->get_name(),
-                    this->get_cardlist()->get_name());
+                    dropped_cardlist->cardlist()->get_name(),
+                    this->cardlist()->get_name());
                 return true;
             }
             return false;
@@ -286,7 +281,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                 dropped_value.init(value.gobj());
 
                 auto dropped_card = dropped_value.get();
-                if (!this->is_child(dropped_card)) {
+                if (!this->is_child(*dropped_card)) {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove_from_parent();
                     this->add(*card_in_dropped);
@@ -295,7 +290,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
                         "[CardlistWidget] CardWidget \"{}\" has been dropped "
                         "on CardlistWidget \"{}\"",
                         dropped_card->get_card()->get_name(),
-                        this->get_cardlist()->get_name());
+                        this->cardlist()->get_name());
                 }
 
                 this->remove_css_class("cardlist-to-drop");
@@ -307,28 +302,28 @@ void ui::CardlistWidget::setup_drag_and_drop() {
     add_controller(drop_target_card);
 }
 
-void ui::CardlistWidget::remove(ui::CardWidget* card) {
+void ui::CardlistWidget::remove(ui::CardWidget& card) {
     spdlog::get("ui")->debug(
         "[CardlistWidget] CardWidget \"{}\" has been removed from "
         "CardlistWidget \"{}\"",
-        card->get_card()->get_name(), cardlist->get_name());
+        card.get_card()->get_name(), m_cardlist->get_name());
 
-    root.remove(*card);
-    cardlist->container().remove(*card->get_card());
-    std::erase(card_widgets, card);
+    root.remove(card);
+    m_cardlist->container().remove(*card.get_card());
+    std::erase(m_cards, &card);
 }
 
 ui::CardWidget* ui::CardlistWidget::add(const Card& card, bool editing_mode) {
-    return _add(cardlist->container().append(card), editing_mode);
+    return _add(m_cardlist->container().append(card), editing_mode);
 }
 
-const std::shared_ptr<CardList>& ui::CardlistWidget::get_cardlist() {
-    return cardlist;
+const std::shared_ptr<CardList>& ui::CardlistWidget::cardlist() {
+    return m_cardlist;
 }
 
-bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
-    for (auto& card_ : card_widgets) {
-        if (card == card_) return true;
+bool ui::CardlistWidget::is_child(ui::CardWidget& card) {
+    for (auto& card_ : m_cards) {
+        if (&card == card_) return true;
     }
     return false;
 }
@@ -336,7 +331,7 @@ bool ui::CardlistWidget::is_child(ui::CardWidget* card) {
 ui::CardWidget* ui::CardlistWidget::_add(const std::shared_ptr<Card>& card,
                                          bool editing_mode) {
     auto cardwidget = Gtk::make_managed<CardWidget>(card, editing_mode);
-    card_widgets.push_back(cardwidget);
+    m_cards.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     root.append(*cardwidget);
     root.reorder_child_after(add_card_button, *cardwidget);
@@ -344,12 +339,12 @@ ui::CardWidget* ui::CardlistWidget::_add(const std::shared_ptr<Card>& card,
     spdlog::get("ui")->debug(
         "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
         "\"{}\"",
-        card->get_name(), cardlist->get_name());
+        card->get_name(), m_cardlist->get_name());
 
     return cardwidget;
 }
 
 void ui::CardlistWidget::cleanup() {
-    cardlist_header.unparent();
+    header.unparent();
     scr_window.unparent();
 }

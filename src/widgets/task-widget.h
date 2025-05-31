@@ -43,7 +43,7 @@ public:
      * @param is_new Boolean flag indicating if this is a new task.
      */
     TaskWidget(CardDetailsDialog& card_details_dialog, CardWidget& card_widget,
-               std::shared_ptr<Task> task, bool is_new = false);
+               const std::shared_ptr<Task>& task, bool is_new = false);
 
     /**
      * @brief Returns the Task object smart pointer associated with this widget.
@@ -53,6 +53,11 @@ public:
     std::shared_ptr<Task> get_task();
 
 protected:
+    /**
+     * @brief Handles the done action.
+     */
+    void done_handler(bool done);
+
     /**
      * @brief Handles the rename action.
      */
@@ -87,25 +92,19 @@ protected:
 
     void cleanup() override;
 
-    Gtk::Label task_label;              ///< Label displaying the task name.
-    Gtk::Revealer task_entry_revealer;  ///< Revealer for the task entry.
-    Gtk::Entry task_entry;              ///< Entry for editing the task name.
-    Gtk::CheckButton
-        task_checkbutton;  ///< Checkbox for marking the task as completed.
+    Gtk::Label task_label;
+    Gtk::Revealer task_entry_revealer;
+    Gtk::Entry task_entry;
+    Gtk::CheckButton task_checkbutton;
+    Gtk::PopoverMenu popover_menu;
 
-    const Glib::RefPtr<Gio::Menu>
-        menu_model;  ///< Menu model for the task widget.
-    const Glib::RefPtr<Gio::SimpleActionGroup>
-        group;  ///< Action group for the task widget.
-    Gtk::PopoverMenu
-        popover_menu;  ///< Popover menu for additional task actions.
+    const Glib::RefPtr<Gio::Menu> menu_model;
+    const Glib::RefPtr<Gio::SimpleActionGroup> group;
 
-    std::shared_ptr<Task>
-        task;  ///< Smart pointer to the associated Task object.
-    CardDetailsDialog&
-        card_details_dialog;  ///< Reference to the parent CardDetailsDialog.
+    std::shared_ptr<Task> task;
+    CardDetailsDialog& card_details_dialog;
 
-    bool is_new;  ///< Flag indicating if this is a new task.
+    bool is_new;
 };
 
 }  // namespace ui

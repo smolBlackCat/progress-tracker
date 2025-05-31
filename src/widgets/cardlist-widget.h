@@ -5,8 +5,6 @@
 #include <glibmm/extraclassinit.h>
 #include <gtkmm.h>
 
-#include <memory>
-
 #include "base-item.h"
 #include "board-widget.h"
 #include "card-widget.h"
@@ -31,8 +29,7 @@ public:
  */
 class CardlistWidget : public CardlistInit, public BaseItem {
 public:
-    static constexpr int CARDLIST_MAX_WIDTH =
-        240;  ///< Maximum width for the card list widget.
+    static constexpr int CARDLIST_MAX_WIDTH = 240;
 
     /**
      * @brief Constructs a CardlistWidget object.
@@ -40,11 +37,12 @@ public:
      * @param board BoardWidget reference to where this widget belongs.
      * @param cardlist CardList smart pointer that this widget is allowed
      *        to change.
-     * @param is_new Indicates whether it's completely new, therefore giving the
-     *        user the chance to cancel creation.
+     * @param editing_mode Boolean indicating whether the card list widget
+     * should start in editing mode. Default is false.
      */
-    CardlistWidget(BoardWidget& board, std::shared_ptr<CardList> cardlist,
-                   bool is_new = false);
+    CardlistWidget(BoardWidget& board,
+                   const std::shared_ptr<CardList>& cardlist,
+                   bool editing_mode = false);
 
     /**
      * @brief Adds a CardWidget object based on the given Card.
@@ -62,14 +60,14 @@ public:
      *
      * @param card Pointer to the CardWidget to be deleted.
      */
-    void remove(ui::CardWidget* card);
+    void remove(ui::CardWidget& card);
 
     /**
      * @brief Retrieves the underlying CardList smart pointer.
      *
      * @return Reference to the CardList smart pointer.
      */
-    const std::shared_ptr<CardList>& get_cardlist();
+    const std::shared_ptr<CardList>& cardlist();
 
     /**
      * @brief Determines whether a given CardWidget object belongs to this
@@ -80,7 +78,7 @@ public:
      * @return True if the CardWidget belongs to this CardlistWidget,
      *         false otherwise.
      */
-    bool is_child(ui::CardWidget* card);
+    bool is_child(ui::CardWidget& card);
 
     /**
      * @brief Reorders card widget "next" after card widget "sibling".
@@ -95,10 +93,9 @@ public:
      *
      * @return Reference to the vector of CardWidget pointers.
      */
-    const std::vector<ui::CardWidget*>& get_card_widgets();
+    const std::vector<ui::CardWidget*>& cards();
 
-    BoardWidget& board;  ///< Reference to the BoardWidget to which this
-                         ///< CardlistWidget belongs.
+    BoardWidget& board;
 
 protected:
     /**
@@ -112,19 +109,16 @@ protected:
     void cleanup() override;
 
     // Widgets
-    EditableLabelHeader cardlist_header;  ///< Header widget for the card list.
+    EditableLabelHeader header;
     Gtk::ScrolledWindow scr_window{};
-    Gtk::Button add_card_button;  ///< Button to add new cards.
-    Gtk::Box root;                ///< Root container for the card list widget.
+    Gtk::Button add_card_button;
+    Gtk::Box root;
 
     // Data
-    std::shared_ptr<CardList>
-        cardlist;  ///< Pointer to the current CardList object.
-    std::vector<ui::CardWidget*>
-        card_widgets;  ///< Vector holding pointers to CardWidget objects.
+    std::shared_ptr<CardList> m_cardlist;
+    std::vector<ui::CardWidget*> m_cards;
 
-    bool is_new;  ///< Flag indicating whether the card list is new or loaded
-                  ///< from a file.
+    bool is_new;
 };
 
 }  // namespace ui
