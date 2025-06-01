@@ -460,6 +460,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     const Date card_date = card->get_due_date();
     if (card_date.ok()) {
         due_date_label.set_label(_("Due: ") + format_date_str(card_date));
+        due_date_label.set_visible();
     }
 
     if (!card->container().get_data().empty()) {
