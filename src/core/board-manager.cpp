@@ -40,8 +40,7 @@ std::string progress_boards_folder() {
 #endif
 }
 
-std::string gen_filename(Board& board) {
-    std::string boards_dir = progress_boards_folder();
+std::string gen_filename(const std::string& boards_dir, const Board& board) {
     std::string filename = "";
 
     if (fs::exists(boards_dir)) {
@@ -54,7 +53,7 @@ std::string gen_filename(Board& board) {
 Board unitialized_board(const std::string& filename) {
     spdlog::get("core")->debug(
         "[BoardManager] BoardManager is loading board from file: {}", filename);
-    if (!std::filesystem::exists(filename))
+    if (!fs::exists(filename))
         throw std::invalid_argument{std::format(
             "Progress Board XML file given does not exist: {}", filename)};
 
@@ -113,7 +112,8 @@ Board unitialized_board(const std::string& filename) {
     return board;
 }
 
-void full_load(const std::string& filename, std::shared_ptr<Board> board) {
+void full_load(const std::string& filename,
+               const std::shared_ptr<Board>& board) {
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLError status = doc.LoadFile(filename.c_str());
     if (status != tinyxml2::XML_SUCCESS) {
@@ -225,14 +225,16 @@ BoardManager::BoardManager() : BoardManager{progress_boards_folder()} {}
 
 BoardManager::BoardManager(const std::string& board_dir)
     : BOARD_DIR{board_dir} {
-    if (!fs::exists(BOARD_DIR)) {
-        fs::create_directories(BOARD_DIR);
+    if (!(fs::exists(BOARD_DIR) || fs::create_directories(BOARD_DIR))) {
+        throw std::runtime_error{
+            "Failed to load boards: Boards folder cannot be resolved"};
     }
 
-    spdlog::get("core")->info("Loading boards from local storage");
+    spdlog::get("core")->info(
+        "[BoardManager] Loading boards from local storage");
     for (const auto& dir_entry :
          std::filesystem::directory_iterator(BOARD_DIR)) {
-        std::string board_filename = dir_entry.path().string();
+        const std::string board_filename = dir_entry.path().string();
         if (board_filename.ends_with(".xml")) {
             try {
                 m_local_boards.push_back(LocalBoard{
@@ -246,8 +248,8 @@ BoardManager::BoardManager(const std::string& board_dir)
         }
     }
 
-    spdlog::get("core")->info("Local boards have been successfully loaded",
-                              BOARD_DIR);
+    spdlog::get("core")->info(
+        "[BoardManager] Local boards have been successfully loaded", BOARD_DIR);
 }
 
 std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
@@ -263,6 +265,10 @@ std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
                 // TODO: Signaling may be good to show a dialog where the error
                 // was since it does not mean that the file is corrupted, it
                 // just means the file is not well-formed
+
+                spdlog::get("core")->warn(
+                    "[BoardManager] Progress Board in {} was ill-formed",
+                    filename);
                 break;
             } catch (std::runtime_error& err) {
                 // File has been deleted at the time for reading, delete the
@@ -283,7 +289,7 @@ const std::vector<LocalBoard>& BoardManager::local_boards() const {
 std::string BoardManager::local_add(const std::string& name,
                                     const std::string& background) {
     Board board{name, background};
-    std::string board_filename = gen_filename(board);
+    const std::string board_filename = gen_filename(BOARD_DIR, board);
     LocalBoard local_board{board_filename, std::make_shared<Board>(board),
                            false};
     __local_save(local_board);
@@ -294,7 +300,7 @@ std::string BoardManager::local_add(const std::string& name,
     return board_filename;
 }
 
-void BoardManager::local_remove(std::shared_ptr<Board> board) {
+void BoardManager::local_remove(const std::shared_ptr<Board>& board) {
     for (auto it = m_local_boards.begin(); it != m_local_boards.end(); it++) {
         LocalBoard local_board = *it;
         if (*(local_board.board) == *board) {
@@ -306,7 +312,7 @@ void BoardManager::local_remove(std::shared_ptr<Board> board) {
     }
 }
 
-void BoardManager::local_save(std::shared_ptr<Board> board) {
+void BoardManager::local_save(const std::shared_ptr<Board>& board) {
     for (auto it = m_local_boards.begin(); it != m_local_boards.end(); it++) {
         LocalBoard local_board = *it;
         if (*(local_board.board) == *board) {
@@ -317,7 +323,7 @@ void BoardManager::local_save(std::shared_ptr<Board> board) {
     }
 }
 
-void BoardManager::local_close(std::shared_ptr<Board> board) {
+void BoardManager::local_close(const std::shared_ptr<Board>& board) {
     for (auto it = m_local_boards.begin(); it != m_local_boards.end(); it++) {
         if (*(it->board) == *board) {
             (*it).is_open = false;
@@ -339,7 +345,7 @@ sigc::signal<void(LocalBoard)>& BoardManager::signal_save_board() {
     return save_board_signal;
 }
 
-void BoardManager::__local_save(LocalBoard& local) {
+void BoardManager::__local_save(const LocalBoard& local) {
     auto doc = std::make_unique<tinyxml2::XMLDocument>();
 
     std::shared_ptr<Board> board = local.board;
@@ -350,19 +356,19 @@ void BoardManager::__local_save(LocalBoard& local) {
     board_element->SetAttribute("uuid", std::string(board->get_id()).c_str());
     doc->InsertEndChild(board_element);
 
-    for (auto& cardlist : board->container()) {
+    for (const auto& cardlist : board->container()) {
         tinyxml2::XMLElement* list_element = doc->NewElement("list");
         list_element->SetAttribute("name", cardlist->get_name().c_str());
         list_element->SetAttribute("uuid", cardlist->get_id().str().c_str());
 
-        for (auto& card : cardlist->container()) {
+        for (const auto& card : cardlist->container()) {
             tinyxml2::XMLElement* card_element = doc->NewElement("card");
             card_element->SetAttribute("name", card->get_name().c_str());
             card_element->SetAttribute("uuid", card->get_id().str().c_str());
             if (card->is_color_set())
                 card_element->SetAttribute(
                     "color", color_to_string(card->get_color()).c_str());
-            auto date = card->get_due_date();
+            const Date date = card->get_due_date();
             if (date.ok()) {
                 card_element->SetAttribute("due",
                                            std::format("{}", date).c_str());
@@ -370,7 +376,7 @@ void BoardManager::__local_save(LocalBoard& local) {
             }
 
             // Add tasks
-            for (auto& task : card->container()) {
+            for (const auto& task : card->container()) {
                 tinyxml2::XMLElement* task_element = doc->NewElement("task");
                 task_element->SetAttribute("name", task->get_name().c_str());
                 task_element->SetAttribute("done", task->get_done());
@@ -396,7 +402,7 @@ void BoardManager::__local_save(LocalBoard& local) {
     board->modify(false);
     board->container().modify(false);
 
-    std::filesystem::path p{local.filename};
+    const std::filesystem::path p{local.filename};
     if (p.has_parent_path() && !std::filesystem::exists(p.parent_path())) {
         spdlog::get("core")->warn(
             "[BoardBackend] Parent path \"{}\" does not exist. Creating",
@@ -404,9 +410,7 @@ void BoardManager::__local_save(LocalBoard& local) {
         std::filesystem::create_directories(p.parent_path());
     }
 
-    bool success =
-        doc->SaveFile(local.filename.c_str()) == tinyxml2::XML_SUCCESS;
-    if (success) {
+    if (doc->SaveFile(local.filename.c_str()) == tinyxml2::XML_SUCCESS) {
         spdlog::get("core")->debug(
             "[BoardManager] BoardManager has saved Board \"{}\" to: {}",
             board->get_name(), local.filename);

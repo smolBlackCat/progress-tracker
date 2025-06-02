@@ -49,17 +49,17 @@ public:
     /**
      * @brief Removes board from local database
      */
-    void local_remove(std::shared_ptr<Board> board);
+    void local_remove(const std::shared_ptr<Board>& board);
 
     /**
      * @brief Saves and board into local database
      */
-    void local_save(std::shared_ptr<Board> board);
+    void local_save(const std::shared_ptr<Board>& board);
 
     /**
      * @brief Closes local board
      */
-    void local_close(std::shared_ptr<Board> board);
+    void local_close(const std::shared_ptr<Board>& board);
 
     sigc::signal<void(LocalBoard)>& signal_add_board();
     sigc::signal<void(LocalBoard)>& signal_remove_board();
@@ -74,5 +74,5 @@ protected:
     sigc::signal<void(LocalBoard)> save_board_signal;
 
 private:
-    void __local_save(LocalBoard& local);
+    void __local_save(const LocalBoard& local);
 };
