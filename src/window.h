@@ -2,6 +2,7 @@
 
 #include <adwaita.h>
 #include <gtkmm.h>
+#include <widgets/board-card-button.h>
 #include <widgets/board-widget.h>
 
 #include "core/board-manager.h"

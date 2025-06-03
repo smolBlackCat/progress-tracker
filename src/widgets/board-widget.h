@@ -3,8 +3,6 @@
 #include <core/board-manager.h>
 #include <gtkmm.h>
 
-#include "board-card-button.h"
-
 namespace ui {
 class CardlistWidget;
 
@@ -27,7 +25,8 @@ public:
         "background-color; "
         "background-color: {};}}";
 
-    static constexpr unsigned int SAVE_INTERVAL = 1000 * 10;
+    static constexpr int SAVE_INTERVAL = 1000 * 10;
+    static constexpr int UPDATE_INTERVAL = SAVE_INTERVAL * 6;
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
     /**
@@ -36,20 +35,44 @@ public:
     BoardWidget(BoardManager& manager);
 
     /**
-     * @brief Sets and updates the board widget.
+     * @brief Loads all widgets composing a BoardWidget from a board object
      *
-     * @param board pointer to a board object.
-     * @param board_card_button pointer to a BoardCardButton object that has
-     *        opened this board
-     *
-     * @details Essentially, what this method does is cleaning the previous
-     *          settings existent within the widget, if there is one, and
-     *          setting a new board to the widget. It also dynamically sets
-     *          every aspect of the board: background and its cards and
-     * lists.
+     * @param board shared pointer to the board object
      */
-    void set(const std::shared_ptr<Board>& board,
-             BoardCardButton* const board_card_button);
+    void set(const std::shared_ptr<Board>& board);
+
+    /**
+     * @brief Updates board's name, reflecting those changes to the
+     * application window
+     *
+     * @param board_name new name for the board
+     */
+    void set_name(const std::string& board_name);
+
+    /**
+     * @brief Sets board widget background
+     *
+     * @param background string referring to a background, either a colour
+     * code or a filename
+     */
+    void set_background(const std::string& background);
+
+    /**
+     * @brief Reorders two CardlistWidget objects.
+     *
+     * @param next widget to be put after sibling
+     * @param sibling widget to be put before next
+     */
+    void reorder_cardlist(CardlistWidget& next, CardlistWidget& sibling);
+
+    /**
+     * @brief Removes a CardlistWidget widget.
+     *
+     * @param cardlist reference to the cardlist to be removed.
+     * @return true if the cardlist was successfully removed, false
+     * otherwise
+     */
+    void remove_cardlist(ui::CardlistWidget& cardlist);
 
     /**
      * @brief Cleans the BoardWidget to an empty state, that is, there will
@@ -66,6 +89,15 @@ public:
     void save(bool clear = true);
 
     /**
+     * @brief Describes whether the board should be able to scroll
+     * horizontally
+     *
+     * @param scroll boolean indicating whether horizontal scrolling should
+     * be enabled
+     */
+    void set_on_scroll(bool scroll = true);
+
+    /**
      * @brief Adds a new CardlistWidget widget based on the CardList object.
      *
      * @param cardlist CardList object
@@ -77,44 +109,11 @@ public:
                                      bool editing_mode = false);
 
     /**
-     * @brief Removes a CardlistWidget widget.
-     *
-     * @param cardlist reference to the cardlist to be removed.
-     * @return true if the cardlist was successfully removed, false
-     * otherwise
-     */
-    bool remove_cardlist(ui::CardlistWidget& cardlist);
-
-    /**
-     * @brief Reorders two CardlistWidget objects.
-     *
-     * @param next widget to be put after sibling
-     * @param sibling widget to be put before next
-     */
-    void reorder_cardlist(CardlistWidget& next, CardlistWidget& sibling);
-
-    /**
-     * @brief Sets the Board background
-     *
-     * @param background string referring to a background, either a colour
-     * code or a filename
-     */
-    void set_background(const std::string& background);
-
-    /**
      * @brief Retrieves the background string
      *
      * @return reference to the background string
      */
     std::string get_background() const;
-
-    /**
-     * @brief Updates board's name, reflecting those changes to the
-     * application window
-     *
-     * @param board_name new name for the board
-     */
-    void set_name(const std::string& board_name);
 
     /**
      * @brief Retrieves the board's name
@@ -131,15 +130,6 @@ public:
     bool get_on_scroll() const;
 
     /**
-     * @brief Describes whether the board should be able to scroll
-     * horizontally
-     *
-     * @param scroll boolean indicating whether horizontal scrolling should
-     * be enabled
-     */
-    void set_on_scroll(bool scroll = true);
-
-    /**
      * @brief Retrieves the current board object
      *
      * @return shared pointer to the current board object
@@ -147,20 +137,11 @@ public:
     std::shared_ptr<Board> get_board() const;
 
 protected:
-    /**
-     * @brief Sets up automatic scrolling for every time the users drags
-     * either cards or cardlists across the screen the BoardWidget will
-     * scroll as needed.
-     */
-    void setup_auto_scrolling();
-
-    /**
-     * @brief Adds a new cardlist widget to the board widget.
-     */
-    CardlistWidget* _add_cardlist(const std::shared_ptr<CardList>& cardlist,
-                                  bool editing_mode = false);
-
+    void __setup_auto_scrolling();
     void __set_background(const std::string& background);
+
+    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
+                                   bool editing_mode = false);
 
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
@@ -170,14 +151,13 @@ protected:
     Gtk::Picture picture;
     Gtk::ScrolledWindow scr;
 #endif
-    Gtk::Box root;
-    Gtk::Button add_button;
-    std::shared_ptr<Board> board = nullptr;
-    BoardCardButton* board_card_button = nullptr;
-    Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
-    std::vector<ui::CardlistWidget*> cardlist_widgets;
+    Gtk::Box m_root;
+    Gtk::Button m_add_button;
+    std::shared_ptr<Board> m_board = nullptr;
+    Glib::RefPtr<Gtk::CssProvider> m_css_provider;
+    std::vector<ui::CardlistWidget*> m_cardlists;
     double x, y;
-    bool on_scroll = false;
+    bool m_on_scroll = false;
 };
 
 }  // namespace ui

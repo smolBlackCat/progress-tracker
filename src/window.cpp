@@ -7,7 +7,6 @@
 #include <glibmm/i18n.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-#include <widgets/board-card-button.h>
 #include <widgets/card-widget.h>
 
 #include <format>
@@ -362,13 +361,12 @@ void ProgressWindow::load_appropriate_style() {
 void ProgressWindow::on_board_loading_done() {
     if (cur_board) {
         on_board_view();
-        board_widget.set(cur_board, cur_board_entry);
+        board_widget.set(cur_board);
         set_title(cur_board->get_name());
         spdlog::get("ui")->info(
             "[Progress Window] Board view loaded successfully");
     } else {
-        // cur_board are still nullptrs because the loading
-        // thread has failed, therefore, go back to the main menu
+        // Loading thread has failed. Warn user and log
         Gtk::AlertDialog::create(_("It was not possible to load this board"))
             ->show(*this);
         boards_grid_p->remove(*cur_board_entry);
