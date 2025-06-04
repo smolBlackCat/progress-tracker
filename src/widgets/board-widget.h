@@ -30,7 +30,9 @@ public:
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
     /**
-     * @brief Constructs a BoardWidget object.
+     * @brief BoardWidget constructor
+     *
+     * @param manager BoardManager reference
      */
     BoardWidget(BoardManager& manager);
 
@@ -42,8 +44,7 @@ public:
     void set(const std::shared_ptr<Board>& board);
 
     /**
-     * @brief Updates board's name, reflecting those changes to the
-     * application window
+     * @brief Updates board' name
      *
      * @param board_name new name for the board
      */
@@ -75,18 +76,18 @@ public:
     void remove_cardlist(ui::CardlistWidget& cardlist);
 
     /**
-     * @brief Cleans the BoardWidget to an empty state, that is, there will
-     * be no pointer to a board object and also the information on
-     *        background and cardlist objects are also deleted.
+     * @brief Cleans the BoardWidget, thus deleting al widgets associated with
+     * it
      */
     void clear();
 
     /**
-     * @brief Saves the contents edited in the Board class.
+     * @brief Calls BoardManager saving variants depending on the Board type
+     * (e.g. local or external)
      *
-     * @param clear indicates whether to clear the board after saving
+     * @param clear indicates whether to clear the board widget after saving
      */
-    void save(bool clear = true);
+    void save(bool clear_after_save = true);
 
     /**
      * @brief Describes whether the board should be able to scroll
@@ -95,7 +96,7 @@ public:
      * @param scroll boolean indicating whether horizontal scrolling should
      * be enabled
      */
-    void set_on_scroll(bool scroll = true);
+    void set_scroll(bool scroll = true);
 
     /**
      * @brief Adds a new CardlistWidget widget based on the CardList object.
@@ -127,14 +128,14 @@ public:
      *
      * @return true if horizontal scrolling is enabled, false otherwise
      */
-    bool get_on_scroll() const;
+    bool scroll() const;
 
     /**
      * @brief Retrieves the current board object
      *
      * @return shared pointer to the current board object
      */
-    std::shared_ptr<Board> get_board() const;
+    std::shared_ptr<Board> board() const;
 
 protected:
     void __setup_auto_scrolling();

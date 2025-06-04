@@ -727,7 +727,7 @@ void CardWidget::setup_drag_and_drop() {
         false);
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
-            this->parent->board.set_on_scroll();
+            this->parent->board.set_scroll();
 
             spdlog::get("ui")->debug(
                 "[CardWidget] CardWidget \"{}\" is being dragged",
@@ -737,7 +737,7 @@ void CardWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
-            this->parent->board.set_on_scroll(false);
+            this->parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
                 "[CardWidget] CardWidget \"{}\" dragging has been canceled",
@@ -747,7 +747,7 @@ void CardWidget::setup_drag_and_drop() {
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
-            this->parent->board.set_on_scroll(false);
+            this->parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
                 "[CardWidget] CardWidget \"{}\" stopped being dragged",
@@ -760,7 +760,7 @@ void CardWidget::setup_drag_and_drop() {
         Glib::Value<CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->parent->board.set_on_scroll(false);
+            this->parent->board.set_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<CardWidget*>::value_type())) {
                 Glib::Value<CardWidget*> dropped_value;

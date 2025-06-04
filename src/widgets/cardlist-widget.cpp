@@ -199,7 +199,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
-            this->board.set_on_scroll();
+            this->board.set_scroll();
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" is being dragged",
@@ -210,7 +210,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag,
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
-            this->board.set_on_scroll(false);
+            this->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" dragging has been "
@@ -222,7 +222,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
-            this->board.set_on_scroll(false);
+            this->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget] CardlistWidget \"{}\" stopped being draggeed",
@@ -235,7 +235,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         Glib::Value<CardlistPayload>::value_type(), Gdk::DragAction::MOVE);
     drop_target_cardlist->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->board.set_on_scroll(false);
+            this->board.set_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<CardlistPayload>::value_type())) {
                 Glib::Value<CardlistPayload> dropped_value;
@@ -274,7 +274,7 @@ void ui::CardlistWidget::setup_drag_and_drop() {
         Glib::Value<ui::CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_card->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->board.set_on_scroll(false);
+            this->board.set_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<ui::CardWidget*>::value_type())) {
                 Glib::Value<ui::CardWidget*> dropped_value;

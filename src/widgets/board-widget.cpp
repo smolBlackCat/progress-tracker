@@ -29,7 +29,7 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     set_child(overlay);
     picture.set_keep_aspect_ratio(false);
     overlay.set_child(picture);
-    scr.set_child(root);
+    scr.set_child(m_root);
     overlay.add_overlay(scr);
     overlay.set_expand(true);
 #else
@@ -178,17 +178,17 @@ void ui::BoardWidget::clear() {
     spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
 
-void ui::BoardWidget::save(bool free) {
+void ui::BoardWidget::save(bool clear_after_save) {
     if (m_board->modified()) {
         m_manager.local_save(m_board);
     }
 
-    if (free) {
+    if (clear_after_save) {
         clear();
     }
 }
 
-void ui::BoardWidget::set_on_scroll(bool scroll) { m_on_scroll = scroll; }
+void ui::BoardWidget::set_scroll(bool scroll) { m_on_scroll = scroll; }
 
 ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
                                                   bool editing_mode) {
@@ -201,9 +201,9 @@ std::string ui::BoardWidget::get_background() const {
 
 std::string ui::BoardWidget::get_name() const { return m_board->get_name(); }
 
-bool ui::BoardWidget::get_on_scroll() const { return m_on_scroll; }
+bool ui::BoardWidget::scroll() const { return m_on_scroll; }
 
-std::shared_ptr<Board> ui::BoardWidget::get_board() const { return m_board; }
+std::shared_ptr<Board> ui::BoardWidget::board() const { return m_board; }
 
 void ui::BoardWidget::__setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
@@ -254,7 +254,7 @@ void ui::BoardWidget::__set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
-            css_provider_refptr->load_from_data(
+            m_css_provider->load_from_data(
                 std::format(CSS_FORMAT_RGB, background));
             picture.set_visible(false);
             break;
@@ -265,7 +265,7 @@ void ui::BoardWidget::__set_background(const std::string& background) {
             break;
         }
         case BackgroundType::INVALID: {
-            css_provider_refptr->load_from_data(
+            m_css_provider->load_from_data(
                 std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
             picture.set_visible(false);
             break;
