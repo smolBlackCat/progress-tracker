@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
-#include "gtkmm/shortcutaction.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -30,57 +29,57 @@ TaskInit::TaskInit()
     : Glib::ExtraClassInit{task_class_init, nullptr, task_init} {}
 
 TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
-                       CardWidget& card_widget,
                        const std::shared_ptr<Task>& task, bool is_new)
     : Glib::ObjectBase{"TaskWidget"},
       TaskInit{},
       BaseItem{Gtk::Orientation::HORIZONTAL, 3},
-      card_details_dialog{card_details_dialog},
-      task{task},
-      menu_model{Gio::Menu::create()},
-      group{Gio::SimpleActionGroup::create()},
+      m_card_dialog{card_details_dialog},
+      m_task{task},
+      m_menu_model{Gio::Menu::create()},
+      m_action_group{Gio::SimpleActionGroup::create()},
       is_new{is_new} {
-    popover_menu.set_menu_model(menu_model);
+    m_popover.set_menu_model(m_menu_model);
     set_margin_start(5);
     set_margin_end(5);
 
     Gtk::Box& inner_box =
         *Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
     inner_box.set_valign(Gtk::Align::CENTER);
-    inner_box.append(task_label);
-    task_label.set_halign(Gtk::Align::START);
-    task_label.set_margin_start(5);
-    task_label.set_wrap();
-    task_label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
-    task_label.set_label(task->get_name());
+    inner_box.append(m_label);
+    m_label.set_halign(Gtk::Align::START);
+    m_label.set_margin_start(5);
+    m_label.set_wrap();
+    m_label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
+    m_label.set_label(task->get_name());
 
-    inner_box.append(task_entry_revealer);
-    task_entry_revealer.set_hexpand();
-    task_entry_revealer.set_child(task_entry);
+    inner_box.append(m_entry_revealer);
+    m_entry_revealer.set_hexpand();
+    m_entry_revealer.set_child(m_entry);
 
     inner_box.insert_at_end(*this);
 
-    task_checkbutton.insert_at_end(*this);
-    task_checkbutton.set_halign(Gtk::Align::END);
-    task_checkbutton.set_hexpand();
-    task_checkbutton.set_margin_end(5);
+    m_checkbutton.insert_at_end(*this);
+    m_checkbutton.set_halign(Gtk::Align::END);
+    m_checkbutton.set_hexpand();
+    m_checkbutton.set_margin_end(5);
 
     if (task->get_done()) add_css_class("complete-task");
 
-    task_checkbutton.signal_toggled().connect(
+    m_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));
-    task_checkbutton.set_active(task->get_done());
+    m_checkbutton.set_active(task->get_done());
 
-    menu_model->append(_("Rename"), "task-widget.rename");
-    menu_model->append(_("Remove"), "task-widget.remove");
-    menu_model->append(_("Convert to card"), "task-widget.task-convert");
-    group->add_action("rename", sigc::mem_fun(*this, &TaskWidget::on_rename));
-    group->add_action("remove", sigc::mem_fun(*this, &TaskWidget::on_remove));
-    group->add_action("task-convert", [this, &card_widget]() {
-        this->on_convert(card_widget);
-    });
-    popover_menu.insert_action_group("task-widget", group);
-    popover_menu.set_parent(*this);
+    m_menu_model->append(_("Rename"), "task-widget.rename");
+    m_menu_model->append(_("Remove"), "task-widget.remove");
+    m_menu_model->append(_("Convert to card"), "task-widget.task-convert");
+    m_action_group->add_action("rename",
+                               sigc::mem_fun(*this, &TaskWidget::on_rename));
+    m_action_group->add_action("remove",
+                               sigc::mem_fun(*this, &TaskWidget::on_remove));
+    m_action_group->add_action("task-convert",
+                               sigc::mem_fun(*this, &TaskWidget::on_convert));
+    m_popover.insert_action_group("task-widget", m_action_group);
+    m_popover.set_parent(*this);
 
     auto gesture_click = Gtk::GestureClick::create();
     gesture_click->set_button();
@@ -91,8 +90,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
                 on_rename();
             } else if (n_pressed == 1 && gesture_click->get_current_button() ==
                                              GDK_BUTTON_SECONDARY) {
-                this->popover_menu.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
-                popover_menu.popup();
+                this->m_popover.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
+                m_popover.popup();
             }
         });
     this->add_controller(gesture_click);
@@ -100,7 +99,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     auto key_controller = Gtk::EventControllerKey::create();
     key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
-            if (task_entry_revealer.get_child_revealed()) {
+            if (m_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
                     case (GDK_KEY_Return): {
                         off_rename();
@@ -110,11 +109,11 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
             }
         },
         false);
-    task_entry.add_controller(key_controller);
+    m_entry.add_controller(key_controller);
     auto focus_controller = Gtk::EventControllerFocus::create();
     focus_controller->signal_leave().connect(
         sigc::mem_fun(*this, &TaskWidget::off_rename));
-    task_entry.add_controller(focus_controller);
+    m_entry.add_controller(focus_controller);
 
     using TaskShortcut =
         std::pair<const char*,
@@ -138,8 +137,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
               return true;
           }},
          {"<Control><Shift>C",
-          [this, &card_widget](Gtk::Widget&, const Glib::VariantBase&) {
-              on_convert(card_widget);
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
+              on_convert();
               return true;
           }},
          {"<Control>Up",
@@ -147,8 +146,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
               Gtk::Widget* previous = this->get_prev_sibling();
               if (previous) {
                   TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
-                  this->card_details_dialog.reorder_task_widget(prev_task,
-                                                                *this);
+                  this->m_card_dialog.reorder_task_widget(prev_task, *this);
               }
               return true;
           }},
@@ -157,8 +155,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
                   TaskWidget& next_task = *static_cast<TaskWidget*>(next);
-                  this->card_details_dialog.reorder_task_widget(*this,
-                                                                next_task);
+                  this->m_card_dialog.reorder_task_widget(*this, next_task);
               }
               return true;
           }}}};
@@ -181,78 +178,78 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     }
 }
 
-std::shared_ptr<Task> TaskWidget::get_task() { return task; }
+std::shared_ptr<Task> TaskWidget::task() const { return m_task; }
 
 void TaskWidget::on_rename() {
-    task_entry_revealer.set_reveal_child();
-    task_label.set_visible(false);
+    m_entry_revealer.set_reveal_child();
+    m_label.set_visible(false);
 
-    task_entry.set_text(task->get_name());
-    task_entry.grab_focus();
+    m_entry.set_text(m_task->get_name());
+    m_entry.grab_focus();
 
     spdlog::get("ui")->debug(
         "[TaskWidget] TaskWidget \"{}\" has entered rename mode",
-        task->get_name());
+        m_task->get_name());
 }
 
 void TaskWidget::off_rename() {
-    task_entry_revealer.set_reveal_child(false);
-    task_label.set_visible(true);
+    m_entry_revealer.set_reveal_child(false);
+    m_label.set_visible(true);
 
-    std::string new_label = task_entry.get_text();
-    if (new_label != task->get_name()) {
-        if (task_checkbutton.get_active()) {
-            task_label.set_markup(
-                Glib::ustring::compose("<s>%1</s>", new_label));
+    std::string new_label = m_entry.get_text();
+    if (new_label != m_task->get_name()) {
+        if (m_checkbutton.get_active()) {
+            m_label.set_markup(Glib::ustring::compose("<s>%1</s>", new_label));
         } else {
-            task_label.set_markup(new_label);
+            m_label.set_markup(new_label);
         }
-        task->set_name(new_label);
+        m_task->set_name(new_label);
         is_new = false;
     }
 
     spdlog::get("ui")->debug(
         "[TaskWidget] TaskWidget \"{}\" has exited rename mode",
-        task->get_name());
+        m_task->get_name());
 }
 
 void TaskWidget::done_handler(bool done) {
     if (done) {
-        task_label.set_markup(
-            Glib::ustring::compose("<s>%1</s>", task->get_name()));
+        m_label.set_markup(
+            Glib::ustring::compose("<s>%1</s>", m_task->get_name()));
         add_css_class("complete-task");
 
         spdlog::get("ui")->debug(
             "[TaskWidget] TaskWidget \"{}\" has been marked as complete",
-            task->get_name());
+            m_task->get_name());
     } else {
-        task_label.set_markup(task->get_name());
+        m_label.set_markup(m_task->get_name());
         remove_css_class("complete-task");
 
         spdlog::get("ui")->debug(
             "[TaskWidget] TaskWidget \"{}\" has been marked as incomplete",
-            task->get_name());
+            m_task->get_name());
     }
 }
 
-void TaskWidget::on_remove() { card_details_dialog.remove_task(*this); }
+void TaskWidget::on_remove() { m_card_dialog.remove_task(*this); }
 
 void TaskWidget::on_checkbox() {
-    this->task->set_done(task_checkbutton.get_active());
-    card_details_dialog.get_card_widget()->update_complete_tasks_label();
+    this->m_task->set_done(m_checkbutton.get_active());
+    m_card_dialog.get_card_widget()->update_complete_tasks_label();
 }
 
-void TaskWidget::on_convert(CardWidget& card_widget) {
+void TaskWidget::on_convert() {
+    CardWidget& card_widget = *m_card_dialog.get_card_widget();
     spdlog::get("ui")->info(
         "[TaskWidget] Task \"{}\" has been converted into a card",
-        task->get_name());
+        m_task->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->cardlist();
-    auto task_as_card = cardlist_widget->add(Card{task->get_name()});
+    auto task_as_card = cardlist_widget->add(Card{m_task->get_name()});
 
     cardlist_widget->reorder(*task_as_card, card_widget);
-    card_details_dialog.remove_task(*this);
+    m_card_dialog.remove_task(*this);
 }
 
 void TaskWidget::setup_drag_and_drop() {
@@ -272,7 +269,7 @@ void TaskWidget::setup_drag_and_drop() {
             this->set_opacity(0.5);
             spdlog::get("ui")->debug(
                 "[TaskWidget] TaskWidget \"{}\" is being dragged",
-                task->get_name());
+                m_task->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -281,7 +278,7 @@ void TaskWidget::setup_drag_and_drop() {
             this->set_opacity(1);
             spdlog::get("ui")->debug(
                 "[TaskWidget] TaskWidget \"{}\" dragging has been canceled",
-                task->get_name());
+                m_task->get_name());
             return true;
         },
         false);
@@ -290,7 +287,7 @@ void TaskWidget::setup_drag_and_drop() {
             this->set_opacity(1);
             spdlog::get("ui")->debug(
                 "[TaskWidget] TaskWidget \"{}\" stopped being dragged",
-                task->get_name());
+                m_task->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     add_controller(drag_source_c);
@@ -310,18 +307,16 @@ void TaskWidget::setup_drag_and_drop() {
                     spdlog::get("ui")->warn(
                         "[TaskWidget] TaskWidget \"{}\" has been dropped onto "
                         "itself",
-                        task->get_name());
+                        m_task->get_name());
                     return true;
                 }
 
                 spdlog::get("ui")->debug(
                     "[TaskWidget] TaskWidget \"{}\" has been dropped on "
                     "TaskWidget \"{}\"",
-                    dropped_taskwidget->get_task()->get_name(),
-                    task->get_name());
+                    dropped_taskwidget->task()->get_name(), m_task->get_name());
 
-                card_details_dialog.reorder_task_widget(*dropped_taskwidget,
-                                                        *this);
+                m_card_dialog.reorder_task_widget(*dropped_taskwidget, *this);
 
                 dropped_taskwidget->set_opacity(1);
                 return true;
@@ -334,7 +329,7 @@ void TaskWidget::setup_drag_and_drop() {
 
 void TaskWidget::cleanup() {
     static_cast<Gtk::Box*>(get_first_child())->unparent();  // inner_box
-    task_checkbutton.unparent();
-    popover_menu.unparent();
+    m_checkbutton.unparent();
+    m_popover.unparent();
 }
 }  // namespace ui

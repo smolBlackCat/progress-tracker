@@ -70,21 +70,21 @@ TaskWidget* CardDetailsDialog::add_task(const Task& task) {
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
-    card->container().remove(*task.get_task());
+    card->container().remove(*task.task());
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
 
     spdlog::get("ui")->debug(
         "[CardDetailsDialog] TaskWidget \"{}\" removed from the Card dialog "
         "checklist",
-        task.get_task()->get_name());
+        task.task()->get_name());
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                                             TaskWidget& sibling) {
     ReorderingType reordering =
-        cur_card_widget->get_card()->container().reorder(*next.get_task(),
-                                                         *sibling.get_task());
+        cur_card_widget->get_card()->container().reorder(*next.task(),
+                                                         *sibling.task());
 
     switch (reordering) {
         case ReorderingType::DOWNUP: {
@@ -98,7 +98,7 @@ void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
             spdlog::get("ui")->debug(
                 "[CardDetailsDialog] TaskWidget \"{}\" was inserted before "
                 "TaskWidget \"{}\"",
-                next.get_task()->get_name(), sibling.get_task()->get_name());
+                next.task()->get_name(), sibling.task()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
@@ -106,7 +106,7 @@ void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
             spdlog::get("ui")->debug(
                 "[CardDetailsDialog] TaskWidget \"{}\" was inserted after "
                 "TaskWidget \"{}\"",
-                next.get_task()->get_name(), sibling.get_task()->get_name());
+                next.task()->get_name(), sibling.task()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
@@ -253,8 +253,7 @@ void CardDetailsDialog::clear() {
 
 TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
                                          bool is_new) {
-    auto task_widget =
-        Gtk::make_managed<TaskWidget>(*this, *cur_card_widget, task, is_new);
+    auto task_widget = Gtk::make_managed<TaskWidget>(*this, task, is_new);
     tasks_box->append(*task_widget);
     tasks_box->reorder_child_after(checklist_add_button, *task_widget);
     tasks_tracker.push_back(task_widget);

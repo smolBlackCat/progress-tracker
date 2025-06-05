@@ -4,8 +4,6 @@
 #include <dialog/card-dialog.h>
 #include <gtkmm.h>
 
-#include <memory>
-
 #include "base-item.h"
 #include "glibmm/extraclassinit.h"
 
@@ -22,39 +20,32 @@ public:
 };
 
 /**
- * @brief Class implementing controlling facilities of Task widget.
- *
- * The TaskWidget class is responsible for displaying and managing a single task
- * within the UI. It provides functionalities such as renaming, removing, and
- * converting tasks, as well as handling drag-and-drop operations. This widget
- * is typically used within a CardDetailsDialog.
+ * @brief TaskWidget class
  */
 class TaskWidget : public TaskInit, public BaseItem {
 public:
     /**
      * @brief TaskWidget constructor.
      *
-     * Initializes a new TaskWidget.
-     *
-     * @param card_details_dialog Reference to the CardDetailsDialog this widget
-     * is related to.
-     * @param card_widget Reference to the CardWidget this widget is related to.
-     * @param task Smart pointer to the Task object associated with this widget.
-     * @param is_new Boolean flag indicating if this is a new task.
+     * @param card_details_dialog CardDetailsDialog reference to hold this
+     * widget
+     * @param task Task data
+     * @param editing_mode bool value indicating whether to start this widget in
+     * editing mode
      */
-    TaskWidget(CardDetailsDialog& card_details_dialog, CardWidget& card_widget,
-               const std::shared_ptr<Task>& task, bool is_new = false);
+    TaskWidget(CardDetailsDialog& card_details_dialog,
+               const std::shared_ptr<Task>& task, bool editing_mode = false);
 
     /**
-     * @brief Returns the Task object smart pointer associated with this widget.
+     * @brief Returns the Task instance pointer
      *
-     * @return std::shared_ptr<Task> Smart pointer to the Task object.
+     * @return Task instance pointer.
      */
-    std::shared_ptr<Task> get_task();
+    std::shared_ptr<Task> task() const;
 
 protected:
     /**
-     * @brief Handles the done action.
+     * @brief Handles the task done signal event
      */
     void done_handler(bool done);
 
@@ -74,16 +65,16 @@ protected:
     void on_remove();
 
     /**
-     * @brief Handles the checkbox toggle action.
+     * @brief Checkbox toggled event handler
      */
     void on_checkbox();
 
     /**
      * @brief Converts the task to a different type.
      *
-     * @param parent Reference to the parent CardWidget.
+     * @param parent CardWidget instance reference.
      */
-    void on_convert(CardWidget& parent);
+    void on_convert();
 
     /**
      * @brief Sets up drag-and-drop functionality for the task widget.
@@ -92,18 +83,18 @@ protected:
 
     void cleanup() override;
 
-    Gtk::Label task_label;
-    Gtk::Revealer task_entry_revealer;
-    Gtk::Entry task_entry;
-    Gtk::CheckButton task_checkbutton;
-    Gtk::PopoverMenu popover_menu;
+    Gtk::Label m_label;
+    Gtk::Revealer m_entry_revealer;
+    Gtk::Entry m_entry;
+    Gtk::CheckButton m_checkbutton;
+    Gtk::PopoverMenu m_popover;
 
-    const Glib::RefPtr<Gio::Menu> menu_model;
-    const Glib::RefPtr<Gio::SimpleActionGroup> group;
+    CardDetailsDialog& m_card_dialog;
 
-    std::shared_ptr<Task> task;
-    CardDetailsDialog& card_details_dialog;
+    const Glib::RefPtr<Gio::Menu> m_menu_model;
+    const Glib::RefPtr<Gio::SimpleActionGroup> m_action_group;
 
+    std::shared_ptr<Task> m_task;
     bool is_new;
 };
 

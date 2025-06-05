@@ -30,7 +30,7 @@ CardlistInit::CardlistInit()
     : Glib::ExtraClassInit(cardlist_class_init, nullptr, cardlist_init) {}
 
 CardlistWidget::CardlistWidget(BoardWidget& board,
-                               const std::shared_ptr<CardList>& cardlist_refptr,
+                               const std::shared_ptr<CardList>& cardlist,
                                bool is_new)
     : Glib::ObjectBase{"CardlistWidget"},
       CardlistInit{},
@@ -39,9 +39,9 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
       m_root{Gtk::Orientation::VERTICAL},
       m_cards{},
       board{board},
-      m_cardlist{cardlist_refptr},
+      m_cardlist{cardlist},
       m_new{is_new},
-      m_header{cardlist_refptr->get_name(), "title-2", "title-2"},
+      m_header{cardlist->get_name(), "title-2", "title-2"},
       m_scr_window{} {
     set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
     add_css_class("cardlist");
@@ -74,7 +74,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_header.insert_at_start(*this);
 
-    for (auto& card : cardlist_refptr->container().get_data()) {
+    for (auto& card : cardlist->container().get_data()) {
         __add(card);
     }
 
