@@ -3,7 +3,8 @@ list(APPEND TEST_EXECUTABLES
     cardlist-test
     card-test
     colorable-test
-    board-manager-test)
+    board-manager-test
+    stress-test)
 
 foreach(EXECUTABLE ${TEST_EXECUTABLES})
     add_executable(${EXECUTABLE} ${EXECUTABLE}.cpp)
