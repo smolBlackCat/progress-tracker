@@ -53,14 +53,14 @@ StressType create_stress_type(const std::string& type) {
 // TODO: Write CLI app that generates the correct amount depending on the
 // given option
 int main(int argc, char* argv[]) {
-    BoardManager bm{argv[1]};
+    std::string dir = argv[1];
+    BoardManager bm{dir};
 
     std::string stress_type = argv[2];
     StressParameters params;
     try {
-        StressParameters params =
-            create_stress_parameters(create_stress_type(stress_type));
-    } catch(std::invalid_argument& err) {
+        params = create_stress_parameters(create_stress_type(stress_type));
+    } catch (std::invalid_argument& err) {
         std::cerr << err.what() << '\n';
     }
 
@@ -76,6 +76,7 @@ int main(int argc, char* argv[]) {
             for (short k = 0; k < std::get<2>(params); ++k) {
                 auto card = cardlist->container().append(
                     Card{std::format("Card {}", k)});
+                card->set_color(Color{165, 29, 45, 1.0});
                 card->set_due_date(Date(2025y, June, 5d));
                 card->set_notes(
                     "Progress is supposed to be simple and I love my "
@@ -90,3 +91,4 @@ int main(int argc, char* argv[]) {
         bm.local_close(board);
     }
 }
+
