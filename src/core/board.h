@@ -31,7 +31,7 @@ public:
     static const std::string BACKGROUND_DEFAULT;
 
     friend BoardManager;
-    friend Board unitialized_board(const std::string& filename);
+    friend std::shared_ptr<Board> unitialized_board(const std::string& filename);
 
     Board() = delete;
     Board(const std::string& name, const std::string& background);

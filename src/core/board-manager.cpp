@@ -1,5 +1,3 @@
-#include "board-manager.h"
-
 #include <app_info.h>
 #include <spdlog/spdlog.h>
 
@@ -7,6 +5,8 @@
 #include <filesystem>
 #include <memory>
 #include <regex>
+
+#include "board-manager.h"
 
 namespace fs = std::filesystem;
 
@@ -50,7 +50,7 @@ std::string gen_filename(const std::string& boards_dir, const Board& board) {
     return filename;
 }
 
-Board unitialized_board(const std::string& filename) {
+std::shared_ptr<Board> unitialized_board(const std::string& filename) {
     spdlog::get("core")->debug(
         "[BoardManager] BoardManager is loading board from file: {}", filename);
     if (!fs::exists(filename))
@@ -102,11 +102,12 @@ Board unitialized_board(const std::string& filename) {
                         filename)};
     }
 
-    Board board{name, background, uuid};
+    std::shared_ptr<Board> board =
+        std::make_shared<Board>(name, background, uuid);
     auto lm_filepath = std::chrono::clock_cast<std::chrono::system_clock,
                                                std::chrono::file_clock>(
         std::filesystem::last_write_time(filename));
-    board.m_last_modified =
+    board->m_last_modified =
         std::chrono::floor<std::chrono::seconds>(lm_filepath);
 
     return board;
@@ -231,16 +232,14 @@ BoardManager::BoardManager(const std::string& board_dir)
     }
 
     spdlog::get("core")->info(
-        "[BoardManager] Loading boards from local storage");
+        "[BoardManager] Loading boards from local storage: {}", board_dir);
     for (const auto& dir_entry :
          std::filesystem::directory_iterator(BOARD_DIR)) {
         const std::string board_filename = dir_entry.path().string();
         if (board_filename.ends_with(".xml")) {
             try {
                 m_local_boards.push_back(LocalBoard{
-                    board_filename,
-                    std::make_shared<Board>(unitialized_board(board_filename)),
-                    false});
+                    board_filename, unitialized_board(board_filename), false});
             } catch (std::invalid_argument& err) {
                 spdlog::get("core")->error("Failed to load board: {}",
                                            err.what());
@@ -426,3 +425,4 @@ void BoardManager::__local_save(const LocalBoard& local) {
             board->get_name(), local.filename);
     }
 }
+
