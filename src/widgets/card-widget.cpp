@@ -1,5 +1,3 @@
-#include "card-widget.h"
-
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
@@ -7,6 +5,7 @@
 
 #include <numeric>
 
+#include "card-widget.h"
 #include "cardlist-widget.h"
 
 extern "C" {
@@ -266,7 +265,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     complete_tasks_label.set_visible(false);
 
     card_info_box.append(due_date_label);
-    due_date_label.add_css_class("due-date");
     due_date_label.set_visible(false);
 
     card_data_box.append(card_info_box);
@@ -516,11 +514,13 @@ void CardWidget::update_due_date_label() {
             css_class = "due-date";
 
         for (const auto& css : DATE_LABEL_CSS_CLASSES) {
-            if (css == css_class)
-                due_date_label.add_css_class(css_class);
-            else if (due_date_label.has_css_class(css))
+            if (due_date_label.has_css_class(css)) {
+                if (css_class == css) return;  // Has already been set
+
                 due_date_label.remove_css_class(css);
+            }
         }
+        due_date_label.add_css_class(css_class);
     }
 }
 
@@ -873,12 +873,13 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
     }
 
     for (const auto& css : TASKS_LABEL_CSS_CLASSES) {
-        if (css == css_class) {
-            complete_tasks_label.add_css_class(css_class);
-        } else if (complete_tasks_label.has_css_class(css)) {
-            complete_tasks_label.remove_css_class(css);
+        if (complete_tasks_label.has_css_class(css_class)) {
+            if (css_class == css) return;
+            complete_tasks_label.remove_css_class(css_class);
         }
     }
+
+    complete_tasks_label.add_css_class(css_class);
 }
 
 void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
@@ -906,3 +907,4 @@ void CardWidget::__clear_cover_color() {
 
 void CardWidget::cleanup() { root_box.unparent(); }
 }  // namespace ui
+
