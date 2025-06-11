@@ -13,26 +13,6 @@ namespace ui {
 class BoardWidget;
 class CreateBoardDialog;
 class PreferencesBoardDialog;
-class ProgressWindow;
-
-/**
- * @brief Bar widget that asks user confirmation to delete selected boards.
- */
-class DeleteBoardsBar : public Gtk::Revealer {
-public:
-    /**
-     * @brief Constructs a DeleteBoardsBar object.
-     *
-     * @param app_window Reference to the ProgressWindow.
-     */
-    DeleteBoardsBar(ui::ProgressWindow& app_window);
-
-private:
-    Gtk::Box root;        ///< Root container for the delete boards bar.
-    Gtk::Label bar_text;  ///< Label displaying the delete confirmation text.
-    Gtk::Button bar_button_delete,
-        bar_button_cancel;  ///< Buttons for delete and cancel actions.
-};
 
 /**
  * @brief Main application window
@@ -133,13 +113,14 @@ protected:
     AdwStyleManager* adw_style_manager;
     Glib::RefPtr<Gtk::CssProvider> css_provider;
     Glib::RefPtr<Gio::Settings>& progress_settings;
-    ui::DeleteBoardsBar delete_boards_bar;
     ui::BoardWidget board_widget;
     Gtk::ShortcutsWindow* sh_window;
-    Gtk::Button *home_button_p, *add_board_button_p;
+    Gtk::Button *home_button_p, *add_board_button_p, *board_delete_button,
+        *cancel_delete_button;
     Gtk::Overlay* app_overlay_p;
     Gtk::Stack* app_stack_p;
     Gtk::FlowBox* boards_grid_p;
+    Gtk::ActionBar* action_bar_p;
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
     Gtk::MenuButton* app_menu_button_p;
 
@@ -170,3 +151,4 @@ protected:
 };
 
 }  // namespace ui
+

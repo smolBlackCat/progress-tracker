@@ -1,9 +1,9 @@
-<?xml version='1.0' encoding='UTF-8' ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Cambalache 0.94.1 -->
 <interface>
   <!-- interface-name app-window.ui -->
-  <requires lib="gtk" version="4.10" />
-  <requires lib="gio" version="2.0" />
+  <requires lib="gtk" version="4.10"/>
+  <requires lib="gio" version="2.0"/>
   <object class="AdwApplicationWindow" id="app-window">
     <property name="height-request">400</property>
     <property name="title">Progress</property>
@@ -15,6 +15,7 @@
               <property name="visible-child-name">board-grid-page</property>
               <child>
                 <object class="GtkStackPage">
+                  <property name="name">board-grid-page</property>
                   <property name="child">
                     <object class="GtkOverlay" id="app-overlay">
                       <child>
@@ -33,9 +34,29 @@
                           <property name="width-request">-1</property>
                         </object>
                       </child>
+                      <child type="overlay">
+                        <object class="GtkActionBar" id="action-bar">
+                          <property name="revealed">false</property>
+                          <property name="valign">GTK_ALIGN_END</property>
+                          <property name="vexpand">false</property>
+
+                          <child type="start">
+                            <object class="GtkButton" id="delete-button">
+                              <property name="label" translatable="yes">Delete</property>
+                              <property name="css-classes">destructive-action</property>
+                            </object>
+                          </child>
+
+                          <child type="start">
+                            <object class="GtkButton" id="cancel-delete-button">
+                              <property name="label" translatable="yes">Cancel</property>
+                              <property name="css-classes">suggested-action</property>
+                            </object>
+                          </child>
+                        </object>
+                      </child>
                     </object>
                   </property>
-                  <property name="name">board-grid-page</property>
                 </object>
               </child>
               <child>
@@ -63,20 +84,14 @@
               <child type="start">
                 <object class="GtkButton" id="home-button">
                   <property name="icon-name">go-home</property>
-                  <property
-                                    name="tooltip-text"
-                                    translatable="yes"
-                                >Homepage</property>
+                  <property name="tooltip-text" translatable="yes">Homepage</property>
                   <property name="visible">false</property>
                 </object>
               </child>
               <child type="start">
                 <object class="GtkButton" id="add-board-button">
                   <property name="icon-name">list-add-symbolic</property>
-                  <property
-                                    name="tooltip-text"
-                                    translatable="yes"
-                                >Add Board</property>
+                  <property name="tooltip-text" translatable="yes">Add Board</property>
                   <property name="visible">true</property>
                 </object>
               </child>
@@ -85,10 +100,7 @@
                   <property name="icon-name">open-menu-symbolic</property>
                   <property name="menu-model">board-grid-menu</property>
                   <property name="primary">true</property>
-                  <property
-                                    name="tooltip-text"
-                                    translatable="yes"
-                                >Main Menu</property>
+                  <property name="tooltip-text" translatable="yes">Main Menu</property>
                 </object>
               </child>
             </object>
@@ -105,10 +117,7 @@
       </item>
       <item>
         <attribute name="action">win.shortcuts</attribute>
-        <attribute
-                    name="label"
-                    translatable="yes"
-                >Keyboard Shortcuts</attribute>
+        <attribute name="label" translatable="yes">Keyboard Shortcuts</attribute>
       </item>
       <item>
         <attribute name="action">win.about</attribute>
@@ -124,10 +133,7 @@
       </item>
       <item>
         <attribute name="action">win.shortcuts</attribute>
-        <attribute
-                    name="label"
-                    translatable="yes"
-                >Keyboard Shortcuts</attribute>
+        <attribute name="label" translatable="yes">Keyboard Shortcuts</attribute>
       </item>
       <item>
         <attribute name="action">win.about</attribute>
@@ -145,33 +151,21 @@
         <object class="GtkShortcutsSection">
           <child>
             <object class="GtkShortcutsGroup">
-              <property
-                            name="title"
-                            translatable="yes"
-                        >Board Grid View</property>
+              <property name="title" translatable="yes">Board Grid View</property>
               <property name="view">board-grid-view</property>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;D</property>
                   <property name="direction">ltr</property>
-                  <property
-                                    name="subtitle"
-                                    translatable="yes"
-                                >Allows the user the user to delete boards by selecting them</property>
+                  <property name="subtitle" translatable="yes">Allows the user the user to delete boards by selecting them</property>
                   <property name="subtitle-set">True</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Enable deletion</property>
+                  <property name="title" translatable="yes">Enable deletion</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;B</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Open dialog to create a new board</property>
+                  <property name="title" translatable="yes">Open dialog to create a new board</property>
                 </object>
               </child>
             </object>
@@ -183,19 +177,13 @@
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;P</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Open preferences dialog</property>
+                  <property name="title" translatable="yes">Open preferences dialog</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;H</property>
-                  <property
-                                    name="subtitle"
-                                    translatable="yes"
-                                >Automatically save the board and head to the board grid view</property>
+                  <property name="subtitle" translatable="yes">Automatically save the board and head to the board grid view</property>
                   <property name="title" translatable="yes">Go home</property>
                 </object>
               </child>
@@ -203,188 +191,116 @@
           </child>
           <child>
             <object class="GtkShortcutsGroup">
-              <property
-                            name="title"
-                            translatable="yes"
-                        >Card Shortcuts</property>
+              <property name="title" translatable="yes">Card Shortcuts</property>
               <property name="view">board-view</property>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;N</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Add a new card next to the focused card</property>
+                  <property name="title" translatable="yes">Add a new card next to the focused card</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;D</property>
-                  <property
-                                    name="subtitle"
-                                    translatable="yes"
-                                >It opens a dialog presenting the card extra settings</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >See card details</property>
+                  <property name="subtitle" translatable="yes">It opens a dialog presenting the card extra settings</property>
+                  <property name="title" translatable="yes">See card details</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;R</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Rename card</property>
+                  <property name="title" translatable="yes">Rename card</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;&lt;Shift&gt;C</property>
-                  <property
-                                    name="subtitle"
-                                    translatable="yes"
-                                >Opens a color dialog so the user can set the card's cover's color</property>
+                  <property name="accelerator">&lt;Control&gt;&lt;Shift&gt;C</property>
+                  <property name="subtitle" translatable="yes">Opens a color dialog so the user can set the card's cover's color</property>
                   <property name="title" translatable="yes">Set color</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;Delete</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Deletes current focused card</property>
+                  <property name="title" translatable="yes">Deletes current focused card</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;Up &lt;Control&gt;Down</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Reorder card within cardlist</property>
+                  <property name="accelerator">&lt;Control&gt;Up &lt;Control&gt;Down</property>
+                  <property name="title" translatable="yes">Reorder card within cardlist</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;Left &lt;Control&gt;Right</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Moves a card to previous or next cardlist</property>
+                  <property name="accelerator">&lt;Control&gt;Left &lt;Control&gt;Right</property>
+                  <property name="title" translatable="yes">Moves a card to previous or next cardlist</property>
                 </object>
               </child>
             </object>
           </child>
           <child>
             <object class="GtkShortcutsGroup">
-              <property
-                            name="title"
-                            translatable="yes"
-                        >Cardlist Shortcuts</property>
+              <property name="title" translatable="yes">Cardlist Shortcuts</property>
               <property name="view">board-view</property>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;R</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Rename the focused cardlist</property>
+                  <property name="title" translatable="yes">Rename the focused cardlist</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;N</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Add a new cardlist next to the focused cardlist</property>
+                  <property name="title" translatable="yes">Add a new cardlist next to the focused cardlist</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;Delete</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Deletes cardlist from board</property>
+                  <property name="title" translatable="yes">Deletes cardlist from board</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;Left &lt;Control&gt;Right</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Move cardlist across the board</property>
+                  <property name="accelerator">&lt;Control&gt;Left &lt;Control&gt;Right</property>
+                  <property name="title" translatable="yes">Move cardlist across the board</property>
                 </object>
               </child>
             </object>
           </child>
           <child>
             <object class="GtkShortcutsGroup">
-              <property
-                            name="title"
-                            translatable="yes"
-                        >Task Shortcuts</property>
+              <property name="title" translatable="yes">Task Shortcuts</property>
               <property name="view">board-view</property>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;R</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Rename task</property>
+                  <property name="title" translatable="yes">Rename task</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;N</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Add new task next to focused task</property>
+                  <property name="title" translatable="yes">Add new task next to focused task</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
                   <property name="accelerator">&lt;Control&gt;Delete</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Delete task from card</property>
+                  <property name="title" translatable="yes">Delete task from card</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;&lt;Shift&gt;C</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Convert task to card</property>
+                  <property name="accelerator">&lt;Control&gt;&lt;Shift&gt;C</property>
+                  <property name="title" translatable="yes">Convert task to card</property>
                 </object>
               </child>
               <child>
                 <object class="GtkShortcutsShortcut">
-                  <property
-                                    name="accelerator"
-                                >&lt;Control&gt;Up &lt;Control&gt;Down</property>
-                  <property
-                                    name="title"
-                                    translatable="yes"
-                                >Move task across the checklist</property>
+                  <property name="accelerator">&lt;Control&gt;Up &lt;Control&gt;Down</property>
+                  <property name="title" translatable="yes">Move task across the checklist</property>
                 </object>
               </child>
             </object>
@@ -393,3 +309,4 @@
       </child>
     </object>
 </interface>
+
