@@ -1,7 +1,7 @@
-#include "task.h"
-
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+
+#include "task.h"
 
 Task::Task(const std::string& name, bool done)
     : Item{name, xg::newGuid()}, m_done{done} {}
@@ -21,6 +21,8 @@ void Task::set_name(const std::string& name) {
 void Task::set_done(bool done) {
     m_done = done;
     m_modified = true;
+
+    done_signal.emit(done);
     spdlog::get("core")->info("[Task] Task \"{}\" marked as {}", name,
                               (done ? "done" : "undone"));
 }
@@ -28,3 +30,4 @@ void Task::set_done(bool done) {
 void Task::modify(bool m) { m_modified = m; }
 
 sigc::signal<void(bool)>& Task::signal_done() { return done_signal; }
+

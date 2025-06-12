@@ -1,5 +1,3 @@
-#include "task-widget.h"
-
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <widgets/card-widget.h>
@@ -8,6 +6,7 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
+#include "task-widget.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -68,6 +67,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     m_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));
     m_checkbutton.set_active(task->get_done());
+    task->signal_done().connect(
+        sigc::mem_fun(*this, &TaskWidget::done_handler));
 
     m_menu_model->append(_("Rename"), "task-widget.rename");
     m_menu_model->append(_("Remove"), "task-widget.remove");
@@ -333,3 +334,4 @@ void TaskWidget::cleanup() {
     m_popover.unparent();
 }
 }  // namespace ui
+

@@ -863,10 +863,13 @@ void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
         css_class = "complete-tasks-indicator-almost";
     }
 
+    if (complete_tasks_label.has_css_class(css_class)) {
+        return;
+    }
+
     for (const auto& css : TASKS_LABEL_CSS_CLASSES) {
-        if (complete_tasks_label.has_css_class(css_class)) {
-            if (css_class == css) return;
-            complete_tasks_label.remove_css_class(css_class);
+        if (complete_tasks_label.has_css_class(css)) {
+            complete_tasks_label.remove_css_class(css);
         }
     }
 
