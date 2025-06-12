@@ -538,6 +538,86 @@ void CardWidget::update_complete_tasks_label() {
 
 std::string CardWidget::get_title() const { return card_label.get_label(); }
 
+std::string truncate(const std::string& text) {
+    const int TRUNCATE_SIZE = 40;
+
+    if (text.size() <= TRUNCATE_SIZE) {
+        return text;
+    }
+
+    std::string truncated_text = text.substr(0, TRUNCATE_SIZE - 3);
+    truncated_text += "...";
+
+    return truncated_text;
+}
+
+std::string time_info_text(const Date& cur_date, const Date& card_due_date) {
+    auto now = sys_days(cur_date);
+    auto days = sys_days(card_due_date);
+    auto delta_days = (days - now).count();
+
+    std::string due_date_text;
+
+    if (delta_days > 0 && delta_days < 30) {
+        due_date_text =
+            Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
+                                       "<b>%1 day</b> remaining",
+                                       "<b>%1 days</b> remaining", delta_days)),
+                                   delta_days) +
+            "\n\n";
+    } else if (delta_days > 0 && delta_days >= 30 && delta_days < 365) {
+        long months_from_delta =
+            delta_days / 30;  // Assume every month has 30 days
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(ngettext("<b>%1 month</b> remaining",
+                                              "<b>%1 months</b> remaining",
+                                              months_from_delta)),
+                months_from_delta) +
+            "\n\n";
+    } else if (delta_days > 0 && delta_days >= 365) {
+        long years_from_delta = delta_days / 365;  // Ignore leap years
+        due_date_text = Glib::ustring::compose(
+                            Glib::locale_to_utf8(ngettext(
+                                "<b>%1 year</b> remaining",
+                                "<b>%1 years</b> remaining", years_from_delta)),
+                            years_from_delta) +
+                        "\n\n";
+    } else if (delta_days > -30) {
+        due_date_text = Glib::ustring::compose(
+                            Glib::locale_to_utf8(ngettext(
+                                "This card is past due date <b>%1 day ago</b>",
+                                "This card is past due date <b>%1 days ago</b>",
+                                -delta_days)),
+                            -delta_days) +
+                        "\n\n";
+    } else if (delta_days <= -30 && delta_days > -365) {
+        long months_from_delta =
+            delta_days / 30;  // Assume every month has 30 days
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(
+                    ngettext("This card is past due date <b>%1 month</b> ago",
+                             "This card is past due date <b>%1 months</b> "
+                             "ago",
+                             -months_from_delta)),
+                -months_from_delta) +
+            "\n\n";
+    } else if (delta_days <= -365) {
+        long years_from_delta = delta_days / 365;  // Ignore leap years
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(
+                    ngettext("This card is past due date <b>%1 year</b> ago",
+                             "This card is past due date <b>%1 years</b> ago",
+                             -years_from_delta)),
+                -years_from_delta) +
+            "\n\n";
+    }
+
+    return due_date_text;
+}
+
 std::string CardWidget::create_details_text() const {
     using namespace std::chrono;
 
@@ -547,7 +627,7 @@ std::string CardWidget::create_details_text() const {
         details_text << Glib::ustring::compose(
                             _("%1%% complete"),
                             Glib::ustring::format(std::fixed,
-                                                  std::setprecision(2),
+                                                  std::setprecision(0),
                                                   card->get_completion()))
                      << "\n\n";
     }
@@ -560,103 +640,14 @@ std::string CardWidget::create_details_text() const {
             details_text << _("This card is complete") << "\n\n";
         } else if (card_due_date == cur_date) {
             details_text << _("The card is due today") << "\n\n";
-        } else if (!card->past_due_date()) {
-            auto now = sys_days(cur_date);
-            auto days = sys_days(card_due_date);
-            auto delta_days = (days - now).count();
-
-            if (delta_days < 30) {
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "<b>%1 day</b> remaining",
-                               "<b>%1 days</b> remaining", delta_days)),
-                           delta_days)
-                    << "\n\n";
-            } else if (delta_days >= 30 && delta_days < 365) {
-                long months_from_delta =
-                    delta_days / 30;  // Assume every month has 30 days
-                details_text
-                    << Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
-                                                  "<b>%1 month</b> remaining",
-                                                  "<b>%1 months</b> remaining",
-                                                  months_from_delta)),
-                                              months_from_delta)
-                    << "\n\n";
-            } else if (delta_days >= 365) {
-                long years_from_delta = delta_days / 365;  // Ignore leap years
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "<b>%1 year</b> remaining",
-                               "<b>%1 years</b> remaining", years_from_delta)),
-                           years_from_delta)
-                    << "\n\n";
-            }
         } else {
-            auto now = sys_days(cur_date);
-            auto days = sys_days(card_due_date);
-            auto delta_days = -(days - now).count();
-
-            if (delta_days < 30) {
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 day ago</b>",
-                               "This card is past due date <b>%1 days ago</b>",
-                               delta_days)),
-                           delta_days)
-                    << "\n\n";
-            } else if (delta_days >= 30 && delta_days < 365) {
-                long months_from_delta =
-                    delta_days / 30;  // Assume every month has 30 days
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 month</b> ago",
-                               "This card is past due date <b>%1 months</b> "
-                               "ago",
-                               months_from_delta)),
-                           months_from_delta)
-                    << "\n\n";
-            } else if (delta_days >= 365) {
-                long years_from_delta = delta_days / 365;  // Ignore leap years
-                details_text
-                    << Glib::ustring::compose(
-                           Glib::locale_to_utf8(ngettext(
-                               "This card is past due date <b>%1 year</b> ago",
-                               "This card is past due date <b>%1 years</b> ago",
-                               years_from_delta)),
-                           years_from_delta)
-                    << "\n\n";
-            }
+            details_text << time_info_text(cur_date, card_due_date);
         }
-    }
-
-    if (!card->container().get_data().empty()) {
-        details_text << "<b>" << _("Checklist") << "</b>" << ":\n";
-        int c = 0;
-        const int max_visible = 5;
-        for (const auto& task : card->container()) {
-            if (c == max_visible) {
-                details_text << "\n...";
-                break;
-            }
-
-            details_text << (task->get_done() ? "- [X] " : "- [ ] ")
-                         << task->get_name();
-            if (c < max_visible - 1 &&
-                task != card->container().get_data().back()) {
-                details_text << "\n";
-            }
-            c++;
-        }
-        details_text << "\n\n";
     }
 
     if (!card->get_notes().empty()) {
-        details_text << "<b>" << _("Notes") << "</b>" << ":\n"
-                     << Glib::ustring{card->get_notes()}.truncate_middle(150);
+        details_text << "<b>" << _("Notes") << "</b>" << ": "
+                     << truncate(card->get_notes()) << "\n\n";
     }
 
     std::string final_text = details_text.str();

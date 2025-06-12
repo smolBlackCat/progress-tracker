@@ -122,6 +122,8 @@ protected:
      */
     class CardPopover : public Gtk::Popover {
     public:
+        // FIXME: The current popover code interface design is bad. This will
+        // increase memory little by little
         const static std::map<const char*, std::pair<const char*, const char*>>
             CARD_COLORS;
 
@@ -284,3 +286,4 @@ protected:
 };
 
 }  // namespace ui
+
