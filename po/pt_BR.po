@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-01 09:12-0300\n"
+"POT-Creation-Date: 2025-06-11 10:35-0300\n"
 "PO-Revision-Date: 2024-02-10 12:25-0300\n"
 "Last-Translator: Gabriel de Moura <moura@moura>\n"
 "Language-Team: Brazilian Portuguese <ldpbr-"
@@ -73,7 +73,8 @@ msgid ""
 "This minor release is actually quite big and important because it adds "
 "features that may enable the users to use Progress across more different "
 "workflows"
-msgstr "Esta pequena atualização é realmente grande e importante porque adiciona "
+msgstr ""
+"Esta pequena atualização é realmente grande e importante porque adiciona "
 "funcionalidades que podem habilitar os usuários a usar o Progress em mais "
 "diferentes fluxos de trabalho"
 
@@ -81,8 +82,9 @@ msgstr "Esta pequena atualização é realmente grande e importante porque adici
 msgid ""
 "Cards have received a revamp, making it more useful for various workflows. "
 "The new features include:"
-msgstr "Cartões receberam uma grande atualização, tornando-os mais "
-"úteis para diversos fluxos de trabalho. As novas funcionalidades incluem:"
+msgstr ""
+"Cartões receberam uma grande atualização, tornando-os mais úteis para "
+"diversos fluxos de trabalho. As novas funcionalidades incluem:"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:75
 msgid "Coloured card covers"
@@ -120,15 +122,17 @@ msgstr "Diálogo de quadro recebeu um novo design de interface"
 msgid ""
 "Applications shortcuts have been introduced. Users can now interact and move "
 "cards, card lists and tasks using the keyboard"
-msgstr "Atalhos de aplicativos foram introduzidos. Os usuários agora podem "
-"interagir e mover cartões, listas de cartões e tarefas usando o teclado"
+msgstr ""
+"Atalhos de aplicativos foram introduzidos. Os usuários agora podem interagir "
+"e mover cartões, listas de cartões e tarefas usando o teclado"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:89
 msgid ""
 "Data model have been updated to be backwards-compatible with boards created "
 "by previous Progress versions"
-msgstr "Modelo de dados foi atualizado para ser compatível com quadros criados "
-"por versões anteriores do Progress"
+msgstr ""
+"Modelo de dados foi atualizado para ser compatível com quadros criados por "
+"versões anteriores do Progress"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:91
 msgid "Drag and drop mechanism have been improved"
@@ -285,27 +289,26 @@ msgstr "Tradução em espanhol foi adicionada"
 msgid "First official release of Progress 1.0"
 msgstr "Primeiro lançamento oficial do Progress 1.0"
 
-#: src/window.cpp:22
-msgid "Select the boards to be deleted"
-msgstr "Selecione os quadros a serem deletados"
+#: src/window.cpp:56
+#, c++-format
+msgid "{} board selected"
+msgid_plural "{} boards selected"
+msgstr[0] "{} quadro selecionado"
+msgstr[1] "{} quadros selecionados"
 
-#: src/window.cpp:23
-msgid "Delete"
-msgstr "Deletar"
+#: src/window.cpp:60 src/window.cpp:250
+msgid "No board has been selected yet"
+msgstr "Nenhum quadro foi selecionado"
 
-#: src/window.cpp:24
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: src/window.cpp:287
+#: src/window.cpp:319
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Todos os direitos reservados"
 
-#: src/window.cpp:289
+#: src/window.cpp:321
 msgid "translator-credits"
 msgstr "Gabriel de Moura <smolblackcat@proton.me>"
 
-#: src/window.cpp:343
+#: src/window.cpp:374
 msgid "It was not possible to load this board"
 msgstr "Não foi possível carregar este quadro"
 
@@ -313,11 +316,11 @@ msgstr "Não foi possível carregar este quadro"
 msgid "Add Task"
 msgstr "Adicionar Tarefa"
 
-#: src/dialog/card-dialog.cpp:160
+#: src/dialog/card-dialog.cpp:165 src/widgets/task-widget.cpp:130
 msgid "New Task"
 msgstr "Nova Tarefa"
 
-#: src/dialog/card-dialog.cpp:208 src/dialog/card-dialog.cpp:243
+#: src/dialog/card-dialog.cpp:212 src/dialog/card-dialog.cpp:245
 #: src/resources/ui/card-details-dialog.ui:63
 msgid "Set Due Date"
 msgstr "Marcar Prazo"
@@ -330,52 +333,60 @@ msgstr "Selecione um Arquivo"
 msgid "Image Files"
 msgstr "Arquivos de Imagem"
 
-#: src/dialog/create_board_dialog.cpp:11
+#: src/dialog/create_board_dialog.cpp:10
 msgid "Create New Board"
 msgstr "Criar Novo Quadro"
 
-#: src/dialog/create_board_dialog.cpp:23
+#: src/dialog/create_board_dialog.cpp:22
 #: src/dialog/preferences-board-dialog.cpp:62
 msgid "Empty board names are not allowed"
 msgstr "Nomes de quadro vazios não são permitidos"
 
-#: src/dialog/preferences-board-dialog.cpp:16
+#: src/dialog/preferences-board-dialog.cpp:14
 msgid "Board Preferences"
 msgstr "Configurações do Quadro"
 
-#: src/dialog/preferences-board-dialog.cpp:17
+#: src/dialog/preferences-board-dialog.cpp:15
 msgid "Save"
 msgstr "Salvar"
 
-#: src/resources/ui/app-window.ui:69
+#: src/resources/ui/app-window.ui:45
+msgid "Delete"
+msgstr "Deletar"
+
+#: src/resources/ui/app-window.ui:52
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/resources/ui/app-window.ui:87
 msgid "Homepage"
 msgstr "Página Inicial"
 
-#: src/resources/ui/app-window.ui:79
+#: src/resources/ui/app-window.ui:94
 msgid "Add Board"
 msgstr "Criar Quadro"
 
-#: src/resources/ui/app-window.ui:91
+#: src/resources/ui/app-window.ui:103
 msgid "Main Menu"
 msgstr "Menu Principal"
 
-#: src/resources/ui/app-window.ui:104
+#: src/resources/ui/app-window.ui:116
 msgid "Delete Boards"
 msgstr "Deletar Quadros"
 
-#: src/resources/ui/app-window.ui:111 src/resources/ui/app-window.ui:130
+#: src/resources/ui/app-window.ui:120 src/resources/ui/app-window.ui:136
 msgid "Keyboard Shortcuts"
 msgstr "Atalhos de Teclado"
 
-#: src/resources/ui/app-window.ui:115 src/resources/ui/app-window.ui:134
+#: src/resources/ui/app-window.ui:124 src/resources/ui/app-window.ui:140
 msgid "About Progress"
 msgstr "Sobre Progress"
 
-#: src/resources/ui/app-window.ui:123
+#: src/resources/ui/app-window.ui:132
 msgid "Preferences"
 msgstr "Preferências"
 
-#: src/resources/ui/app-window.ui:151
+#: src/resources/ui/app-window.ui:154
 msgid "Board Grid View"
 msgstr "Visualização em Grade do Quadro"
 
@@ -383,114 +394,114 @@ msgstr "Visualização em Grade do Quadro"
 msgid "Allows the user the user to delete boards by selecting them"
 msgstr "Permite ao usuário deletar quadros selecionando-os"
 
-#: src/resources/ui/app-window.ui:165
+#: src/resources/ui/app-window.ui:162
 msgid "Enable deletion"
 msgstr "Habilitar exclusão"
 
-#: src/resources/ui/app-window.ui:174
+#: src/resources/ui/app-window.ui:168
 msgid "Open dialog to create a new board"
 msgstr "Abrir diálogo para criar um novo quadro"
 
-#: src/resources/ui/app-window.ui:181
+#: src/resources/ui/app-window.ui:175
 msgid "Board View"
 msgstr "Visualização do Quadro"
 
-#: src/resources/ui/app-window.ui:189
+#: src/resources/ui/app-window.ui:180
 msgid "Open preferences dialog"
 msgstr "Abrir diálogo de preferências"
 
-#: src/resources/ui/app-window.ui:198
+#: src/resources/ui/app-window.ui:186
 msgid "Automatically save the board and head to the board grid view"
 msgstr ""
 "Salvar automaticamente o quadro e ir para a visualização em grade do quadro"
 
-#: src/resources/ui/app-window.ui:199
+#: src/resources/ui/app-window.ui:187
 msgid "Go home"
 msgstr "Ir para a página inicial"
 
-#: src/resources/ui/app-window.ui:209
+#: src/resources/ui/app-window.ui:194
 msgid "Card Shortcuts"
 msgstr "Atalhos de Cartão"
 
-#: src/resources/ui/app-window.ui:217
+#: src/resources/ui/app-window.ui:199
 msgid "Add a new card next to the focused card"
 msgstr "Adicionar um novo cartão ao lado do cartão focado"
 
-#: src/resources/ui/app-window.ui:226
+#: src/resources/ui/app-window.ui:205
 msgid "It opens a dialog presenting the card extra settings"
 msgstr "Abre um diálogo apresentando as configurações extras do cartão"
 
-#: src/resources/ui/app-window.ui:230
+#: src/resources/ui/app-window.ui:206
 msgid "See card details"
 msgstr "Ver detalhes do cartão"
 
-#: src/resources/ui/app-window.ui:239
+#: src/resources/ui/app-window.ui:212
 msgid "Rename card"
 msgstr "Renomear cartão"
 
-#: src/resources/ui/app-window.ui:250
+#: src/resources/ui/app-window.ui:218
 msgid "Opens a color dialog so the user can set the card's cover's color"
 msgstr ""
 "Abre um diálogo de cores para que o usuário possa definir a cor da capa do "
 "cartão"
 
-#: src/resources/ui/app-window.ui:251
+#: src/resources/ui/app-window.ui:219
 msgid "Set color"
 msgstr "Definir cor"
 
-#: src/resources/ui/app-window.ui:260
+#: src/resources/ui/app-window.ui:225
 msgid "Deletes current focused card"
 msgstr "Deleta o cartão em foco"
 
-#: src/resources/ui/app-window.ui:271
+#: src/resources/ui/app-window.ui:231
 msgid "Reorder card within cardlist"
 msgstr "Reordena cartão dentro da lista de cartões"
 
-#: src/resources/ui/app-window.ui:282
+#: src/resources/ui/app-window.ui:237
 msgid "Moves a card to previous or next cardlist"
 msgstr "Move um cartão para a lista de cartões anterior ou seguinte"
 
-#: src/resources/ui/app-window.ui:292
+#: src/resources/ui/app-window.ui:244
 msgid "Cardlist Shortcuts"
 msgstr "Atalhos de Lista de Cartões"
 
-#: src/resources/ui/app-window.ui:300
+#: src/resources/ui/app-window.ui:249
 msgid "Rename the focused cardlist"
 msgstr "Renomeia a lista de cartões em foco"
 
-#: src/resources/ui/app-window.ui:309
+#: src/resources/ui/app-window.ui:255
 msgid "Add a new cardlist next to the focused cardlist"
 msgstr "Adiciona uma nova lista de cartões ao lado da lista de cartões em foco"
 
-#: src/resources/ui/app-window.ui:318
+#: src/resources/ui/app-window.ui:261
 msgid "Deletes cardlist from board"
 msgstr "Deleta a lista de cartões do quadro"
 
-#: src/resources/ui/app-window.ui:329
+#: src/resources/ui/app-window.ui:267
 msgid "Move cardlist across the board"
 msgstr "Move a lista de cartões pelo quadro"
 
-#: src/resources/ui/app-window.ui:339
+#: src/resources/ui/app-window.ui:274
 msgid "Task Shortcuts"
 msgstr "Atalhos de Tarefa"
 
-#: src/resources/ui/app-window.ui:347
+#: src/resources/ui/app-window.ui:279
 msgid "Rename task"
 msgstr "Renomeia a tarefa"
 
-#: src/resources/ui/app-window.ui:356
+#: src/resources/ui/app-window.ui:285
 msgid "Add new task next to focused task"
 msgstr "Adiciona nova tarefa ao lado da tarefa em foco"
 
-#: src/resources/ui/app-window.ui:365
+#: src/resources/ui/app-window.ui:291
 msgid "Delete task from card"
 msgstr "Apaga tarefa do cartão"
 
-#: src/resources/ui/app-window.ui:376
+#: src/resources/ui/app-window.ui:297
 msgid "Convert task to card"
 msgstr "Converte tarefa para cartão"
 
-#: src/resources/ui/app-window.ui:387
+#: src/resources/ui/app-window.ui:303
 msgid "Move task across the checklist"
 msgstr "Mover tarefa sobre a lista de tarefas"
 
@@ -510,19 +521,19 @@ msgstr "Remover Prazo"
 msgid "Mark this card complete"
 msgstr "Marcar cartão como concluído"
 
-#: src/resources/ui/card-details-dialog.ui:108 src/widgets/card-widget.cpp:841
+#: src/resources/ui/card-details-dialog.ui:108 src/widgets/card-widget.cpp:637
 msgid "Checklist"
 msgstr "Lista de Tarefas"
 
-#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:861
+#: src/resources/ui/card-details-dialog.ui:138 src/widgets/card-widget.cpp:658
 msgid "Notes"
 msgstr "Anotações"
 
-#: src/resources/ui/card-details-dialog.ui:164
+#: src/resources/ui/card-details-dialog.ui:167
 msgid "Delete Card"
 msgstr "Apagar Cartão"
 
-#: src/resources/ui/card-details-dialog.ui:175 src/widgets/card-widget.cpp:71
+#: src/resources/ui/card-details-dialog.ui:178 src/widgets/card-widget.cpp:75
 msgid "Card Details"
 msgstr "Detalhes do Cartão"
 
@@ -550,108 +561,108 @@ msgstr "Selecionar Cor"
 msgid "Set Image"
 msgstr "Selecionar Imagem"
 
-#: src/widgets/board-widget.cpp:23
+#: src/widgets/board-widget.cpp:25
 msgid "Add List"
 msgstr "Adicionar Lista"
 
-#: src/widgets/board-widget.cpp:49
+#: src/widgets/board-widget.cpp:51
 msgid "New CardList"
 msgstr "Nova lista de cartões"
 
-#: src/widgets/card-widget.cpp:40
+#: src/widgets/card-widget.cpp:34
 msgid "Red"
 msgstr "Vermelho"
 
-#: src/widgets/card-widget.cpp:41
+#: src/widgets/card-widget.cpp:35
 msgid "Orange"
 msgstr "Laranja"
 
-#: src/widgets/card-widget.cpp:42
+#: src/widgets/card-widget.cpp:36
 msgid "Yellow"
 msgstr "Amarelo"
 
-#: src/widgets/card-widget.cpp:43
+#: src/widgets/card-widget.cpp:37
 msgid "Green"
 msgstr "Verde"
 
-#: src/widgets/card-widget.cpp:44
+#: src/widgets/card-widget.cpp:38
 msgid "Blue"
 msgstr "Azul"
 
-#: src/widgets/card-widget.cpp:45
+#: src/widgets/card-widget.cpp:39
 msgid "Purple"
 msgstr "Roxo"
 
-#: src/widgets/card-widget.cpp:66 src/widgets/editable-label-header.cpp:79
-#: src/widgets/task-widget.cpp:74
+#: src/widgets/card-widget.cpp:70 src/widgets/editable-label-header.cpp:79
+#: src/widgets/task-widget.cpp:72
 msgid "Rename"
 msgstr "Renomear"
 
-#: src/widgets/card-widget.cpp:76 src/widgets/cardlist-widget.cpp:55
-#: src/widgets/task-widget.cpp:75
+#: src/widgets/card-widget.cpp:80 src/widgets/cardlist-widget.cpp:55
+#: src/widgets/task-widget.cpp:73
 msgid "Remove"
 msgstr "Remover"
 
-#: src/widgets/card-widget.cpp:94
+#: src/widgets/card-widget.cpp:98
 msgid "Unset Color"
 msgstr "Remover Cor"
 
-#: src/widgets/card-widget.cpp:237 src/widgets/card-widget.cpp:299
-#: src/widgets/cardlist-widget.cpp:74
+#: src/widgets/card-widget.cpp:248 src/widgets/card-widget.cpp:324
+#: src/widgets/cardlist-widget.cpp:72
 msgid "New Card"
 msgstr "Novo cartão"
 
-#: src/widgets/card-widget.cpp:272
+#: src/widgets/card-widget.cpp:282
 msgid "Card Options"
 msgstr "Opções do Cartão"
 
-#: src/widgets/card-widget.cpp:528
+#: src/widgets/card-widget.cpp:460 src/widgets/card-widget.cpp:692
 msgid "Due: "
 msgstr "Prazo: "
 
-#: src/widgets/card-widget.cpp:752
+#: src/widgets/card-widget.cpp:548
 msgid "%1%% complete"
 msgstr "%1%% completo"
 
-#: src/widgets/card-widget.cpp:764
+#: src/widgets/card-widget.cpp:560
 msgid "This card is complete"
 msgstr "Este cartão está concluído"
 
-#: src/widgets/card-widget.cpp:774
+#: src/widgets/card-widget.cpp:562
+msgid "The card is due today"
+msgstr "O cartão é para hoje"
+
+#: src/widgets/card-widget.cpp:572
 msgid "<b>%1 day</b> remaining"
 msgid_plural "<b>%1 days</b> remaining"
 msgstr[0] "<b>%1 dia</b> restante"
 msgstr[1] "<b>%1 dias</b> restantes"
 
-#: src/widgets/card-widget.cpp:783
+#: src/widgets/card-widget.cpp:581
 msgid "<b>%1 month</b> remaining"
 msgid_plural "<b>%1 months</b> remaining"
 msgstr[0] "<b>%1 mês</b> restante"
 msgstr[1] "<b>%1 meses</b> restantes"
 
-#: src/widgets/card-widget.cpp:793
+#: src/widgets/card-widget.cpp:591
 msgid "<b>%1 year</b> remaining"
 msgid_plural "<b>%1 years</b> remaining"
 msgstr[0] "<b>%1 ano</b> restante"
 msgstr[1] "<b>%1 anos</b> restantes"
 
-#: src/widgets/card-widget.cpp:799
-msgid "The card is due today"
-msgstr "O cartão é para hoje"
-
-#: src/widgets/card-widget.cpp:809
+#: src/widgets/card-widget.cpp:605
 msgid "This card is past due date <b>%1 day ago</b>"
 msgid_plural "This card is past due date <b>%1 days ago</b>"
 msgstr[0] "Este cartão está atrasado há <b>%1 dia</b>"
 msgstr[1] "Este cartão está atrasado há <b>%1 dias</b>"
 
-#: src/widgets/card-widget.cpp:820
+#: src/widgets/card-widget.cpp:616
 msgid "This card is past due date <b>%1 month</b> ago"
 msgid_plural "This card is past due date <b>%1 months</b> ago"
 msgstr[0] "Este cartão está atrasado há <b>%1 mês</b>"
 msgstr[1] "Este cartão está atrasado há <b>%1 meses</b>"
 
-#: src/widgets/card-widget.cpp:831
+#: src/widgets/card-widget.cpp:627
 msgid "This card is past due date <b>%1 year</b> ago"
 msgid_plural "This card is past due date <b>%1 years</b> ago"
 msgstr[0] "Este cartão está atrasado há <b>%1 ano</b>"
@@ -661,13 +672,16 @@ msgstr[1] "Este cartão está atrasado há <b>%1 anos</b>"
 msgid "Add card"
 msgstr "Adicionar cartão"
 
-#: src/widgets/cardlist-widget.cpp:105
+#: src/widgets/cardlist-widget.cpp:101
 msgid "New Cardlist"
 msgstr "Nova Lista de Cartões"
 
-#: src/widgets/task-widget.cpp:76
+#: src/widgets/task-widget.cpp:74
 msgid "Convert to card"
 msgstr "Converter para cartão"
+
+#~ msgid "Select the boards to be deleted"
+#~ msgstr "Selecione os quadros a serem deletados"
 
 #, c-format
 #~ msgid "This card is due %x"
