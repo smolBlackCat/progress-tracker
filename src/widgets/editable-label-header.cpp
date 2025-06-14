@@ -1,8 +1,7 @@
-#include "editable-label-header.h"
-
 #include <glibmm/i18n.h>
 
 #include "cardlist-widget.h"
+#include "editable-label-header.h"
 
 namespace ui {
 EditableLabelHeader::EditableLabelHeader() : EditableLabelHeader{""} {}
@@ -129,13 +128,20 @@ void EditableLabelHeader::exit_editing_mode() {
     menu_button.set_visible();
 }
 
-sigc::signal<void(std::string)>&
-EditableLabelHeader::signal_on_confirm() {
+Glib::RefPtr<Gio::Menu> EditableLabelHeader::get_menu_model() const {
+    return menu;
+}
+
+Glib::RefPtr<Gio::SimpleActionGroup> EditableLabelHeader::get_menu_actions()
+    const {
+    return menu_actions;
+}
+
+sigc::signal<void(std::string)>& EditableLabelHeader::signal_on_confirm() {
     return on_confirm_signal;
 }
 
-sigc::signal<void(std::string)>&
-EditableLabelHeader::signal_on_cancel() {
+sigc::signal<void(std::string)>& EditableLabelHeader::signal_on_cancel() {
     return on_cancel_signal;
 }
 
@@ -174,3 +180,4 @@ void EditableLabelHeader::on_mouse_button_released(int n_press, double x,
     }
 }
 }  // namespace ui
+

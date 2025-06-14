@@ -130,6 +130,11 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     root.insert_child_after(*frame, *action_buttons["card-details"]);
 }
 
+void CardWidget::CardPopover::popup() {
+    Gtk::Popover::popup();
+    action_buttons["rename"]->grab_focus();
+}
+
 void CardWidget::CardPopover::set_selected_color(Gdk::RGBA color,
                                                  bool trigger) {
     if (!trigger) disable_color_signals();
@@ -318,7 +323,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
         std::pair<const char*,
                   std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
 
-    const std::array<CardShortcut, 9> card_shortcuts = {
+    const std::array<CardShortcut, 10> card_shortcuts = {
         {{"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
               auto new_card = parent->add(Card{_("New Card")}, true);
@@ -351,6 +356,8 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                   static_cast<CardWidget*>(this->get_prev_sibling());
               if (previous_card) {
                   this->parent->reorder(*previous_card, *this);
+              } else {
+                  this->error_bell();
               }
               return true;
           }},
@@ -360,6 +367,8 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
                   this->parent->reorder(*this, *static_cast<CardWidget*>(next));
+              } else {
+                  this->error_bell();
               }
               return true;
           }},
@@ -371,10 +380,13 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                   this->remove_from_parent();
                   auto this_card = prev_parent->add(*this->card);
                   this_card->grab_focus();
+              } else {
+                  this->error_bell();
               }
               return true;
           }},
-         {"<Control>Right", [this](Gtk::Widget&, const Glib::VariantBase&) {
+         {"<Control>Right",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
               Widget* next_parent = this->parent->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
                                               Gtk::Button::get_type())) {
@@ -383,7 +395,13 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                   this->remove_from_parent();
                   auto this_card = next_cardlist->add(*this->card);
                   this_card->grab_focus();
+              } else {
+                  this->error_bell();
               }
+              return true;
+          }},
+         {"Menu|<Shift>F10", [this](Gtk::Widget& m, const Glib::VariantBase&) {
+              this->card_menu_popover2.popup();
               return true;
           }}}};
 

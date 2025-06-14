@@ -120,7 +120,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         std::pair<const char*,
                   std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
 
-    const std::array<TaskShortcut, 6> task_shortcuts = {
+    const std::array<TaskShortcut, 7> task_shortcuts = {
         {{"<Control>R",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
               on_rename();
@@ -148,16 +148,25 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
               if (previous) {
                   TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
                   this->m_card_dialog.reorder_task_widget(prev_task, *this);
+              } else {
+                  this->error_bell();
               }
               return true;
           }},
-         {"<Control>Down", [this](Gtk::Widget&, const Glib::VariantBase&) {
+         {"<Control>Down",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
               Gtk::Widget* next = this->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
                   TaskWidget& next_task = *static_cast<TaskWidget*>(next);
                   this->m_card_dialog.reorder_task_widget(*this, next_task);
+              } else {
+                  this->error_bell();
               }
+              return true;
+          }},
+         {"Menu|<Shift>F10", [this](Gtk::Widget&, const Glib::VariantBase&) {
+              m_popover.popup();
               return true;
           }}}};
 

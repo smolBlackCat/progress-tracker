@@ -140,6 +140,8 @@ protected:
          */
         CardPopover(CardWidget* card);
 
+        void popup();
+
         /**
          * @brief Marks one of the color radio buttons as selected. If a color
          * that does not belong to CARD_COLORS, this call is ignored.

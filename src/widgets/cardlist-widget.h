@@ -105,12 +105,13 @@ protected:
     void cleanup() override;
 
     CardWidget* __add(const std::shared_ptr<Card>& card,
-                     bool editing_mode = false);
+                      bool editing_mode = false);
 
     // Widgets
     EditableLabelHeader m_header;
     Gtk::ScrolledWindow m_scr_window;
     Gtk::Button m_add_card_button;
+    Gtk::PopoverMenu m_popover;
     Gtk::Box m_root;
 
     // Data
@@ -121,3 +122,4 @@ protected:
 };
 
 }  // namespace ui
+

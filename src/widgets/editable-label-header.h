@@ -48,6 +48,9 @@ public:
      */
     void exit_editing_mode();
 
+    Glib::RefPtr<Gio::Menu> get_menu_model() const;
+    Glib::RefPtr<Gio::SimpleActionGroup> get_menu_actions() const;
+
     sigc::signal<void(std::string)>& signal_on_confirm();
 
     sigc::signal<void(std::string)>& signal_on_cancel();
@@ -69,7 +72,6 @@ protected:
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
-
     sigc::signal<void(std::string)> on_confirm_signal;
     sigc::signal<void(std::string)> on_cancel_signal;
 
@@ -88,3 +90,4 @@ protected:
     void on_mouse_button_released(int n_press, double x, double y);
 };
 }  // namespace ui
+

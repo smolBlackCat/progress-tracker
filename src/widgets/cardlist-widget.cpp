@@ -1,10 +1,9 @@
-#include "cardlist-widget.h"
-
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card-widget.h"
+#include "cardlist-widget.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -64,6 +63,14 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
             this->board.remove_cardlist(*this);
         }
     });
+
+    // FIXME: We're getting EditableLabelHeader instance's menus, but honestly,
+    // that is quite dirty, primarily when the other widgets implement their
+    // header as well rather than having a helper widget
+    m_popover.set_menu_model(m_header.get_menu_model());
+    m_popover.insert_action_group("label-header", m_header.get_menu_actions());
+    m_popover.set_has_arrow(false);
+    m_popover.set_parent(m_header);
     m_header.set_margin_bottom(15);
 
     m_add_card_button.set_valign(Gtk::Align::CENTER);
@@ -89,7 +96,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
         std::pair<const char*,
                   std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
 
-    const std::array<CardListShortcut, 5> cardlist_shortcuts = {
+    const std::array<CardListShortcut, 6> cardlist_shortcuts = {
         {{"<Control>R",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
               this->m_header.to_editing_mode();
@@ -113,17 +120,26 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
                   static_cast<CardlistWidget*>(this->get_prev_sibling());
               if (previous_cardlist) {
                   this->board.reorder_cardlist(*previous_cardlist, *this);
+              } else {
+                  this->error_bell();
               }
               return true;
           }},
-         {"<Control>Right", [this](Gtk::Widget&, const Glib::VariantBase&) {
+         {"<Control>Right",
+          [this](Gtk::Widget&, const Glib::VariantBase&) {
               Widget* maybe_cardlist = this->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(maybe_cardlist->gobj(),
                                               Gtk::Button::get_type())) {
                   CardlistWidget* cardlist_widget =
                       static_cast<CardlistWidget*>(maybe_cardlist);
                   this->board.reorder_cardlist(*this, *cardlist_widget);
+              } else {
+                  this->error_bell();
               }
+              return true;
+          }},
+         {"Menu|<Shift>F10", [this](Gtk::Widget&, const Glib::VariantBase&) {
+              m_popover.popup();
               return true;
           }}}};
 
@@ -146,6 +162,19 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
     // drop_motion_controller->signal_leave().connect(
     //     [this]() { this->remove_css_class("cardlist-to-drop"); });
     add_controller(drop_motion_controller);
+
+    auto gesture_click = Gtk::GestureClick::create();
+
+    gesture_click->set_button(0);
+    gesture_click->signal_released().connect(
+        [this, gesture_click](int n_pressed, double x, double y) {
+            if (n_pressed == 1 &&
+                gesture_click->get_current_button() == GDK_BUTTON_SECONDARY) {
+                this->m_popover.set_pointing_to(Gdk::Rectangle(x, y, 0, 0));
+                m_popover.popup();
+            }
+        });
+    add_controller(gesture_click);
 }
 
 void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
@@ -330,6 +359,7 @@ void CardlistWidget::setup_drag_and_drop() {
 
 void CardlistWidget::cleanup() {
     m_header.unparent();
+    m_popover.unparent();
     m_scr_window.unparent();
 }
 
@@ -349,3 +379,4 @@ CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card,
     return cardwidget;
 }
 }  // namespace ui
+
