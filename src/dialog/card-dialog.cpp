@@ -1,5 +1,3 @@
-#include "card-dialog.h"
-
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <widgets/card-widget.h>
@@ -7,6 +5,7 @@
 
 #include <ctime>
 
+#include "card-dialog.h"
 #include "glibmm/ustring.h"
 
 namespace ui {
@@ -56,6 +55,9 @@ CardDetailsDialog::CardDetailsDialog()
         }),
         this);
 
+    checklist_add_button.set_margin_start(4);
+    checklist_add_button.set_margin_end(4);
+    checklist_add_button.set_margin_bottom(3);
     tasks_box->append(checklist_add_button);
 }
 
@@ -265,3 +267,4 @@ TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
     return task_widget;
 }
 }  // namespace ui
+
