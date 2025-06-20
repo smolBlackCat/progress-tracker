@@ -129,7 +129,7 @@
     <section>
       <item>
         <attribute name="action">win.preferences</attribute>
-        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="label" translatable="yes">Edit Board</attribute>
       </item>
       <item>
         <attribute name="action">win.shortcuts</attribute>
