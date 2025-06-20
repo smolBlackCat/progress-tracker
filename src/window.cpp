@@ -385,6 +385,8 @@ void ProgressWindow::on_board_loading_done() {
 }
 
 bool ProgressWindow::on_close() {
+    set_visible(false);
+
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
@@ -392,7 +394,6 @@ bool ProgressWindow::on_close() {
     progress_settings->set_boolean("window-maximized", is_maximized());
     progress_settings->set_int("window-height", get_height());
     progress_settings->set_int("window-width", get_width());
-    set_visible(false);
 
     spdlog::get("app")->info("Application window has been closed");
     return true;

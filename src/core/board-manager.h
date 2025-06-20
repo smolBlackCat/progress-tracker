@@ -61,6 +61,11 @@ public:
      */
     void local_close(const std::shared_ptr<Board>& board);
 
+    /**
+     * @brief Returns whether the boards can be safely modified
+     */
+    bool loaded() const;
+
     sigc::signal<void(LocalBoard)>& signal_add_board();
     sigc::signal<void(LocalBoard)>& signal_remove_board();
     sigc::signal<void(LocalBoard)>& signal_save_board();
@@ -74,5 +79,8 @@ protected:
     sigc::signal<void(LocalBoard)> save_board_signal;
 
 private:
+    std::mutex valid_mutex;
+    volatile bool m_loaded = false;
     void __local_save(const LocalBoard& local);
 };
+

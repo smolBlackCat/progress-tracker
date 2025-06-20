@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <memory>
 #include <regex>
+#include <thread>
 
 #include "board-manager.h"
 
@@ -233,19 +234,24 @@ BoardManager::BoardManager(const std::string& board_dir)
 
     spdlog::get("core")->info(
         "[BoardManager] Loading boards from local storage: {}", board_dir);
-    for (const auto& dir_entry :
-         std::filesystem::directory_iterator(BOARD_DIR)) {
-        const std::string board_filename = dir_entry.path().string();
-        if (board_filename.ends_with(".xml")) {
-            try {
-                m_local_boards.push_back(LocalBoard{
-                    board_filename, unitialized_board(board_filename), false});
-            } catch (std::invalid_argument& err) {
-                spdlog::get("core")->error("Failed to load board: {}",
-                                           err.what());
+    std::thread([this]() {
+        std::lock_guard<std::mutex> lock(this->valid_mutex);
+        for (const auto& dir_entry :
+             std::filesystem::directory_iterator(BOARD_DIR)) {
+            const std::string board_filename = dir_entry.path().string();
+            if (board_filename.ends_with(".xml")) {
+                try {
+                    m_local_boards.push_back(
+                        LocalBoard{board_filename,
+                                   unitialized_board(board_filename), false});
+                } catch (std::invalid_argument& err) {
+                    spdlog::get("core")->error("Failed to load board: {}",
+                                               err.what());
+                }
             }
         }
-    }
+        m_loaded = true;
+    }).detach();
 
     spdlog::get("core")->info(
         "[BoardManager] Local boards have been successfully loaded", BOARD_DIR);
@@ -282,6 +288,9 @@ std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
 }
 
 const std::vector<LocalBoard>& BoardManager::local_boards() const {
+    if (!m_loaded) {
+        throw std::logic_error{"Board is not valid"};
+    }
     return m_local_boards;
 }
 
@@ -331,6 +340,8 @@ void BoardManager::local_close(const std::shared_ptr<Board>& board) {
         }
     }
 }
+
+bool BoardManager::loaded() const { return m_loaded; }
 
 sigc::signal<void(LocalBoard)>& BoardManager::signal_add_board() {
     return add_board_signal;

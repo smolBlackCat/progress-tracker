@@ -1,5 +1,3 @@
-#include "application.h"
-
 #include <adwaita.h>
 #include <app_info.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -9,10 +7,14 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "application.h"
+
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
 
+// BoardManager will load all boards in a different thread at the Application
+// constructor.
 ui::Application::Application()
     : Gtk::Application{APPLICATION_ID},
       progress_settings{
@@ -45,15 +47,27 @@ void ui::Application::on_startup() {
                                   window_height);
     }
 
-    for (const auto& local_entry : m_manager.local_boards()) {
-        main_window->add_local_board_entry(local_entry);
-    }
-
     add_window(*main_window);
 }
 
 void ui::Application::on_activate() {
     Gtk::Application::on_activate();
     main_window->set_visible();
+
+    // FIXME:
+    // Scheduling an idle task that'll check whether all boards were loaded
+    // before actually loading them into the application. This workaround works
+    // but it can be enhanced by improving the core itself to be thread-safe.
+    Glib::signal_idle().connect([this]() {
+        if (m_manager.loaded()) {
+            for (const auto& local_entry : m_manager.local_boards()) {
+                main_window->add_local_board_entry(local_entry);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    });
     spdlog::get("app")->info("Application initialised");
 }
+
