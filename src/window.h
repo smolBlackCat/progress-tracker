@@ -124,6 +124,10 @@ protected:
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
     Gtk::MenuButton* app_menu_button_p;
 
+#if not GTKMM_CHECK_VERSION(4, 14, 0)
+    std::vector<BoardCardButton*> entry_buttons;
+#endif
+
     CardDetailsDialog card_dialog;
 
     /**

@@ -186,6 +186,8 @@ void ProgressWindow::add_board_handler(LocalBoard board_entry) {
 
 // FIXME: We could actually keep track of the boardcardbuttons added instead of
 // searching linearly. This may be optmised to an amortised O(1)
+
+#if GTKMM_CHECK_VERSION(4, 14, 0)
 void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
     for (Widget* fb_child : boards_grid_p->get_children()) {
         BoardCardButton* cur = static_cast<BoardCardButton*>(
@@ -196,6 +198,15 @@ void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
         }
     }
 }
+#else
+void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
+    for (BoardCardButton* entry_button : entry_buttons) {
+        if (entry_button->get_board() == board_entry.board) {
+            boards_grid_p->remove(*entry_button);
+        }
+    }
+}
+#endif
 
 void ProgressWindow::save_board_handler(LocalBoard board) {
     boards_grid_p->invalidate_sort();
@@ -240,6 +251,10 @@ void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
             }
         }
     });
+
+#if not GTKMM_CHECK_VERSION(4, 14, 0)
+    entry_buttons.push_back(board_card_button);
+#endif
 }
 
 void ProgressWindow::on_delete_board_mode() {
