@@ -88,6 +88,7 @@ protected:
     Gtk::Entry m_entry;
     Gtk::CheckButton m_checkbutton;
     Gtk::PopoverMenu m_popover;
+    const Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
 
     CardDetailsDialog& m_card_dialog;
 
@@ -99,3 +100,4 @@ protected:
 };
 
 }  // namespace ui
+

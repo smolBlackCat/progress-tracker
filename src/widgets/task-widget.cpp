@@ -34,6 +34,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
       BaseItem{Gtk::Orientation::HORIZONTAL, 3},
       m_card_dialog{card_details_dialog},
       m_task{task},
+      focus_controller{Gtk::EventControllerFocus::create()},
       m_menu_model{Gio::Menu::create()},
       m_action_group{Gio::SimpleActionGroup::create()},
       is_new{is_new} {
@@ -111,7 +112,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
         },
         false);
     m_entry.add_controller(key_controller);
-    auto focus_controller = Gtk::EventControllerFocus::create();
+
     focus_controller->signal_leave().connect(
         sigc::mem_fun(*this, &TaskWidget::off_rename));
     m_entry.add_controller(focus_controller);
@@ -191,11 +192,14 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
 std::shared_ptr<Task> TaskWidget::task() const { return m_task; }
 
 void TaskWidget::on_rename() {
+    m_entry.remove_controller(focus_controller);
     m_entry_revealer.set_reveal_child();
     m_label.set_visible(false);
 
     m_entry.set_text(m_task->get_name());
     m_entry.grab_focus();
+
+    m_entry.add_controller(focus_controller);
 
     spdlog::get("ui")->debug(
         "[TaskWidget] TaskWidget \"{}\" has entered rename mode",
