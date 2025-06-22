@@ -1,9 +1,10 @@
+#include "cardlist-widget.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card-widget.h"
-#include "cardlist-widget.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -104,9 +105,8 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
           }},
          {"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              auto n_cardlist =
-                  this->board.add_cardlist(CardList{_("New Cardlist")}, true);
-              this->board.reorder_cardlist(*n_cardlist, *this);
+              this->board.insert_new_cardlist_after(CardList{_("New Cardlist")},
+                                                    this);
               return true;
           }},
          {"<Control>Delete",
@@ -224,6 +224,22 @@ void CardlistWidget::remove(CardWidget& card) {
 
 CardWidget* CardlistWidget::add(const Card& card, bool editing_mode) {
     return __add(m_cardlist->container().append(card), editing_mode);
+}
+
+CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
+                                                      ui::CardWidget* sibling) {
+    auto cardwidget = Gtk::make_managed<CardWidget>(
+        m_cardlist->container().insert_after(card, *sibling->get_card()), true);
+    m_cards.push_back(cardwidget);
+    cardwidget->set_cardlist(this);
+    m_root.insert_child_after(*cardwidget, *sibling);
+
+    spdlog::get("ui")->debug(
+        "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
+        "\"{}\"",
+        card.get_name(), m_cardlist->get_name());
+
+    return cardwidget;
 }
 
 bool CardlistWidget::is_child(CardWidget& card) {
@@ -379,4 +395,3 @@ CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card,
     return cardwidget;
 }
 }  // namespace ui
-

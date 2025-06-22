@@ -195,6 +195,23 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
     return __add_cardlist(m_board->container().append(cardlist), editing_mode);
 }
 
+ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
+    const CardList& cardlist, ui::CardlistWidget* sibling) {
+    auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
+        *this,
+        m_board->container().insert_after(cardlist, *sibling->cardlist()),
+        true);
+    m_cardlists.push_back(new_cardlist);
+
+    m_root.insert_child_after(*new_cardlist, *sibling);
+
+    spdlog::get("ui")->debug(
+        "[BoardWidget] CardlistWidget \"{}\" has been added",
+        cardlist.get_name());
+
+    return new_cardlist;
+}
+
 std::string ui::BoardWidget::get_background() const {
     return m_board->get_background();
 }

@@ -109,6 +109,9 @@ public:
     ui::CardlistWidget* add_cardlist(const CardList& cardlist,
                                      bool editing_mode = false);
 
+    ui::CardlistWidget* insert_new_cardlist_after(const CardList& cardlist,
+                                                  ui::CardlistWidget* sibling);
+
     /**
      * @brief Retrieves the background string
      *

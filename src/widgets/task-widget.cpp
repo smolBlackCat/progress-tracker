@@ -129,8 +129,8 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
           }},
          {"<Control>N",
           [&card_details_dialog, this](Gtk::Widget&, const Glib::VariantBase&) {
-              auto new_task = card_details_dialog.add_task(Task{_("New Task")});
-              card_details_dialog.reorder_task_widget(*new_task, *this);
+              auto new_task = card_details_dialog.insert_new_task_after(
+                  Task{_("New Task")}, this);
               return true;
           }},
          {"<Control>Delete",

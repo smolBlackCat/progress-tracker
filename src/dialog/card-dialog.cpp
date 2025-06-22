@@ -70,6 +70,22 @@ TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     return task_widget;
 }
 
+TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
+                                                     TaskWidget* sibling) {
+    auto new_task = cur_card_widget->get_card()->container().insert_after(
+        task, *sibling->task());
+    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task, true);
+    tasks_box->insert_child_after(*task_widget, *sibling);
+    tasks_tracker.push_back(task_widget);
+
+    spdlog::get("ui")->debug(
+        "[CardDetailsDialog] TaskWidget \"{}\" has been inserted to the "
+        "checklist after \"{}\"",
+        task.get_name(), sibling->task()->get_name());
+
+    return task_widget;
+}
+
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
     card->container().remove(*task.task());

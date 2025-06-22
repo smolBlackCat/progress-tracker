@@ -70,6 +70,9 @@ public:
      */
     ui::CardWidget* add(const Card& card, bool editing_mode = false);
 
+    ui::CardWidget* insert_new_card_after(const Card& card,
+                                          ui::CardWidget* sibling);
+
     /**
      * @brief Determines whether this CardlistWidget instance is the given
      * CardWidget instance's parent
@@ -122,4 +125,3 @@ protected:
 };
 
 }  // namespace ui
-

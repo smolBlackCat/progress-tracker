@@ -326,8 +326,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     const std::array<CardShortcut, 10> card_shortcuts = {
         {{"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              auto new_card = parent->add(Card{_("New Card")}, true);
-              parent->reorder(*new_card, *this);
+              parent->insert_new_card_after(Card{_("New Card")}, this);
               return true;
           }},
          {"<Control>D",

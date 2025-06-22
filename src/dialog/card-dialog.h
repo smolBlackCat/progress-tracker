@@ -40,6 +40,8 @@ public:
 
     TaskWidget* add_task(const Task& task);
 
+    TaskWidget* insert_new_task_after(const Task& task, TaskWidget* sibling);
+
     /**
      * @brief Removes a TaskWidget from the checklist area of the dialog.
      *
@@ -152,3 +154,4 @@ private:
 };
 
 }  // namespace ui
+
