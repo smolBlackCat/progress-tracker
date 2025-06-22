@@ -1,6 +1,5 @@
-#include "item-container.h"
-
 #include "cardlist.h"
+#include "item-container.h"
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
@@ -44,14 +43,53 @@ template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::shared_ptr<T> ItemContainer<T>::insert_after(const T& item,
                                                   const T& sibling) {
-    return nullptr;
+    ssize_t index = -1;
+    ssize_t c = 0;
+    for (const auto& item : m_data) {
+        if (*item == sibling) {
+            index = c;
+            break;
+        }
+
+        c++;
+    }
+
+    if (index == -1) return nullptr;
+
+    std::shared_ptr<T> item_s = std::make_shared<T>(item);
+    if (index == (m_data.size() - 1)) {
+        m_data.push_back(item_s);
+    } else {
+        auto sibling_it = (m_data.begin() + index + 1);
+        m_data.insert(sibling_it, item_s);
+    }
+
+    return item_s;
 }
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
 std::shared_ptr<T> ItemContainer<T>::insert_before(const T& item,
                                                    const T& sibling) {
-    return nullptr;
+    ssize_t index = -1;
+    ssize_t c = 0;
+    for (const auto& item : m_data) {
+        if (*item == sibling) {
+            index = c;
+            break;
+        }
+
+        c++;
+    }
+
+    if (index == -1) return nullptr;
+
+    auto sibling_it = (m_data.begin() + index);
+    std::shared_ptr<T> item_s = std::make_shared<T>(item);
+
+    m_data.insert(sibling_it, item_s);
+
+    return item_s;
 }
 
 template <typename T>
@@ -183,3 +221,4 @@ ItemContainer<T>::signal_reorder() {
 template class ItemContainer<CardList>;
 template class ItemContainer<Card>;
 template class ItemContainer<Task>;
+

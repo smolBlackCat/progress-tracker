@@ -1,9 +1,10 @@
 #include "core/cardlist.h"
-
 #include "core/item.h"
 #define CATCH_CONFIG_MAIN
 
+#include <array>
 #include <catch2/catch_test_macros.hpp>
+#include <format>
 
 TEST_CASE("CardList Instantiation", "[CardList]") {
     CardList cardlist{"TODO"};
@@ -89,6 +90,67 @@ TEST_CASE("Signal Emission", "[CardList]") {
         cardlist.container().reorder(*card, Card{"nobody here"});
         CHECK_FALSE(reordered_item);
     }
+
+    SECTION("Inserting items at beginning") {
+        const int n_cards = 5;
+        std::array<std::shared_ptr<Card>, n_cards> ptrs;
+        for (int i = 0; i < n_cards; i++) {
+            ptrs[i] =
+                cardlist.container().append(Card{std::format("Card {}", i)});
+        }
+
+        REQUIRE(cardlist.container().get_data().size() == 5);
+        REQUIRE(cardlist.container().modified());
+
+        Card card = Card{"New Card"};
+        cardlist.container().insert_before(card, *ptrs[0]);
+
+        CHECK((cardlist.container().get_data()[0]->get_name()) ==
+              card.get_name());
+    }
+
+    SECTION("Inserting items at the end") {
+        const int n_cards = 5;
+        std::array<std::shared_ptr<Card>, n_cards> ptrs;
+        for (int i = 0; i < n_cards; i++) {
+            ptrs[i] =
+                cardlist.container().append(Card{std::format("Card {}", i)});
+        }
+
+        REQUIRE(cardlist.container().get_data().size() == 5);
+        REQUIRE(cardlist.container().modified());
+
+        Card card = Card{"New Card"};
+        cardlist.container().insert_before(card, *ptrs[n_cards - 1]);
+
+        CHECK((cardlist.container().get_data()[n_cards - 1])->get_name() ==
+              card.get_name());
+    }
+
+    SECTION("Inserting items at middle") {
+        const int n_cards = 5;
+        std::array<std::shared_ptr<Card>, n_cards> ptrs;
+        for (int i = 0; i < n_cards; i++) {
+            ptrs[i] =
+                cardlist.container().append(Card{std::format("Card {}", i)});
+        }
+
+        REQUIRE(cardlist.container().get_data().size() == 5);
+        REQUIRE(cardlist.container().modified());
+
+        Card card = Card{"New Card"};
+        // We're roughly adding it in the middle;
+        cardlist.container().insert_before(card, *ptrs[(n_cards + 1) / 2]);
+
+        CHECK(*(cardlist.container().get_data()[(n_cards + 1) / 2]) == card);
+
+        Card another_card = Card{"Another one"};
+        // We're roughly adding it in the middle;
+        cardlist.container().insert_after(another_card,
+                                          *ptrs[((n_cards + 1) / 2)]);
+        CHECK((cardlist.container().get_data()[((n_cards + 1) / 2) + 2])
+                  ->get_name() == another_card.get_name());
+    }
 }
 
 TEST_CASE("Modification State", "[CardList]") {
@@ -154,3 +216,4 @@ TEST_CASE("Modification State", "[CardList]") {
         CHECK_FALSE(cardlist.modified());
     }
 }
+

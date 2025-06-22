@@ -155,6 +155,62 @@ TEST_CASE("Signal Emission", "[Card]") {
 
         CHECK_FALSE(reordered);
     }
+
+    SECTION("Inserting items at beginning") {
+        const int n_tasks = 5;
+        std::array<std::shared_ptr<Task>, n_tasks> ptrs;
+        for (int i = 0; i < n_tasks; i++) {
+            ptrs[i] = card.container().append(Task{std::format("Task {}", i)});
+        }
+
+        REQUIRE(card.container().get_data().size() == 5);
+        REQUIRE(card.container().modified());
+
+        Task task = Task{"New Card"};
+        card.container().insert_before(task, *ptrs[0]);
+
+        CHECK((card.container().get_data()[0]->get_name()) == task.get_name());
+    }
+
+    SECTION("Inserting items at the end") {
+        const int n_tasks = 5;
+        std::array<std::shared_ptr<Task>, n_tasks> ptrs;
+        for (int i = 0; i < n_tasks; i++) {
+            ptrs[i] = card.container().append(Task{std::format("Card {}", i)});
+        }
+
+        REQUIRE(card.container().get_data().size() == 5);
+        REQUIRE(card.container().modified());
+
+        Task task = Task{"New Card"};
+        card.container().insert_before(task, *ptrs[n_tasks - 1]);
+
+        CHECK((card.container().get_data()[n_tasks - 1])->get_name() ==
+              task.get_name());
+    }
+
+    SECTION("Inserting items at middle") {
+        const int n_tasks = 5;
+        std::array<std::shared_ptr<Task>, n_tasks> ptrs;
+        for (int i = 0; i < n_tasks; i++) {
+            ptrs[i] = card.container().append(Task{std::format("Task {}", i)});
+        }
+
+        REQUIRE(card.container().get_data().size() == 5);
+        REQUIRE(card.container().modified());
+
+        Task task = Task{"New Task"};
+        // We're roughly adding it in the middle;
+        card.container().insert_before(task, *ptrs[(n_tasks + 1) / 2]);
+
+        CHECK(*(card.container().get_data()[(n_tasks + 1) / 2]) == task);
+
+        Task another_task = Task{"Another one"};
+        // We're roughly adding it in the middle;
+        card.container().insert_after(another_task, *ptrs[((n_tasks + 1) / 2)]);
+        CHECK((card.container().get_data()[((n_tasks + 1) / 2) + 2])
+                  ->get_name() == another_task.get_name());
+    }
 }
 
 TEST_CASE("Modification State", "[Card]") {
@@ -267,3 +323,4 @@ TEST_CASE("Modification State", "[Card]") {
         CHECK_FALSE(card.modified());
     }
 }
+
