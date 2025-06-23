@@ -33,8 +33,8 @@
       "sources": [
         {
           "type": "archive",
-          "url": "https://download.gnome.org/sources/gtkmm/4.16/gtkmm-4.16.0.tar.xz",
-          "sha256": "3b23fd3abf8fb223b00e9983b6010af2db80e38c89ab6994b8b6230aa85d60f9"
+          "url": "https://download.gnome.org/sources/gtkmm/4.18/gtkmm-4.18.0.tar.xz",
+          "sha256": "2ee31c15479fc4d8e958b03c8b5fbbc8e17bc122c2a2f544497b4e05619e33ec"
         }
       ],
       "modules": [
@@ -77,10 +77,10 @@
           "buildsystem": "meson",
           "config-opts": ["-Dbuild-examples=false"],
           "cleanup": [
-            "/include/glibmm-2.68",
-            "/include/giomm-2.68",
-            "/lib/glibmm-2.68",
-            "/lib/giomm-2.68",
+            "/include/glibmm-2.82",
+            "/include/giomm-2.82",
+            "/lib/glibmm-2.82",
+            "/lib/giomm-2.82",
             "/lib/libglibmm_generate_extra_defs*"
           ],
           "sources": [
