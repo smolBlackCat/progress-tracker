@@ -150,6 +150,10 @@ protected:
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
 
+    // We need this value to keep track of the next cardlist to add in the idle
+    // process
+    ssize_t cardlist_index = 0;
+
 #ifdef WIN32
     Gtk::Overlay overlay;
     Gtk::Picture picture;
@@ -165,3 +169,4 @@ protected:
 };
 
 }  // namespace ui
+

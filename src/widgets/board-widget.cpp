@@ -1,11 +1,10 @@
-#include "board-widget.h"
-
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <window.h>
 
 #include <format>
 
+#include "board-widget.h"
 #include "cardlist-widget.h"
 #include "core/colorable.h"
 
@@ -84,11 +83,22 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
 void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
     if (board) {
         this->m_board = board;
-
         __set_background(board->get_background());
-        for (auto& cardlist : board->container()) {
-            __add_cardlist(cardlist, false);
-        }
+
+        Glib::signal_idle().connect(
+            [this]() {
+                if (this->cardlist_index >
+                        (m_board->container().get_data().size() - 1) ||
+                    !m_board) {
+                    return false;  // We have finished adding the cardlists,
+                                   // exit now
+                }
+                __add_cardlist(m_board->container().get_data()[cardlist_index],
+                               false);
+                cardlist_index++;
+                return true;
+            },
+            Glib::PRIORITY_LOW);
 
         m_connections.emplace_back(board->signal_background().connect(
             sigc::mem_fun(*this, &BoardWidget::__set_background)));
@@ -174,6 +184,8 @@ void ui::BoardWidget::clear() {
     std::for_each(m_connections.begin(), m_connections.end(),
                   [](auto& connection) { connection.disconnect(); });
     m_connections.clear();
+    m_board = nullptr;
+    cardlist_index = 0;
 
     spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
@@ -328,3 +340,4 @@ ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
 
     return new_cardlist;
 }
+

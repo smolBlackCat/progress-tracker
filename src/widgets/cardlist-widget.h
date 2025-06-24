@@ -121,7 +121,9 @@ protected:
     std::shared_ptr<CardList> m_cardlist;
     std::vector<ui::CardWidget*> m_cards;
 
+    ssize_t card_index = 0;
     bool m_new;
 };
 
 }  // namespace ui
+
