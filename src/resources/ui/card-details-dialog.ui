@@ -148,6 +148,7 @@ a Card object details. -->
 													<object class="GtkScrolledWindow">
 														<property name="child">
 															<object class="GtkTextView" id="notes-textview">
+															  <property name="justification">GTK_JUSTIFY_FILL</property>
 																<property name="buffer">
 																	<object class="GtkTextBuffer" id="notes-textbuffer"/>
 																</property>
