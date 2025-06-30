@@ -48,6 +48,9 @@ CardDetailsDialog::CardDetailsDialog()
     g_signal_connect(
         adw_dialog->gobj(), "closed",
         G_CALLBACK(+[](AdwDialog* self, gpointer data) {
+            reinterpret_cast<CardDetailsDialog*>(data)
+                ->get_card_widget()
+                ->grab_focus();
             reinterpret_cast<CardDetailsDialog*>(data)->on_save();
             reinterpret_cast<CardDetailsDialog*>(data)->clear();
 
