@@ -54,51 +54,26 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
 
     m_root.append(m_add_button);
 
-    // Auto-saves the Board after 10 secs
-    Glib::signal_timeout().connect(
-        [this]() {
-            if (this->m_board) {
-                this->save(false);
-            }
-            return true;
-        },
-        BoardWidget::SAVE_INTERVAL);
-
     // Update due date labels of every card in the board every minute
-    Glib::signal_timeout().connect(
-        [this]() {
-            if (this->m_board) {
-                for (auto& cardlist : this->m_cardlists) {
-                    for (auto& card : cardlist->cards()) {
-                        card->set_tooltip_markup(card->create_details_text());
-                        card->update_due_date_label();
-                    }
-                }
-            }
-            return true;
-        },
-        BoardWidget::UPDATE_INTERVAL);
+    // Glib::signal_timeout().connect(
+    //     [this]() {
+    //         if (this->m_board) {
+    //             for (auto& cardlist : this->m_cardlists) {
+    //                 for (auto& card : cardlist->cards()) {
+    //                     card->set_tooltip_markup(card->create_details_text());
+    //                     card->update_due_date_label();
+    //                 }
+    //             }
+    //         }
+    //         return true;
+    //     },
+    //     BoardWidget::UPDATE_INTERVAL);
 }
 
 void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
     if (board) {
         this->m_board = board;
         __set_background(board->get_background());
-
-        Glib::signal_idle().connect(
-            [this]() {
-                if (this->cardlist_index >
-                        (m_board->container().get_data().size() - 1) ||
-                    !m_board) {
-                    return false;  // We have finished adding the cardlists,
-                                   // exit now
-                }
-                __add_cardlist(m_board->container().get_data()[cardlist_index],
-                               false);
-                cardlist_index++;
-                return true;
-            },
-            Glib::PRIORITY_LOW);
 
         m_connections.emplace_back(board->signal_background().connect(
             sigc::mem_fun(*this, &BoardWidget::__set_background)));
@@ -174,18 +149,10 @@ void ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
 }
 
 void ui::BoardWidget::clear() {
-    if (!m_cardlists.empty()) {
-        for (const auto& cardlist_widget : m_cardlists) {
-            m_root.remove(*cardlist_widget);
-        }
-        m_cardlists.clear();
-    }
-
     std::for_each(m_connections.begin(), m_connections.end(),
                   [](auto& connection) { connection.disconnect(); });
     m_connections.clear();
     m_board = nullptr;
-    cardlist_index = 0;
 
     spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }

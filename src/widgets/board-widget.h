@@ -29,6 +29,8 @@ public:
     static constexpr int UPDATE_INTERVAL = SAVE_INTERVAL * 6;
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
+    Gtk::Box m_root;
+
     /**
      * @brief BoardWidget constructor
      *
@@ -140,26 +142,21 @@ public:
      */
     std::shared_ptr<Board> board() const;
 
+    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
+                                   bool editing_mode = false);
+
 protected:
     void __setup_auto_scrolling();
     void __set_background(const std::string& background);
 
-    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
-                                   bool editing_mode = false);
-
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
-
-    // We need this value to keep track of the next cardlist to add in the idle
-    // process
-    ssize_t cardlist_index = 0;
 
 #ifdef WIN32
     Gtk::Overlay overlay;
     Gtk::Picture picture;
     Gtk::ScrolledWindow scr;
 #endif
-    Gtk::Box m_root;
     Gtk::Button m_add_button;
     std::shared_ptr<Board> m_board = nullptr;
     Glib::RefPtr<Gtk::CssProvider> m_css_provider;
