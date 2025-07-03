@@ -83,7 +83,7 @@
             <object class="GtkHeaderBar">
               <child type="start">
                 <object class="GtkButton" id="home-button">
-                  <property name="icon-name">go-home</property>
+                  <property name="icon-name">go-home-symbolic</property>
                   <property name="tooltip-text" translatable="yes">Homepage</property>
                   <property name="visible">false</property>
                 </object>
