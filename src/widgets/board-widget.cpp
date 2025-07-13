@@ -174,6 +174,17 @@ ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
     return __add_cardlist(m_board->container().append(cardlist), editing_mode);
 }
 
+ui::CardlistWidget* ui::BoardWidget::pop() {
+    if (m_cardlists.empty()) {
+        return nullptr;
+    }
+
+    auto cardlist = m_cardlists.back();
+    m_root.remove(*cardlist);
+    m_cardlists.pop_back();
+    return cardlist;
+}
+
 ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
     const CardList& cardlist, ui::CardlistWidget* sibling) {
     auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(

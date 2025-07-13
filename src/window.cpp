@@ -1,3 +1,4 @@
+#include <app-context.h>
 #include <app_info.h>
 #include <core/exceptions.h>
 #include <dialog/create_board_dialog.h>
@@ -37,6 +38,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       progress_settings{progress_settings},
       card_dialog{},
       sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
+
+    m_context = new AppContext{*this, board_widget, m_manager};
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
@@ -65,11 +68,6 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         sigc::mem_fun(*this, &ProgressWindow::delete_selected_boards));
     cancel_delete_button->signal_clicked().connect(
         sigc::mem_fun(*this, &ProgressWindow::off_delete_board_mode));
-
-    load_board_dispatcher.connect(
-        sigc::mem_fun(*this, &ProgressWindow::on_board_loading_done));
-    save_board_dispatcher.connect(
-        sigc::mem_fun(*this, &ProgressWindow::on_board_saved));
 
     load_appropriate_style();
 
@@ -178,7 +176,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
     app_stack_p->add(board_widget, "board-page");
 }
 
-ProgressWindow::~ProgressWindow() {}
+ProgressWindow::~ProgressWindow() {
+    delete m_context;
+    m_context = nullptr;
+}
 
 void ProgressWindow::add_board_handler(LocalBoard board_entry) {
     add_local_board_entry(board_entry);
@@ -219,40 +220,23 @@ void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
     fb_child_p->set_child(*board_card_button);
     fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
-    board_card_button->signal_clicked().connect([this, board_entry,
-                                                 board_card_button,
-                                                 fb_child_p]() {
-        if (!this->on_delete_mode) {
-            app_stack_p->set_visible_child("loading-page",
-                                           Gtk::StackTransitionType::CROSSFADE);
-            add_board_button_p->set_sensitive(false);
-            app_menu_button_p->set_sensitive(false);
+    board_card_button->signal_clicked().connect(
+        [this, board_entry, board_card_button, fb_child_p]() {
+            if (!this->on_delete_mode) {
+                app_stack_p->set_visible_child(
+                    "loading-page", Gtk::StackTransitionType::CROSSFADE);
+                add_board_button_p->set_sensitive(false);
+                app_menu_button_p->set_sensitive(false);
 
-            this->load_board_thread = new std::thread{[this, board_entry,
-                                                       &board_card_button]() {
-                spdlog::get("app")->debug(
-                    "Starting helper thread to load board");
-                try {
-                    this->cur_board_entry = board_card_button;
-                    this->cur_board =
-                        this->m_manager.local_open(board_entry.filename);
-                } catch (std::invalid_argument& err) {
-                    this->cur_board = nullptr;
-                    spdlog::get("app")->error("Failed to load board: {}",
-                                              err.what());
-                }
-                this->load_board_dispatcher.emit();
-                spdlog::get("app")->debug(
-                    "Helper thread finished. Dispatching for main GUI thread");
-            }};
-        } else {
-            if (fb_child_p->is_selected()) {
-                boards_grid_p->unselect_child(*fb_child_p);
+                this->m_context->open_board(board_entry.filename);
             } else {
-                boards_grid_p->select_child(*fb_child_p);
+                if (fb_child_p->is_selected()) {
+                    boards_grid_p->unselect_child(*fb_child_p);
+                } else {
+                    boards_grid_p->select_child(*fb_child_p);
+                }
             }
-        }
-    });
+        });
 
 #if not GTKMM_CHECK_VERSION(4, 14, 0)
     entry_buttons.push_back(board_card_button);
@@ -290,7 +274,7 @@ void ProgressWindow::off_delete_board_mode() {
 
 void ProgressWindow::on_main_menu() {
     // Flag idle task to stop running after
-    board_widget_loading = false;
+    m_context->close_board();
 
     app_stack_p->set_visible_child("board-grid-page");
     sh_window->property_view_name().set_value("board-grid-view");
@@ -298,37 +282,6 @@ void ProgressWindow::on_main_menu() {
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
     set_title("Progress");
-    if (cur_board && cur_board_entry) {
-        if (save_board_thread) {
-            spdlog::get("ui")->debug(
-                "[ProgressWindow] saver worker thread is still running. Wait "
-                "for it to finish");
-            save_board_thread->join();
-        } else {
-            m_manager.local_save(cur_board);
-        }
-        m_manager.local_close(cur_board);
-
-        this->board_widget_clearing = true;
-        board_widget.clear();
-        if (!m_cardlists.empty()) {
-            Glib::signal_idle().connect(
-                [this]() {
-                    if (this->m_cardlists.empty() ) {
-                        this->board_widget_clearing = false;
-                        return false;
-                    } else {
-                        this->board_widget_clearing = true;
-                        board_widget.m_root.remove(*m_cardlists.back());
-                        m_cardlists.pop_back();
-                        return true;
-                    }
-                }
-            );
-        }
-        cur_board = nullptr;
-        cur_board_entry = nullptr;
-    }
 
     spdlog::get("app")->info(
         "[Progress Window] Current view changed to board grid");
@@ -340,6 +293,9 @@ void ProgressWindow::on_board_view() {
     app_menu_button_p->set_menu_model(board_menu_p);
     home_button_p->set_visible();
     add_board_button_p->set_visible(false);
+
+    add_board_button_p->set_sensitive(true);
+    app_menu_button_p->set_sensitive(true);
 
     spdlog::get("app")->info(
         "[Progress Window] App view changed to board view");
@@ -412,119 +368,11 @@ void ProgressWindow::load_appropriate_style() {
     }
 }
 
-void ProgressWindow::on_board_loading_done() {
-    if (cur_board) {
-        on_board_view();
+// void ProgressWindow::on_board_loading_done() {
 
-        // From now on, board-widget is working
-        this->board_widget_busy = true;
-        this->board_widget_loading = true;
-
-        set_title(cur_board->get_name());
-        board_widget.set(cur_board);
-        cardlist_index = 0;
-
-        Glib::signal_idle().connect(
-            [this]() {
-                if (this->board_widget_clearing) return true;
-
-                if (!this->board_widget_loading) {
-                    spdlog::get("ui")->debug(
-                        "[ProgressWindow] User has canceled board loading");
-                    return false;
-                }
-
-                if (this->cardlist_index >
-                        (cur_board->container().get_data().size() - 1) ||
-                    !cur_board) {
-                    this->board_widget_loading = false;
-                    return false;  // We have finished adding the cardlists,
-                                   // exit now
-                }
-                auto m = board_widget.__add_cardlist(
-                    cur_board->container().get_data()[cardlist_index], false);
-                this->m_cardlists.push_back(m);
-                cardlist_index++;
-                this->board_widget_loading = true;
-                return true;
-            },
-            Glib::PRIORITY_LOW);
-
-        spdlog::get("ui")->info(
-            "[Progress Window] Board view loaded successfully");
-
-        load_board_thread->join();
-        delete load_board_thread;
-        load_board_thread = nullptr;
-
-        board_widget_busy = true;
-
-        // Schedule a worker thread saving the current board every SAVE_INTERVAL
-        if (!timeout_save_task.empty()) {
-            // The timeout task may not have had the opportunity to exit on its
-            // own. Close it before scheduling a new timeout task
-            timeout_save_task.disconnect();
-            spdlog::get("ui")->debug(
-                "[ProgressWindow] Existing timeout save task. "
-                "Disconnecting...");
-        }
-
-        this->timeout_save_task = Glib::signal_timeout().connect(
-            [this]() {
-                if (!this->cur_board) {
-                    // There is no board to save, stop this timeout procedure
-
-                    return false;
-                }
-
-                if (this->save_board_thread) {
-                    // It simply means that there is still a worker thread
-                    // active, so pass it
-                    spdlog::get("ui")->debug(
-                        "[ProgressWindow] Tried to schedule saver worker "
-                        "thread however there was one running still");
-                    return true;
-                } else {
-                    spdlog::get("ui")->debug(
-                        "[ProgressWindow] saver thread has been scheduled");
-                    this->save_board_thread = new std::thread{[this]() {
-                        this->m_manager.local_save(this->cur_board);
-                        save_board_dispatcher.emit();  // calls on_board_saved()
-                    }};
-                    return true;
-                }
-            },
-            BoardWidget::SAVE_INTERVAL);
-    } else {
-        // Loading thread has failed. Warn user and log
-        Gtk::AlertDialog::create(_("It was not possible to load this board"))
-            ->show(*this);
-        boards_grid_p->remove(*cur_board_entry);
-        cur_board_entry = nullptr;
-        on_main_menu();
-
-        spdlog::get("ui")->error(
-            "[Progress Window] Failed to load board widget");
-    }
-
-    board_widget_busy = true;
-    add_board_button_p->set_sensitive();
-    app_menu_button_p->set_sensitive();
-}
-
-void ProgressWindow::on_board_saved() {
-    if (save_board_thread->joinable()) {
-        // A prior call to join has been made because the user has quit the
-        // board and save worker thread was still running
-        save_board_thread->join();
-    }
-
-    delete save_board_thread;
-    save_board_thread = nullptr;
-
-    spdlog::get("ui")->debug(
-        "[ProgressWindow] Save worker thread has been cleaned out");
-}
+//     add_board_button_p->set_sensitive();
+//     app_menu_button_p->set_sensitive();
+// }
 
 bool ProgressWindow::on_close() {
     set_visible(false);

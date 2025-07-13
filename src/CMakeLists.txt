@@ -25,6 +25,8 @@ if (BUILD_APP)
     file(GLOB_RECURSE DIALOG_SOURCES "dialog/*.cpp" "dialog/*.h")
     add_executable(progress-tracker
     main.cpp
+    app-context.h
+    app-context.cpp
     application.cpp
     application.h
     window.cpp
