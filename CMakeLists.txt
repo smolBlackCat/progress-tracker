@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # General Settings
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(DEVELOPMENT "Build the application in development mode" ON)
 option(FLATPAK "Defines whether the application is a flatpak distribution" OFF)
 option(BUILD_TESTS "Build the tests" ON)
@@ -35,14 +36,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 pkg_check_modules(ADWAITA REQUIRED libadwaita-1)
 pkg_check_modules(SIGCXX REQUIRED sigc++-3.0)
-
-if (SIGCXX_FOUND)
-    message("There is a sigc++ lib")
-    message(${SIGCXX_LIBRARIES})
-    message(${SIGCXX_INCLUDE_DIRS})
-    message(${SIGCXX_LIBRARY_DIRS})
-    message(${SIGCXX_CFLAGS})
-endif()
 
 # Crossuid dependency
 add_subdirectory(subprojects/crossguid)
