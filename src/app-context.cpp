@@ -49,7 +49,7 @@ void AppContext::close_board() {
         m_board_widget.clear();
 
         m_board_widget_flags["clearing"] = true;
-        if (!m_cardlists.empty()) {
+        if (!m_board_widget.empty()) {
             Glib::signal_idle().connect(
                 sigc::mem_fun(*this, &AppContext::idle_clear_board_widget_task),
                 Glib::PRIORITY_LOW);
@@ -146,10 +146,6 @@ bool AppContext::idle_load_board_widget_task() {
     }
 
     auto m = m_board_widget.__add_cardlist(data[m_cardlist_index], false);
-
-    m->signal_destroy().connect(
-        [this, m]() { std::erase(this->m_cardlists, m); });
-    m_cardlists.push_back(m);
     m_cardlist_index++;
 
     m_board_widget_flags["loading"] = true;
@@ -159,7 +155,6 @@ bool AppContext::idle_load_board_widget_task() {
 bool AppContext::idle_clear_board_widget_task() {
     if (!m_board_widget_flags["clearing"]) {
         m_board_widget_flags["busy"] = false;
-        m_cardlists.clear();
         spdlog::get("app")->debug("[AppContext] Board widget has been cleared");
         return false;
     } else {
@@ -175,22 +170,27 @@ bool AppContext::timeout_save_board_task() {
     if (!m_current_board) {
         // There is no board to save, stop this timeout procedure
         return false;
-    }
-
-    if (m_board_save_thread) {
-        // It simply means that there is still a worker thread
-        // active, so pass it
-        spdlog::get("app")->debug(
-            "[AppContext] Tried to schedule saver worker"
-            "thread however there was one still running");
-        return true;
+    } else if (m_current_board->modified()) {
+        if (m_board_save_thread) {
+            // It simply means that there is still a worker thread
+            // active, so pass it
+            spdlog::get("app")->debug(
+                "[AppContext] Tried to schedule saver worker"
+                "thread however there was one still running");
+            return true;
+        } else {
+            spdlog::get("app")->debug(
+                "[AppContext] saver thread has been scheduled");
+            m_board_save_thread = new std::thread{[this]() {
+                m_manager.local_save(m_current_board);
+                m_save_board_dispatcher.emit();  // calls on_board_saved()
+            }};
+            return true;
+        }
     } else {
         spdlog::get("app")->debug(
-            "[AppContext] saver thread has been scheduled");
-        m_board_save_thread = new std::thread{[this]() {
-            m_manager.local_save(m_current_board);
-            m_save_board_dispatcher.emit();  // calls on_board_saved()
-        }};
+            "[AppContext] No modifications registered. Don't scheduled save "
+            "thread");
         return true;
     }
 }

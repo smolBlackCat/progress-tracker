@@ -210,6 +210,8 @@ std::string ui::BoardWidget::get_name() const { return m_board->get_name(); }
 
 bool ui::BoardWidget::scroll() const { return m_on_scroll; }
 
+bool ui::BoardWidget::empty() const { return m_cardlists.empty(); }
+
 std::shared_ptr<Board> ui::BoardWidget::board() const { return m_board; }
 
 void ui::BoardWidget::__setup_auto_scrolling() {

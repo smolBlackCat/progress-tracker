@@ -69,7 +69,6 @@ protected:
         {"clearing", false},
         {"busy", false},
     };
-    std::vector<ui::CardlistWidget *> m_cardlists;
     std::vector<ui::CardWidget *> m_cards;
     ssize_t m_cardlist_index = 0;
 };

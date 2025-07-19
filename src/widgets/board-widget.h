@@ -137,6 +137,11 @@ public:
     bool scroll() const;
 
     /**
+     * @brief Returns true when BoardWidget is empty
+     */
+    bool empty() const;
+
+    /**
      * @brief Retrieves the current board object
      *
      * @return shared pointer to the current board object
