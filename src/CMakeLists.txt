@@ -10,9 +10,7 @@ target_link_libraries(libcore PUBLIC spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 
 target_link_directories(libcore PUBLIC ${SIGCXX_LIBRARY_DIRS})
 
-target_include_directories(libcore PRIVATE
-    /usr/include/sigc++-3.0
-    /usr/lib/x86_64-linux-gnu/sigc++-3.0/include)
+target_include_directories(libcore PRIVATE ${SIGCXX_INCLUDE_DIRS})
 target_include_directories(libcore PRIVATE ${TINYXML2_INCLUDE_DIRS})
 target_include_directories(libcore
     PUBLIC ${CMAKE_SOURCE_DIR}/subprojects/crossguid/include/crossguid/)
