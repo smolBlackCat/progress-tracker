@@ -36,7 +36,8 @@ When writing a commit message, the component being changed have to be named.
 Use these prefixes when writing commits:
 
 * `(core)`: Chnages related to the core functionality or UI behaviour.
-* `(ui)`: Changes affecting the app's appearance or stylesheets.
+* `(widgets)`: Changes affecting the app's widget implementation.
+* `(dialog)`: Changes affecting the app's dialog implementation
 * `(i18n)`: Internationalisation support.
 * `(chore)`: General project settings changes.
 
