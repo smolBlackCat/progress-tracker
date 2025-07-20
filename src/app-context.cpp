@@ -17,7 +17,7 @@ AppContext::AppContext(ui::ProgressWindow &app_window,
 void AppContext::open_board(const std::string &filename) {
     spdlog::get("app")->debug(
         "[AppContext] Dispatch board loading helper thread");
-    m_board_load_thread = new std::thread{[this, &filename]() {
+    m_board_load_thread = new std::thread{[this, filename]() {
         try {
             this->m_current_board = this->m_manager.local_open(filename);
         } catch (std::invalid_argument &err) {
