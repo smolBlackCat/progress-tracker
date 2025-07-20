@@ -22,10 +22,7 @@ void AppContext::open_board(const std::string &filename) {
             this->m_current_board = this->m_manager.local_open(filename);
         } catch (std::invalid_argument &err) {
             this->m_current_board = nullptr;
-            spdlog::get("app")->error("[AppContext] Failed to load board: {}",
-                                      err.what());
         }
-
         // Calls on_board_loaded
         m_load_board_dispatcher.emit();
     }};
@@ -33,13 +30,12 @@ void AppContext::open_board(const std::string &filename) {
 
 void AppContext::close_board() {
     spdlog::get("app")->info("[AppContext] Finish current board session");
-    m_board_widget_flags["loading"] = false;
+    m_board_widget_flags[States::LOADING] = false;
 
     if (m_current_board) {
         if (m_board_save_thread) {
             spdlog::get("app")->debug(
-                "[AppContext] saver worker thread is still running. Wait "
-                "for it to finish");
+                "[AppContext] Saver worker thread still running. Joining");
             m_board_save_thread->join();
         } else {
             m_manager.local_save(m_current_board);
@@ -48,7 +44,7 @@ void AppContext::close_board() {
 
         m_board_widget.clear();
 
-        m_board_widget_flags["clearing"] = true;
+        m_board_widget_flags[States::CLEARING] = true;
         if (!m_board_widget.empty()) {
             Glib::signal_idle().connect(
                 sigc::mem_fun(*this, &AppContext::idle_clear_board_widget_task),
@@ -64,7 +60,7 @@ void AppContext::on_board_loaded() {
     if (m_current_board) {
         m_app_window.on_board_view();
 
-        m_board_widget_flags["loading"] = true;
+        m_board_widget_flags[States::LOADING] = true;
 
         m_app_window.set_title(m_current_board->get_name());
         m_board_widget.set(m_current_board);
@@ -92,16 +88,17 @@ void AppContext::on_board_loaded() {
             sigc::mem_fun(*this, &AppContext::timeout_save_board_task),
             ui::BoardWidget::SAVE_INTERVAL);
     } else {
-        // Because loading the current board has failed, let's reset the context
-        m_board_widget_flags["loading"] = false;
-        m_board_widget_flags["busy"] = false;
+        // Board has failed to load. Go back to previous state
+
+        spdlog::get("app")->info(
+            "[AppContext] Failed to load board. Exiting to main Menu");
+
+        m_board_widget_flags[States::LOADING] = false;
+        m_board_widget_flags[States::BUSY] = false;
 
         Gtk::AlertDialog::create(_("It was not possible to load this board"))
             ->show(m_app_window);
         m_app_window.on_main_menu();
-
-        spdlog::get("app")->error(
-            "[AppContext] BoardWidget loading has failed");
     }
 }
 
@@ -122,17 +119,19 @@ void AppContext::on_board_saved() {
 
 bool AppContext::idle_load_board_widget_task() {
     if (!m_current_board) {
+        spdlog::get("app")->warn(
+            "[AppContext] Loading operation has been canceled because of "
+            "unavailable allocated Board object");
         return false;
     }
 
-    if (m_board_widget_flags["clearing"]) {
+    if (m_board_widget_flags[States::CLEARING]) {
         spdlog::get("app")->debug(
-            "[AppContext] BoardWidget is still clearing. Waiting for it to be "
-            "available");
+            "[AppContext] Board is not empty yet. Wait a moment");
         return true;
     }
 
-    if (!m_board_widget_flags["loading"]) {
+    if (!m_board_widget_flags[States::LOADING]) {
         spdlog::get("app")->debug("[AppContext] Stopping loading.");
         return false;
     }
@@ -141,34 +140,38 @@ bool AppContext::idle_load_board_widget_task() {
 
     if (m_cardlist_index > (data.size() - 1) || !m_current_board ||
         data.empty()) {
-        m_board_widget_flags["loading"] = false;
+        m_board_widget_flags[States::LOADING] = false;
         return false;
     }
 
     auto m = m_board_widget.__add_cardlist(data[m_cardlist_index], false);
     m_cardlist_index++;
 
-    m_board_widget_flags["loading"] = true;
+    m_board_widget_flags[States::LOADING] = true;
+    m_board_widget_flags[States::BUSY] = true;
     return true;
 }
 
 bool AppContext::idle_clear_board_widget_task() {
-    if (!m_board_widget_flags["clearing"]) {
-        m_board_widget_flags["busy"] = false;
-        spdlog::get("app")->debug("[AppContext] Board widget has been cleared");
+    auto cardlist_widget = m_board_widget.pop();
+    if (!cardlist_widget) {
+        m_board_widget_flags[States::CLEARING] = false;
+        m_board_widget_flags[States::BUSY] = false;
+        spdlog::get("app")->debug("[AppContext] Board Widget has been cleared");
         return false;
-    } else {
-        m_board_widget_flags["clearing"] = true;
-        m_board_widget_flags["busy"] = true;
-        auto cardlist_widget = m_board_widget.pop();
-        if (!cardlist_widget) m_board_widget_flags["clearing"] = false;
-        return true;
     }
+
+    m_board_widget_flags[States::BUSY] = true;
+    return true;
 }
 
+// FIXME: This procedure is executed even when m_current board is not available
 bool AppContext::timeout_save_board_task() {
     if (!m_current_board) {
         // There is no board to save, stop this timeout procedure
+        spdlog::get("app")->warn(
+            "[AppContext] Attempted to save board, however it is now "
+            "unavailable. Stop timeout save procedure");
         return false;
     } else if (m_current_board->modified()) {
         if (m_board_save_thread) {

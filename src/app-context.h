@@ -10,6 +10,10 @@ namespace ui {
 class ProgressWindow;
 }
 
+enum class States {
+    CLEARING, LOADING, BUSY
+};
+
 /**
  * @brief Application controller class
  *
@@ -64,10 +68,10 @@ protected:
 
     // BoardWidget context
     std::shared_ptr<Board> m_current_board;
-    std::map<std::string, bool> m_board_widget_flags = {
-        {"loading", false},
-        {"clearing", false},
-        {"busy", false},
+    std::unordered_map<States, bool> m_board_widget_flags = {
+        {States::LOADING, false},
+        {States::CLEARING, false},
+        {States::BUSY, false},
     };
     std::vector<ui::CardWidget *> m_cards;
     ssize_t m_cardlist_index = 0;
