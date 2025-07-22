@@ -170,7 +170,6 @@ a Card object details. -->
 									<object class="GtkButton" id="delete-card-button">
 										<style>
 											<class name="destructive-action"/>
-											<class name="pill"/>
 										</style>
 										<property name="has-frame">False</property>
 										<property name="label" translatable="yes">Delete Card</property>
