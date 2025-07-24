@@ -97,6 +97,9 @@ public:
      */
     const std::shared_ptr<CardList>& cardlist();
 
+    CardWidget* __add(const std::shared_ptr<Card>& card,
+                      bool editing_mode = false);
+
     BoardWidget& board;
 
 protected:
@@ -106,9 +109,6 @@ protected:
     void setup_drag_and_drop();
 
     void cleanup() override;
-
-    CardWidget* __add(const std::shared_ptr<Card>& card,
-                      bool editing_mode = false);
 
     // Widgets
     EditableLabelHeader m_header;

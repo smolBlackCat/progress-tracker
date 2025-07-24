@@ -81,9 +81,9 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_header.insert_at_start(*this);
 
-    for (const auto& card : m_cardlist->container()) {
-        __add(card);
-    }
+    // for (const auto& card : m_cardlist->container()) {
+    //     __add(card);
+    // }
 
     m_root.set_vexpand();
     m_root.set_spacing(15);

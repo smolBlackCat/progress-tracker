@@ -1,3 +1,5 @@
+#include "board-widget.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <window.h>
@@ -55,6 +57,7 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.append(m_add_button);
 
     // Update due date labels of every card in the board every minute
+    // FIXME: Transfer card updating logic from here to AppContext
     // Glib::signal_timeout().connect(
     //     [this]() {
     //         if (this->m_board) {
@@ -64,6 +67,8 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     //                     card->update_due_date_label();
     //                 }
     //             }
+    //             spdlog::get("ui")->debug(
+    //                 "[BoardWidget] CardWidget objects have been updated");
     //         }
     //         return true;
     //     },
@@ -320,4 +325,3 @@ ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
 
     return new_cardlist;
 }
-

@@ -25,6 +25,9 @@ enum class States {
  */
 class AppContext {
 public:
+    static constexpr int SAVE_INTERVAL = 1000 * 10;
+    static constexpr int UPDATE_INTERVAL = 1000 * 3;
+
     AppContext(ui::ProgressWindow &app_window, ui::BoardWidget &board_widget,
                BoardManager &manager);
 
@@ -56,6 +59,7 @@ protected:
     bool idle_load_board_widget_task();
     bool idle_clear_board_widget_task();
     bool timeout_save_board_task();
+    bool timeout_update_cards_task();
 
     ui::ProgressWindow &m_app_window;
     ui::BoardWidget &m_board_widget;
@@ -64,15 +68,16 @@ protected:
     BoardManager &m_manager;
     std::thread *m_board_save_thread, *m_board_load_thread;
     Glib::Dispatcher m_load_board_dispatcher, m_save_board_dispatcher;
-    sigc::connection m_timeout_save_task;
+    sigc::connection m_timeout_save_task, m_timeout_cards_update_task;
 
     // BoardWidget context
     std::shared_ptr<Board> m_current_board;
-    std::unordered_map<States, bool> m_board_widget_flags = {
+    std::unordered_map<States, bool> m_session_flags = {
         {States::LOADING, false},
         {States::CLEARING, false},
         {States::BUSY, false},
     };
     std::vector<ui::CardWidget *> m_cards;
-    ssize_t m_cardlist_index = 0;
+    ssize_t m_next_card_i = 0;
+    ssize_t m_cardlist_i = 0;
 };

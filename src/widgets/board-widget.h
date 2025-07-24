@@ -25,8 +25,6 @@ public:
         "background-color; "
         "background-color: {};}}";
 
-    static constexpr int SAVE_INTERVAL = 1000 * 10;
-    static constexpr int UPDATE_INTERVAL = SAVE_INTERVAL * 6;
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
     Gtk::Box m_root;

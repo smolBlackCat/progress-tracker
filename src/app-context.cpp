@@ -29,8 +29,9 @@ void AppContext::open_board(const std::string &filename) {
 }
 
 void AppContext::close_board() {
-    spdlog::get("app")->info("[AppContext] Finish current board session");
-    m_board_widget_flags[States::LOADING] = false;
+    spdlog::get("app")->info(
+        "[AppContext] \"{}\" Kanban Board session finished",
+        m_current_board->get_name());
 
     if (m_current_board) {
         if (m_board_save_thread) {
@@ -40,17 +41,20 @@ void AppContext::close_board() {
         } else {
             m_manager.local_save(m_current_board);
         }
+
+        m_timeout_save_task.disconnect();
         m_manager.local_close(m_current_board);
-
         m_board_widget.clear();
+        m_current_board = nullptr;
 
-        m_board_widget_flags[States::CLEARING] = true;
+        m_session_flags[States::LOADING] = false;
+        m_session_flags[States::CLEARING] = true;
+
         if (!m_board_widget.empty()) {
             Glib::signal_idle().connect(
                 sigc::mem_fun(*this, &AppContext::idle_clear_board_widget_task),
                 Glib::PRIORITY_LOW);
         }
-        m_current_board = nullptr;
     }
     spdlog::get("app")->info(
         "[AppContext] Kanban board session has been finished");
@@ -60,11 +64,11 @@ void AppContext::on_board_loaded() {
     if (m_current_board) {
         m_app_window.on_board_view();
 
-        m_board_widget_flags[States::LOADING] = true;
+        m_session_flags[States::LOADING] = true;
 
         m_app_window.set_title(m_current_board->get_name());
         m_board_widget.set(m_current_board);
-        m_cardlist_index = 0;
+        m_cardlist_i = 0;
 
         Glib::signal_idle().connect(
             sigc::mem_fun(*this, &AppContext::idle_load_board_widget_task),
@@ -75,7 +79,6 @@ void AppContext::on_board_loaded() {
         delete m_board_load_thread;
         m_board_load_thread = nullptr;
 
-        // Schedule a worker thread saving the current board every SAVE_INTERVAL
         if (!m_timeout_save_task.empty()) {
             // The timeout task may not have had the opportunity to exit on its
             // own. Close it before scheduling a new timeout task
@@ -84,17 +87,18 @@ void AppContext::on_board_loaded() {
                 "[AppContext] Existing timeout task has been disconnected");
         }
 
+        // Schedule a worker thread saving the current board every SAVE_INTERVAL
         m_timeout_save_task = Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &AppContext::timeout_save_board_task),
-            ui::BoardWidget::SAVE_INTERVAL);
+            AppContext::SAVE_INTERVAL);
     } else {
         // Board has failed to load. Go back to previous state
 
         spdlog::get("app")->info(
             "[AppContext] Failed to load board. Exiting to main Menu");
 
-        m_board_widget_flags[States::LOADING] = false;
-        m_board_widget_flags[States::BUSY] = false;
+        m_session_flags[States::LOADING] = false;
+        m_session_flags[States::BUSY] = false;
 
         Gtk::AlertDialog::create(_("It was not possible to load this board"))
             ->show(m_app_window);
@@ -125,43 +129,69 @@ bool AppContext::idle_load_board_widget_task() {
         return false;
     }
 
-    if (m_board_widget_flags[States::CLEARING]) {
-        spdlog::get("app")->debug(
-            "[AppContext] Board is not empty yet. Wait a moment");
+    if (m_session_flags[States::CLEARING]) {
+        spdlog::get("app")->warn(
+            "[AppContext] Current session (\"{}\") attempted to load new "
+            "widgets, but remainings from a previous session was not cleared "
+            "yet",
+            m_current_board->get_name());
         return true;
     }
 
-    if (!m_board_widget_flags[States::LOADING]) {
+    if (!m_session_flags[States::LOADING]) {
         spdlog::get("app")->debug("[AppContext] Stopping loading.");
+        spdlog::get("app")->debug("[AppContext] Items in m_cards: {}",
+                                  m_cards.size());
         return false;
     }
 
-    const auto data = m_current_board->container().get_data();
+    const auto &data = m_current_board->container().get_data();
 
-    if (m_cardlist_index > (data.size() - 1) || !m_current_board ||
-        data.empty()) {
-        m_board_widget_flags[States::LOADING] = false;
+    if (m_cardlist_i > (data.size() - 1) || data.empty()) {
+        m_session_flags[States::LOADING] = false;
         return false;
     }
 
-    auto m = m_board_widget.__add_cardlist(data[m_cardlist_index], false);
-    m_cardlist_index++;
+    auto cardlist_widget =
+        m_board_widget.__add_cardlist(data[m_cardlist_i], false);
 
-    m_board_widget_flags[States::LOADING] = true;
-    m_board_widget_flags[States::BUSY] = true;
+    // Load the cards widgets into cardlist_widget
+    for (const auto &card : cardlist_widget->cardlist()->container()) {
+        auto card_widget = cardlist_widget->__add(card);
+        m_cards.push_back(card_widget);
+
+        // We cannot guarantee the user won't delete a card widget when the
+        // cards are still being added. Remove them from the tracker as they get
+        // destroyed
+        card_widget->signal_destroy().connect(
+            [this, card_widget]() { std::erase(m_cards, card_widget); });
+    }
+    m_cardlist_i++;
+
+    // Start timeout task for updating the CardWidgets objects every 5 minutes
+    m_next_card_i = 0;
+    m_timeout_cards_update_task = Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &AppContext::timeout_update_cards_task),
+        AppContext::UPDATE_INTERVAL);
+
+    m_session_flags[States::LOADING] = true;
+    m_session_flags[States::BUSY] = true;
     return true;
 }
 
 bool AppContext::idle_clear_board_widget_task() {
     auto cardlist_widget = m_board_widget.pop();
     if (!cardlist_widget) {
-        m_board_widget_flags[States::CLEARING] = false;
-        m_board_widget_flags[States::BUSY] = false;
+        m_session_flags[States::CLEARING] = false;
+        m_session_flags[States::BUSY] = false;
+
         spdlog::get("app")->debug("[AppContext] Board Widget has been cleared");
+        spdlog::get("app")->debug("[AppContext] m_cards after clearing: {}",
+                                  m_cards.size());
         return false;
     }
 
-    m_board_widget_flags[States::BUSY] = true;
+    m_session_flags[States::BUSY] = true;
     return true;
 }
 
@@ -196,4 +226,32 @@ bool AppContext::timeout_save_board_task() {
             "thread");
         return true;
     }
+}
+
+bool AppContext::timeout_update_cards_task() {
+    if (m_session_flags[States::BUSY]) {
+        const ssize_t size = m_cards.size();
+
+        if (m_next_card_i > size - 1) {
+            spdlog::get("app")->debug(
+                "[AppContext] Restarting m_next_card_i to zero");
+            m_next_card_i = 0;
+        }
+
+        auto card = m_cards[m_next_card_i];
+
+        card->update_due_date_label();
+        card->set_tooltip_text(card->create_details_text());
+
+        spdlog::get("app")->debug(
+            "[AppContext] CardWidget \"{}\" has been updated",
+            card->get_card()->get_name());
+
+        m_next_card_i++;
+
+        return true;
+    }
+
+    // We supposedly stop running at this point
+    return false;
 }
