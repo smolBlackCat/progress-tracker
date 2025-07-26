@@ -773,9 +773,9 @@ void CardWidget::setup_drag_and_drop() {
                               Glib::Value<CardWidget*>::value_type())) {
                 Glib::Value<CardWidget*> dropped_value;
                 dropped_value.init(value.gobj());
-                auto dropped_card = dropped_value.get();
+                auto dropped_card_widget = dropped_value.get();
 
-                if (dropped_card == this) {
+                if (dropped_card_widget == this) {
                     spdlog::warn(
                         "[CardWidget] CardWidget \"{}\" has been dropped to "
                         "itself",
@@ -787,13 +787,13 @@ void CardWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                if (this->parent->is_child(*dropped_card)) {
-                    this->parent->reorder(*dropped_card, *this);
+                if (this->parent->is_child(*dropped_card_widget)) {
+                    this->parent->reorder(*dropped_card_widget, *this);
                 } else {
-                    auto card_from_dropped = dropped_card->get_card();
+                    auto dropped_card = dropped_card_widget->get_card();
                     CardWidget* dropped_copy =
-                        this->parent->add(*card_from_dropped);
-                    dropped_card->remove_from_parent();
+                        this->parent->add(*dropped_card);
+                    dropped_card_widget->remove_from_parent();
                     this->parent->reorder(*dropped_copy, *this);
                 }
 

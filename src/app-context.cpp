@@ -3,6 +3,8 @@
 #include <glibmm/i18n.h>
 #include <window.h>
 
+#include "sigc++/adaptors/track_obj.h"
+
 AppContext::AppContext(ui::ProgressWindow &app_window,
                        ui::BoardWidget &board_widget, BoardManager &manager)
     : m_app_window(app_window),
@@ -12,6 +14,26 @@ AppContext::AppContext(ui::ProgressWindow &app_window,
         sigc::mem_fun(*this, &AppContext::on_board_loaded));
     m_save_board_dispatcher.connect(
         sigc::mem_fun(*this, &AppContext::on_board_saved));
+
+    // FIXME: This is too much to read. This asks the cardlist added to board
+    // widget to sign whether a card widget has been added to it. In addition,
+    // it asks the added card to sign whether it has been destructed.
+    m_board_widget.signal_cardlist_added().connect(
+        [this](ui::CardlistWidget *cardlist) {
+            cardlist->signal_card_added().connect(sigc::track_obj(
+                [this](ui::CardWidget *card) {
+                    this->m_cards.push_back(card);
+                    card->signal_destroy().connect(
+                        [this, card]() { std::erase(this->m_cards, card); });
+                },
+                *cardlist));
+
+            cardlist->signal_card_removed().connect(sigc::track_obj(
+                [this](ui::CardWidget *card) {
+                    std::erase(this->m_cards, card);
+                },
+                *cardlist));
+        });
 }
 
 void AppContext::open_board(const std::string &filename) {
@@ -42,6 +64,9 @@ void AppContext::close_board() {
             m_manager.local_save(m_current_board);
         }
 
+        // TODO: Extract these cleanup operations onto a helper function
+        m_next_card_i = 0;
+        m_cards.clear();
         m_timeout_save_task.disconnect();
         m_manager.local_close(m_current_board);
         m_board_widget.clear();
@@ -154,22 +179,12 @@ bool AppContext::idle_load_board_widget_task() {
 
     auto cardlist_widget =
         m_board_widget.__add_cardlist(data[m_cardlist_i], false);
-
-    // Load the cards widgets into cardlist_widget
     for (const auto &card : cardlist_widget->cardlist()->container()) {
         auto card_widget = cardlist_widget->__add(card);
         m_cards.push_back(card_widget);
-
-        // We cannot guarantee the user won't delete a card widget when the
-        // cards are still being added. Remove them from the tracker as they get
-        // destroyed
-        card_widget->signal_destroy().connect(
-            [this, card_widget]() { std::erase(m_cards, card_widget); });
     }
     m_cardlist_i++;
 
-    // Start timeout task for updating the CardWidgets objects every 5 minutes
-    m_next_card_i = 0;
     m_timeout_cards_update_task = Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &AppContext::timeout_update_cards_task),
         AppContext::UPDATE_INTERVAL);
@@ -232,6 +247,10 @@ bool AppContext::timeout_update_cards_task() {
     if (m_session_flags[States::BUSY]) {
         const ssize_t size = m_cards.size();
 
+        if (m_cards.empty()) {
+            return true;
+        }
+
         if (m_next_card_i > size - 1) {
             spdlog::get("app")->debug(
                 "[AppContext] Restarting m_next_card_i to zero");
@@ -252,6 +271,7 @@ bool AppContext::timeout_update_cards_task() {
         return true;
     }
 
-    // We supposedly stop running at this point
+    // We stop running at this point
+    m_timeout_cards_update_task.disconnect();
     return false;
 }

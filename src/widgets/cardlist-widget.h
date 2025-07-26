@@ -100,6 +100,9 @@ public:
     CardWidget* __add(const std::shared_ptr<Card>& card,
                       bool editing_mode = false);
 
+    sigc::signal<void(CardWidget*)>& signal_card_added();
+    sigc::signal<void(CardWidget*)>& signal_card_removed();
+
     BoardWidget& board;
 
 protected:
@@ -120,6 +123,10 @@ protected:
     // Data
     std::shared_ptr<CardList> m_cardlist;
     std::vector<ui::CardWidget*> m_cards;
+
+    // Signals
+    sigc::signal<void(CardWidget*)> add_card_signal;
+    sigc::signal<void(CardWidget*)> remove_card_signal;
 
     ssize_t card_index = 0;
     bool m_new;

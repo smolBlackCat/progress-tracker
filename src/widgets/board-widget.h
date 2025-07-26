@@ -149,12 +149,19 @@ public:
     CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
                                    bool editing_mode = false);
 
+    sigc::signal<void(CardlistWidget*)>& signal_cardlist_added();
+    sigc::signal<void(CardlistWidget*)>& signal_cardlist_removed();
+
 protected:
     void __setup_auto_scrolling();
     void __set_background(const std::string& background);
 
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
+
+    sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
+        remove_cardlist_signal;
+
 
 #ifdef WIN32
     Gtk::Overlay overlay;

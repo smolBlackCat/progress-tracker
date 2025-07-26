@@ -1,9 +1,10 @@
+#include "cardlist-widget.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card-widget.h"
-#include "cardlist-widget.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -219,6 +220,8 @@ void CardlistWidget::remove(CardWidget& card) {
     m_root.remove(card);
     m_cardlist->container().remove(*card.get_card());
     std::erase(m_cards, &card);
+
+    remove_card_signal.emit(&card);
 }
 
 CardWidget* CardlistWidget::add(const Card& card, bool editing_mode) {
@@ -237,6 +240,8 @@ CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
         "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
         "\"{}\"",
         card.get_name(), m_cardlist->get_name());
+
+    add_card_signal.emit(cardwidget);
 
     return cardwidget;
 }
@@ -391,7 +396,16 @@ CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card,
         "\"{}\"",
         card->get_name(), m_cardlist->get_name());
 
+    add_card_signal.emit(cardwidget);
+
     return cardwidget;
+}
+
+sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_added() {
+    return add_card_signal;
+}
+sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
+    return remove_card_signal;
 }
 }  // namespace ui
 

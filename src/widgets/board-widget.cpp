@@ -55,24 +55,6 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_add_button.add_css_class("opaque");
 
     m_root.append(m_add_button);
-
-    // Update due date labels of every card in the board every minute
-    // FIXME: Transfer card updating logic from here to AppContext
-    // Glib::signal_timeout().connect(
-    //     [this]() {
-    //         if (this->m_board) {
-    //             for (auto& cardlist : this->m_cardlists) {
-    //                 for (auto& card : cardlist->cards()) {
-    //                     card->set_tooltip_markup(card->create_details_text());
-    //                     card->update_due_date_label();
-    //                 }
-    //             }
-    //             spdlog::get("ui")->debug(
-    //                 "[BoardWidget] CardWidget objects have been updated");
-    //         }
-    //         return true;
-    //     },
-    //     BoardWidget::UPDATE_INTERVAL);
 }
 
 void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
@@ -204,6 +186,8 @@ ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
         "[BoardWidget] CardlistWidget \"{}\" has been added",
         cardlist.get_name());
 
+    add_cardlist_signal.emit(new_cardlist);
+
     return new_cardlist;
 }
 
@@ -218,6 +202,16 @@ bool ui::BoardWidget::scroll() const { return m_on_scroll; }
 bool ui::BoardWidget::empty() const { return m_cardlists.empty(); }
 
 std::shared_ptr<Board> ui::BoardWidget::board() const { return m_board; }
+
+sigc::signal<void(ui::CardlistWidget*)>&
+ui::BoardWidget::signal_cardlist_added() {
+    return add_cardlist_signal;
+}
+
+sigc::signal<void(ui::CardlistWidget*)>&
+ui::BoardWidget::signal_cardlist_removed() {
+    return remove_cardlist_signal;
+}
 
 void ui::BoardWidget::__setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
@@ -322,6 +316,8 @@ ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
     spdlog::get("ui")->debug(
         "[BoardWidget] CardlistWidget \"{}\" has been added",
         cardlist->get_name());
+
+    add_cardlist_signal.emit(new_cardlist);
 
     return new_cardlist;
 }
