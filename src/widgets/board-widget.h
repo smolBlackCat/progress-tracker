@@ -6,6 +6,31 @@
 namespace ui {
 class CardlistWidget;
 
+typedef int ImageQuality;
+
+/**
+ * @brief Helper class for delivering compressed background images
+ */
+class BackgroundProvider {
+public:
+
+    static const std::string CACHE_DIR;
+
+    enum {HIGH, MEDIUM, LOW};
+    BackgroundProvider();
+
+    /**
+     * @brief Returns the compressed counterpart's filename of the given image
+     * filename
+     */
+    std::string compressed_filename(const std::string& image_filename);
+
+protected:
+    std::string create_compressed(
+                    const std::string& filename,
+                    ImageQuality quality = BackgroundProvider::MEDIUM);
+};
+
 /**
  * @brief Widget that holds a list of CardLists
  */
@@ -158,6 +183,7 @@ protected:
 
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
+    BackgroundProvider bg_provider;
 
     sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
         remove_cardlist_signal;

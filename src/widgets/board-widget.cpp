@@ -4,16 +4,89 @@
 #include <spdlog/spdlog.h>
 #include <window.h>
 
+#include <filesystem>
 #include <format>
 
 #include "board-widget.h"
 #include "cardlist-widget.h"
 #include "core/colorable.h"
+#include "gdkmm/pixbuf.h"
 
-/**
- * TODO: High memory is allocated in setting background, mainly when the
- * background image is high. Should I try to compress it?
- */
+namespace fs = std::filesystem;
+
+std::string get_cache_dir() {
+#ifdef WIN32
+    if (const char* local_app_data = std::getenv("LOCALAPPDATA")) {
+        return std::string{local_app_data} + "\\Progress\\Backgrounds";
+    }
+#else
+    if (const char* cache_home = std::getenv("XDG_CACHE_HOME")) {
+        return std::string{cache_home} + "/progress/backgrounds";
+    } else {
+        return std::string{std::getenv("HOME")} +
+               "/.cache/progress/backgrounds";
+    }
+#endif
+}
+
+const std::string ui::BackgroundProvider::CACHE_DIR = get_cache_dir();
+
+ui::BackgroundProvider::BackgroundProvider() {}
+
+std::string ui::BackgroundProvider::compressed_filename(
+    const std::string& image_filename) {
+    std::string filename_checksum = Glib::Checksum::compute_checksum(
+        Glib::Checksum::Type::MD5, image_filename);
+
+    // Cache hit
+    const fs::path cached_image = fs::path{CACHE_DIR} / filename_checksum;
+    if (fs::exists(cached_image)) {
+        spdlog::get("ui")->debug("[BackgroundProvider] Cache hit");
+        return cached_image.string();
+    } else {
+        // Compresses the given image file and return the compressed's filename
+        spdlog::get("ui")->debug(
+            "[BackgroundProvider] There was no compressed file available. "
+            "Compress it");
+        return create_compressed(image_filename);
+    }
+}
+
+std::string ui::BackgroundProvider::create_compressed(
+    const std::string& filename, ImageQuality quality) {
+    // We ensure a cache directory exists at all times
+    fs::create_directories(CACHE_DIR);
+
+    std::string compressed_f =
+        fs::path{CACHE_DIR} /
+        Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, filename);
+
+    auto image_pixbuf = Gdk::Pixbuf::create_from_file(filename);
+    Glib::RefPtr<Gdk::Pixbuf> compressed_image;
+
+    switch (quality) {
+        case BackgroundProvider::LOW: {
+            compressed_image =
+                image_pixbuf->scale_simple(720, 480, Gdk::InterpType::BILINEAR);
+            break;
+        }
+        case BackgroundProvider::MEDIUM: {
+            compressed_image = image_pixbuf->scale_simple(
+                1280, 720, Gdk::InterpType::BILINEAR);
+            break;
+        }
+        case BackgroundProvider::HIGH: {
+            compressed_image = image_pixbuf->scale_simple(
+                1920, 1080, Gdk::InterpType::BILINEAR);
+            break;
+        }
+    }
+
+    compressed_image->save(compressed_f, "png");
+
+    return compressed_f;
+}
+
 ui::BoardWidget::BoardWidget(BoardManager& manager)
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
@@ -268,7 +341,7 @@ void ui::BoardWidget::__set_background(const std::string& background) {
             break;
         }
         case BackgroundType::IMAGE: {
-            picture.set_filename(background);
+            picture.set_filename(bg_provider.compressed_filename(background));
             picture.set_visible(true);
             break;
         }
@@ -291,8 +364,8 @@ void ui::BoardWidget::__set_background(const std::string& background) {
             break;
         }
         case BackgroundType::IMAGE: {
-            m_css_provider->load_from_data(
-                std::format(CSS_FORMAT_FILE, background));
+            m_css_provider->load_from_data(std::format(
+                CSS_FORMAT_FILE, bg_provider.compressed_filename(background)));
             break;
         }
         case BackgroundType::INVALID: {
