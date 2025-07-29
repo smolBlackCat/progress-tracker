@@ -177,11 +177,14 @@ bool AppContext::idle_load_board_widget_task() {
         return false;
     }
 
-    auto cardlist_widget =
-        m_board_widget.__add_cardlist(data[m_cardlist_i], false);
+    ui::CardlistWidget *cardlist_widget = Gtk::make_managed<ui::CardlistWidget>(
+        m_board_widget, data[m_cardlist_i], false);
+    m_board_widget.append(*cardlist_widget);
+
     for (const auto &card : cardlist_widget->cardlist()->container()) {
-        auto card_widget = cardlist_widget->__add(card);
-        m_cards.push_back(card_widget);
+        ui::CardWidget *card_widget =
+            Gtk::make_managed<ui::CardWidget>(card, false);
+        cardlist_widget->append(*card_widget);
     }
     m_cardlist_i++;
 

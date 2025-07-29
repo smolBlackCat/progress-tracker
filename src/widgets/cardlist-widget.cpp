@@ -52,16 +52,15 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
     if (is_new) {
         m_header.to_editing_mode();
     }
-    m_header.add_option_button(_("Remove"), "remove", [this]() {
-        this->board.remove_cardlist(*this);
-    });
+    m_header.add_option_button(_("Remove"), "remove",
+                               [this]() { this->board.remove(*this); });
     m_header.signal_on_confirm().connect([this](std::string label) {
         this->m_cardlist->set_name(label);
         this->m_new = false;
     });
     m_header.signal_on_cancel().connect([this](std::string label) {
         if (this->m_new) {
-            this->board.remove_cardlist(*this);
+            this->board.remove(*this);
         }
     });
 
@@ -76,15 +75,12 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_add_card_button.set_valign(Gtk::Align::CENTER);
     m_add_card_button.set_hexpand(true);
-    m_add_card_button.signal_clicked().connect(
-        [this]() { this->add(Card{_("New Card")}, true); });
+    m_add_card_button.signal_clicked().connect([this]() {
+        this->__add(this->m_cardlist->container().append(Card{_("New Card")}));
+    });
     m_root.append(m_add_card_button);
 
     m_header.insert_at_start(*this);
-
-    // for (const auto& card : m_cardlist->container()) {
-    //     __add(card);
-    // }
 
     m_root.set_vexpand();
     m_root.set_spacing(15);
@@ -111,7 +107,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
           }},
          {"<Control>Delete",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              this->board.remove_cardlist(*this);
+              this->board.remove(*this);
               return true;
           }},
          {"<Control>Left",
@@ -119,7 +115,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
               CardlistWidget* previous_cardlist =
                   static_cast<CardlistWidget*>(this->get_prev_sibling());
               if (previous_cardlist) {
-                  this->board.reorder_cardlist(*previous_cardlist, *this);
+                  this->board.reorder(*previous_cardlist, *this);
               } else {
                   this->error_bell();
               }
@@ -132,7 +128,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
                                               Gtk::Button::get_type())) {
                   CardlistWidget* cardlist_widget =
                       static_cast<CardlistWidget*>(maybe_cardlist);
-                  this->board.reorder_cardlist(*this, *cardlist_widget);
+                  this->board.reorder(*this, *cardlist_widget);
               } else {
                   this->error_bell();
               }
@@ -224,8 +220,17 @@ void CardlistWidget::remove(CardWidget& card) {
     remove_card_signal.emit(&card);
 }
 
-CardWidget* CardlistWidget::add(const Card& card, bool editing_mode) {
-    return __add(m_cardlist->container().append(card), editing_mode);
+void CardlistWidget::append(CardWidget& card) {
+    m_cards.push_back(&card);
+    card.set_cardlist(this);
+    m_root.append(card);
+    m_root.reorder_child_after(m_add_card_button, card);
+
+    add_card_signal.emit(&card);
+}
+
+CardWidget* CardlistWidget::append_new_card(const Card& card) {
+    return __add(m_cardlist->container().append(card));
 }
 
 CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
@@ -328,7 +333,7 @@ void CardlistWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                this->board.reorder_cardlist(*dropped_cardlist, *this);
+                this->board.reorder(*dropped_cardlist, *this);
                 dropped_cardlist->set_opacity(1);
 
                 this->remove_css_class("cardlist-to-drop");
@@ -359,7 +364,7 @@ void CardlistWidget::setup_drag_and_drop() {
                 if (!this->is_child(*dropped_card)) {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove_from_parent();
-                    this->add(*card_in_dropped);
+                    this->__add(card_in_dropped);
 
                     spdlog::get("ui")->debug(
                         "[CardlistWidget] CardWidget \"{}\" has been dropped "
@@ -408,4 +413,3 @@ sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
     return remove_card_signal;
 }
 }  // namespace ui
-

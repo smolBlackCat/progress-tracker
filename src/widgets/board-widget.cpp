@@ -7,7 +7,6 @@
 #include <filesystem>
 #include <format>
 
-#include "board-widget.h"
 #include "cardlist-widget.h"
 #include "core/colorable.h"
 #include "gdkmm/pixbuf.h"
@@ -57,9 +56,9 @@ std::string ui::BackgroundProvider::create_compressed(
     // We ensure a cache directory exists at all times
     fs::create_directories(CACHE_DIR);
 
-    std::string compressed_f =
-        fs::path{CACHE_DIR} /
-        Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, filename);
+    std::string compressed_f = std::format(
+        "{}/{}", CACHE_DIR,
+        Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, filename));
 
     auto image_pixbuf = Gdk::Pixbuf::create_from_file(filename);
     Glib::RefPtr<Gdk::Pixbuf> compressed_image;
@@ -122,7 +121,7 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_css_provider->load_from_data(CSS_FORMAT);
 
     m_add_button.signal_clicked().connect(
-        [this]() { add_cardlist(CardList{_("New CardList")}, true); });
+        [this]() { add_new_cardlist(CardList{_("New CardList")}, true); });
     m_add_button.set_valign(Gtk::Align::START);
     m_add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
     m_add_button.add_css_class("opaque");
@@ -162,8 +161,16 @@ void ui::BoardWidget::set_background(const std::string& background) {
     }
 }
 
-void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
-                                       CardlistWidget& sibling) {
+void ui::BoardWidget::append(CardlistWidget& child) {
+    m_cardlists.push_back(&child);
+
+    m_root.append(child);
+    m_root.reorder_child_after(m_add_button, child);
+
+    add_cardlist_signal.emit(&child);
+}
+
+void ui::BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
     ReorderingType reordering =
         m_board->container().reorder(*next.cardlist(), *sibling.cardlist());
 
@@ -197,7 +204,7 @@ void ui::BoardWidget::reorder_cardlist(CardlistWidget& next,
     }
 }
 
-void ui::BoardWidget::remove_cardlist(ui::CardlistWidget& cardlist) {
+void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
     spdlog::get("ui")->debug(
         "[BoardWidget] CardlistWidget \"{}\" has been removed",
         cardlist.cardlist()->get_name());
@@ -229,8 +236,8 @@ void ui::BoardWidget::save(bool clear_after_save) {
 
 void ui::BoardWidget::set_scroll(bool scroll) { m_on_scroll = scroll; }
 
-ui::CardlistWidget* ui::BoardWidget::add_cardlist(const CardList& cardlist,
-                                                  bool editing_mode) {
+ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
+                                                      bool editing_mode) {
     return __add_cardlist(m_board->container().append(cardlist), editing_mode);
 }
 

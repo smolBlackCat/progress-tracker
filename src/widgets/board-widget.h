@@ -13,10 +13,9 @@ typedef int ImageQuality;
  */
 class BackgroundProvider {
 public:
-
     static const std::string CACHE_DIR;
 
-    enum {HIGH, MEDIUM, LOW};
+    enum { HIGH, MEDIUM, LOW };
     BackgroundProvider();
 
     /**
@@ -27,8 +26,8 @@ public:
 
 protected:
     std::string create_compressed(
-                    const std::string& filename,
-                    ImageQuality quality = BackgroundProvider::MEDIUM);
+        const std::string& filename,
+        ImageQuality quality = BackgroundProvider::MEDIUM);
 };
 
 /**
@@ -84,12 +83,19 @@ public:
     void set_background(const std::string& background);
 
     /**
+     * @brief Adds a new cardlist widget
+     *
+     * @param child CardlistWidget object reference
+     */
+    void append(CardlistWidget& child);
+
+    /**
      * @brief Reorders two CardlistWidget objects.
      *
      * @param next widget to be put after sibling
      * @param sibling widget to be put before next
      */
-    void reorder_cardlist(CardlistWidget& next, CardlistWidget& sibling);
+    void reorder(CardlistWidget& next, CardlistWidget& sibling);
 
     /**
      * @brief Removes a CardlistWidget widget.
@@ -98,7 +104,7 @@ public:
      * @return true if the cardlist was successfully removed, false
      * otherwise
      */
-    void remove_cardlist(ui::CardlistWidget& cardlist);
+    void remove(ui::CardlistWidget& cardlist);
 
     /**
      * @brief Cleans the BoardWidget, thus deleting al widgets associated with
@@ -131,8 +137,8 @@ public:
      * completely new (has not been loaded from a file) or not
      * @return pointer to the newly added CardlistWidget
      */
-    ui::CardlistWidget* add_cardlist(const CardList& cardlist,
-                                     bool editing_mode = false);
+    ui::CardlistWidget* add_new_cardlist(const CardList& cardlist,
+                                         bool editing_mode = false);
     ui::CardlistWidget* pop();
 
     ui::CardlistWidget* insert_new_cardlist_after(const CardList& cardlist,
@@ -187,7 +193,6 @@ protected:
 
     sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
         remove_cardlist_signal;
-
 
 #ifdef WIN32
     Gtk::Overlay overlay;

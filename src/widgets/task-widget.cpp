@@ -1,3 +1,5 @@
+#include "task-widget.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <widgets/card-widget.h>
@@ -6,7 +8,6 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
-#include "task-widget.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -260,7 +261,8 @@ void TaskWidget::on_convert() {
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->cardlist();
-    auto task_as_card = cardlist_widget->add(Card{m_task->get_name()});
+    auto task_as_card =
+        cardlist_widget->append_new_card(Card{m_task->get_name()});
 
     cardlist_widget->reorder(*task_as_card, card_widget);
     m_card_dialog.remove_task(*this);
@@ -347,4 +349,3 @@ void TaskWidget::cleanup() {
     m_popover.unparent();
 }
 }  // namespace ui
-

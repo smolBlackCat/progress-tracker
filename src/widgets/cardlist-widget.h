@@ -59,16 +59,15 @@ public:
     void remove(ui::CardWidget& card);
 
     /**
-     * @brief Adds a new Card instance to this object's CardList instance and
-     * then adds the respective CardWidget
-     *
-     * @param card Card object reference.
-     * @param editing_mode bool value indicating whether the newly created
-     * widget instance should begin in editing mode
-     *
-     * @return CardWidget instance pointer pointing to the newly added instance.
+     * @brief Appends a CardWidget object reference.
      */
-    ui::CardWidget* add(const Card& card, bool editing_mode = false);
+    void append(ui::CardWidget& card);
+
+    /**
+     * @brief appends a new card object to the underlying cardlist object and a
+     * CardWidget object
+     */
+    ui::CardWidget* append_new_card(const Card& card);
 
     ui::CardWidget* insert_new_card_after(const Card& card,
                                           ui::CardWidget* sibling);
@@ -133,4 +132,3 @@ protected:
 };
 
 }  // namespace ui
-

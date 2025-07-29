@@ -1,3 +1,5 @@
+#include "card-widget.h"
+
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
@@ -5,7 +7,6 @@
 
 #include <numeric>
 
-#include "card-widget.h"
 #include "cardlist-widget.h"
 
 extern "C" {
@@ -377,7 +378,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                   this->parent->get_prev_sibling());
               if (prev_parent) {
                   this->remove_from_parent();
-                  auto this_card = prev_parent->add(*this->card);
+                  auto this_card = prev_parent->append_new_card(*this->card);
                   this_card->grab_focus();
               } else {
                   this->error_bell();
@@ -392,7 +393,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                   CardlistWidget* next_cardlist =
                       static_cast<CardlistWidget*>(next_parent);
                   this->remove_from_parent();
-                  auto this_card = next_cardlist->add(*this->card);
+                  auto this_card = next_cardlist->append_new_card(*this->card);
                   this_card->grab_focus();
               } else {
                   this->error_bell();
@@ -792,7 +793,7 @@ void CardWidget::setup_drag_and_drop() {
                 } else {
                     auto dropped_card = dropped_card_widget->get_card();
                     CardWidget* dropped_copy =
-                        this->parent->add(*dropped_card);
+                        this->parent->append_new_card(*dropped_card);
                     dropped_card_widget->remove_from_parent();
                     this->parent->reorder(*dropped_copy, *this);
                 }
@@ -918,4 +919,3 @@ void CardWidget::__clear_cover_color() {
 
 void CardWidget::cleanup() { root_box.unparent(); }
 }  // namespace ui
-
