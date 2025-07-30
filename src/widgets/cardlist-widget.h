@@ -96,15 +96,15 @@ public:
      */
     const std::shared_ptr<CardList>& cardlist();
 
-    CardWidget* __add(const std::shared_ptr<Card>& card,
-                      bool editing_mode = false);
-
     sigc::signal<void(CardWidget*)>& signal_card_added();
     sigc::signal<void(CardWidget*)>& signal_card_removed();
 
     BoardWidget& board;
 
 protected:
+    CardWidget* __add(const std::shared_ptr<Card>& card,
+                      bool editing_mode = false);
+
     /**
      * @brief Sets up drag and drop functionality for the card list widget.
      */
@@ -132,3 +132,4 @@ protected:
 };
 
 }  // namespace ui
+

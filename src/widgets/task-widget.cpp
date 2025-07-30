@@ -132,6 +132,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
           [&card_details_dialog, this](Gtk::Widget&, const Glib::VariantBase&) {
               auto new_task = card_details_dialog.insert_new_task_after(
                   Task{_("New Task")}, this);
+              new_task->grab_focus();
               return true;
           }},
          {"<Control>Delete",

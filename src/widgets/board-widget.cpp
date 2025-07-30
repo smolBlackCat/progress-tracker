@@ -257,7 +257,7 @@ ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
     auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
         *this,
         m_board->container().insert_after(cardlist, *sibling->cardlist()),
-        true);
+        false);
     m_cardlists.push_back(new_cardlist);
 
     m_root.insert_child_after(*new_cardlist, *sibling);

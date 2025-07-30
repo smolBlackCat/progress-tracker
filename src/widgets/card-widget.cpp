@@ -1,5 +1,3 @@
-#include "card-widget.h"
-
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
@@ -7,6 +5,7 @@
 
 #include <numeric>
 
+#include "card-widget.h"
 #include "cardlist-widget.h"
 
 extern "C" {
@@ -327,7 +326,9 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     const std::array<CardShortcut, 10> card_shortcuts = {
         {{"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              parent->insert_new_card_after(Card{_("New Card")}, this);
+              auto card_widget =
+                  parent->insert_new_card_after(Card{_("New Card")}, this);
+              card_widget->grab_focus();
               return true;
           }},
          {"<Control>D",
@@ -919,3 +920,4 @@ void CardWidget::__clear_cover_color() {
 
 void CardWidget::cleanup() { root_box.unparent(); }
 }  // namespace ui
+

@@ -1,10 +1,9 @@
-#include "cardlist-widget.h"
-
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card-widget.h"
+#include "cardlist-widget.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -75,9 +74,8 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_add_card_button.set_valign(Gtk::Align::CENTER);
     m_add_card_button.set_hexpand(true);
-    m_add_card_button.signal_clicked().connect([this]() {
-        this->__add(this->m_cardlist->container().append(Card{_("New Card")}));
-    });
+    m_add_card_button.signal_clicked().connect(
+        [this]() { this->append_new_card(Card{_("New Card")}); });
     m_root.append(m_add_card_button);
 
     m_header.insert_at_start(*this);
@@ -101,8 +99,10 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
           }},
          {"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              this->board.insert_new_cardlist_after(CardList{_("New Cardlist")},
-                                                    this);
+              auto cardlist_widget = this->board.insert_new_cardlist_after(
+                  CardList{_("New Cardlist")}, this);
+              cardlist_widget->grab_focus();
+
               return true;
           }},
          {"<Control>Delete",
@@ -364,7 +364,7 @@ void CardlistWidget::setup_drag_and_drop() {
                 if (!this->is_child(*dropped_card)) {
                     auto card_in_dropped = dropped_card->get_card();
                     dropped_card->remove_from_parent();
-                    this->__add(card_in_dropped);
+                    this->append_new_card(*card_in_dropped);
 
                     spdlog::get("ui")->debug(
                         "[CardlistWidget] CardWidget \"{}\" has been dropped "
@@ -413,3 +413,4 @@ sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
     return remove_card_signal;
 }
 }  // namespace ui
+
