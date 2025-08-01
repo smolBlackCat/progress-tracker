@@ -105,17 +105,24 @@ void AppContext::on_board_loaded() {
         m_board_load_thread = nullptr;
 
         if (!m_timeout_save_task.empty()) {
-            // The timeout task may not have had the opportunity to exit on its
-            // own. Close it before scheduling a new timeout task
+            // The timeout task may not have had the opportunity to exit on
+            // its own. Close it before scheduling a new timeout task
             m_timeout_save_task.disconnect();
             spdlog::get("app")->debug(
                 "[AppContext] Existing timeout task has been disconnected");
         }
 
-        // Schedule a worker thread saving the current board every SAVE_INTERVAL
+        // Schedule a worker thread saving the current board every
+        // SAVE_INTERVAL
         m_timeout_save_task = Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &AppContext::timeout_save_board_task),
             AppContext::SAVE_INTERVAL);
+
+        // Schedule a single update to the next card in index m_next_card_i
+        // every UPDATE_INTERVAL
+        m_timeout_cards_update_task = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &AppContext::timeout_update_cards_task),
+            AppContext::UPDATE_INTERVAL);
     } else {
         // Board has failed to load. Go back to previous state
 
@@ -157,7 +164,8 @@ bool AppContext::idle_load_board_widget_task() {
     if (m_session_flags[States::CLEARING]) {
         spdlog::get("app")->warn(
             "[AppContext] Current session (\"{}\") attempted to load new "
-            "widgets, but remainings from a previous session was not cleared "
+            "widgets, but remainings from a previous session was not "
+            "cleared "
             "yet",
             m_current_board->get_name());
         return true;
@@ -188,10 +196,6 @@ bool AppContext::idle_load_board_widget_task() {
     }
     m_cardlist_i++;
 
-    m_timeout_cards_update_task = Glib::signal_timeout().connect(
-        sigc::mem_fun(*this, &AppContext::timeout_update_cards_task),
-        AppContext::UPDATE_INTERVAL);
-
     m_session_flags[States::LOADING] = true;
     m_session_flags[States::BUSY] = true;
     return true;
@@ -213,7 +217,6 @@ bool AppContext::idle_clear_board_widget_task() {
     return true;
 }
 
-// FIXME: This procedure is executed even when m_current board is not available
 bool AppContext::timeout_save_board_task() {
     if (!m_current_board) {
         // There is no board to save, stop this timeout procedure
@@ -240,7 +243,8 @@ bool AppContext::timeout_save_board_task() {
         }
     } else {
         spdlog::get("app")->debug(
-            "[AppContext] No modifications registered. Don't scheduled save "
+            "[AppContext] No modifications registered. Don't scheduled "
+            "save "
             "thread");
         return true;
     }
@@ -275,6 +279,9 @@ bool AppContext::timeout_update_cards_task() {
     }
 
     // We stop running at this point
+    spdlog::get("app")->debug(
+        "[App Context] Stopping timeout card updates task");
     m_timeout_cards_update_task.disconnect();
     return false;
 }
+

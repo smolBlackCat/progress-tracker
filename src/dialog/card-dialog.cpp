@@ -77,7 +77,7 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
                                                      TaskWidget* sibling) {
     auto new_task = cur_card_widget->get_card()->container().insert_after(
         task, *sibling->task());
-    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task, true);
+    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task, false);
     tasks_box->insert_child_after(*task_widget, *sibling);
     tasks_tracker.push_back(task_widget);
 
@@ -184,7 +184,7 @@ CardWidget* CardDetailsDialog::get_card_widget() { return cur_card_widget; }
 void CardDetailsDialog::on_add_task() {
     _add_task(
         cur_card_widget->get_card()->container().append(Task{_("New Task")}),
-        true);
+        false);
 }
 
 void CardDetailsDialog::on_save() {
