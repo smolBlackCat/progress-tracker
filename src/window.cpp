@@ -1,3 +1,5 @@
+#include "window.h"
+
 #include <app-context.h>
 #include <app_info.h>
 #include <core/exceptions.h>
@@ -9,8 +11,6 @@
 #include <widgets/card-widget.h>
 
 #include <format>
-
-#include "window.h"
 
 namespace ui {
 
@@ -38,7 +38,6 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       progress_settings{progress_settings},
       card_dialog{},
       sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
-
     m_context = new AppContext{*this, board_widget, m_manager};
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -380,10 +379,12 @@ bool ProgressWindow::on_close() {
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
+    int height, width;
+    this->get_default_size(width, height);
 
     progress_settings->set_boolean("window-maximized", is_maximized());
-    progress_settings->set_int("window-height", get_height());
-    progress_settings->set_int("window-width", get_width());
+    progress_settings->set_int("window-height", height);
+    progress_settings->set_int("window-width", width);
 
     spdlog::get("app")->info("Application window has been closed");
     return true;
