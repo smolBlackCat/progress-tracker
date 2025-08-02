@@ -227,7 +227,7 @@ void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
                 add_board_button_p->set_sensitive(false);
                 app_menu_button_p->set_sensitive(false);
 
-                this->m_context->open_board(board_entry.filename);
+                this->m_context->open_session(board_entry.filename);
             } else {
                 if (fb_child_p->is_selected()) {
                     boards_grid_p->unselect_child(*fb_child_p);
@@ -273,7 +273,7 @@ void ProgressWindow::off_delete_board_mode() {
 
 void ProgressWindow::on_main_menu() {
     // Flag idle task to stop running after
-    m_context->close_board();
+    m_context->close_session();
 
     app_stack_p->set_visible_child("board-grid-page");
     sh_window->property_view_name().set_value("board-grid-view");
