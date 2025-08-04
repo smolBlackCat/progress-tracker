@@ -68,7 +68,7 @@ CardDetailsDialog::~CardDetailsDialog() {}
 
 TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     TaskWidget* task_widget =
-        _add_task(cur_card_widget->get_card()->container().append(task), true);
+        _add_task(cur_card_widget->get_card()->container().append(task), false);
 
     return task_widget;
 }

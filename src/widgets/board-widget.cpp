@@ -2,89 +2,13 @@
 
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
+#include <utils.h>
 #include <window.h>
 
-#include <filesystem>
 #include <format>
 
 #include "cardlist-widget.h"
 #include "core/colorable.h"
-#include "gdkmm/pixbuf.h"
-
-namespace fs = std::filesystem;
-
-std::string get_cache_dir() {
-#ifdef WIN32
-    if (const char* local_app_data = std::getenv("LOCALAPPDATA")) {
-        return std::string{local_app_data} + "\\Progress\\Backgrounds";
-    }
-#else
-    if (const char* cache_home = std::getenv("XDG_CACHE_HOME")) {
-        return std::string{cache_home} + "/progress/backgrounds";
-    } else {
-        return std::string{std::getenv("HOME")} +
-               "/.cache/progress/backgrounds";
-    }
-#endif
-}
-
-const std::string ui::BackgroundProvider::CACHE_DIR = get_cache_dir();
-
-ui::BackgroundProvider::BackgroundProvider() {}
-
-std::string ui::BackgroundProvider::compressed_filename(
-    const std::string& image_filename) {
-    std::string filename_checksum = Glib::Checksum::compute_checksum(
-        Glib::Checksum::Type::MD5, image_filename);
-
-    // Cache hit
-    const fs::path cached_image = fs::path{CACHE_DIR} / filename_checksum;
-    if (fs::exists(cached_image)) {
-        spdlog::get("ui")->debug("[BackgroundProvider] Cache hit");
-        return cached_image.string();
-    } else {
-        // Compresses the given image file and return the compressed's filename
-        spdlog::get("ui")->debug(
-            "[BackgroundProvider] There was no compressed file available. "
-            "Compress it");
-        return create_compressed(image_filename);
-    }
-}
-
-std::string ui::BackgroundProvider::create_compressed(
-    const std::string& filename, ImageQuality quality) {
-    // We ensure a cache directory exists at all times
-    fs::create_directories(CACHE_DIR);
-
-    std::string compressed_f = std::format(
-        "{}/{}", CACHE_DIR,
-        Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, filename));
-
-    auto image_pixbuf = Gdk::Pixbuf::create_from_file(filename);
-    Glib::RefPtr<Gdk::Pixbuf> compressed_image;
-
-    switch (quality) {
-        case BackgroundProvider::LOW: {
-            compressed_image =
-                image_pixbuf->scale_simple(720, 480, Gdk::InterpType::BILINEAR);
-            break;
-        }
-        case BackgroundProvider::MEDIUM: {
-            compressed_image = image_pixbuf->scale_simple(
-                1280, 720, Gdk::InterpType::BILINEAR);
-            break;
-        }
-        case BackgroundProvider::HIGH: {
-            compressed_image = image_pixbuf->scale_simple(
-                1920, 1080, Gdk::InterpType::BILINEAR);
-            break;
-        }
-    }
-
-    compressed_image->save(compressed_f, "png");
-
-    return compressed_f;
-}
 
 ui::BoardWidget::BoardWidget(BoardManager& manager)
     : Gtk::ScrolledWindow{},
@@ -121,7 +45,7 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_css_provider->load_from_data(CSS_FORMAT);
 
     m_add_button.signal_clicked().connect(
-        [this]() { add_new_cardlist(CardList{_("New CardList")}, true); });
+        [this]() { add_new_cardlist(CardList{_("New CardList")}, false); });
     m_add_button.set_valign(Gtk::Align::START);
     m_add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
     m_add_button.add_css_class("opaque");
@@ -348,7 +272,7 @@ void ui::BoardWidget::__set_background(const std::string& background) {
             break;
         }
         case BackgroundType::IMAGE: {
-            picture.set_filename(bg_provider.compressed_filename(background));
+            picture.set_filename(compressed_bg_filename(background));
             picture.set_visible(true);
             break;
         }
@@ -372,7 +296,7 @@ void ui::BoardWidget::__set_background(const std::string& background) {
         }
         case BackgroundType::IMAGE: {
             m_css_provider->load_from_data(std::format(
-                CSS_FORMAT_FILE, bg_provider.compressed_filename(background)));
+                CSS_FORMAT_FILE, compressed_bg_filename(background)));
             break;
         }
         case BackgroundType::INVALID: {

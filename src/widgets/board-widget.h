@@ -6,30 +6,6 @@
 namespace ui {
 class CardlistWidget;
 
-typedef int ImageQuality;
-
-/**
- * @brief Helper class for delivering compressed background images
- */
-class BackgroundProvider {
-public:
-    static const std::string CACHE_DIR;
-
-    enum { HIGH, MEDIUM, LOW };
-    BackgroundProvider();
-
-    /**
-     * @brief Returns the compressed counterpart's filename of the given image
-     * filename
-     */
-    std::string compressed_filename(const std::string& image_filename);
-
-protected:
-    std::string create_compressed(
-        const std::string& filename,
-        ImageQuality quality = BackgroundProvider::MEDIUM);
-};
-
 /**
  * @brief Widget that holds a list of CardLists
  */
@@ -189,7 +165,6 @@ protected:
 
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
-    BackgroundProvider bg_provider;
 
     sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
         remove_cardlist_signal;
@@ -202,10 +177,11 @@ protected:
     Gtk::Button m_add_button;
     std::shared_ptr<Board> m_board = nullptr;
     Glib::RefPtr<Gtk::CssProvider> m_css_provider;
+
+    // FIXME: This may be redundant
     std::vector<ui::CardlistWidget*> m_cardlists;
     double x, y;
     bool m_on_scroll = false;
 };
 
 }  // namespace ui
-

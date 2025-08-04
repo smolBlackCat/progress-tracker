@@ -3,6 +3,7 @@
 #include <adwaita.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
+#include <utils.h>
 
 #include "core/colorable.h"
 
@@ -92,7 +93,7 @@ void BoardDialog::on_filedialog_finish(
     const Glib::RefPtr<Gtk::FileDialog>& dialog) {
     try {
         image_filename = dialog->open_finish(result)->get_path();
-        set_picture(image_filename);
+        set_picture(compressed_thumb_filename(image_filename));
     } catch (Glib::Error& err) {
         spdlog::get("ui")->warn("[BoardDialog] {}", err.what());
     }

@@ -1,7 +1,7 @@
 #include "board-card-button.h"
 
 #include <spdlog/spdlog.h>
-
+#include <utils.h>
 #include <string>
 
 ui::BoardCardButton::BoardCardButton(LocalBoard board_entry)
@@ -61,8 +61,8 @@ void ui::BoardCardButton::set_background(const std::string& background) {
             break;
         }
         case BackgroundType::IMAGE: {
-            auto board_bg_image =
-                Gdk::Pixbuf::create_from_file(background, 256, 256, false);
+            auto board_bg_image = Gdk::Pixbuf::create_from_file(
+                compressed_thumb_filename(background), 256, 256, false);
             board_thumbnail.set(board_bg_image);
             break;
         }
