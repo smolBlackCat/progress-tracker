@@ -54,7 +54,7 @@ protected:
     /**
      * @brief Resets to context's variables to an initial state
      */
-    void reset_state();
+    void reset_session_state();
 
     /**
      * @brief Schedule auto-save, widgets updating, and lazy loading tasks to
@@ -93,4 +93,7 @@ protected:
     std::vector<ui::CardWidget *> m_cards;
     ssize_t m_next_card_i = 0;
     ssize_t m_cardlist_i = 0;
+
+private:
+    void register_cardlist_container_update(ui::CardlistWidget* cardlist);
 };
