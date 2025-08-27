@@ -68,7 +68,7 @@ whether the system's C++ compiler is C++20 compliant.
 2. Clone the project's repository
 
    ```sh
-   git clone https://github.com/smolBlackCat/progress-tracker.git
+   git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
    ```
 
 3. Configure and compile project.
@@ -76,8 +76,7 @@ whether the system's C++ compiler is C++20 compliant.
    ```sh
    cd progress-tracker/
 
-   # Use -DDEVELOPMENT=ON to build the application in development mode
-   cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_PREFIX=Release
+   cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX=/usr -DDEVELOPMENT=OFF
    cmake --build build/
    ```
 
@@ -104,18 +103,18 @@ before proceeding.
 2. Clone the project's repository
 
    ```sh
-   git clone https://github.com/smolBlackCat/progress-tracker.git
+   git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
    ```
 
 3. Configure and compile project
 
    ```sh
    cd progress-tracker/
-   cmake -S . -B build/ -DCMAKE_BUILD_PREFIX=Release
+   cmake -S . -B build/ -DDEVELOPMENT=OFF
    cmake --build build/
    ```
 
-4. Build the Progress installer
+4. Build the Progress installer and ZIP file
 
    ```sh
    cd build/
