@@ -3,51 +3,41 @@ name: Progress CI
 on: ["push", "pull_request"]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  windows:
+    runs-on: windows-latest
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
         development-modes: [ON, OFF]
 
     defaults:
       run:
-        shell: msys2 {0}  # Default shell for Windows
+        shell: msys2 {0}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Environment
-        run: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            echo "Setting up MSYS2 environment..."
-            # Setup for Windows
-            uses: msys2/setup-msys2@v2
-            with:
-              msystem: UCRT64
-              update: true
-              install: |
-                mingw-w64-ucrt-x86_64-gcc
-                mingw-w64-ucrt-x86_64-cmake
-                mingw-w64-ucrt-x86_64-python
-                mingw-w64-ucrt-x86_64-gtkmm4
-                mingw-w64-ucrt-x86_64-libadwaita
-                mingw-w64-ucrt-x86_64-tinyxml2
-                mingw-w64-ucrt-x86_64-gettext
-                mingw-w64-ucrt-x86_64-catch
-                mingw-w64-ucrt-x86_64-spdlog
-                mingw-w64-ucrt-x86_64-nsis
-                git
-          else
-            echo "Installing dependencies for Linux..."
-            sudo apt update
-            sudo apt install -y libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev libspdlog-dev gettext catch2
-          fi
+      - name: Setup UCRT64 Environment
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: |
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gtkmm4
+            mingw-w64-ucrt-x86_64-libadwaita
+            mingw-w64-ucrt-x86_64-tinyxml2
+            mingw-w64-ucrt-x86_64-gettext
+            mingw-w64-ucrt-x86_64-catch
+            mingw-w64-ucrt-x86_64-spdlog
+            mingw-w64-ucrt-x86_64-nsis
+            git
 
       - name: Build
         run: |
           git submodule update --init
-          cmake -B build -DDEVELOPMENT=${{ matrix.development-modes }} -DCMAKE_CXX_COMPILER=g++-14
+          cmake -GNinja -B build -DDEVELOPMENT=${{matrix.development-modes}}
           cmake --build build
 
       - name: Test
@@ -55,15 +45,14 @@ jobs:
           cd build/
           ctest
 
-      - name: Setup Artifacts
+      - name: Setup Windows Artifacts
         run: |
           cd build/
-          mkdir dev-build
+          mkdir dev-build/
           cpack
-          mv *.exe dev-build/ || true
-          mv *.deb dev-build/ || true
-          mv *.tar.xz dev-build/ || true
-          if [ "${{ matrix.development-modes }}" == "ON" ]; then
+          mv *.exe dev-build/
+          mv *.zip dev-build/
+          if [ "${{matrix.development-modes}}" == "ON" ]; then
             echo "FILENAME=devel" >> $GITHUB_ENV
           else
             echo "FILENAME=prod" >> $GITHUB_ENV
@@ -72,6 +61,54 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ env.FILENAME }}-build
+          name: windows-${{env.FILENAME}}-build
           path: build/dev-build/
 
+  linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        development-modes: [ON, OFF]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Dependencies
+        run: |
+          sudo apt update
+          sudo apt install libgtkmm-4.0-dev
+          sudo apt install libadwaita-1-dev
+          sudo apt install libtinyxml2-dev
+          sudo apt install libspdlog-dev
+          sudo apt install gettext
+          sudo apt install catch2
+
+      - name: Build
+        run: |
+          git submodule update --init
+          cmake -B ${{github.workspace}}/build -DDEVELOPMENT=${{matrix.development-modes}} -DCMAKE_CXX_COMPILER=g++-14
+          cmake --build ${{github.workspace}}/build
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest
+
+      - name: Setup Linux Artifacts
+        run: |
+          cd build/
+          cpack
+          mkdir dev-build
+          mv *.deb dev-build
+          mv *.tar.xz dev-build
+          if [ "${{matrix.development-modes}}" == "ON" ]; then
+            echo "FILENAME=devel" >> $GITHUB_ENV
+          else
+            echo "FILENAME=prod" >> $GITHUB_ENV
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{env.FILENAME}}-build
+          path: build/dev-build
