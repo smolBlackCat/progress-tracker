@@ -5,6 +5,9 @@ on: ["push", "pull_request"]
 jobs:
   windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        development-modes: [ON, OFF]
 
     defaults:
       run:
@@ -34,7 +37,7 @@ jobs:
       - name: Build
         run: |
           git submodule update --init
-          cmake -GNinja -B build -DDEVELOPMENT=ON
+          cmake -GNinja -B build -DDEVELOPMENT=${{matrix.development-modes}}
           cmake --build build
 
       - name: Test
@@ -49,15 +52,24 @@ jobs:
           cpack
           mv *.exe dev-build/
           mv *.zip dev-build/
+          if [ "${{matrix.development-modes}}" == "ON" ]; then
+            echo "FILENAME=devel" >> $GITHUB_ENV
+          else
+            echo "FILENAME=prod" >> $GITHUB_ENV
+          fi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Windows Build
+          name: windows-${{env.FILENAME}}-build
           path: build/dev-build/
 
   linux:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        development-modes: [ON, OFF]
 
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +87,7 @@ jobs:
       - name: Build
         run: |
           git submodule update --init
-          cmake -B ${{github.workspace}}/build -DDEVELOPMENT=ON -DCMAKE_CXX_COMPILER=g++-14
+          cmake -B ${{github.workspace}}/build -DDEVELOPMENT=${{matrix.development-modes}} -DCMAKE_CXX_COMPILER=g++-14
           cmake --build ${{github.workspace}}/build
 
       - name: Test
@@ -89,9 +101,14 @@ jobs:
           mkdir dev-build
           mv *.deb dev-build
           mv *.tar.xz dev-build
+          if [ "${{matrix.development-modes}}" == "ON" ]; then
+            echo "FILENAME=devel" >> $GITHUB_ENV
+          else
+            echo "FILENAME=prod" >> $GITHUB_ENV
+          fi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Linux Build
+          name: linux-${{env.FILENAME}}-build
           path: build/dev-build
