@@ -91,4 +91,3 @@ int main(int argc, char* argv[]) {
         bm.local_close(board);
     }
 }
-
