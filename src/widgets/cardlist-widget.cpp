@@ -220,6 +220,9 @@ void CardlistWidget::remove(CardWidget& card) {
     spdlog::get("app")->info("Card (\"{}\") removed from CardList (\"{}\")",
                              card.get_card()->get_name(),
                              m_cardlist->get_name());
+    if (Gtk::Widget* previous_sibling = card.get_prev_sibling()) {
+        previous_sibling->grab_focus();
+    }
 
     m_root.remove(card);
     m_cardlist->container().remove(*card.get_card());
@@ -246,7 +249,8 @@ CardWidget* CardlistWidget::append_new_card(const Card& card) {
 CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
                                                   ui::CardWidget* sibling) {
     auto cardwidget = Gtk::make_managed<CardWidget>(
-        m_cardlist->container().insert_after(card, *sibling->get_card()), true);
+        m_cardlist->container().insert_after(card, *sibling->get_card()),
+        false);
     m_cards.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     m_root.insert_child_after(*cardwidget, *sibling);

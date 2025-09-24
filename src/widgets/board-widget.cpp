@@ -125,6 +125,10 @@ void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
     spdlog::get("app")->info("Removed CardList (\"{}\")",
                              cardlist.cardlist()->get_name());
 
+    if (Gtk::Widget* previous_sibling = cardlist.get_prev_sibling()) {
+        previous_sibling->grab_focus();
+    }
+
     m_root.remove(cardlist);
     std::erase(m_cardlists, &cardlist);
 

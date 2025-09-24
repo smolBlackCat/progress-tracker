@@ -83,12 +83,18 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
     auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task, false);
     tasks_box->insert_child_after(*task_widget, *sibling);
     tasks_tracker.push_back(task_widget);
+    cur_card_widget->update_complete_tasks_label();
 
     return task_widget;
 }
 
 void CardDetailsDialog::remove_task(TaskWidget& task) {
     auto card = cur_card_widget->get_card();
+
+    if (Gtk::Widget* previous_sibling = task.get_prev_sibling()) {
+        previous_sibling->grab_focus();
+    }
+
     card->container().remove(*task.task());
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
