@@ -1,60 +1,51 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "card.h"
 #include "item.h"
+#include "modifiable.h"
 
 /**
- * @class CardList
- *
- * @brief A class representing a single list of cards inside a board.
+ * @brief Represents a list of cards within a kanban board
  */
-class CardList : public Item {
+class CardList : public Item, public Modifiable {
 public:
     /**
      * @brief CardList constructor;
+     *
+     * @param name name of the card list
      */
     CardList(const std::string& name);
 
     /**
-     * @brief Adds a Card object to the cardlist by moving the Card object
-     * into a newly allocated space.
+     * @brief CardList constructor;
      *
-     * @returns A pointer to the allocated object. It may be nullptr
+     * @param name name of the card list
+     * @param uuid unique identifier of the card list
      */
-    std::shared_ptr<Card> add_card(const Card& card);
+    CardList(const std::string& name, const xg::Guid uuid);
+
+    ~CardList() override;
+
+    void set_name(const std::string& name) override;
+
+    void modify(bool m = true) override;
 
     /**
-     * @brief Removes a Card object from the cardlist.
+     * @brief Returns whether either the object has been modified or its
+     * container has been modified
      *
-     * @param card Card instance.
-     *
-     * @returns True if the card was successfully removed from the cardlist.
-     *          False may be returned when the requested Card to be removed is
-     *          not present in the cardlist.
+     * @return true if either the object or its container has been modified
+     * @return false otherwise
      */
-    bool remove_card(const Card& card);
-
-    bool get_modified() override;
-
-    const std::vector<std::shared_ptr<Card>>& get_card_vector();
+    bool modified() const override;
 
     /**
-     * @brief Reorders the cards in a way that next is put after sibling.
-     *
-     * @param next Card to be put after sibling
-     * @param sibling Card where next will be put after
-     *
-     * @throws std::invalid_argument if either next or sibling are not children
-     * of this cardlist
+     * @brief Returns a reference to the container of cards
      */
-    void reorder_card(std::shared_ptr<Card> next,
-                      std::shared_ptr<Card> sibling);
+    ItemContainer<Card>& container();
 
-private:
-    std::vector<std::shared_ptr<Card>> card_vector;
+protected:
+    ItemContainer<Card> cards;
 
-    bool cards_modified();
+    bool m_modified = false;
 };

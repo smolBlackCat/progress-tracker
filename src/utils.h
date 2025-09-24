@@ -1,17 +1,18 @@
 #include <string>
 
 /**
- * @brief Returns Progress locale folder
+ * @brief Background compression image quality
  */
-std::string locale_folder();
+enum class ImageQuality { HIGH, MEDIUM, LOW };
 
 /**
- * @brief Progress boards folder path
+ * @brief Returns a compressed background image version from the image in
+ * filename
  */
-std::string progress_boards_folder();
+std::string compressed_bg_filename(const std::string& filename,
+                                   ImageQuality quality = ImageQuality::MEDIUM);
 
 /**
- * @brief Generates an unique filename based on a given base and the
- * filename's availability
+ * @brief Returns a thumbnail version of the image in filename
  */
-std::string gen_unique_filename(const std::string& base);
+std::string compressed_thumb_filename(const std::string& filename);

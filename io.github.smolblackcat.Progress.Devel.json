@@ -1,149 +1,172 @@
 {
-	"id": "io.github.smolblackcat.Progress.Devel",
-	"runtime": "org.gnome.Platform",
-	"sdk": "org.gnome.Sdk",
-	"runtime-version": "46",
-	"command": "progress-debug",
-	"finish-args": [
-		"--socket=fallback-x11",
-		"--socket=wayland",
-		"--device=dri",
-		"--share=ipc"
-	],
-	"cleanup": [
-		"*.a",
-		"*.la",
-		"/include",
-		"/lib/pkgconfig",
-		"/man",
-		"/share/aclocal",
-		"/share/man",
-		"/share/pkgconfig"
-	],
-	"modules": [
-		{
-			"name": "gtkmm-4-10",
-			"buildsystem": "meson",
-			"config-opts": [
-				"-Dmaintainer-mode=false",
-				"-Dbuild-demos=false",
-				"-Dbuild-tests=false"
-			],
-			"cleanup": [
-				"/lib/gdkmm-4.0",
-				"/lib/gtkmm-4.0"
-			],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz",
-					"sha256": "e1b109771557ecc53cba915a80b6ede827ffdbd0049c62fdf8bd7fa79afcc6eb"
-				}
-			],
-			"modules": [
-				{
-					"name": "libsigc++",
-					"buildsystem": "meson",
-					"config-opts": [
-						"-Dmaintainer-mode=false",
-						"-Dbuild-examples=false",
-						"-Dbuild-documentation=false"
-					],
-					"cleanup": [
-						"/include/sigc++-3.0",
-						"/lib/sigc++-3.0"
-					],
-					"sources": [
-						{
-							"type": "archive",
-							"url": "https://download.gnome.org/sources/libsigc++/3.0/libsigc++-3.0.7.tar.xz",
-							"sha256": "bfbe91c0d094ea6bbc6cbd3909b7d98c6561eea8b6d9c0c25add906a6e83d733"
-						}
-					]
-				},
-				{
-					"name": "cairomm",
-					"buildsystem": "meson",
-					"config-opts": [
-						"-Dmaintainer-mode=false",
-						"-Dbuild-examples=false",
-						"-Dbuild-tests=false"
-					],
-					"cleanup": [
-						"/lib/cairomm-1.16"
-					],
-					"sources": [
-						{
-							"type": "archive",
-							"url": "https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz",
-							"sha512": "61dc639eabe8502e1262c53c92fe57c5647e5ab9931f86ed51e657df1b7d0e3e58c2571910a05236cc0dca8d52f1f693aed99a553430f14d0fb87be1832a6b62"
-						}
-					]
-				},
-				{
-					"name": "glibmm",
-					"buildsystem": "meson",
-					"config-opts": [
-						"-Dbuild-examples=false"
-					],
-					"cleanup": [
-						"/include/glibmm-2.68",
-						"/include/giomm-2.68",
-						"/lib/glibmm-2.68",
-						"/lib/giomm-2.68",
-						"/lib/libglibmm_generate_extra_defs*"
-					],
-					"sources": [
-						{
-							"type": "archive",
-							"url": "https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.2.tar.xz",
-							"sha256": "91e0a8618f7b82db4aaf2648932ea2bcfe626ad030068c18fa2d106fd838d8ad"
-						}
-					]
-				},
-				{
-					"name": "pangomm",
-					"buildsystem": "meson",
-					"sources": [
-						{
-							"type": "archive",
-							"url": "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.2.tar.xz",
-							"sha256": "1bc5ab4ea3280442580d68318226dab36ceedfc3288f9d83711cf7cfab50a9fb"
-						}
-					],
-					"cleanup": [
-						"/include/pangomm-2.48",
-						"/lib/pangomm-2.48",
-						"/lib/pkgconfig"
-					]
-				}
-			]
-		},
-		{
-			"name": "tinyxml2-10",
-			"buildsystem": "meson",
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/leethomason/tinyxml2.git",
-					"tag": "10.0.0"
-				}
-			]
-		},
-		{
-			"name": "progress-tracker",
-			"buildsystem": "cmake-ninja",
-			"builddir": true,
-			"config-opts": [
-				"-DFLATPAK=True",
-				"-DCMAKE_BUILD_TYPE=Debug"
-			],
-			"sources": [
-				{
-					"type": "dir",
-					"path": "./"
-				}
-			]
-		}
-	]
+  "id": "io.github.smolblackcat.Progress.Devel",
+  "runtime": "org.gnome.Platform",
+  "sdk": "org.gnome.Sdk",
+  "runtime-version": "48",
+  "command": "progress-debug",
+  "finish-args": [
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--device=dri",
+    "--share=ipc"
+  ],
+  "cleanup": [
+    "*.a",
+    "*.la",
+    "/include",
+    "/lib/pkgconfig",
+    "/man",
+    "/share/aclocal",
+    "/share/man",
+    "/share/pkgconfig"
+  ],
+  "modules": [
+    {
+      "name": "gtkmm-4-10",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dmaintainer-mode=false",
+        "-Dbuild-demos=false",
+        "-Dbuild-tests=false"
+      ],
+      "cleanup": ["/lib/gdkmm-4.0", "/lib/gtkmm-4.0"],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://download.gnome.org/sources/gtkmm/4.18/gtkmm-4.18.0.tar.xz",
+          "sha256": "2ee31c15479fc4d8e958b03c8b5fbbc8e17bc122c2a2f544497b4e05619e33ec"
+        }
+      ],
+      "modules": [
+        {
+          "name": "libsigc++",
+          "buildsystem": "meson",
+          "config-opts": [
+            "-Dmaintainer-mode=false",
+            "-Dbuild-examples=false",
+            "-Dbuild-documentation=false"
+          ],
+          "cleanup": ["/include/sigc++-3.0", "/lib/sigc++-3.0"],
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://download.gnome.org/sources/libsigc++/3.6/libsigc++-3.6.0.tar.xz",
+              "sha256": "c3d23b37dfd6e39f2e09f091b77b1541fbfa17c4f0b6bf5c89baef7229080e17"
+            }
+          ]
+        },
+        {
+          "name": "cairomm",
+          "buildsystem": "meson",
+          "config-opts": [
+            "-Dmaintainer-mode=false",
+            "-Dbuild-examples=false",
+            "-Dbuild-tests=false"
+          ],
+          "cleanup": ["/lib/cairomm-1.18"],
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://www.cairographics.org/releases/cairomm-1.18.0.tar.xz",
+              "sha512": "d358a765136e244773b4a0fdcb2d9c81dd0b76f7a27c7108f94df9765f2d790f5f50b5645c09c292efce3e012528f85114d51916450c5fe6fa87d09f5a405d4c"
+            }
+          ]
+        },
+        {
+          "name": "glibmm",
+          "buildsystem": "meson",
+          "config-opts": ["-Dbuild-examples=false"],
+          "cleanup": [
+            "/include/glibmm-2.82",
+            "/include/giomm-2.82",
+            "/lib/glibmm-2.82",
+            "/lib/giomm-2.82",
+            "/lib/libglibmm_generate_extra_defs*"
+          ],
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://download.gnome.org/sources/glibmm/2.82/glibmm-2.82.0.tar.xz",
+              "sha256": "38684cff317273615c67b8fa9806f16299d51e5506d9b909bae15b589fa99cb6"
+            }
+          ]
+        },
+        {
+          "name": "pangomm",
+          "buildsystem": "meson",
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://download.gnome.org/sources/pangomm/2.54/pangomm-2.54.0.tar.xz",
+              "sha256": "4a5b1fd1b7c47a1af45277ea82b5abeaca8e08fb10a27daa6394cf88d74e7acf"
+            }
+          ],
+          "cleanup": [
+            "/include/pangomm-2.48",
+            "/lib/pangomm-2.48",
+            "/lib/pkgconfig"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tinyxml2-10",
+      "buildsystem": "meson",
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/leethomason/tinyxml2.git",
+          "tag": "10.0.0"
+        }
+      ]
+    },
+
+    {
+      "name": "spdlog",
+      "buildsystem": "cmake",
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/gabime/spdlog.git",
+          "branch": "v1.x"
+        }
+      ],
+      "config-opts": [
+        "-DSPDLOG_BUILD_EXAMPLE=OFF",
+        "-DSPDLOG_BUILD_TESTS=OFF",
+        "-DSPDLOG_ENABLE_PCH=ON",
+        "-DSPDLOG_BUILD_SHARED=ON"
+      ]
+    },
+
+    {
+      "name": "catch2",
+      "buildsystem": "cmake",
+      "builddir": true,
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/catchorg/Catch2.git",
+          "tag": "v3.8.0"
+        }
+      ]
+    },
+    {
+      "name": "progress-tracker",
+      "buildsystem": "cmake-ninja",
+      "builddir": true,
+      "config-opts": [
+        "-DDEVELOPMENT=ON",
+        "-DFLATPAK=ON",
+        "-DCMAKE_INSTALL_PREFIX=/app"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "./"
+        }
+      ],
+      "post-install": ["glib-compile-schemas /app/share/glib-2.0/schemas/"]
+    }
+  ]
 }

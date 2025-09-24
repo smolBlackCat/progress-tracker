@@ -1,99 +1,135 @@
 #pragma once
 
+#include <core/card.h>
+#include <core/cardlist.h>
+#include <glibmm/extraclassinit.h>
 #include <gtkmm.h>
 
-#include <memory>
-
-#include "../core/card.h"
-#include "../core/cardlist.h"
+#include "base-item.h"
 #include "board-widget.h"
-#include "card.h"
+#include "card-widget.h"
 #include "editable-label-header.h"
+
+extern "C" {
+static void cardlist_class_init(void* klass, void* user_data);
+}
 
 namespace ui {
 
 class BoardWidget;
 class CardWidget;
 
-/**
- * @brief Class that implements the facilities of a card list widget
- */
-class CardlistWidget : public Gtk::ListBox {
+class CardlistInit : public Glib::ExtraClassInit {
 public:
-    static constexpr int CARDLIST_SIZE = 240;
+    CardlistInit();
+};
+
+/**
+ * @brief Cardlist Widget
+ */
+class CardlistWidget : public CardlistInit, public BaseItem {
+public:
+    static constexpr int CARDLIST_MAX_WIDTH = 240;
 
     /**
-     * @brief CardlistWidget's constructor
+     * @brief CardlistWidget constructor
      *
-     * @param board BoardWidget reference to where this widget belongs
-     * @param cardlist_refptr CardList smart pointer that this widget is allowed
-     *        to change
-     * @param is_new Indicates whether it's completely new, therefore giving the
-     *        user the chance to cancel creation
+     * @param parent_board BoardWidget reference
+     * @param cardlist CardList data
+     * @param editing_mode Boolean indicating whether the card list widget
+     * should start in editing mode. Default is false.
      */
-    CardlistWidget(BoardWidget& board,
-                   std::shared_ptr<CardList> cardlist_refptr,
-                   bool is_new = false);
+    CardlistWidget(BoardWidget& parent_board,
+                   const std::shared_ptr<CardList>& cardlist,
+                   bool editing_mode = false);
 
     /**
-     * @brief Adds a CardWidget object based on the given Card
+     * @brief Reorders card widget "next" after card widget "sibling".
      *
-     * @param card Card object
-     * @param editing_mode Boolean indicating whether the card widget should
-     * start in editing mode. Default is false
-     *
-     * @return The created CardWidget object pointer
+     * @param next Reference to the CardWidget to be placed after the sibling.
+     * @param sibling Reference to the CardWidget to be placed before the next.
      */
-    ui::CardWidget* add_card(const Card& card, bool editing_mode = false);
+    void reorder(ui::CardWidget& next, ui::CardWidget& sibling);
 
     /**
-     * @brief Removes the specified CardWidget
+     * @brief Removes CardWidget instance
      *
-     * @param card Pointer to the CardWidget to be deleted.
+     * @param card CardWidget reference to remove
      */
-    void remove_card(ui::CardWidget* card);
+    void remove(ui::CardWidget& card);
+
+    /**
+     * @brief Appends a CardWidget object reference.
+     */
+    void append(ui::CardWidget& card);
+
+    /**
+     * @brief appends a new card object to the underlying cardlist object and a
+     * CardWidget object
+     */
+    ui::CardWidget* append_new_card(const Card& card);
+
+    ui::CardWidget* insert_new_card_after(const Card& card,
+                                          ui::CardWidget* sibling);
+
+    /**
+     * @brief Determines whether this CardlistWidget instance is the given
+     * CardWidget instance's parent
+     *
+     * @param card CardWidget instance reference
+     *
+     * @return True if this instance is card's parent, otherwise false
+     */
+    bool is_child(ui::CardWidget& card);
+
+    /**
+     * @brief Access the card widgets tracker vector.
+     *
+     * @return Reference to the vector of CardWidget pointers.
+     */
+    const std::vector<ui::CardWidget*>& cards();
 
     /**
      * @brief Retrieves the underlying CardList smart pointer.
      *
      * @return Reference to the CardList smart pointer.
      */
-    std::shared_ptr<CardList>& get_cardlist_refptr();
+    const std::shared_ptr<CardList>& cardlist();
 
-    /**
-     * @brief Determines whether a given CardWidget object belongs to this
-     *        CardlistWidget instance.
-     *
-     * @param card Pointer to the CardWidget object to check
-     *
-     * @return True if the CardWidget belongs to this CardlistWidget,
-     *         false otherwise.
-     */
-    bool is_child(ui::CardWidget* card);
+    sigc::signal<void(CardWidget*)>& signal_card_added();
+    sigc::signal<void(CardWidget*)>& signal_card_removed();
 
-    /**
-     * @brief Returns CardListHeader object associated with this CardlistWidget
-     *        instance.
-     *
-     * @return Reference to the CardListHeader object.
-     */
-    EditableLabelHeader& get_header();
-
-    bool is_new;
     BoardWidget& board;
 
-    void reorder_cardwidget(ui::CardWidget& next, ui::CardWidget& sibling);
+protected:
+    CardWidget* __add(const std::shared_ptr<Card>& card,
+                      bool editing_mode = false);
 
-private:
+    /**
+     * @brief Sets up drag and drop functionality for the card list widget.
+     */
     void setup_drag_and_drop();
 
+    void cleanup() override;
+
     // Widgets
-    EditableLabelHeader cardlist_header;
-    Gtk::Button add_card_button;
-    Gtk::Box root;
+    EditableLabelHeader m_header;
+    Gtk::ScrolledWindow m_scr_window;
+    Gtk::Button m_add_card_button;
+    Gtk::PopoverMenu m_popover;
+    Gtk::Box m_root;
 
     // Data
-    std::shared_ptr<CardList> cardlist_refptr;
-    std::vector<ui::CardWidget*> cards_tracker;
+    std::shared_ptr<CardList> m_cardlist;
+    std::vector<ui::CardWidget*> m_cards;
+
+    // Signals
+    sigc::signal<void(CardWidget*)> add_card_signal;
+    sigc::signal<void(CardWidget*)> remove_card_signal;
+
+    ssize_t card_index = 0;
+    bool m_new;
 };
+
 }  // namespace ui
+

@@ -2,55 +2,51 @@
 
 #include <tinyxml2.h>
 
-#include <vector>
+#include <string>
 
 #include "cardlist.h"
+#include "item-container.h"
 #include "item.h"
+#include "modifiable.h"
 
 enum class BackgroundType { COLOR, IMAGE, INVALID };
 
+using namespace std::chrono;
+
+class BoardManager;
+
 /**
- * @class Board
- *
- * @brief A class representing the kanban-style board of the application,
+ * @brief Kanban Board
  */
-class Board : public Item {
+class Board : public Item, public Modifiable {
 public:
-    Board();
-
     /**
-     * @brief Board constructor.
+     * @brief Returns the type of a given background
      *
-     * @param name The board's name.
-     * @param background The board's background. It can be either a path to an
-     *                   image or a solid colour RGBA representation.
+     * @returns a BackgroundType enum informing the background's type
      */
+    static BackgroundType get_background_type(const std::string& background);
+
+    // Black colour
+    static const std::string BACKGROUND_DEFAULT;
+
+    friend BoardManager;
+    friend std::shared_ptr<Board> unitialized_board(const std::string& filename);
+
+    Board() = delete;
     Board(const std::string& name, const std::string& background);
+    Board(const std::string& name, const std::string& background,
+          const xg::Guid uuid);
+
+    ~Board();
+
+    void set_name(const std::string& name) override;
 
     /**
-     * @brief Constructs a Board object from a filepath
-     *
-     * @param board_file_path valid path name pointing to a valid board xml file
-     *
-     * @details It's completely necessary for the filepath given to be valid,
-     * that is, the file exists and the syntax of Progress Boards checks out.
-     *
-     * @throws std::domain_error if the board_file_path is not valid at all
+     * @brief Sets the board background image or colour
      */
-    Board(const std::string& board_file_path);
-
-    /**
-     * @brief Changes the background information of the board. If the given
-     *        background is BackgroundType::INVALID, then the background will
-     *        fall back for a default defined in Board::BACKGROUND_DEFAULT.
-     *
-     * @param other The new background.
-     * @param modify flag indicating whether to count this operation as a
-     * modification
-     *
-     * @returns a BackgroundType for later processing. It may be ignored
-     */
-    BackgroundType set_background(const std::string& other, bool modify = true);
+    void set_background(const std::string& image_filename);
+    void set_background(const Color& color);
 
     /**
      * @brief Returns the current background value
@@ -60,81 +56,38 @@ public:
     std::string get_background() const;
 
     /**
-     * @brief Sets a file path to where the board will be saved.
-     *
-     * @param filepath absolute path where the board will be saved
-     *
-     * @param create_dirs Flag indicating whether filepath's parent directory
-     * can be created if it does not exist
-     *
-     * @returns true if the path was set successfully, otherwise false.
+     * @brief Get last modification time in seconds
      */
-    bool set_filepath(const std::string& file_path, bool create_dirs = true);
+    time_point<system_clock, seconds> get_last_modified() const;
 
     /**
-     * @brief Adds a CardList object to the board by moving the contents to a
-     * dynamic allocated space.
-     *
-     * @param cardlist CardList object
-     *
-     * @returns a CardList pointer to the newly allocated object.
+     * @brief Returns true if either the board data or the board's container has
+     * been modified
      */
-    std::shared_ptr<CardList> add_cardlist(const CardList& cardlist);
+    bool modified() const override;
 
     /**
-     * @brief Removes a CardList object from the board and free the allocated
-     * space linked to the cardlist object.
-     *
-     * @returns True if the CardList object is removed from the board.
-     *          False is returned if the CardList object requested to be
-     *          removed isn't in the board.
-     */
-    bool remove_cardlist(const CardList& cardlist);
+     * @brief Sets board as modified */
+    void modify(bool m = true) override;
 
     /**
-     * @brief Reorders the next card after sibling
+     * @brief Returns the container of the board
+     *
+     * @returns The container reference of the board
      */
-    void reorder_cardlist(std::shared_ptr<CardList> next,
-                          std::shared_ptr<CardList> sibling);
+    ItemContainer<CardList>& container();
 
-    /**
-     * @brief Saves the board information as a file.
-     *
-     * @param create_dirs Flag indicating whether filepath's parent directory
-     * can be created if it does not exist
-     *
-     * @details This method will create a new file based on the board's name. It
-     *          will start numbering the files in case there are boards with the
-     *          same name.
-     *
-     * @returns True if the file was created sucessfully. False may be returned
-     * when the board's filepath is invalid (e.g parent directory does not
-     * exist and create_dirs is false or an OS error).
-     */
-    bool save_as_xml(bool create_dirs = true);
+    sigc::signal<void(std::string)>& signal_background();
+    sigc::signal<void(std::string)>& signal_description();
 
-    std::string get_filepath() const;
+protected:
+    std::string m_background, m_description;
+    time_point<system_clock, seconds> m_last_modified;
+    ItemContainer<CardList> m_cardlists;
 
-    const std::vector<std::shared_ptr<CardList>>& get_cardlist_vector();
+    bool m_modified = false;
 
-    /**
-     * @brief Returns true if the board was modified in some way, otherwise
-     * False.
-     *
-     * @returns Boolean indicating if the board was modified.
-     */
-    bool get_modified() override;
-
-    /**
-     * @brief Returns the type of a given background
-     *
-     * @returns a BackgroundType enum informing the background's type
-     */
-    static BackgroundType get_background_type(const std::string& background);
-
-    static const std::string BACKGROUND_DEFAULT;
-
-private:
-    std::string background, file_path;
-    std::vector<std::shared_ptr<CardList>> cardlist_vector;
+    // Signals
+    sigc::signal<void(std::string)> m_background_signal;
+    sigc::signal<void(std::string)> m_description_signal;
 };

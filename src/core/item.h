@@ -1,8 +1,14 @@
 #pragma once
+#include <sigc++/signal.h>
 
-#include <tinyxml2.h>
-
+#include <guid.hpp>
 #include <string>
+
+enum class ReorderingType {
+    UPDOWN,
+    DOWNUP,
+    INVALID,
+};
 
 /**
  * @class Item
@@ -17,8 +23,9 @@ public:
      * @param name The item's name.
      */
     Item(const std::string& name);
+    Item(const std::string& name, xg::Guid uuid);
 
-    virtual ~Item() = default;
+    virtual ~Item();
 
     /**
      * @brief Changes the object's name.
@@ -28,11 +35,6 @@ public:
     virtual void set_name(const std::string& other);
 
     /**
-     * @brief Sets modified state
-     */
-    virtual void set_modified(bool modified);
-
-    /**
      * @brief Gets the name of the object.
      *
      * @returns String as the name of the object.
@@ -40,21 +42,25 @@ public:
     virtual std::string get_name() const;
 
     /**
-     * @brief Produces true if the Item object was modified.
-     */
-    virtual bool get_modified();
-
-    /**
      * @brief Gets the object's ID.
      *
      * @returns The integer as the object's ID.
      */
-    virtual unsigned long long get_id() const;
+    virtual xg::Guid get_id() const;
+
+    /**
+     * @brief Signal emitted when the item's name is changed.
+     *
+     * @returns Reference to the signal.
+     */
+    sigc::signal<void()>& signal_name_changed();
 
     bool operator==(const Item& Item) const;
 
 protected:
     std::string name;
-    unsigned long long id;
-    bool modified = false;
+    xg::Guid uuid;
+
+    // Signals
+    sigc::signal<void()> name_changed;
 };

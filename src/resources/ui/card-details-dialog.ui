@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Cambalache 0.94.1 -->
+<interface>
+	<!-- interface-name carddetailsdialog.ui -->
+	<!-- interface-description Describes the structure for a Dialog containing
+a Card object details. -->
+	<!-- interface-authors Gabriel de Moura -->
+	<requires lib="gtk" version="4.12"/>
+	<requires lib="libadwaita" version="1.5"/>
+	<object class="AdwDialog" id="card-dialog">
+		<property name="can-close">True</property>
+		<property name="child">
+			<object class="AdwToolbarView">
+				<child type="top">
+					<object class="AdwHeaderBar"/>
+				</child>
+				<child>
+					<object class="GtkScrolledWindow">
+						<property name="hexpand">true</property>
+						<property name="hscrollbar-policy">never</property>
+						<property name="propagate-natural-height">true</property>
+						<property name="propagate-natural-width">true</property>
+						<property name="vexpand">true</property>
+						<child>
+							<object class="GtkBox" id="card-dialog-box">
+								<property name="margin-end">20</property>
+								<property name="margin-start">20</property>
+								<property name="margin-top">20</property>
+								<property name="orientation">vertical</property>
+								<property name="spacing">30</property>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">2</property>
+										<child>
+											<object class="GtkLabel">
+												<property name="css-classes">title-4</property>
+												<property name="halign">start</property>
+												<property name="label" translatable="yes">Card Title</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkEntry" id="card-title-entry"/>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">2</property>
+										<child>
+											<object class="GtkLabel">
+												<property name="css-classes">title-4</property>
+												<property name="halign">start</property>
+												<property name="label" translatable="yes">Deadline</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkBox">
+												<property name="spacing">4</property>
+												<child>
+													<object class="GtkMenuButton" id="date-menubutton">
+														<property name="label" translatable="yes">Set Due Date</property>
+														<property name="popover">
+															<object class="GtkPopover">
+																<property name="child">
+																	<object class="GtkBox">
+																		<property name="orientation">vertical</property>
+																		<child>
+																			<object class="GtkButton" id="unset-due-date-button">
+																				<property name="has-frame">False</property>
+																				<property name="label" translatable="yes">Unset Due Date</property>
+																			</object>
+																		</child>
+																		<child>
+																			<object class="GtkSeparator"/>
+																		</child>
+																		<child>
+																			<object class="GtkCalendar" id="calendar"/>
+																		</child>
+																	</object>
+																</property>
+															</object>
+														</property>
+													</object>
+												</child>
+												<child>
+													<object class="GtkRevealer" id="checkbutton-revealer">
+														<property name="child">
+															<object class="GtkCheckButton" id="checkbutton">
+																<property name="tooltip-text" translatable="yes">Mark this card complete</property>
+															</object>
+														</property>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">2</property>
+										<child>
+											<object class="GtkLabel">
+												<property name="css-classes">title-4</property>
+												<property name="halign">start</property>
+												<property name="label" translatable="yes">Checklist</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkFrame">
+												<child>
+													<object class="GtkScrolledWindow">
+														<property name="child">
+															<object class="GtkBox" id="tasks-box">
+																<property name="margin-top">5</property>
+																<property name="orientation">vertical</property>
+																<property name="spacing">5</property>
+																<property name="vexpand">True</property>
+															</object>
+														</property>
+														<property name="has-frame">True</property>
+														<property name="hscrollbar-policy">never</property>
+														<property name="max-content-height">600</property>
+														<property name="min-content-height">175</property>
+														<property name="propagate-natural-height">True</property>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">2</property>
+										<child>
+											<object class="GtkLabel">
+												<property name="css-classes">title-4</property>
+												<property name="halign">start</property>
+												<property name="label" translatable="yes">Notes</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkFrame">
+												<child>
+													<object class="GtkScrolledWindow">
+														<property name="child">
+															<object class="GtkTextView" id="notes-textview">
+															  <property name="justification">GTK_JUSTIFY_FILL</property>
+																<property name="buffer">
+																	<object class="GtkTextBuffer" id="notes-textbuffer"/>
+																</property>
+																<property name="vexpand">True</property>
+																<property name="wrap-mode">word-char</property>
+															</object>
+														</property>
+														<property name="hscrollbar-policy">never</property>
+														<property name="max-content-height">400</property>
+														<property name="min-content-height">120</property>
+														<property name="propagate-natural-height">True</property>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkButton" id="delete-card-button">
+										<style>
+											<class name="destructive-action"/>
+										</style>
+										<property name="has-frame">False</property>
+										<property name="label" translatable="yes">Delete Card</property>
+										<property name="margin-bottom">8</property>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</property>
+		<property name="follows-content-size">True</property>
+		<property name="title" translatable="yes">Card Details</property>
+		<property name="width-request">380</property>
+	</object>
+</interface>
+

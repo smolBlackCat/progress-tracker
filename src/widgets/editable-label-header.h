@@ -21,20 +21,22 @@ namespace ui {
  */
 class EditableLabelHeader : public Gtk::Box {
 public:
+    static constexpr int BOX_SPACING = 4;
     EditableLabelHeader();
     EditableLabelHeader(const std::string& label,
                         const std::string& label_css_class = "",
                         const std::string& entry_css_class = "");
 
-    std::string get_text();
+    std::string get_text() const;
 
     virtual void set_label(const std::string& new_label);
 
     /**
-     * @brief Add an extra option to be selected in the menu button
+     * @brief Add an option to the EditableLabelHeader main menu
      */
-    void add_option(const std::string& name, const std::string& title_name,
-                    const Gio::ActionMap::ActivateSlot& procedure);
+    void add_option_button(const std::string& title_name,
+                           const std::string& name,
+                           const Glib::SlotSpawnChildSetup& procedure);
 
     /**
      * @brief Changes the widget view to editing mode
@@ -46,26 +48,32 @@ public:
      */
     void exit_editing_mode();
 
-    sigc::signal_with_accumulator<void, void, std::string>& signal_confirm();
+    Glib::RefPtr<Gio::Menu> get_menu_model() const;
+    Glib::RefPtr<Gio::SimpleActionGroup> get_menu_actions() const;
 
-    sigc::signal_with_accumulator<void, void, std::string>& signal_cancel();
+    sigc::signal<void(std::string)>& signal_on_confirm();
+
+    sigc::signal<void(std::string)>& signal_on_cancel();
 
 protected:
     Gtk::Box editing_box{Gtk::Orientation::HORIZONTAL},
         label_box{Gtk::Orientation::HORIZONTAL};
     Gtk::Revealer revealer;
+
     Gtk::Label label;
     Gtk::Entry entry;
     Gtk::Button confirm_changes_button, cancel_changes_button;
+
+    Glib::RefPtr<Gio::SimpleActionGroup> menu_actions;
+    Glib::RefPtr<Gio::Menu> menu;
     Gtk::MenuButton menu_button;
 
-    Glib::RefPtr<Gio::SimpleActionGroup> actions;
-    Glib::RefPtr<Gio::Menu> menu;
+    Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
     Glib::RefPtr<Gtk::EventControllerKey> key_controller;
     Glib::RefPtr<Gtk::GestureClick> click_controller;
 
-    sigc::signal_with_accumulator<void, void, std::string> on_confirm_signal;
-    sigc::signal_with_accumulator<void, void, std::string> on_cancel_signal;
+    sigc::signal<void(std::string)> on_confirm_signal;
+    sigc::signal<void(std::string)> on_cancel_signal;
 
     /**
      * @brief Updates the label
@@ -76,5 +84,10 @@ protected:
      * @brief Cancels the changes made to this label
      */
     void on_cancel_changes();
+
+    void on_key_released(guint keyval, guint keycode, Gdk::ModifierType state);
+
+    void on_mouse_button_released(int n_press, double x, double y);
 };
 }  // namespace ui
+

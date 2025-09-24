@@ -1,137 +1,152 @@
 #include "window.h"
 
+#include <app-context.h>
+#include <app_info.h>
+#include <core/exceptions.h>
+#include <dialog/create_board_dialog.h>
+#include <dialog/preferences-board-dialog.h>
 #include <glibmm/i18n.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+#include <widgets/card-widget.h>
 
-#include <filesystem>
 #include <format>
-#include <iostream>
-
-#include "app_info.h"
-#include "core/exceptions.h"
-#include "dialog/create_board_dialog.h"
-#include "dialog/preferences-board-dialog.h"
-#include "widgets/board-card-button.h"
 
 namespace ui {
 
-ProgressAboutDialog::ProgressAboutDialog(Gtk::Window& parent)
-    : parent{parent} {}
-
-ProgressAboutDialog::~ProgressAboutDialog() { g_object_unref(about_dialogp); }
-
-void ProgressAboutDialog::show() {
-    setup();
-    adw_dialog_present(ADW_DIALOG(about_dialogp), parent.gobj());
-}
-
-void ProgressAboutDialog::setup() {
-    about_dialogp = adw_about_dialog_new();
-
-    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(about_dialogp),
-                                          "Progress");
-    adw_about_dialog_set_version(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
-            .c_str());
-    adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(about_dialogp),
-                                        "Gabriel de Moura");
-
-    adw_about_dialog_set_translator_credits(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        // Translators: Replace "translator-credits" with your names, one name
-        // per line
-        _("translator-credits"));
-
-    adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(about_dialogp),
-                                      GTK_LICENSE_MIT_X11);
-    adw_about_dialog_set_copyright(ADW_ABOUT_DIALOG(about_dialogp),
-                                   _("De Moura © All rights reserved"));
-    adw_about_dialog_set_issue_url(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        "https://github.com/smolBlackCat/progress-tracker/issues");
-    adw_about_dialog_set_website(
-        ADW_ABOUT_DIALOG(about_dialogp),
-        "https://github.com/smolBlackCat/progress-tracker");
-    adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(about_dialogp),
-                                          APPLICATION_ID);
-}
-
-DeleteBoardsBar::DeleteBoardsBar(ui::ProgressWindow& app_window)
-    : Gtk::Revealer{},
-      root{Gtk::Orientation::HORIZONTAL},
-      bar_text{_("Select the boards to be deleted")},
-      bar_button_delete{_("Delete")},
-      bar_button_cancel{_("Cancel")},
-      app_window{app_window} {
-    set_child(root);
-    add_css_class("delete-board-infobar");
-    bar_text.add_css_class("delete-board-infobar-text");
-    set_transition_type(Gtk::RevealerTransitionType::SLIDE_UP);
-
-    bar_text.set_margin(4);
-    bar_text.set_markup(std::format("<b>{}</b>", bar_text.get_text().c_str()));
-    bar_button_delete.set_margin(4);
-    bar_button_delete.add_css_class("destructive-action");
-    bar_button_cancel.set_margin(4);
-    bar_button_cancel.add_css_class("suggested-action");
-    root.append(bar_text);
-    root.append(bar_button_delete);
-    root.append(bar_button_cancel);
-    root.set_spacing(4);
-
-    bar_button_delete.signal_clicked().connect(
-        sigc::mem_fun(app_window, &ProgressWindow::delete_selected_boards));
-    bar_button_cancel.signal_clicked().connect(
-        sigc::mem_fun(app_window, &ProgressWindow::off_delete_board_mode));
-}
-
 ProgressWindow::ProgressWindow(BaseObjectType* cobject,
-                               const Glib::RefPtr<Gtk::Builder>& b)
+                               const Glib::RefPtr<Gtk::Builder>& b,
+                               Glib::RefPtr<Gio::Settings>& progress_settings,
+                               BoardManager& manager)
     : Gtk::ApplicationWindow{cobject},
-      about_dialog{*this},
-      board_widget{*this},
-      delete_boards_bar{*this},
+      m_manager{manager},
+      board_widget{manager},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
+      board_delete_button{b->get_widget<Gtk::Button>("delete-button")},
+      cancel_delete_button{b->get_widget<Gtk::Button>("cancel-delete-button")},
       app_overlay_p{b->get_widget<Gtk::Overlay>("app-overlay")},
       app_stack_p{b->get_widget<Gtk::Stack>("app-stack")},
       boards_grid_p{b->get_widget<Gtk::FlowBox>("boards-grid")},
       board_grid_menu_p{b->get_object<Gio::MenuModel>("board-grid-menu")},
       board_menu_p{b->get_object<Gio::MenuModel>("board-menu")},
       app_menu_button_p{b->get_widget<Gtk::MenuButton>("app-menu-button")},
+      action_bar_p{b->get_widget<Gtk::ActionBar>("action-bar")},
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
-      css_provider{Gtk::CssProvider::create()} {
-    signal_close_request().connect(
-        sigc::mem_fun(*this, &ProgressWindow::on_window_close), true);
-
-    auto cbd_builder = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
-    auto cbd_builder1 = Gtk::Builder::create_from_resource(CREATE_BOARD_DIALOG);
-    create_board_dialog =
-        Gtk::Builder::get_widget_derived<ui::CreateBoardDialog>(
-            cbd_builder, "create-board", *this);
-    preferences_board_dialog =
-        Gtk::Builder::get_widget_derived<ui::PreferencesBoardDialog>(
-            cbd_builder1, "create-board", board_widget);
-
-    create_board_dialog->set_transient_for(*this);
-    preferences_board_dialog->set_transient_for(*this);
-
+      css_provider{Gtk::CssProvider::create()},
+      progress_settings{progress_settings},
+      card_dialog{},
+      sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
+    m_context = new AppContext{*this, board_widget, m_manager};
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    // We're not overriding 'on_close_request' because the behaviour is not
+    // executed. This may be due to the fact that cobject is actually a
+    // AdwApplicationWindow, not a GtkApplicationWindow
+    this->signal_close_request().connect(
+        sigc::mem_fun(*this, &ProgressWindow::on_close), true);
+    boards_grid_p->signal_selected_children_changed().connect(
+        sigc::track_object(
+            [this]() {
+                const int size =
+                    this->boards_grid_p->get_selected_children().size();
+                if (size > 0) {
+                    std::string selected_text = ngettext(
+                        "{} board selected", "{} boards selected", size);
+                    set_title(std::vformat(selected_text,
+                                           std::make_format_args(size)));
+                } else {
+                    set_title(_("No board has been selected yet"));
+                }
+            },
+            *this));
+
+    board_delete_button->signal_clicked().connect(
+        sigc::mem_fun(*this, &ProgressWindow::delete_selected_boards));
+    cancel_delete_button->signal_clicked().connect(
+        sigc::mem_fun(*this, &ProgressWindow::off_delete_board_mode));
+
     load_appropriate_style();
+
+    // FIXME: Use automatic stylesheet loading provided by adwaita
     g_signal_connect_after(
-        G_OBJECT(adw_style_manager), "notify::dark",
+        adw_style_manager, "notify::dark",
         G_CALLBACK(+[](AdwStyleManager* adw_style_manager, GParamSpec* pspec,
                        gpointer data) {
             reinterpret_cast<ProgressWindow*>(data)->load_appropriate_style();
         }),
         this);
 
+    using WindowShortcut =
+        std::pair<const char*,
+                  std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
+
+    const std::array<WindowShortcut, 5> shortcuts = {
+        WindowShortcut{"<Control>D",
+                       [this](Gtk::Widget&, const Glib::VariantBase&) {
+                           if (app_stack_p->get_visible_child_name() ==
+                               "board-grid-page") {
+                               this->on_delete_board_mode();
+                           }
+
+                           return true;
+                       }},
+        WindowShortcut{"<Control>B",
+                       [this](Gtk::Widget&, const Glib::VariantBase&) {
+                           if (app_stack_p->get_visible_child_name() ==
+                               "board-grid-page") {
+                               auto create_board_dialog =
+                                   CreateBoardDialog::create(m_manager);
+                               create_board_dialog->open(*this);
+                           }
+
+                           return true;
+                       }},
+        WindowShortcut{
+            "<Control>P",
+            [this](Gtk::Widget&, const Glib::VariantBase&) {
+                if (app_stack_p->get_visible_child_name() == "board-page") {
+                    auto preference_dialog =
+                        PreferencesBoardDialog::create(this->board_widget);
+                    preference_dialog->open(*this);
+                }
+                return true;
+            }},
+        WindowShortcut{"<Control>H",
+                       [this](Gtk::Widget&, const Glib::VariantBase&) {
+                           if (app_stack_p->get_visible_child_name() ==
+                               "board-page") {
+                               this->on_main_menu();
+                           }
+                           return true;
+                       }},
+        WindowShortcut{"<Control>W",
+                       [this](Gtk::Widget&, const Glib::VariantBase&) {
+                           close();
+                           return true;
+                       }}};
+
+    auto shortcut_controller = Gtk::ShortcutController::create();
+    for (const auto& [keybind, callback] : shortcuts) {
+        shortcut_controller->add_shortcut(
+            Gtk::Shortcut::create(Gtk::ShortcutTrigger::parse_string(keybind),
+                                  Gtk::CallbackAction::create(callback)));
+    }
+    add_controller(shortcut_controller);
+
+#if defined(DEVELOPMENT)
+    add_css_class("devel");
+#endif
+
     home_button_p->signal_clicked().connect(
         sigc::mem_fun(*this, &ProgressWindow::on_main_menu));
-    add_board_button_p->signal_clicked().connect(
-        sigc::mem_fun(*create_board_dialog, &CreateBoardDialog::open_window));
+    add_board_button_p->signal_clicked().connect([this]() {
+        auto create_board_dialog = CreateBoardDialog::create(m_manager);
+
+        create_board_dialog->open(*this);
+    });
     setup_menu_button();
 
     boards_grid_p->set_sort_func([](Gtk::FlowBoxChild* child1,
@@ -148,41 +163,71 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         }
     });
 
-    delete_boards_bar.set_halign(Gtk::Align::CENTER);
-    delete_boards_bar.set_valign(Gtk::Align::END);
-    delete_boards_bar.set_vexpand();
-    delete_boards_bar.set_margin_bottom(10);
-    app_overlay_p->add_overlay(delete_boards_bar);
+    m_manager.signal_add_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::add_board_handler));
+    m_manager.signal_remove_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::remove_board_handler));
+    m_manager.signal_save_board().connect(
+        sigc::mem_fun(*this, &ProgressWindow::save_board_handler));
+
+    sh_window->set_application(this->get_application());
+
     app_stack_p->add(board_widget, "board-page");
 }
 
 ProgressWindow::~ProgressWindow() {
-    delete create_board_dialog;
-    delete preferences_board_dialog;
+    delete m_context;
+    m_context = nullptr;
 }
 
-void ProgressWindow::add_board(const std::string& board_filepath) {
-    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_filepath);
+void ProgressWindow::add_board_handler(LocalBoard board_entry) {
+    add_local_board_entry(board_entry);
+    boards_grid_p->invalidate_sort();
+}
+
+// FIXME: We could actually keep track of the boardcardbuttons added instead of
+// searching linearly. This may be optmised to an amortised O(1)
+
+#if GTKMM_CHECK_VERSION(4, 14, 0)
+void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
+    for (Widget* fb_child : boards_grid_p->get_children()) {
+        BoardCardButton* cur = static_cast<BoardCardButton*>(
+            static_cast<Gtk::FlowBoxChild*>(fb_child)->get_child());
+
+        if (cur->get_board() == board_entry.board) {
+            boards_grid_p->remove(*cur);
+        }
+    }
+}
+#else
+void ProgressWindow::remove_board_handler(LocalBoard board_entry) {
+    for (BoardCardButton* entry_button : entry_buttons) {
+        if (entry_button->get_board() == board_entry.board) {
+            boards_grid_p->remove(*entry_button);
+        }
+    }
+}
+#endif
+
+void ProgressWindow::save_board_handler(LocalBoard board) {
+    boards_grid_p->invalidate_sort();
+}
+
+void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
+    auto board_card_button = Gtk::make_managed<BoardCardButton>(board_entry);
     auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
     fb_child_p->set_child(*board_card_button);
+    fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
     board_card_button->signal_clicked().connect(
-        [this, board_card_button, fb_child_p]() {
+        [this, board_entry, board_card_button, fb_child_p]() {
             if (!this->on_delete_mode) {
-                Board* board;
-                try {
-                    board = new Board{board_card_button->get_filepath()};
-                } catch (std::invalid_argument& err) {
-                    Gtk::AlertDialog::create(
-                        _("It was not possible to load this board"))
-                        ->show(*this);
+                app_stack_p->set_visible_child(
+                    "loading-page", Gtk::StackTransitionType::CROSSFADE);
+                add_board_button_p->set_sensitive(false);
+                app_menu_button_p->set_sensitive(false);
 
-                    boards_grid_p->remove(*fb_child_p);
-                    return;
-                }
-                on_board_view();
-                board_widget.set(board, board_card_button);
-                set_title(board->get_name());
+                this->m_context->open_session(board_entry.filename);
             } else {
                 if (fb_child_p->is_selected()) {
                     boards_grid_p->unselect_child(*fb_child_p);
@@ -191,62 +236,109 @@ void ProgressWindow::add_board(const std::string& board_filepath) {
                 }
             }
         });
-}
 
-void ProgressWindow::show_create_board_dialog() {
-    create_board_dialog->open_window();
+#if not GTKMM_CHECK_VERSION(4, 14, 0)
+    entry_buttons.push_back(board_card_button);
+#endif
 }
 
 void ProgressWindow::on_delete_board_mode() {
     on_delete_mode = true;
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
-    delete_boards_bar.set_reveal_child();
+    action_bar_p->set_revealed();
+
+    set_title(_("No board has been selected yet"));
+
+    // TAB clicks won't include them, making more manageable to delete boards
+    add_board_button_p->set_visible(false);
+    app_menu_button_p->set_visible(false);
+
+    spdlog::get("app")->info("Entered delete board mode");
 }
 
 void ProgressWindow::off_delete_board_mode() {
     on_delete_mode = false;
-    delete_boards_bar.set_reveal_child(false);
+    action_bar_p->set_revealed(false);
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::NONE);
+
+    add_board_button_p->set_visible();
+    app_menu_button_p->set_visible();
+
+    set_title("Progress");
+
+    spdlog::get("app")->info("Left deletion mode");
 }
 
 void ProgressWindow::on_main_menu() {
+    // Flag idle task to stop running after
+    m_context->close_session();
+
     app_stack_p->set_visible_child("board-grid-page");
+    sh_window->property_view_name().set_value("board-grid-view");
     app_menu_button_p->set_menu_model(board_grid_menu_p);
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
     set_title("Progress");
-    board_widget.save();
-    boards_grid_p->invalidate_sort();
 }
 
 void ProgressWindow::on_board_view() {
     app_stack_p->set_visible_child("board-page");
+    sh_window->property_view_name().set_value("board-view");
     app_menu_button_p->set_menu_model(board_menu_p);
     home_button_p->set_visible();
     add_board_button_p->set_visible(false);
+
+    add_board_button_p->set_sensitive(true);
+    app_menu_button_p->set_sensitive(true);
 }
 
+// FIXME: This super inefficient because we're running at almost O(n²)
 void ProgressWindow::delete_selected_boards() {
     auto selected_children = boards_grid_p->get_selected_children();
     for (auto& child : selected_children) {
         ui::BoardCardButton* cur_child =
             (ui::BoardCardButton*)child->get_child();
-        std::filesystem::remove(cur_child->get_filepath());
-        boards_grid_p->remove(*cur_child);
+        m_manager.local_remove(cur_child->get_board());
     }
+
+    spdlog::get("app")->info("Deleted {} boards", selected_children.size());
 
     off_delete_board_mode();
 }
 
+void ProgressWindow::show_about_dialog() {
+    adw_show_about_dialog(
+        GTK_WIDGET(this->gobj()), "application-name", "Progress",
+        "application-icon", APPLICATION_ID, "version",
+        std::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)
+            .c_str(),
+        "copyright", _("De Moura © All rights reserved"), "license-type",
+        GTK_LICENSE_MIT_X11, "developer-name", "Gabriel de Moura",
+        "translator-credits", _("translator-credits"), "issue-url",
+        "https://github.com/smolBlackCat/progress-tracker/issues", "website",
+        "https://github.com/smolBlackCat/progress-tracker", NULL);
+}
+
+void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
+    card_dialog.open(*this, card_widget);
+}
+
+void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
+
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
     action_group->add_action(
-        "about", sigc::mem_fun(about_dialog, &ProgressAboutDialog::show));
+        "about", sigc::mem_fun(*this, &ProgressWindow::show_about_dialog));
+    action_group->add_action(
+        "shortcuts",
+        sigc::mem_fun(*this, &ProgressWindow::show_shortcuts_dialog));
     action_group->add_action(
         "delete", sigc::mem_fun(*this, &ProgressWindow::on_delete_board_mode));
-    action_group->add_action(
-        "preferences", sigc::mem_fun(*preferences_board_dialog,
-                                     &PreferencesBoardDialog::open_window));
+    action_group->add_action("preferences", [this]() {
+        auto preference_dialog =
+            PreferencesBoardDialog::create(this->board_widget);
+        preference_dialog->open(*this);
+    });
 
     app_menu_button_p->insert_action_group("win", action_group);
 }
@@ -259,11 +351,23 @@ void ProgressWindow::load_appropriate_style() {
     }
 }
 
-bool ProgressWindow::on_window_close() {
+bool ProgressWindow::on_close() {
+    set_visible(false);
+
     if (app_stack_p->get_visible_child_name() == "board-page") {
         board_widget.save();
     }
-    set_visible(false);
+    int height, width;
+    this->get_default_size(width, height);
+
+    progress_settings->set_boolean("window-maximized", is_maximized());
+    progress_settings->set_int("window-height", height);
+    progress_settings->set_int("window-width", width);
+
+    spdlog::get("app")->debug(
+        "On close status:\n\twindow-maximized: {}\n\twindow-height: "
+        "{}\n\twindow-width: {}",
+        is_maximized(), height, width);
     return true;
 }
 }  // namespace ui

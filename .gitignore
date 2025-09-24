@@ -31,13 +31,20 @@
 *.out
 *.app
 
-# Visual Studio Code Settings
+# IDE settings
 .vscode/
+.cache/
+.idea/
+.zed/
 
 # Ignore build
 build/
+rel-build/
 
 # Ignore flatpak folders
 .flatpak*/
 flatpak-build/
 repo/
+
+# Ignore Cambalache
+*.cmb

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: https://github.com/smolBlackCat/progress-tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 13:19-0300\n"
+"POT-Creation-Date: 2025-06-20 10:19-0300\n"
 "PO-Revision-Date: 2024-04-28 21:10+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: volkov <volkovissocool@gmail.com>\n"
@@ -18,141 +18,680 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-# Що таке "Канбан" - https://uk.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BD%D0%B1%D0%B0%D0%BD
-#: src/window.cpp:43
-msgid "translator-credits"
-msgstr "volkov <volkovissocool@gmail.com>"
+#: data/io.github.smolblackcat.Progress.desktop.in.in:3
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:4
+msgid "Progress"
+msgstr ""
 
-#: src/window.cpp:48
+#: data/io.github.smolblackcat.Progress.desktop.in.in:5
+msgid "_Kanban style todo app"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.desktop.in.in:7
+msgid "_Kanban;Todo;Progress;"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
+msgid "Kanban board application"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:7
+msgid "Gabriel de Moura"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:28
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:40
+msgid "Separate different contexts into different boards"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:32
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:44
+msgid "Editable kanban board"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:36
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:48
+msgid "Edit the extra details of a Card"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:53
+msgid ""
+"Progress allows the user to organise their tasks concisely into custom "
+"kanban boards, which are easily editable with its distinctive drag-and-drop "
+"feature."
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:67
+msgid "What's new in Progress 1.7.0"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:68
+msgid ""
+"This minor release is actually quite big and important because it adds "
+"features that may enable the users to use Progress across more different "
+"workflows"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:72
+msgid ""
+"Cards have received a revamp, making it more useful for various workflows. "
+"The new features include:"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:75
+msgid "Coloured card covers"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:76
+msgid "Card notes"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:77
+msgid "Deadline settings"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:78
+msgid "Sub-tasks"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:79
+msgid "Dedicated dialog for card editing"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:81
+msgid "UI has been greatly improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:83
+msgid "Dark mode and light mode styles have improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:84
+msgid "Board dialog has received a new UI design"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:86
+msgid ""
+"Applications shortcuts have been introduced. Users can now interact and move "
+"cards, card lists and tasks using the keyboard"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:89
+msgid ""
+"Data model have been updated to be backwards-compatible with boards created "
+"by previous Progress versions"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:91
+msgid "Drag and drop mechanism have been improved"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:92
+msgid "Various bugs and memory leaks have been fixed"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:98
+msgid "What's new in Progress 1.6.0"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:100
+msgid "Added Polish Translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:101
+msgid "Fixed rendering artifact (Windows)"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:107
+msgid "What's new in Progress 1.5.2"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:109
+msgid ""
+"Fix bug where application would crash after dropping a cardlist onto itself"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:116
+msgid "What's new in Progress 1.5.1"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:118
+msgid ""
+"Fix bug where the board's background was set only if the board's name was "
+"also modified"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:125
+msgid "What's new in Progress 1.5.0"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:127
+msgid "Board buttons will now appear in the order of modification"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:128
+msgid ""
+"Preferences Board Dialog will only generate a new name file if the board's "
+"name was changed"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:135
+msgid "What's new in Progress 1.4.1"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:137
+msgid "Locale directory resolution optimised"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:143
+msgid "What's new in Progress 1.4"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:145
+msgid "Spanish translation has been updated"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:151
+msgid "What's new in Progress 1.3"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:153
+msgid "Italian translation has been updated"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:154
+msgid "Russian Translation has been added"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:155
+msgid "Ukranian Translation has been added"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:156
+msgid "Card widgets have gotten an UI rework"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:157
+msgid "A cancel button has been added to cancel creation and renaming"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:163
+msgid "The current minor releases brings some additions and improvements"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:165
+msgid "Utilise Adwaita About Dialogs"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:166
+msgid "Added Bulgarian Translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:167
+msgid "Added Turkish Translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:168
+msgid "Progress will not fail to start in case the boards are corrupted"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:169
+msgid "Added tooltips"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:175
+msgid "Bug Fixes and Improvements"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:177
+msgid "Board grid UI enhance"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:178
+msgid "Fix segmentation fault error when moving cards onto themselves"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:179
+msgid "Progress is better integrated on GNOME systems"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:180
+msgid "Add Dutch translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:181
+msgid "Add Italian translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:182
+msgid "Add Spanish translation"
+msgstr ""
+
+#: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:188
+msgid "First official release of Progress 1.0"
+msgstr ""
+
+#: src/window.cpp:56
+#, c++-format
+msgid "{} board selected"
+msgid_plural "{} boards selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/window.cpp:60 src/window.cpp:265
+msgid "No board has been selected yet"
+msgstr ""
+
+#: src/window.cpp:334
 msgid "De Moura © All rights reserved"
 msgstr "De Moura © Всі права захищені"
 
-#: src/window.cpp:62
-msgid "Select the boards to be deleted"
-msgstr "Оберіть дошки які треба видалити"
+# Що таке "Канбан" - https://uk.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BD%D0%B1%D0%B0%D0%BD
+#: src/window.cpp:336
+msgid "translator-credits"
+msgstr "volkov <volkovissocool@gmail.com>"
 
-#: src/window.cpp:63
-msgid "Delete"
-msgstr "Видалити"
-
-#: src/window.cpp:64 src/dialog/board-dialog.cpp:21
-msgid "Cancel"
-msgstr "Скасувати"
-
-#: src/window.cpp:181
+#: src/window.cpp:389
 msgid "It was not possible to load this board"
 msgstr "Не вдалося завантажити цю дошку"
 
-#: src/dialog/board-dialog.cpp:20
-msgid "Board's name"
-msgstr "Назва дошки"
+#: src/dialog/card-dialog.cpp:14
+msgid "Add Task"
+msgstr ""
 
-#: src/dialog/board-dialog.cpp:22 src/dialog/board-dialog.cpp:49
-#: src/dialog/preferences-board-dialog.cpp:63
+#: src/dialog/card-dialog.cpp:167 src/widgets/task-widget.cpp:132
+msgid "New Task"
+msgstr ""
+
+#: src/dialog/card-dialog.cpp:214 src/dialog/card-dialog.cpp:247
+#: src/resources/ui/card-details-dialog.ui:63
+msgid "Set Due Date"
+msgstr ""
+
+#: src/dialog/board-dialog.cpp:52
 msgid "Select a file"
 msgstr "Вибір файлу"
 
-#: src/dialog/board-dialog.cpp:23
-msgid "Select File"
-msgstr "Обрати файл"
-
-#: src/dialog/board-dialog.cpp:40
-msgid "No file selected"
-msgstr "Не було обрано файл"
-
-#: src/dialog/board-dialog.cpp:54
+#: src/dialog/board-dialog.cpp:57
 msgid "Image Files"
 msgstr "Файли зображень"
 
-#: src/dialog/create_board_dialog.cpp:14
-msgid "Create Board"
-msgstr "Створити дошку"
+#: src/dialog/create_board_dialog.cpp:10
+msgid "Create New Board"
+msgstr ""
 
-#: src/dialog/create_board_dialog.cpp:18
-msgid "Create"
-msgstr "Створити"
-
-#: src/dialog/create_board_dialog.cpp:26
+#: src/dialog/create_board_dialog.cpp:22
+#: src/dialog/preferences-board-dialog.cpp:62
 msgid "Empty board names are not allowed"
 msgstr "Неможливо створити дошку з порожньою назвою"
 
-#: src/dialog/create_board_dialog.cpp:34
-msgid "A file must be selected"
-msgstr "Треба обрати файл"
-
-#: src/dialog/create_board_dialog.cpp:48
-msgid "It was not possible to create a Board with given name"
-msgstr "Не вдалося створити дошку з такою назвою"
-
-#: src/dialog/preferences-board-dialog.cpp:13
-msgid "Edit Board"
-msgstr "Редагування дошки"
-
 #: src/dialog/preferences-board-dialog.cpp:14
+msgid "Board Preferences"
+msgstr ""
+
+#: src/dialog/preferences-board-dialog.cpp:15
 msgid "Save"
 msgstr "Зберегти"
 
-#: src/dialog/preferences-board-dialog.cpp:28
-#: src/dialog/preferences-board-dialog.cpp:45
-msgid "No file was selected"
-msgstr "Не було обрано жодного файлу"
+#: src/resources/ui/app-window.ui:45
+msgid "Delete"
+msgstr "Видалити"
 
-#: src/resources/ui/app-window.ui:13
+#: src/resources/ui/app-window.ui:52
+msgid "Cancel"
+msgstr "Скасувати"
+
+#: src/resources/ui/app-window.ui:87
 msgid "Homepage"
 msgstr "Домашня сторінка"
 
-#: src/resources/ui/app-window.ui:20
+#: src/resources/ui/app-window.ui:94
 msgid "Add Board"
 msgstr "Додати дошку"
 
-#: src/resources/ui/app-window.ui:28
+#: src/resources/ui/app-window.ui:103
 msgid "Main Menu"
 msgstr "Головне меню"
 
-#: src/resources/ui/app-window.ui:70
+#: src/resources/ui/app-window.ui:116
 msgid "Delete Boards"
 msgstr "Видалення дошок"
 
-#: src/resources/ui/app-window.ui:74 src/resources/ui/app-window.ui:86
+#: src/resources/ui/app-window.ui:120 src/resources/ui/app-window.ui:136
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:124 src/resources/ui/app-window.ui:140
 msgid "About Progress"
 msgstr "Про додаток"
 
-#: src/resources/ui/app-window.ui:82
-msgid "Preferences"
-msgstr "Налаштування"
+#: src/resources/ui/app-window.ui:132
+msgid "Edit Board"
+msgstr "Редагування дошки"
 
-#: src/resources/ui/create-board-dialog.ui:24
-msgid "Background"
-msgstr "Відобразити тло як…"
+#: src/resources/ui/app-window.ui:154
+msgid "Board Grid View"
+msgstr ""
 
-#: src/resources/ui/create-board-dialog.ui:53
-msgid "As a file"
-msgstr "Файлом зображення"
+#: src/resources/ui/app-window.ui:160
+msgid "Allows the user the user to delete boards by selecting them"
+msgstr ""
 
-#: src/resources/ui/create-board-dialog.ui:93
-msgid "As a color"
-msgstr "Суцільним кольором"
+#: src/resources/ui/app-window.ui:162
+msgid "Enable deletion"
+msgstr ""
 
-#: src/widgets/board-widget.cpp:21
+#: src/resources/ui/app-window.ui:168
+msgid "Open dialog to create a new board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:175
+msgid "Board View"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:180
+msgid "Open preferences dialog"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:186
+msgid "Automatically save the board and head to the board grid view"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:187
+msgid "Go home"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:194
+msgid "Card Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:199
+msgid "Add a new card next to the focused card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:205
+msgid "It opens a dialog presenting the card extra settings"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:206
+msgid "See card details"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:212
+msgid "Rename card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:218
+msgid "Opens a color dialog so the user can set the card's cover's color"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:219
+msgid "Set color"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:225
+msgid "Deletes current focused card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:231
+msgid "Reorder card within cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:237
+msgid "Moves a card to previous or next cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:244
+msgid "Cardlist Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:249
+msgid "Rename the focused cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:255
+msgid "Add a new cardlist next to the focused cardlist"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:261
+msgid "Deletes cardlist from board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:267
+msgid "Move cardlist across the board"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:274
+msgid "Task Shortcuts"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:279
+msgid "Rename task"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:285
+msgid "Add new task next to focused task"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:291
+msgid "Delete task from card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:297
+msgid "Convert task to card"
+msgstr ""
+
+#: src/resources/ui/app-window.ui:303
+msgid "Move task across the checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:39
+msgid "Card Title"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:55
+msgid "Deadline"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:72
+msgid "Unset Due Date"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:91
+msgid "Mark this card complete"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:108
+msgid "Checklist"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:142 src/widgets/card-widget.cpp:667
+msgid "Notes"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:175
+msgid "Delete Card"
+msgstr ""
+
+#: src/resources/ui/card-details-dialog.ui:186 src/widgets/card-widget.cpp:75
+msgid "Card Details"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:34
+msgid "Board Title"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:53
+msgid "Board Background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:76
+msgid "Click to set a board background"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:88
+msgid "Create Board"
+msgstr "Створити дошку"
+
+#: src/resources/ui/board-dialog.ui:101
+msgid "Set Color"
+msgstr ""
+
+#: src/resources/ui/board-dialog.ui:105
+msgid "Set Image"
+msgstr ""
+
+#: src/widgets/board-widget.cpp:25
 msgid "Add List"
 msgstr "Додати список"
 
-#: src/widgets/board-widget.cpp:53
+#: src/widgets/board-widget.cpp:51
 msgid "New CardList"
 msgstr "Новий список карток"
 
-#: src/widgets/card.cpp:15 src/widgets/cardlist-widget.cpp:52
+#: src/widgets/card-widget.cpp:34
+msgid "Red"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:35
+msgid "Orange"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:36
+msgid "Yellow"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:37
+msgid "Green"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:38
+msgid "Blue"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:39
+msgid "Purple"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:70 src/widgets/editable-label-header.cpp:78
+#: src/widgets/task-widget.cpp:74
+msgid "Rename"
+msgstr "Перейменувати"
+
+#: src/widgets/card-widget.cpp:80 src/widgets/cardlist-widget.cpp:54
+#: src/widgets/task-widget.cpp:75
 msgid "Remove"
 msgstr "Видалити"
 
-#: src/widgets/cardlist-widget.cpp:33
-msgid "Add card"
-msgstr "Додати картку"
+#: src/widgets/card-widget.cpp:98
+msgid "Unset Color"
+msgstr ""
 
-#: src/widgets/cardlist-widget.cpp:60
+#: src/widgets/card-widget.cpp:253 src/widgets/card-widget.cpp:329
+#: src/widgets/cardlist-widget.cpp:79
 msgid "New Card"
 msgstr "Нова картка"
 
-#: src/widgets/editable-label-header.cpp:67
-msgid "Rename"
-msgstr "Перейменувати"
+#: src/widgets/card-widget.cpp:287
+msgid "Card Options"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:478 src/widgets/card-widget.cpp:701
+msgid "Due: "
+msgstr ""
+
+#: src/widgets/card-widget.cpp:582
+msgid "<b>%1 day</b> remaining"
+msgid_plural "<b>%1 days</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:591
+msgid "<b>%1 month</b> remaining"
+msgid_plural "<b>%1 months</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:600
+msgid "<b>%1 year</b> remaining"
+msgid_plural "<b>%1 years</b> remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:607
+msgid "This card is past due date <b>%1 day ago</b>"
+msgid_plural "This card is past due date <b>%1 days ago</b>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:618
+msgid "This card is past due date <b>%1 month</b> ago"
+msgid_plural "This card is past due date <b>%1 months</b> ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:629
+msgid "This card is past due date <b>%1 year</b> ago"
+msgid_plural "This card is past due date <b>%1 years</b> ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/widgets/card-widget.cpp:646
+msgid "%1%% complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:658
+msgid "This card is complete"
+msgstr ""
+
+#: src/widgets/card-widget.cpp:660
+msgid "The card is due today"
+msgstr ""
+
+#: src/widgets/cardlist-widget.cpp:37
+msgid "Add card"
+msgstr "Додати картку"
+
+#: src/widgets/cardlist-widget.cpp:108
+msgid "New Cardlist"
+msgstr ""
+
+#: src/widgets/task-widget.cpp:76
+msgid "Convert to card"
+msgstr ""
+
+#~ msgid "Preferences"
+#~ msgstr "Налаштування"
+
+#~ msgid "Select the boards to be deleted"
+#~ msgstr "Оберіть дошки які треба видалити"
+
+#~ msgid "Board's name"
+#~ msgstr "Назва дошки"
+
+#~ msgid "Select File"
+#~ msgstr "Обрати файл"
+
+#~ msgid "No file selected"
+#~ msgstr "Не було обрано файл"
+
+#~ msgid "Create"
+#~ msgstr "Створити"
+
+#~ msgid "A file must be selected"
+#~ msgstr "Треба обрати файл"
+
+#~ msgid "It was not possible to create a Board with given name"
+#~ msgstr "Не вдалося створити дошку з такою назвою"
+
+#~ msgid "No file was selected"
+#~ msgstr "Не було обрано жодного файлу"
+
+#~ msgid "Background"
+#~ msgstr "Відобразити тло як…"
+
+#~ msgid "As a file"
+#~ msgstr "Файлом зображення"
+
+#~ msgid "As a color"
+#~ msgstr "Суцільним кольором"

@@ -1,34 +1,168 @@
 .confirm-action {
-    background-color: #26a269;
+    background-color: @success_color;
 }
 
-list.rich-list {
-    border-radius: 20px;
-}
-
-.card {
-    background-color: #5e5c64;
+.complete-task {
+    transition-property: background-color;
+    transition-duration: 1s;
+    background-color: @insensitive_bg_color;
     border-radius: 5px;
     padding: 4px;
-    box-shadow: 0 0 2px #000000;
+    box-shadow: 0 0 2px @card_shade_color;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
+cardlist {
+    background-color: @theme_bg_color;
+    padding: 12px;
+    border: 2px solid @card_shade_color;
+    border-radius: 20px;
+    box-shadow: 0 0 4px @card_shade_color;
+}
+
+.card-cover {
+    border-radius: 5px;
+}
+
+card {
+    background-color: @card_bg_color;
+    border-radius: 5px;
+    border: 2px solid @card_shade_color;
+    box-shadow: 0 0 3px @card_shade_color;
+    transition-property: background-color, border, box-shadow, outline;
+    transition-duration: 0.2s;
+}
+
+task {
+    transition-property: background-color;
+    transition-duration: 1s;
+    background-color: @card_bg_color;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
+card:focus,
+.card-to-drop,
+cardlist:focus,
+.cardlist-to-drop,
+task:focus {
+    box-shadow: 0 0 6px @accent_bg_color;
+    border: 2px solid @accent_bg_color;
+    transition-property: background-color, border, box-shadow, outline;
+    transition-duration: 0.2s;
 }
 
 .delete-board-infobar-text {
-    color: #ffffff;
     font-weight: bold;
 }
 
 .delete-board-infobar {
-    background-color: #1a5fb4;
+    background-color: @popover_bg_color;
     border-radius: 5px;
 }
 
-.cardlist-title {
-    font-weight: bold;
-    font-size: large;
+.complete-tasks-indicator-complete {
+    background-color: @success_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
 }
 
-.image-label {
-    font-weight: bold;
-    font-size: medium;
+.complete-tasks-indicator-almost {
+    background-color: @warning_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.complete-tasks-indicator-incomplete {
+    background-color: @error_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.due-date {
+    background-color: @insensitive_bg_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
+.past-due-date {
+    background-color: @error_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
+.due-date-complete {
+    background-color: @success_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
+/*
+ * Original CSS by Vlad Krupinskii <mrvladus@yandex.ru>
+ * Source: https://github.com/mrvladus/Errands
+ * License: MIT License (https://opensource.org/licenses/MIT)
+ */
+
+.accent-color-btn radio {
+  all: unset;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  min-width: 14px;
+  min-height: 14px;
+  color: @light_1;
+}
+
+.accent-color-btn radio:checked {
+    border: 2px solid @light_1;
+}
+
+.accent-color-btn radio:hover {
+  filter: brightness(1.2);
+}
+
+.red radio {
+    background-color: #a51d2d;
+}
+
+.green radio {
+    background-color: #26a269;
+}
+
+.blue radio {
+    background-color: #1a5fb4;
+}
+
+.yellow radio {
+    background-color: #e5a50a;
+}
+
+.orange radio {
+    background-color: #c64600;
+}
+
+.purple radio {
+    background-color: #200941;
 }

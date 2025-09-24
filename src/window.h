@@ -1,95 +1,83 @@
 #pragma once
 
+#include <adwaita.h>
 #include <gtkmm.h>
-#include <libadwaita-1/adwaita.h>
+#include <widgets/board-card-button.h>
+#include <widgets/board-widget.h>
 
-#include "core/board.h"
-#include "widgets/board-card-button.h"
-#include "widgets/board-widget.h"
+#include "core/board-manager.h"
+#include "dialog/card-dialog.h"
+
+class AppContext;
 
 namespace ui {
 
 class BoardWidget;
 class CreateBoardDialog;
 class PreferencesBoardDialog;
-class ProgressWindow;
 
 /**
- * Progress app about dialog.
- */
-class ProgressAboutDialog {
-public:
-    ProgressAboutDialog(Gtk::Window& parent);
-    ~ProgressAboutDialog();
-
-    /**
-     * @brief Presents the about dialog on screen
-     */
-    void show();
-
-protected:
-    void setup();
-
-    AdwDialog* about_dialogp;
-    Gtk::Widget& parent;
-};
-
-/**
- * @brief Bar widget that asks user confirmation to delete selected boards.
- */
-class DeleteBoardsBar : public Gtk::Revealer {
-public:
-    DeleteBoardsBar(ui::ProgressWindow& app_window);
-
-private:
-    Gtk::Box root;
-    Gtk::Label bar_text;
-    Gtk::Button bar_button_delete, bar_button_cancel;
-
-    ui::ProgressWindow& app_window;
-};
-
-/**
- * Progress application window.
+ * @brief Main application window
+ *
+ * It provides functionalities for managing boards, switching views, and
+ * handling user interactions.
  */
 class ProgressWindow : public Gtk::ApplicationWindow {
 public:
     static constexpr const char* STYLE_DARK_CSS =
         "/io/github/smolblackcat/Progress/style-dark.css";
+
     static constexpr const char* STYLE_CSS =
         "/io/github/smolblackcat/Progress/style.css";
+
     static constexpr const char* CREATE_BOARD_DIALOG =
         "/io/github/smolblackcat/Progress/create-board-dialog.ui";
 
-    ProgressWindow(BaseObjectType* cobject,
-                   const Glib::RefPtr<Gtk::Builder>& b);
+    /**
+     * @brief Constructs a ProgressWindow object.
+     *
+     * @param cobject Pointer to the base object type.
+     * @param b Reference to the Gtk::Builder.
+     * @param progress_settings Reference to the application settings.
+     */
+    ProgressWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& b,
+                   Glib::RefPtr<Gio::Settings>& progress_settings,
+                   BoardManager& manager);
+
+    /**
+     * @brief Destructor.
+     */
     ~ProgressWindow() override;
 
-    void add_board(const std::string& board_filepath);
+    void add_board_handler(LocalBoard board_entry);
+    void remove_board_handler(LocalBoard board_entry);
+    void save_board_handler(LocalBoard board_entry);
 
     /**
-     * @brief Presents dialog for creating boards
+     * @brief Adds local boards from a given backend.
+     *
+     * @param board_backend The backend from which to load the boards.
      */
-    void show_create_board_dialog();
+    void add_local_board_entry(LocalBoard board_entry);
 
     /**
-     * @brief Enters deletion mode, where the user will select all boards to
-     * be deleted
+     * @brief Enters deletion mode, where the user will select all boards to be
+     * deleted.
      */
     void on_delete_board_mode();
 
     /**
-     * @brief Exits deletion mode
+     * @brief Exits deletion mode.
      */
     void off_delete_board_mode();
 
     /**
-     * @brief Changes the application view to the board grid view
+     * @brief Changes the application view to the board grid view.
      */
     void on_main_menu();
 
     /**
-     * @brief Changes the application view to board view
+     * @brief Changes the application view to board view.
      */
     void on_board_view();
 
@@ -98,26 +86,68 @@ public:
      */
     void delete_selected_boards();
 
+    /**
+     * @brief Shows the general information about the application.
+     */
+    void show_about_dialog();
+
+    /**
+     * @brief Shows the card details dialog.
+     *
+     * @param card_widget Pointer to the CardWidget to show details for.
+     */
+    void show_card_dialog(CardWidget* card_widget);
+
+    /**
+     * @brief Shows the shortcuts dialog.
+     */
+    void show_shortcuts_dialog();
+
 protected:
-    AdwStyleManager* adw_style_manager;
-    Glib::RefPtr<Gtk::CssProvider> css_provider;
+    BoardManager& m_manager;
+    AppContext* m_context;
 
     bool on_delete_mode = false;
 
-    ui::ProgressAboutDialog about_dialog;
-    ui::CreateBoardDialog* create_board_dialog;
-    ui::PreferencesBoardDialog* preferences_board_dialog;
-    ui::DeleteBoardsBar delete_boards_bar;
+    // Settings
+    Glib::RefPtr<Gtk::CssProvider> css_provider;
+    Glib::RefPtr<Gio::Settings>& progress_settings;
+
+    // Widgets
+    AdwStyleManager* adw_style_manager;
     ui::BoardWidget board_widget;
-    Gtk::Button *home_button_p, *add_board_button_p;
+    Gtk::ShortcutsWindow* sh_window;
+    Gtk::Button *home_button_p, *add_board_button_p, *board_delete_button,
+        *cancel_delete_button;
     Gtk::Overlay* app_overlay_p;
     Gtk::Stack* app_stack_p;
     Gtk::FlowBox* boards_grid_p;
+    Gtk::ActionBar* action_bar_p;
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
     Gtk::MenuButton* app_menu_button_p;
 
+#if not GTKMM_CHECK_VERSION(4, 14, 0)
+    std::vector<BoardCardButton*> entry_buttons;
+#endif
+
+    CardDetailsDialog card_dialog;
+
+    /**
+     * @brief Sets up the menu button.
+     */
     void setup_menu_button();
+
+    /**
+     * @brief Loads the appropriate style based on the settings.
+     */
     void load_appropriate_style();
-    bool on_window_close();
+
+    /**
+     * @brief Handles the close event.
+     *
+     * @return True if the event was handled, false otherwise.
+     */
+    bool on_close();
 };
+
 }  // namespace ui

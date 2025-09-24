@@ -42,9 +42,9 @@ def get_dlls(MSYSTEM):
 
 
 def main():
-    """Script for fetching all windows dlls necessary for 'Progress'
-    to work depending on the building environment. The script assumes
-    the current directory is PROJECT_BINARY_DIR.
+    """Script for setting up the gtk environment for the application
+    to run.The script assumes the current directory is
+    PROJECT_BINARY_DIR.
     """
     SUPPORTED_ENVIRONMENTS = ["UCRT64", "MINGW32"]
     MSYSTEM = os.getenv("MSYSTEM")
@@ -58,21 +58,29 @@ def main():
     try:
         os.mkdir("share")
         os.mkdir("lib")
+        os.mkdir("DLLS")
     except FileExistsError as err:
-        print("directories still exist. Continuing...")
+        print("Directories still exists. Files will still be replaced")
 
     subprocess.run(["cp", "-r", f"{ROOT}/share/glib-2.0/", "share"])
     subprocess.run(["cp", "-r", f"{ROOT}/share/icons/", "share"])
     subprocess.run(["cp", "-r", f"{ROOT}/lib/gdk-pixbuf-2.0/", "lib"])
 
     dlls = get_dlls(MSYSTEM)
-
     for dll in dlls:
-        subprocess.run(["cp", f"{ROOT}/bin/{dll}", "."])
+        subprocess.run(["cp", f"{ROOT}/bin/{dll}", "DLLS"])
 
     if MSYSTEM == "UCRT64":
         # Necessary for older 64 bit operating systems
-        subprocess.run("cp /c/Windows/System32/ucrtbase.dll .".split())
+        subprocess.run("cp /c/Windows/System32/ucrtbase.dll DLLS".split())
+
+    # Helper executable
+    subprocess.run(f"cp {ROOT}/bin/gdbus.exe .".split())
+
+    print("Setting up Progress schemas")
+    progress_schema = "../data/io.github.smolblackcat.Progress.gschema.xml"
+    subprocess.run(f"cp {progress_schema} share/glib-2.0/schemas/".split())
+    subprocess.run("glib-compile-schemas share/glib-2.0/schemas/".split())
 
 
 if __name__ == "__main__":

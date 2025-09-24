@@ -1,28 +1,9 @@
 #pragma once
 
+#include <core/board-manager.h>
 #include <gtkmm.h>
 
-#include <memory>
-#include <vector>
-
-#include "../core/board.h"
-#include "app_info.h"
-#include "board-card-button.h"
-
-#define CSS_FORMAT \
-    "#board-root {transition-property: background-image, background-color;}"
-#define CSS_FORMAT_FILE                                                       \
-    "#board-root {{transition-property: background-image, background-color; " \
-    "background-size: cover;"                                                 \
-    "background-repeat: no-repeat;"                                           \
-    "background-image: url(\"file:{}\");}}"
-#define CSS_FORMAT_RGB                                                        \
-    "#board-root {{transition-property: background-image, background-color; " \
-    "background-color: {};}}"
-
 namespace ui {
-
-class ProgressWindow;
 class CardlistWidget;
 
 /**
@@ -30,54 +11,59 @@ class CardlistWidget;
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
-    BoardWidget(ProgressWindow& app_window);
+    static constexpr const char* CSS_FORMAT =
+        "#board-root {transition-property: background-image, "
+        "background-color;}";
+    static constexpr const char* CSS_FORMAT_FILE =
+        "#board-root {{transition-property: background-image, "
+        "background-color; "
+        "background-size: cover;"
+        "background-repeat: no-repeat;"
+        "background-image: url(\"file:{}\");}}";
+    static constexpr const char* CSS_FORMAT_RGB =
+        "#board-root {{transition-property: background-image, "
+        "background-color; "
+        "background-color: {};}}";
 
-    ~BoardWidget() override;
+    static constexpr int SCROLL_SPEED_FACTOR = 6;
 
-    /**
-     * @brief Sets and updates the board widget.
-     *
-     * @param board pointer to a board object.
-     * @param board_card_button pointer to a BoardCardButton object that have
-     *        opened this board
-     *
-     * @details Essentially, what this method does is cleaning the previous
-     *          settings existent within the widget, if there is one, and
-     *          setting a new board to the widget. It also dynamically sets
-     *          every aspect of the board: background and its cards and lists.
-     */
-    void set(Board* board, BoardCardButton* board_card_button);
-
-    /**
-     * @brief Cleans the BoardWidget to an empty state, that is, there will be
-     *        no pointer to a board object and also the information on
-     *        background and cardlist objects are also deleted.
-     */
-    void clear();
+    Gtk::Box m_root;
 
     /**
-     * @brief Saves the contents edited in the Board class.
+     * @brief BoardWidget constructor
      *
-     * @param free indicates whether to free allocated memory by Board
+     * @param manager BoardManager reference
      */
-    bool save(bool free = true);
+    BoardWidget(BoardManager& manager);
 
     /**
-     * @brief Adds a new CardlistWidget widget based on the CardList object.
+     * @brief Loads all widgets composing a BoardWidget from a board object
      *
-     * @param cardlist CardList object
-     * @param editing_mode bool indicating whether the cardlist is completely
-     * new (has not been loaded from a file) or not
+     * @param board shared pointer to the board object
      */
-    ui::CardlistWidget* add_cardlist(const CardList& cardlist,
-                                     bool editing_mode = false);
+    void set(const std::shared_ptr<Board>& board);
 
     /**
-     * @brief Removes a CardlistWidget widget.
+     * @brief Updates board' name
      *
-     * @param cardlist reference to the cardlist to be removed.
+     * @param board_name new name for the board
      */
-    bool remove_cardlist(ui::CardlistWidget& cardlist);
+    void set_name(const std::string& board_name);
+
+    /**
+     * @brief Sets board widget background
+     *
+     * @param background string referring to a background, either a colour
+     * code or a filename
+     */
+    void set_background(const std::string& background);
+
+    /**
+     * @brief Adds a new cardlist widget
+     *
+     * @param child CardlistWidget object reference
+     */
+    void append(CardlistWidget& child);
 
     /**
      * @brief Reorders two CardlistWidget objects.
@@ -85,71 +71,117 @@ public:
      * @param next widget to be put after sibling
      * @param sibling widget to be put before next
      */
-    void reorder_cardlist(CardlistWidget& next, CardlistWidget& sibling);
+    void reorder(CardlistWidget& next, CardlistWidget& sibling);
 
     /**
-     * @brief Sets the Board background
+     * @brief Removes a CardlistWidget widget.
      *
-     * @param background string referring to a background, either of
-     * "colour" or "file" or even "invalid"
-     * @param modify boolean indicating whether the inner board object will
-     * count this operation as a modfication. Default is true
+     * @param cardlist reference to the cardlist to be removed.
+     * @return true if the cardlist was successfully removed, false
+     * otherwise
      */
-    void set_background(const std::string& background, bool modify = true);
+    void remove(ui::CardlistWidget& cardlist);
+
+    /**
+     * @brief Cleans the BoardWidget, thus deleting al widgets associated with
+     * it
+     */
+    void clear();
+
+    /**
+     * @brief Calls BoardManager saving variants depending on the Board type
+     * (e.g. local or external)
+     *
+     * @param clear indicates whether to clear the board widget after saving
+     */
+    void save(bool clear_after_save = true);
+
+    /**
+     * @brief Describes whether the board should be able to scroll
+     * horizontally
+     *
+     * @param scroll boolean indicating whether horizontal scrolling should
+     * be enabled
+     */
+    void set_scroll(bool scroll = true);
+
+    /**
+     * @brief Adds a new CardlistWidget widget based on the CardList object.
+     *
+     * @param cardlist CardList object
+     * @param editing_mode bool indicating whether the cardlist is
+     * completely new (has not been loaded from a file) or not
+     * @return pointer to the newly added CardlistWidget
+     */
+    ui::CardlistWidget* add_new_cardlist(const CardList& cardlist,
+                                         bool editing_mode = false);
+    ui::CardlistWidget* pop();
+
+    ui::CardlistWidget* insert_new_cardlist_after(const CardList& cardlist,
+                                                  ui::CardlistWidget* sibling);
 
     /**
      * @brief Retrieves the background string
-     */
-    std::string get_background();
-
-    /**
-     * @brief Updates board's name, reflecting those changes to the application
-     * window
      *
-     * @param board_name new name for the board
+     * @return reference to the background string
      */
-    void set_board_name(const std::string& board_name);
+    std::string get_background() const;
 
     /**
      * @brief Retrieves the board's name
-     */
-    std::string get_board_name();
-
-    /**
-     * @brief Sets a new filepath from where the current board object will be
-     * loaded from
      *
-     * @param board_filepath path to a board file
+     * @return reference to the board's name string
      */
-    void set_filepath(const std::string& board_filepath);
+    std::string get_name() const;
 
     /**
-     * @brief Retrieves the current board file path
+     * @brief Returns true if the board is set up to horizontally scroll
+     *
+     * @return true if horizontal scrolling is enabled, false otherwise
      */
-    std::string get_filepath();
+    bool scroll() const;
 
-    bool on_drag;
+    /**
+     * @brief Returns true when BoardWidget is empty
+     */
+    bool empty() const;
 
-private:
-#ifdef WINDOWS
+    /**
+     * @brief Retrieves the current board object
+     *
+     * @return shared pointer to the current board object
+     */
+    std::shared_ptr<Board> board() const;
+
+    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
+                                   bool editing_mode = false);
+
+    sigc::signal<void(CardlistWidget*)>& signal_cardlist_added();
+    sigc::signal<void(CardlistWidget*)>& signal_cardlist_removed();
+
+protected:
+    void __setup_auto_scrolling();
+    void __set_background(const std::string& background);
+
+    BoardManager& m_manager;
+    std::vector<sigc::connection> m_connections;
+
+    sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
+        remove_cardlist_signal;
+
+#ifdef WIN32
     Gtk::Overlay overlay;
     Gtk::Picture picture;
     Gtk::ScrolledWindow scr;
 #endif
-    Gtk::Box root;
-    Gtk::Button add_button;
-    Board* board = nullptr;
-    BoardCardButton* board_card_button = nullptr;
-    Glib::RefPtr<Gtk::CssProvider> css_provider_refptr;
-    std::vector<ui::CardlistWidget*> cardlist_vector;
-    ProgressWindow& app_window;
-    double x, y;
+    Gtk::Button m_add_button;
+    std::shared_ptr<Board> m_board = nullptr;
+    Glib::RefPtr<Gtk::CssProvider> m_css_provider;
 
-    /**
-     * @brief Sets up automatic scrolling for every time the users drags either
-     * cards or cardlists across the screen the BoardWidget will scroll as
-     * needed.
-     */
-    void setup_auto_scrolling();
+    // FIXME: This may be redundant
+    std::vector<ui::CardlistWidget*> m_cardlists;
+    double x, y;
+    bool m_on_scroll = false;
 };
+
 }  // namespace ui

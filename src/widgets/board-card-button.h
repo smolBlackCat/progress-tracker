@@ -1,42 +1,32 @@
 #pragma once
 
+#include <core/board-manager.h>
 #include <gtkmm.h>
 
+#include <chrono>
 #include <compare>
-
-#include "../core/board.h"
 
 namespace ui {
 
+using namespace std::chrono;
+
 /**
- * @brief Custom Gtk::Button implementation that allocates a Board object and
- *        opens the board view. It also shows the user to which Board the button
- *        will lead to when clicked by presenting the board's name and the
- *        board's background as a thumbnail.
+ * @brief Custom Gtk::Button implementation that presents to the user the board
+ * to be loaded. It also shows the user to which Board the button will lead to
+ * when clicked by presenting the board's name and the board's background as a
+ * thumbnail.
  */
 class BoardCardButton : public Gtk::Button {
 public:
     /**
      * @brief BoardCardButton constructor.
-     * @param board Board object pointer from which basic information will be
-     *              gathered from.
+     * @param boardbackend Reference to a backend responsible for loading the
+     * board object
      *
-     * @throws std::invalid_argument when the file given does not exist
+     * @throws std::invalid_argument if it is not possible to load information
+     * about a board
      */
-    BoardCardButton(const std::string& board_filepath);
-
-    /**
-     * @brief Returns the filepath pointing to the Board object to be allocated
-     *        when clicking this button.
-     */
-    std::string get_filepath() const;
-
-    /**
-     * @brief Updates the Button settings
-     *
-     * @param board Board object pointer to load the settings from
-     */
-    void update(Board* board);
+    BoardCardButton(LocalBoard board_entry);
 
     /**
      * @brief Updates the button's title
@@ -48,13 +38,19 @@ public:
      */
     void set_background(const std::string& background);
 
+    const std::shared_ptr<Board> get_board() const;
+
+    /**
+     * @brief Gets the last modification time of the Board
+     */
+    time_point<system_clock, seconds> get_last_modified() const;
+
     std::strong_ordering operator<=>(const BoardCardButton& other) const;
 
 private:
     Gtk::Box root_box;
-    Gtk::Image board_thumbnail;
+    Gtk::Picture board_thumbnail;
     Gtk::Label board_name;
-
-    std::string board_filepath;
+    LocalBoard local_board_entry;
 };
 }  // namespace ui

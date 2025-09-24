@@ -1,40 +1,34 @@
 #include "board-card-button.h"
 
-#include <cstdint>
-#include <filesystem>
-#include <format>
+#include <spdlog/spdlog.h>
+#include <utils.h>
+
 #include <string>
 
-uint32_t rgb_to_hex(const Gdk::RGBA& colour) {
-    uint8_t r = static_cast<uint8_t>(colour.get_red_u());
-    uint8_t g = static_cast<uint8_t>(colour.get_green_u());
-    uint8_t b = static_cast<uint8_t>(colour.get_blue_u());
-    uint8_t a = static_cast<uint8_t>(colour.get_alpha_u());
-
-    return (r << 24) + (g << 16) + (b << 8) + a;
-}
-
-ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
+ui::BoardCardButton::BoardCardButton(LocalBoard board_entry)
     : Button{},
       root_box{Gtk::Orientation::VERTICAL},
       board_thumbnail{},
       board_name{},
-      board_filepath{board_filepath} {
-    Board board{board_filepath};
-
+      local_board_entry{board_entry} {
+    set_name_(board_entry.board->get_name());
     set_valign(Gtk::Align::CENTER);
     set_halign(Gtk::Align::CENTER);
     set_has_frame(false);
 
     set_expand(false);
 
-    set_name_(board.get_name());
     board_name.set_valign(Gtk::Align::CENTER);
     board_name.set_vexpand(false);
 
-    set_background(board.get_background());
+    set_background(board_entry.board->get_background());
     board_thumbnail.set_size_request(256, 256);
     board_thumbnail.set_margin_top(10);
+
+    local_board_entry.board->signal_name_changed().connect(
+        [this]() { set_name_(local_board_entry.board->get_name()); });
+    local_board_entry.board->signal_background().connect(
+        [this](std::string background) { set_background(background); });
 
     root_box.set_spacing(4);
     root_box.append(board_thumbnail);
@@ -42,12 +36,13 @@ ui::BoardCardButton::BoardCardButton(const std::string& board_filepath)
     set_child(root_box);
 }
 
-std::string ui::BoardCardButton::get_filepath() const { return board_filepath; }
+time_point<system_clock, seconds> ui::BoardCardButton::get_last_modified()
+    const {
+    return local_board_entry.board->get_last_modified();
+}
 
-void ui::BoardCardButton::update(Board* board) {
-    board_filepath = board->get_filepath();
-    set_name_(board->get_name());
-    set_background(board->get_background());
+const std::shared_ptr<Board> ui::BoardCardButton::get_board() const {
+    return local_board_entry.board;
 }
 
 void ui::BoardCardButton::set_name_(const std::string& name) {
@@ -61,23 +56,25 @@ void ui::BoardCardButton::set_background(const std::string& background) {
         case BackgroundType::COLOR: {
             auto solid_colour =
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-            Gdk::RGBA colour{background};
+            Color colour = string_to_color(background);
             solid_colour->fill(rgb_to_hex(colour));
-            board_thumbnail.set(solid_colour);
+            board_thumbnail.set_pixbuf(solid_colour);
             break;
         }
         case BackgroundType::IMAGE: {
-            auto board_bg_image =
-                Gdk::Pixbuf::create_from_file(background, 256, 256, false);
-            board_thumbnail.set(board_bg_image);
+            board_thumbnail.set_filename(compressed_thumb_filename(background));
             break;
         }
         case BackgroundType::INVALID: {
             auto solid_colour =
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
-            Gdk::RGBA colour{0, 0, 0, 1};
+            Color colour{0, 0, 0, 1};
             solid_colour->fill(rgb_to_hex(colour));
-            board_thumbnail.set(solid_colour);
+            board_thumbnail.set_pixbuf(solid_colour);
+            spdlog::get("ui")->warn(
+                "[BoardCardButton.set_background] Cannot load background for "
+                "Board \"{}\". Falling back to default color",
+                board_name.get_text().c_str());
             break;
         }
     }
@@ -85,8 +82,5 @@ void ui::BoardCardButton::set_background(const std::string& background) {
 
 std::strong_ordering ui::BoardCardButton::operator<=>(
     const BoardCardButton& other) const {
-    auto this_lm_time = std::filesystem::last_write_time(board_filepath);
-    auto other_lm_time = std::filesystem::last_write_time(other.get_filepath());
-
-    return this_lm_time <=> other_lm_time;
+    return this->get_last_modified() <=> other.get_last_modified();
 }

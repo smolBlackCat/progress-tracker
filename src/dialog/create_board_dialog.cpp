@@ -1,56 +1,52 @@
 #include "create_board_dialog.h"
 
 #include <glibmm/i18n.h>
-
-#include <format>
-
-#include "../utils.h"
+#include <spdlog/spdlog.h>
 
 namespace ui {
-CreateBoardDialog::CreateBoardDialog(
-    BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& ref_builder,
-    ProgressWindow& app_window)
-    : BoardDialog{cobject, ref_builder}, app_window{app_window} {
-    set_title(_("Create Board"));
-    p_left_button->add_css_class("destructive-action");
-    p_right_button->add_css_class("suggested-action");
-
-    p_right_button->set_label(_("Create"));
-    p_right_button->signal_clicked().connect(
-        sigc::mem_fun(*this, &CreateBoardDialog::create_board));
+CreateBoardDialog::CreateBoardDialog(BoardManager& board_creator)
+    : BoardDialog{}, m_manager{board_creator} {
+    adw_dialog_set_title(ADW_DIALOG(board_dialog->gobj()),
+                         _("Create New Board"));
 }
 
+CreateBoardDialog* CreateBoardDialog::create(BoardManager& board_creator) {
+    return new CreateBoardDialog(board_creator);
+}
+
+void CreateBoardDialog::on_footer_button_click() { create_board(); }
+
 void CreateBoardDialog::create_board() {
-    if (p_board_name_entry->get_text_length() == 0) {
+    if (board_title_entry->get_text_length() == 0) {
         auto message_dialog =
             Gtk::AlertDialog::create(_("Empty board names are not allowed"));
-        message_dialog->show(*this);
+        message_dialog->show(*parent);
         return;
     }
 
-    if ((!file_selected) &&
-        p_background_selector_stack->get_visible_child_name() == "as-file") {
-        auto message_dialog =
-            Gtk::AlertDialog::create(_("A file must be selected"));
-        message_dialog->show(*this);
-        return;
+    switch (bg_type) {
+        case BackgroundType::COLOR: {
+            // FIXME:
+            // Not a clean solution, we have to rely on calculation everytime
+            // because there is no exact standard for colour setting
+            auto rgb_string = std::format(
+                "rgb({},{},{})", (int)(rgba.get_red() * 255),
+                (int)(rgba.get_green() * 255), (int)(rgba.get_blue() * 255));
+            m_manager.local_add(board_title_entry->get_text(), rgb_string);
+            break;
+        }
+        case BackgroundType::IMAGE: {
+            m_manager.local_add(board_title_entry->get_text(), image_filename);
+            break;
+        }
+        default: {
+            // Report probable data corruption
+            break;
+        }
     }
 
-    std::string background_type =
-        p_background_selector_stack->get_visible_child_name();
-    std::string background = background_type == "as-file"
-                                 ? p_select_file_label->get_text()
-                                 : p_colour_button->get_rgba().to_string();
-    Board board = Board{p_board_name_entry->get_text(), background};
-    std::string new_file_path = gen_unique_filename(board.get_name());
-    if (!board.set_filepath(new_file_path)) {
-        auto message_dialog = Gtk::AlertDialog::create(
-            _("It was not possible to create a Board with given name"));
-        message_dialog->show(*this);
-    } else {
-        board.save_as_xml();
-        app_window.add_board(new_file_path);
-        close_window();
-    }
+    spdlog::get("app")->info("Board (\"{}\") created",
+                             board_title_entry->get_text().c_str());
+    adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

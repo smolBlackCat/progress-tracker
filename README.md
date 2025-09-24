@@ -1,38 +1,42 @@
-
 # ![progress-logo] Progress
 
-Simple kanban-style task organiser
+Simple Kanban board manager
 
-![GitHub Release][github-release-badge]
-![Flathub Downloads][flatpak-release-badge]
-![GitHub License][github-licence]
+[![GitHub Release][github-release-badge]][github-release]
+[![Flathub Downloads][flatpak-release-badge]][progress-flathub]
+[![GitHub License][github-licence]](LICENSE)
 
 ![App Windows](pictures/progress-app-presentation.png)
 
-Progress is a simple task management app focused on simplicity yet enough for
-most workflows. It can be used on various contexts, from software development
-to daily tasks. It is written in C++ using GTK 4(gtkmm) and libadwaita.
+Progress is a Kanban board management app designed to be simple yet flexible for
+most workflows. Whether you're managing software projects or organsing
+daily tasks, Progress keeps things straightforward. It is built in
+C++ with GTK4 and LibAdwaita.
+
+## Dependencies
+
+* gtkmm-4 (>= 4.15.0)
+* libadwaita1 (>= 1.5)
+* tinyxml2 (>= 11.0.0)
+* spdlog (>= 1.15)
+* crossguid (built-in)
 
 ## Installation
 
 ### Flatpak
 
-Progress is available to download at [Flathub][progress-flathub].
+[![flathub-badge]][progress-flathub]
 
-![flathub-badge][flathub-badge]
+### Debian-based
 
-### Debian
-
-A debian build is also available. The debian package can be obtained in the
-[releases][github-release] page.
-
-```sh
-sudo apt install ./progress-tracker-1.6.deb
-```
+A Debian package can be found and installed in the Progress's releases page. It
+is built on a *Debian Testing* box, so some dependencies may not be available to
+your Debian-based or Ubuntu-based distribution.
 
 ### Arch Linux (AUR)
 
-Progress is available on the AUR (Arch User Repository). You can install it using the `yay` command-line application:
+Progress is available on the AUR (Arch User Repository). You can install it
+using the `yay` command-line application:
 
 ```sh
 yay -S progress-tracker
@@ -40,92 +44,94 @@ yay -S progress-tracker
 
 ### Windows
 
-Windows installers are also available in the [releases][github-release] section.
-The installers were tested against the following environments.
-
-* Windows 8
-* Windows 10
-* Windows 11
+For Windows systems, Progress is available as a standard Windows installer
+executable or as a compressed file containing the application's binary and its
+dependencies. These builds target x64 systems, so make sure the host operating
+system is also x64.
 
 ### Building from Source
 
-For contributing to Progress source code, building from source might be the
-better option.
+Alternative for those who may want to contribute to the project somehow or want
+a custom build. Ensure all dependencies are installed beforehand and verify
+whether the system's C++ compiler is C++20 compliant.
 
-#### Dependencies
-
-* cmake
-* python3 (required only if building on Windows)
-* libgtkmm-4.0-dev
-* libadwaita-1-dev
-* libtinyxml2-dev
-* gettext
-* catch2 (optional)
-
-#### Building on Linux
+#### Linux
 
 1. Install the dependencies
 
-    ```sh
-    # Use your package manager
-    sudo apt install cmake libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev gettext catch2
-    ```
+   ```sh
+   # Use your package manager
+   sudo apt install cmake libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev \
+    libspdlog-dev gettext catch2
+   ```
 
 2. Clone the project's repository
 
-    ```sh
-    git clone https://github.com/smolBlackCat/progress-tracker.git
-    ```
+   ```sh
+   git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
+   ```
 
 3. Configure and compile project.
 
-    ```sh
-    cd progress-tracker/
+   ```sh
+   cd progress-tracker/
 
-    # Use DCMAKE_BUILD_TYPE=Debug to build the application in development mode
-    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release
-    cmake --build build/
-    ```
+   cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX=/usr -DDEVELOPMENT=OFF
+   cmake --build build/
+   ```
 
 4. Install the Project
 
-    ```sh
-    sudo ninja install -C build/
-    ```
+   ```sh
+   sudo ninja install -C build/
+   sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+   ```
 
-#### Building on Windows
+#### Windows
 
-There are multiple approaches to building projects on Windows. The approach used
-by this project is setting up a [MSYS2 environment](https://www.msys2.org/) and
-downloading the MSYS dependencies similar to the one listed before. Currently,
-the project build settings support only two environments: UCRT64 and MINGW32.
+[MSYS2][msys-download] is a build platform utilised by the project for porting
+Progress to Windows operating systems. Ensure that the platform is installed
+before proceeding.
 
 1. Install the dependencies
 
-    ```sh
-    # Replace env with either 'ucrt64' or 'mingw32'
-    pacman -Syu mingw-w64-env-cmake mingw-w64-env-python mingw-w64-env-gtkmm4 \
-        mingw-w64-env-libadwaita mingw-w64-env-tinyxml2 \
-        mingw-w64-env-gettext mingw-w64-env-catch git
-    ```
+   ```sh
+   # This snippet assumes you're running on the UCRT64 environment
+   pacman -Syu mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-python mingw-w64-ucrt-x86_64-gtkmm4 mingw-w64-ucrt-x86_64-libadwaita mingw-w64-ucrt-x86_64-tinyxml2 mingw-w64-ucrt-x86_64-gettext mingw-w64-ucrt-x86_64-catch mingw-w64-ucrt-x86_64-spdlog mingw-w64-ucrt-x86_64-nsis git
+   ```
 
 2. Clone the project's repository
 
-    ```sh
-    git clone https://github.com/smolBlackCat/progress-tracker.git
-    ```
+   ```sh
+   git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
+   ```
 
 3. Configure and compile project
 
-    ```sh
-    cd progress-tracker/
-    cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release -DWINDOWS=True
-    cmake --build build/
-    ```
+   ```sh
+   cd progress-tracker/
+   cmake -S . -B build/ -DDEVELOPMENT=OFF
+   cmake --build build/
+   ```
 
-4. Build installer using
-[Inno Setup Script Compiler](https://jrsoftware.org/isinfo.php) (optional).
+4. Build the Progress installer and ZIP file
 
+   ```sh
+   cd build/
+
+   # Builds a Windows installer executable
+   cpack
+   ```
+
+## Support
+
+Consider supporting my work here. Balancing college life and software
+maintainance is a lot of work, so if you like what I do, you can pay me a cup
+of coffee (or a donut).
+
+[![paypal-image]][paypal-link]
+
+[paypal-link]: https://www.paypal.com/donate/?hosted_button_id=9E5ELM2GFRU7U
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
 [progress-flathub]: https://flathub.org/apps/io.github.smolblackcat.Progress
 [github-release]: https://github.com/smolBlackCat/progress-tracker/releases
@@ -133,3 +139,6 @@ the project build settings support only two environments: UCRT64 and MINGW32.
 [github-release-badge]: https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github
 [flatpak-release-badge]: https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub
 [github-licence]: https://img.shields.io/github/license/smolBlackCat/progress-tracker
+[build-status]: https://img.shields.io/github/actions/workflow/status/smolBlackCat/progress-tracker/progress-ci.yml
+[msys-download]: https://www.msys2.org/
+[paypal-image]: https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg

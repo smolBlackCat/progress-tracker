@@ -2,10 +2,8 @@
 
 #include <glibmm.h>
 #include <gtkmm/application.h>
+#include <core/board-manager.h>
 
-#include <vector>
-
-#include "core/board.h"
 #include "window.h"
 
 namespace ui {
@@ -20,12 +18,16 @@ public:
 
     static Glib::RefPtr<ui::Application> create();
 
+    ~Application() override;
+
 protected:
     Application();
 
     void on_startup() override;
     void on_activate() override;
 
+    BoardManager m_manager;
     ProgressWindow* main_window = nullptr;
+    Glib::RefPtr<Gio::Settings> progress_settings;
 };
 }  // namespace ui
