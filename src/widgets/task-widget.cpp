@@ -204,7 +204,7 @@ void TaskWidget::on_rename() {
     m_entry.add_controller(focus_controller);
 
     spdlog::get("ui")->debug(
-        "[TaskWidget] TaskWidget \"{}\" has entered rename mode",
+        "[TaskWidget.on_rename] (\"{}\"): Entered rename mode",
         m_task->get_name());
 }
 
@@ -219,32 +219,38 @@ void TaskWidget::off_rename() {
         } else {
             m_label.set_markup(new_label);
         }
+        const std::string old_name = m_task->get_name();
         m_task->set_name(new_label);
+
+        // FIXME: This large call only for getting the card's name is awful.
+        // This is result of bad design.
+        spdlog::get("app")->info(
+            "Task (\"{}\") from Card (\"{}\") renamed to (\"{}\")", old_name,
+            m_card_dialog.get_card_widget()->get_card()->get_name(), new_label);
         is_new = false;
     }
 
     spdlog::get("ui")->debug(
-        "[TaskWidget] TaskWidget \"{}\" has exited rename mode",
+        "[TaskWidget.off_rename] (\"{}\"): Exited rename mode",
         m_task->get_name());
 }
 
+// TODO: Reassess the need for handlers in the widget implementation
 void TaskWidget::done_handler(bool done) {
     if (done) {
         m_label.set_markup(
             Glib::ustring::compose("<s>%1</s>", m_task->get_name()));
         add_css_class("complete-task");
-
-        spdlog::get("ui")->debug(
-            "[TaskWidget] TaskWidget \"{}\" has been marked as complete",
-            m_task->get_name());
     } else {
         m_label.set_markup(m_task->get_name());
         remove_css_class("complete-task");
-
-        spdlog::get("ui")->debug(
-            "[TaskWidget] TaskWidget \"{}\" has been marked as incomplete",
-            m_task->get_name());
     }
+
+    // FIXME: This one is a awful-looking call
+    spdlog::get("app")->info(
+        "Task (\"{}\") from Card (\"{}\") set as {}", m_task->get_name(),
+        m_card_dialog.get_card_widget()->get_card()->get_name(),
+        (done ? "complete" : "incomplete"));
 }
 
 void TaskWidget::on_remove() { m_card_dialog.remove_task(*this); }
@@ -256,9 +262,10 @@ void TaskWidget::on_checkbox() {
 
 void TaskWidget::on_convert() {
     CardWidget& card_widget = *m_card_dialog.get_card_widget();
-    spdlog::get("ui")->info(
-        "[TaskWidget] Task \"{}\" has been converted into a card",
-        m_task->get_name());
+    spdlog::get("app")->info(
+        "Task (\"{}\") from Card (\"{}\") converted into a card",
+        m_task->get_name(),
+        m_card_dialog.get_card_widget()->get_card()->get_name());
     auto cardlist_widget =
         const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
     auto cardlist_model = cardlist_widget->cardlist();
@@ -284,9 +291,8 @@ void TaskWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
-            spdlog::get("ui")->debug(
-                "[TaskWidget] TaskWidget \"{}\" is being dragged",
-                m_task->get_name());
+            spdlog::get("ui")->debug("[TaskWidget.dnd] (\"{}\"): On drag",
+                                     m_task->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -294,7 +300,7 @@ void TaskWidget::setup_drag_and_drop() {
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
             spdlog::get("ui")->debug(
-                "[TaskWidget] TaskWidget \"{}\" dragging has been canceled",
+                "[TaskWidget.dnd] (\"{}\"): Canceled drag event",
                 m_task->get_name());
             return true;
         },
@@ -303,7 +309,7 @@ void TaskWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
             spdlog::get("ui")->debug(
-                "[TaskWidget] TaskWidget \"{}\" stopped being dragged",
+                "[TaskWidget.dnd] (\"{}\"): Stopped being dragged",
                 m_task->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
@@ -322,15 +328,14 @@ void TaskWidget::setup_drag_and_drop() {
 
                 if (dropped_taskwidget == this) {
                     spdlog::get("ui")->warn(
-                        "[TaskWidget] TaskWidget \"{}\" has been dropped onto "
+                        "[TaskWidget.dnd] (\"{}\") has been dropped onto "
                         "itself",
                         m_task->get_name());
                     return true;
                 }
 
-                spdlog::get("ui")->debug(
-                    "[TaskWidget] TaskWidget \"{}\" has been dropped on "
-                    "TaskWidget \"{}\"",
+                spdlog::get("app")->info(
+                    "Task (\"{}\") dropped on Task (\"{}\")",
                     dropped_taskwidget->task()->get_name(), m_task->get_name());
 
                 m_card_dialog.reorder_task_widget(*dropped_taskwidget, *this);

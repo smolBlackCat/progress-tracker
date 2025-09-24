@@ -49,7 +49,7 @@ public:
 
 private:
     Gtk::Box root_box;
-    Gtk::Image board_thumbnail;
+    Gtk::Picture board_thumbnail;
     Gtk::Label board_name;
     LocalBoard local_board_entry;
 };

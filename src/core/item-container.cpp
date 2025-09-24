@@ -1,5 +1,6 @@
-#include "cardlist.h"
 #include "item-container.h"
+
+#include "cardlist.h"
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
@@ -16,8 +17,6 @@ std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
 
     auto new_item = std::make_shared<T>(item);
     m_data.push_back(std::make_shared<T>(item));
-    spdlog::get("core")->info("[ItemContainer] Item \"{}\" has been added",
-                              item.get_name());
     modify();
     on_append_signal.emit(new_item);
     return m_data.back();
@@ -29,9 +28,6 @@ void ItemContainer<T>::remove(const T& item) {
     for (auto it = m_data.begin(); it != m_data.end(); it++) {
         if (item == *(*it)) {
             m_data.erase(it);
-            spdlog::get("core")->info(
-                "[ItemContainer] Item \"{}\" has been removed",
-                item.get_name());
             modify();
             on_remove_signal.emit(*it);
             return;
@@ -112,8 +108,6 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
     bool is_same = next_i == sibling_i;
 
     if (any_absent || is_same) {
-        spdlog::get("core")->warn(
-            "[ItemContainer] Cannot reorder items: same references or missing");
         return ReorderingType::INVALID;
     }
 
@@ -128,9 +122,6 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
         m_data.insert(m_data.begin() + (sibling_i == 0 ? 0 : sibling_i),
                       next_v);
         reordering = ReorderingType::DOWNUP;
-        spdlog::get("core")->info(
-            "[ItemContainer] Item \"{}\" was inserted before Item \"{}\"",
-            next.get_name(), sibling.get_name());
         modify();
         on_reorder_signal.emit(next_v, sibling_v, reordering);
         return reordering;
@@ -138,9 +129,6 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
         // Up to down reordering
         m_data.insert(m_data.begin() + sibling_i, next_v);
         reordering = ReorderingType::UPDOWN;
-        spdlog::get("core")->info(
-            "[ItemContainer] Item \"{}\" was inserted after Item \"{}\"",
-            next.get_name(), sibling.get_name());
         modify();
         on_reorder_signal.emit(next_v, sibling_v, reordering);
         return reordering;
@@ -221,4 +209,3 @@ ItemContainer<T>::signal_reorder() {
 template class ItemContainer<CardList>;
 template class ItemContainer<Card>;
 template class ItemContainer<Task>;
-

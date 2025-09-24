@@ -1,3 +1,5 @@
+#include "card-dialog.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <widgets/card-widget.h>
@@ -5,7 +7,6 @@
 
 #include <ctime>
 
-#include "card-dialog.h"
 #include "glibmm/ustring.h"
 
 namespace ui {
@@ -45,18 +46,17 @@ CardDetailsDialog::CardDetailsDialog()
     unset_due_date_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_unset_due_date));
 
-    g_signal_connect(
-        adw_dialog->gobj(), "closed",
-        G_CALLBACK(+[](AdwDialog* self, gpointer data) {
-            reinterpret_cast<CardDetailsDialog*>(data)
-                ->get_card_widget()
-                ->grab_focus();
-            reinterpret_cast<CardDetailsDialog*>(data)->on_save();
-            reinterpret_cast<CardDetailsDialog*>(data)->clear();
+    g_signal_connect(adw_dialog->gobj(), "closed",
+                     G_CALLBACK(+[](AdwDialog* self, gpointer data) {
+                         reinterpret_cast<CardDetailsDialog*>(data)
+                             ->get_card_widget()
+                             ->grab_focus();
+                         reinterpret_cast<CardDetailsDialog*>(data)->on_save();
+                         reinterpret_cast<CardDetailsDialog*>(data)->clear();
 
-            spdlog::get("ui")->info("[CardDetailsDialog] Dialog has closed");
-        }),
-        this);
+                         spdlog::get("app")->info("Card dialog closed");
+                     }),
+                     this);
 
     checklist_add_button.set_margin_start(4);
     checklist_add_button.set_margin_end(4);
@@ -69,6 +69,9 @@ CardDetailsDialog::~CardDetailsDialog() {}
 TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     TaskWidget* task_widget =
         _add_task(cur_card_widget->get_card()->container().append(task), false);
+    spdlog::get("app")->info("Task (\"{}\") added to card (\"{}\")",
+                             task.get_name(),
+                             cur_card_widget->get_card()->get_name());
 
     return task_widget;
 }
@@ -81,11 +84,6 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
     tasks_box->insert_child_after(*task_widget, *sibling);
     tasks_tracker.push_back(task_widget);
 
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] TaskWidget \"{}\" has been inserted to the "
-        "checklist after \"{}\"",
-        task.get_name(), sibling->task()->get_name());
-
     return task_widget;
 }
 
@@ -95,10 +93,8 @@ void CardDetailsDialog::remove_task(TaskWidget& task) {
     tasks_box->remove(task);
     std::erase(tasks_tracker, &task);
 
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] TaskWidget \"{}\" removed from the Card dialog "
-        "checklist",
-        task.task()->get_name());
+    spdlog::get("app")->info("Task (\"{}\") removed from Card (\"{}\")",
+                             task.task()->get_name(), card->get_name());
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
@@ -116,23 +112,25 @@ void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
                 tasks_box->reorder_child_after(next, *sibling_sibling);
             }
 
-            spdlog::get("ui")->debug(
-                "[CardDetailsDialog] TaskWidget \"{}\" was inserted before "
-                "TaskWidget \"{}\"",
-                next.task()->get_name(), sibling.task()->get_name());
+            spdlog::get("app")->info(
+                "Reordered task (\"{}\") before task (\"{}\") in Card(\"{}\")",
+                next.task()->get_name(), sibling.task()->get_name(),
+                cur_card_widget->get_card()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
             tasks_box->reorder_child_after(next, sibling);
-            spdlog::get("ui")->debug(
-                "[CardDetailsDialog] TaskWidget \"{}\" was inserted after "
-                "TaskWidget \"{}\"",
-                next.task()->get_name(), sibling.task()->get_name());
+            spdlog::get("app")->info(
+                "Reordered task (\"{}\") after task (\"{}\") in Card(\"{}\")",
+                next.task()->get_name(), sibling.task()->get_name(),
+                cur_card_widget->get_card()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
             spdlog::get("ui")->warn(
-                "[CardDetailsDialog] Invalid reorder request");
+                "[CardDetailsDialog.reorder] Cannot reorder (\"{}\") and "
+                "(\"{}\")",
+                next.task()->get_name(), sibling.task()->get_name());
             break;
         }
     }
@@ -158,7 +156,7 @@ void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
     adw_dialog_present(ADW_DIALOG(adw_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
 
-    spdlog::get("app")->info("Card dialog opened for Card {}",
+    spdlog::get("app")->info("Card dialog opened for card (\"{}\")",
                              card_widget->get_card()->get_name());
 }
 
@@ -173,10 +171,6 @@ void CardDetailsDialog::update_due_date_label() {
     char date_str[255];
     strftime(date_str, 255, "%x", std::gmtime(&time));
     date_menubutton->set_label(Glib::ustring{date_str});
-
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] Card Dialog's due date label has been set to: {}",
-        date_str);
 }
 
 CardWidget* CardDetailsDialog::get_card_widget() { return cur_card_widget; }
@@ -185,6 +179,9 @@ void CardDetailsDialog::on_add_task() {
     _add_task(
         cur_card_widget->get_card()->container().append(Task{_("New Task")}),
         false);
+
+    spdlog::get("app")->info("New task appended to Card (\"{}\")",
+                             cur_card_widget->get_card()->get_name());
 }
 
 void CardDetailsDialog::on_save() {
@@ -196,20 +193,25 @@ void CardDetailsDialog::on_save() {
     std::string new_card_name = card_title_entry->get_text();
     std::string new_notes = notes_textbuffer->get_text();
 
+    bool changes = false;
+
     if (card->get_name() != new_card_name) {
         cur_card_widget->set_title(new_card_name);
         card->set_name(new_card_name);
+        changes = true;
     }
 
     if (card->get_notes() != new_notes) {
         card->set_notes(new_notes);
+        changes = true;
     }
 
     cur_card_widget->set_tooltip_markup(cur_card_widget->create_details_text());
 
-    spdlog::get("ui")->info(
-        "[CardDetailsDialog] Card dialog has saved changes made to Card \"{}\"",
-        card->get_name());
+    if (changes) {
+        spdlog::get("app")->info("Changes made to card (\"{}\") saved",
+                                 card->get_name());
+    }
 }
 
 void CardDetailsDialog::on_delete_card() {
@@ -220,10 +222,6 @@ void CardDetailsDialog::on_delete_card() {
     cur_card_widget->remove_from_parent();
     cur_card_widget = nullptr;
 
-    spdlog::get("ui")->info(
-        "[CardDetailsDialog] Card dialog has deleted Card \"{}\"",
-        card->get_name());
-
     close();
 }
 
@@ -233,9 +231,6 @@ void CardDetailsDialog::on_unset_due_date() {
     date_menubutton->set_label(_("Set Due Date"));
     card_ptr->set_due_date(Date{});
     checkbutton_revealer->set_reveal_child(false);
-
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] Card dialog has unset due date");
 }
 
 void CardDetailsDialog::on_set_due_date() {
@@ -251,8 +246,6 @@ void CardDetailsDialog::on_set_due_date() {
     card_ptr->set_due_date(new_date);
     checkbutton_revealer->set_reveal_child(true);
     update_due_date_label();
-
-    spdlog::get("ui")->debug("Card Dialog has set due date");
 }
 
 void CardDetailsDialog::clear() {
@@ -268,8 +261,7 @@ void CardDetailsDialog::clear() {
 
     cur_card_widget = nullptr;
 
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] Card Dialog has been cleared");
+    spdlog::get("ui")->debug("[CardDetailsDialog.clear] Dialog cleaned");
 }
 
 TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
@@ -278,12 +270,6 @@ TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
     tasks_box->append(*task_widget);
     tasks_box->reorder_child_after(checklist_add_button, *task_widget);
     tasks_tracker.push_back(task_widget);
-
-    spdlog::get("ui")->debug(
-        "[CardDetailsDialog] TaskWidget \"{}\" has been added to the checklist",
-        task->get_name());
-
     return task_widget;
 }
 }  // namespace ui
-

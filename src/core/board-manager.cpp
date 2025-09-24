@@ -1,13 +1,12 @@
+#include "board-manager.h"
+
 #include <app_info.h>
-#include <spdlog/spdlog.h>
 
 #include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <regex>
 #include <thread>
-
-#include "board-manager.h"
 
 namespace fs = std::filesystem;
 
@@ -52,8 +51,6 @@ std::string gen_filename(const std::string& boards_dir, const Board& board) {
 }
 
 std::shared_ptr<Board> unitialized_board(const std::string& filename) {
-    spdlog::get("core")->debug(
-        "[BoardManager] BoardManager is loading board from file: {}", filename);
     if (!fs::exists(filename))
         throw std::invalid_argument{std::format(
             "Progress Board XML file given does not exist: {}", filename)};
@@ -217,10 +214,6 @@ void full_load(const std::string& filename,
 
     board->modify(false);
     board->container().modify(false);
-
-    spdlog::get("core")->debug(
-        "BoardManager has loaded all cardlists for board \"{}\"",
-        board->get_name());
 }
 
 BoardManager::BoardManager() : BoardManager{progress_boards_folder()} {}
@@ -232,8 +225,6 @@ BoardManager::BoardManager(const std::string& board_dir)
             "Failed to load boards: Boards folder cannot be resolved"};
     }
 
-    spdlog::get("core")->info(
-        "[BoardManager] Loading boards from local storage: {}", board_dir);
     std::thread([this]() {
         std::lock_guard<std::mutex> lock(this->valid_mutex);
         for (const auto& dir_entry :
@@ -245,16 +236,12 @@ BoardManager::BoardManager(const std::string& board_dir)
                         LocalBoard{board_filename,
                                    unitialized_board(board_filename), false});
                 } catch (std::invalid_argument& err) {
-                    spdlog::get("core")->error("Failed to load board: {}",
-                                               err.what());
+                    // error loading board: keep going
                 }
             }
         }
         m_loaded = true;
     }).detach();
-
-    spdlog::get("core")->info(
-        "[BoardManager] Local boards have been successfully loaded", BOARD_DIR);
 }
 
 std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
@@ -271,9 +258,6 @@ std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
                 // was since it does not mean that the file is corrupted, it
                 // just means the file is not well-formed
 
-                spdlog::get("core")->warn(
-                    "[BoardManager] Progress Board in {} was ill-formed",
-                    filename);
                 break;
             } catch (std::runtime_error& err) {
                 // File has been deleted at the time for reading, delete the
@@ -414,26 +398,16 @@ void BoardManager::__local_save(const LocalBoard& local) {
 
     const std::filesystem::path p{local.filename};
     if (p.has_parent_path() && !std::filesystem::exists(p.parent_path())) {
-        spdlog::get("core")->warn(
-            "[BoardBackend] Parent path \"{}\" does not exist. Creating",
-            p.parent_path().string());
         std::filesystem::create_directories(p.parent_path());
     }
 
     if (doc->SaveFile(local.filename.c_str()) == tinyxml2::XML_SUCCESS) {
-        spdlog::get("core")->debug(
-            "[BoardManager] BoardManager has saved Board \"{}\" to: {}",
-            board->get_name(), local.filename);
-
         auto lm_filepath = std::chrono::clock_cast<std::chrono::system_clock,
                                                    std::chrono::file_clock>(
             std::filesystem::last_write_time(p));
         board->m_last_modified =
             std::chrono::floor<std::chrono::seconds>(lm_filepath);
     } else {
-        spdlog::get("core")->error(
-            "[BoardManager] Failed to save board \"{}\" to: {}",
-            board->get_name(), local.filename);
+        // failed to save: no logging emitted
     }
 }
-

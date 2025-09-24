@@ -2,9 +2,6 @@
 
 #include <guid.hpp>
 
-extern const std::shared_ptr<spdlog::logger> core_logger =
-    spdlog::stdout_color_mt("core");
-
 Item::Item(const std::string& name) : Item{name, xg::newGuid()} {}
 
 Item::Item(const std::string& name, xg::Guid uuid) : name{name}, uuid{uuid} {}
@@ -12,11 +9,7 @@ Item::Item(const std::string& name, xg::Guid uuid) : name{name}, uuid{uuid} {}
 Item::~Item() {}
 
 void Item::set_name(const std::string& other) {
-    if (!name.empty())
-        spdlog::get("core")->info("[Item] Item \"{}\" renamed to \"{}\"", name,
-                                  other);
-
-    name = other;
+    if (!name.empty()) name = other;
     name_changed.emit();
 }
 

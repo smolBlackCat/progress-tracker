@@ -26,6 +26,7 @@ void CreateBoardDialog::create_board() {
 
     switch (bg_type) {
         case BackgroundType::COLOR: {
+            // FIXME:
             // Not a clean solution, we have to rely on calculation everytime
             // because there is no exact standard for colour setting
             auto rgb_string = std::format(
@@ -44,8 +45,8 @@ void CreateBoardDialog::create_board() {
         }
     }
 
-    spdlog::get("ui")->info(
-        "[CreateBoardDialog] Dialog has created a new board successfully");
+    spdlog::get("app")->info("Board (\"{}\") created",
+                             board_title_entry->get_text().c_str());
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

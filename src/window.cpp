@@ -253,8 +253,7 @@ void ProgressWindow::on_delete_board_mode() {
     add_board_button_p->set_visible(false);
     app_menu_button_p->set_visible(false);
 
-    spdlog::get("app")->info(
-        "[Progress Window] User entered delete board mode");
+    spdlog::get("app")->info("Entered delete board mode");
 }
 
 void ProgressWindow::off_delete_board_mode() {
@@ -267,8 +266,7 @@ void ProgressWindow::off_delete_board_mode() {
 
     set_title("Progress");
 
-    spdlog::get("app")->info(
-        "[Progress Window] User has left delete board mode");
+    spdlog::get("app")->info("Left deletion mode");
 }
 
 void ProgressWindow::on_main_menu() {
@@ -281,9 +279,6 @@ void ProgressWindow::on_main_menu() {
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
     set_title("Progress");
-
-    spdlog::get("app")->info(
-        "[Progress Window] Current view changed to board grid");
 }
 
 void ProgressWindow::on_board_view() {
@@ -295,9 +290,6 @@ void ProgressWindow::on_board_view() {
 
     add_board_button_p->set_sensitive(true);
     app_menu_button_p->set_sensitive(true);
-
-    spdlog::get("app")->info(
-        "[Progress Window] App view changed to board view");
 }
 
 // FIXME: This super inefficient because we're running at almost O(n²)
@@ -309,8 +301,7 @@ void ProgressWindow::delete_selected_boards() {
         m_manager.local_remove(cur_child->get_board());
     }
 
-    spdlog::get("app")->info("[Progress Window] User has deleted {} boards",
-                             selected_children.size());
+    spdlog::get("app")->info("Deleted {} boards", selected_children.size());
 
     off_delete_board_mode();
 }
@@ -326,18 +317,13 @@ void ProgressWindow::show_about_dialog() {
         "translator-credits", _("translator-credits"), "issue-url",
         "https://github.com/smolBlackCat/progress-tracker/issues", "website",
         "https://github.com/smolBlackCat/progress-tracker", NULL);
-    spdlog::get("app")->info("[Progress Window] Show about dialog");
 }
 
 void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
     card_dialog.open(*this, card_widget);
 }
 
-void ProgressWindow::show_shortcuts_dialog() {
-    sh_window->set_visible();
-
-    spdlog::get("app")->info("[Progress Window] Shortcuts dialog opened");
-}
+void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
@@ -360,18 +346,10 @@ void ProgressWindow::setup_menu_button() {
 void ProgressWindow::load_appropriate_style() {
     if (adw_style_manager_get_dark(adw_style_manager)) {
         css_provider->load_from_resource(ProgressWindow::STYLE_DARK_CSS);
-        spdlog::get("ui")->debug("[Progress Window] Loaded dark style");
     } else {
-        spdlog::get("ui")->debug("[Progress Window] Loaded light style");
         css_provider->load_from_resource(ProgressWindow::STYLE_CSS);
     }
 }
-
-// void ProgressWindow::on_board_loading_done() {
-
-//     add_board_button_p->set_sensitive();
-//     app_menu_button_p->set_sensitive();
-// }
 
 bool ProgressWindow::on_close() {
     set_visible(false);
@@ -386,8 +364,10 @@ bool ProgressWindow::on_close() {
     progress_settings->set_int("window-height", height);
     progress_settings->set_int("window-width", width);
 
-    spdlog::get("app")->info("Application window has been closed");
+    spdlog::get("app")->debug(
+        "On close status:\n\twindow-maximized: {}\n\twindow-height: "
+        "{}\n\twindow-width: {}",
+        is_maximized(), height, width);
     return true;
 }
 }  // namespace ui
-

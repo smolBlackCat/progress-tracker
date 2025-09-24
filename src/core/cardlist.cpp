@@ -1,8 +1,5 @@
 #include "cardlist.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include "guid.hpp"
 
 CardList::CardList(const std::string& name) : CardList{name, xg::newGuid()} {}

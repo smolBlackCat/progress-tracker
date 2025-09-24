@@ -1,21 +1,29 @@
 #include "card.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include <numeric>
 #include <utility>
 
 Card::Card(const std::string& name, const Date& date, bool complete,
            const Color& color)
-    : Item{name, xg::newGuid()}, m_complete{complete}, m_due_date{date} {
-    this->color = color;
-}
+    : Card{name, date, xg::newGuid(), complete, color} {}
 
 Card::Card(const std::string& name, const Date& date, const xg::Guid uuid,
            bool complete, const Color& color)
     : Item{name, uuid}, m_complete{complete}, m_due_date{date} {
     this->color = color;
+
+    m_tasks.signal_append().connect([](const std::shared_ptr<Task> /*clist*/) {
+        // previously logged: task append
+    });
+    m_tasks.signal_remove().connect([](const std::shared_ptr<Task> /*clist*/) {
+        // previously logged: task remove
+    });
+    m_tasks.signal_reorder().connect(
+        [](const std::shared_ptr<Task> /*task_next*/,
+           const std::shared_ptr<Task> /*task_sibling*/,
+           ReorderingType /*reordering*/) {
+            // previously logged: task reorder
+        });
 }
 
 Card::Card(const std::string& name, const Color& color)
@@ -32,12 +40,9 @@ void Card::set_name(const std::string& name) {
 }
 
 void Card::set_color(const Color& color) {
-    Color old_color = color;
+    Color old_color = this->color;
     this->color = color;
     modify();
-
-    spdlog::get("core")->info("[Card] Card \"{}\"'s color set to: {}", name,
-                              color_to_string(color));
 
     color_signal.emit(std::move(old_color), this->color);
 }
@@ -50,8 +55,6 @@ void Card::set_notes(const std::string& notes) {
     std::string old_notes = m_notes;
     this->m_notes = notes;
     modify();
-    spdlog::get("core")->info("[Card] Card \"{}\" notes set to: \"{}\"", name,
-                              notes);
     notes_signal.emit(std::move(old_notes), notes);
 }
 
@@ -77,8 +80,6 @@ void Card::set_due_date(const Date& date) {
     m_due_date = date;
     due_date_signal.emit(std::move(old), m_due_date);
     modify();
-    spdlog::get("core")->info("[Card] Card \"{}\" due date set to: {}", name,
-                              std::format("{}", date));
 };
 
 void Card::modify(bool m) { m_modified = m; }
@@ -91,14 +92,9 @@ void Card::set_complete(bool complete) {
     if (m_due_date.ok()) {
         this->m_complete = complete;
         modify();
-        spdlog::get("core")->info("[Card] Card \"{}\" marked as {}", name,
-                                  (complete ? "complete" : "incomplete"));
         complete_signal.emit(m_complete);
     } else {
-        spdlog::get("core")->warn(
-            "[Card] Card \"{}\" cannot be set as complete because no deadline "
-            "was assigned",
-            name);
+        // previously logged: impossible operation when no due date
     }
 }
 

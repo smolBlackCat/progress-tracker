@@ -1,9 +1,10 @@
+#include "cardlist-widget.h"
+
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 
 #include "board-widget.h"
 #include "card-widget.h"
-#include "cardlist-widget.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -54,11 +55,16 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
     m_header.add_option_button(_("Remove"), "remove",
                                [this]() { this->board.remove(*this); });
     m_header.signal_on_confirm().connect([this](std::string label) {
+        std::string old_name = this->m_cardlist->get_name();
         this->m_cardlist->set_name(label);
         this->m_new = false;
+
+        spdlog::get("app")->info("Card list (\"{}\") renamed to (\"{}\")",
+                                 old_name, this->m_cardlist->get_name());
     });
     m_header.signal_on_cancel().connect([this](std::string label) {
         if (this->m_new) {
+            spdlog::get("app")->info("New card list creation canceled");
             this->board.remove(*this);
         }
     });
@@ -185,33 +191,35 @@ void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
             } else {
                 m_root.reorder_child_after(next, *sibling_sibling);
             }
-            spdlog::get("ui")->debug(
-                "[CardlistWidget] CardWidget \"{}\" was inserted before "
-                "CardWidget \"{}\"",
-                next.get_card()->get_name(), sibling.get_card()->get_name());
+            spdlog::get("app")->info(
+                "Reordered Card (\"{}\") before Card (\"{}\") in Card "
+                "list(\"{}\")",
+                next.get_card()->get_name(), sibling.get_card()->get_name(),
+                m_cardlist->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
             m_root.reorder_child_after(next, sibling);
-
-            spdlog::get("ui")->debug(
-                "[CardlistWidget] CardWidget \"{}\" was inserted after "
-                "CardWidget \"{}\"",
-                next.get_card()->get_name(), sibling.get_card()->get_name());
+            spdlog::get("app")->info(
+                "Reordered Card (\"{}\") after Card (\"{}\") in Card "
+                "list(\"{}\")",
+                next.get_card()->get_name(), sibling.get_card()->get_name(),
+                m_cardlist->get_name());
             break;
         }
         case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn("[CardlistWidget] Invalid reorder request");
+            spdlog::get("ui")->warn(
+                "[CardlistWidget.reorder] Cannot reorder (\"{}\") and (\"{}\")",
+                next.get_card()->get_name(), sibling.get_card()->get_name());
             break;
         }
     }
 }
 
 void CardlistWidget::remove(CardWidget& card) {
-    spdlog::get("ui")->debug(
-        "[CardlistWidget] CardWidget \"{}\" has been removed from "
-        "CardlistWidget \"{}\"",
-        card.get_card()->get_name(), m_cardlist->get_name());
+    spdlog::get("app")->info("Card (\"{}\") removed from CardList (\"{}\")",
+                             card.get_card()->get_name(),
+                             m_cardlist->get_name());
 
     m_root.remove(card);
     m_cardlist->container().remove(*card.get_card());
@@ -230,6 +238,8 @@ void CardlistWidget::append(CardWidget& card) {
 }
 
 CardWidget* CardlistWidget::append_new_card(const Card& card) {
+    spdlog::get("app")->info("Added Card (\"{}\") to Card list (\"{}\")",
+                             card.get_name(), m_cardlist->get_name());
     return __add(m_cardlist->container().append(card));
 }
 
@@ -240,11 +250,6 @@ CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
     m_cards.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     m_root.insert_child_after(*cardwidget, *sibling);
-
-    spdlog::get("ui")->debug(
-        "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
-        "\"{}\"",
-        card.get_name(), m_cardlist->get_name());
 
     add_card_signal.emit(cardwidget);
 
@@ -281,9 +286,8 @@ void CardlistWidget::setup_drag_and_drop() {
             this->set_opacity(0.5);
             this->board.set_scroll();
 
-            spdlog::get("ui")->debug(
-                "[CardlistWidget] CardlistWidget \"{}\" is being dragged",
-                this->cardlist()->get_name());
+            spdlog::get("ui")->debug("[CardlistWidget.dnd] (\"{}\"): On drag",
+                                     this->cardlist()->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -293,8 +297,7 @@ void CardlistWidget::setup_drag_and_drop() {
             this->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardlistWidget] CardlistWidget \"{}\" dragging has been "
-                "canceled",
+                "[CardlistWidget.dnd] (\"{}\"): Canceled drag event",
                 this->cardlist()->get_name());
             return true;
         },
@@ -305,7 +308,7 @@ void CardlistWidget::setup_drag_and_drop() {
             this->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardlistWidget] CardlistWidget \"{}\" stopped being draggeed",
+                "[CardlistWidget.dnd] (\"{}\"): Stopped being draggeed",
                 this->cardlist()->get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
@@ -325,8 +328,8 @@ void CardlistWidget::setup_drag_and_drop() {
                     dropped_value.get().cardlist_widget;
 
                 if (dropped_cardlist == this) {
-                    spdlog::get("ui")->warn(
-                        "[CardlistWidget] CardlistWidget \"{}\" has been "
+                    spdlog::get("app")->warn(
+                        "[CardlistWidget.dnd] Card list(\"{}\") has been "
                         "dropped on itself.",
                         this->cardlist()->get_name());
                     this->remove_css_class("cardlist-to-drop");
@@ -338,9 +341,8 @@ void CardlistWidget::setup_drag_and_drop() {
 
                 this->remove_css_class("cardlist-to-drop");
 
-                spdlog::get("ui")->debug(
-                    "[CardlistWidget] CardlistWidget \"{}\" has been dropped "
-                    "on CardlistWidget \"{}\"",
+                spdlog::get("app")->info(
+                    "Card list (\"{}\") dropped on Card list (\"{}\")",
                     dropped_cardlist->cardlist()->get_name(),
                     this->cardlist()->get_name());
                 return true;
@@ -366,9 +368,8 @@ void CardlistWidget::setup_drag_and_drop() {
                     dropped_card->remove_from_parent();
                     this->append_new_card(*card_in_dropped);
 
-                    spdlog::get("ui")->debug(
-                        "[CardlistWidget] CardWidget \"{}\" has been dropped "
-                        "on CardlistWidget \"{}\"",
+                    spdlog::get("app")->info(
+                        "Card (\"{}\") dropped on card list (\"{}\")",
                         dropped_card->get_card()->get_name(),
                         this->cardlist()->get_name());
                 }
@@ -396,11 +397,6 @@ CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card,
     m_root.append(*cardwidget);
     m_root.reorder_child_after(m_add_card_button, *cardwidget);
 
-    spdlog::get("ui")->debug(
-        "[CardlistWidget] CardWidget \"{}\" has been added to CardlistWidget "
-        "\"{}\"",
-        card->get_name(), m_cardlist->get_name());
-
     add_card_signal.emit(cardwidget);
 
     return cardwidget;
@@ -413,4 +409,3 @@ sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
     return remove_card_signal;
 }
 }  // namespace ui
-

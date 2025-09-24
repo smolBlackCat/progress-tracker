@@ -4,7 +4,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include <filesystem>
 #include <locale>
 
 /**
@@ -29,13 +28,11 @@ int main(int argc, char* argv[]) {
     bind_textdomain_codeset("progress-tracker", "utf-8");
     textdomain("progress-tracker");
 
-    spdlog::get("app")->debug("Current System Locale: {}", sys_locale);
-    spdlog::get("app")->info("Loading locale data from: {}", LOCALE_FOLDER);
+    spdlog::get("app")->info("Locale: {}", sys_locale);
 
     auto app = ui::Application::create();
     int code = app->run(argc, argv);
 
-    spdlog::get("app")->info("Application exited with code {}", code);
+    spdlog::get("app")->info("Exit code: {}", code);
     return code;
 }
-

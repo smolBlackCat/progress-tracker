@@ -37,8 +37,9 @@ void PreferencesBoardDialog::load_board() {
         case BackgroundType::INVALID: {
             this->bg_type = BackgroundType::COLOR;
             spdlog::get("ui")->warn(
-                "[PreferencesBoardDialog] Current board background is invalid. "
-                "Falling back to default");
+                "[PreferencesBoardDialog.load_board] Cannot load Board "
+                "(\"{}\") background. Falling back to default",
+                board_widget.get_name());
             set_picture(Gdk::RGBA{});
             break;
         }
@@ -53,9 +54,8 @@ PreferencesBoardDialog* PreferencesBoardDialog::create(
 void PreferencesBoardDialog::on_footer_button_click() { on_save_changes(); }
 
 void PreferencesBoardDialog::on_save_changes() {
-    std::string new_name = board_title_entry->get_text();
-    parent->set_title(new_name);
-    board_widget.set_name(new_name);
+    const std::string old_name = board_widget.board()->get_name();
+    const std::string new_name = board_title_entry->get_text();
 
     if (new_name.empty()) {
         auto message_dialog =
@@ -64,19 +64,38 @@ void PreferencesBoardDialog::on_save_changes() {
         return;
     }
 
+    if (new_name != old_name) {
+        parent->set_title(new_name);
+        board_widget.set_name(new_name);
+
+        spdlog::get("app")->info("Board (\"{}\") renamed to (\"{}\")", old_name,
+                                 new_name);
+    }
+
+    const std::string old_background = board_widget.board()->get_background();
+    std::string new_background;
     switch (bg_type) {
         case BackgroundType::COLOR: {
-            board_widget.set_background(rgba.to_string());
+            new_background = rgba.to_string();
             break;
         }
         case BackgroundType::IMAGE: {
-            board_widget.set_background(image_filename);
+            new_background = image_filename;
             break;
         }
         default: {
             // Report probable corruption
         }
     }
+
+    if (new_background != old_background) {
+        board_widget.set_background(new_background);
+
+        spdlog::get("app")->info(
+            "Board (\"{}\") background changed to (\"{}\")", new_name,
+            new_background);
+    }
+
     board_widget.save(false);
 
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));

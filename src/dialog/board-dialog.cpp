@@ -8,7 +8,7 @@
 #include "core/colorable.h"
 
 namespace ui {
-
+// TODO: Add property signals for this base class for better extensibility
 BoardDialog::BoardDialog()
     : builder{Gtk::Builder::create_from_resource(BOARD_DIALOG)},
       color_dialog{Gtk::ColorDialog::create()},
@@ -32,7 +32,7 @@ BoardDialog::BoardDialog()
     g_signal_connect(
         board_dialog->gobj(), "closed",
         G_CALLBACK(+[](AdwDialog*, gpointer user_data) {
-            spdlog::get("ui")->info("[BoardDialog] Board dialog closed");
+            spdlog::get("ui")->info("[BoardDialog.close] Board dialog closed");
         }),
         nullptr);
 }
@@ -44,7 +44,7 @@ void BoardDialog::open(Gtk::Window& parent) {
                        static_cast<Gtk::Widget&>(parent).gobj());
     this->parent = &parent;
 
-    spdlog::get("ui")->info("[BoardDialog] Board dialog has opened");
+    spdlog::get("app")->info("A Board dialog opened");
 }
 
 void BoardDialog::on_set_image() {
@@ -66,16 +66,12 @@ void BoardDialog::on_set_image() {
         *parent,
         sigc::bind(sigc::mem_fun(*this, &ui::BoardDialog::on_filedialog_finish),
                    dialog));
-
-    spdlog::get("ui")->info("[BoardDialog] File chooser dialog opened");
 }
 
 void BoardDialog::on_set_color() {
     color_dialog->set_modal();
     color_dialog->choose_rgba(
         *parent, sigc::mem_fun(*this, &BoardDialog::on_color_finish));
-
-    spdlog::get("ui")->info("[BoardDialog] Colour dialog opened");
 }
 
 void BoardDialog::on_color_finish(
@@ -83,8 +79,10 @@ void BoardDialog::on_color_finish(
     try {
         rgba = color_dialog->choose_rgba_finish(result);
         set_picture(rgba);
+        spdlog::get("app")->info("[BoardDialog.set_picture] Color set to: {}",
+                                 rgba.to_string().c_str());
     } catch (Gtk::DialogError& err) {
-        spdlog::get("ui")->warn("[BoardDialog] {}", err.what());
+        spdlog::get("app")->warn("[BoardDialog.on_color_finish] {}", err.what());
     }
 }
 
@@ -94,12 +92,15 @@ void BoardDialog::on_filedialog_finish(
     try {
         image_filename = dialog->open_finish(result)->get_path();
         set_picture(compressed_thumb_filename(image_filename));
+        spdlog::get("app")->info("[BoardDialog.set_picture] Picture set to: {}",
+                                 image_filename);
     } catch (Glib::Error& err) {
-        spdlog::get("ui")->warn("[BoardDialog] {}", err.what());
+        spdlog::get("app")->warn("[BoardDialog.on_filedialog_finish] {}",
+                                err.what());
     }
 }
 
-// FIXME: Colour setting code is pretty inneficient because of the to-hex
+// FIXME: Colour setting code is pretty ineficient because of the to-hex
 // conversion overhead
 void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     this->rgba = rgba;
@@ -114,18 +115,10 @@ void BoardDialog::set_picture(const Gdk::RGBA& rgba) {
     }
     board_picture->set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
-
-    spdlog::get("ui")->info(
-        "[BoardDialog] Board dialog background chooser was set to: {}",
-        rgba.to_string().c_str());
 }
 
 void BoardDialog::set_picture(const std::string& image_filename) {
     board_picture->set_filename(image_filename);
     bg_type = BackgroundType::IMAGE;
-
-    spdlog::get("ui")->info(
-        "[BoardDialog] Board dialog background chooser was set to: {}",
-        image_filename);
 }
 }  // namespace ui

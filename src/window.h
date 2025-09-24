@@ -5,8 +5,6 @@
 #include <widgets/board-card-button.h>
 #include <widgets/board-widget.h>
 
-#include <thread>
-
 #include "core/board-manager.h"
 #include "dialog/card-dialog.h"
 
@@ -153,4 +151,3 @@ protected:
 };
 
 }  // namespace ui
-

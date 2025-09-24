@@ -1,6 +1,7 @@
 #include "app-context.h"
 
 #include <glibmm/i18n.h>
+#include <spdlog/spdlog.h>
 #include <window.h>
 
 #include "sigc++/adaptors/track_obj.h"
@@ -21,7 +22,7 @@ AppContext::AppContext(ui::ProgressWindow &app_window,
 
 void AppContext::open_session(const std::string &filename) {
     spdlog::get("app")->debug(
-        "[AppContext] Dispatch board loading helper thread");
+        "[AppContext.open_session] Dispatch board session starter thread");
     m_board_load_thread = std::thread{[this, filename]() {
         try {
             this->m_current_board = this->m_manager.local_open(filename);
@@ -34,8 +35,6 @@ void AppContext::open_session(const std::string &filename) {
 }
 
 void AppContext::close_session() {
-    spdlog::get("app")->info("Closing Kanban board session: \"{}\"",
-                             m_current_board->get_name());
     if (m_current_board) {
         if (m_board_save_thread.joinable()) {
             spdlog::get("app")->debug(
@@ -45,6 +44,9 @@ void AppContext::close_session() {
             m_manager.local_save(m_current_board);
         }
         m_manager.local_close(m_current_board);
+
+        spdlog::get("app")->info("Closed Kanban board session (\"{}\")",
+                                 m_current_board->get_name());
 
         reset_session_state();
 
@@ -71,15 +73,17 @@ void AppContext::reset_session_state() {
 }
 
 void AppContext::on_session_loaded() {
-    // Cleans out the allocated thread object
     if (m_board_load_thread.joinable()) {
         m_board_load_thread.join();
     }
 
     if (m_current_board) {
+        spdlog::get("app")->info("Kanban Board Session (\"{}\") started",
+                                 m_current_board->get_name());
         m_session_flags[Status::LOADING] = true;
 
         m_app_window.set_title(m_current_board->get_name());
+        m_app_window.on_board_view();
         m_board_widget.set(m_current_board);
 
         m_idle_load_session_cnn = Glib::signal_idle().connect(
@@ -93,8 +97,9 @@ void AppContext::on_session_loaded() {
             AppContext::UPDATE_INTERVAL);
     } else {
         // Board has failed to load. Go back to previous state
-        spdlog::get("app")->info(
-            "[AppContext] Failed to load board. Exiting to main Menu");
+        spdlog::get("app")->warn(
+            "[AppContext.on_session_loaded] Board session initialization has "
+            "failed");
 
         m_session_flags[Status::LOADING] = false;
         m_session_flags[Status::BUSY] = false;
@@ -108,40 +113,39 @@ void AppContext::on_session_loaded() {
 void AppContext::on_session_saved() {
     if (m_board_save_thread.joinable()) {
         m_board_save_thread.join();
-        spdlog::get("app")->debug("[AppContext] Joining save worker thread");
+        spdlog::get("app")->debug(
+            "[AppContext.on_session_saved] Joining save worker thread");
     }
 
-    spdlog::get("app")->debug(
-        "[AppContext] Save worker thread has been cleaned out");
+    spdlog::get("app")->info("Changes made to Board (\"{}\") saved",
+                             m_current_board->get_name());
 }
 
 bool AppContext::idle_load_session() {
     if (!m_current_board) {
-        spdlog::get("app")->warn(
-            "[AppContext] Current board is not valid. Stopping loading task");
+        spdlog::get("app")->error(
+            "[AppContext.idle_load_session] Current board is invalid. Stopping "
+            "loading task");
         m_session_flags[Status::LOADING] = false;
         return false;
     }
 
     if (m_session_flags[Status::CLEARING] && m_session_flags[Status::LOADING]) {
         spdlog::get("app")->warn(
-            "[AppContext] Current session (\"{}\") has to wait for the Board "
-            "to be empty",
+            "[AppContext.idle_load_session] Board view is not clean. Current "
+            "session (\"{}\") is waiting",
             m_current_board->get_name());
         return true;
-    }
-
-    if (!m_session_flags[Status::LOADING]) {
-        spdlog::get("app")->debug("[AppContext] Stopping loading.");
-        spdlog::get("app")->debug("[AppContext] Items in m_cards: {}",
-                                  m_cards.size());
-        return false;
     }
 
     const auto &data = m_current_board->container().get_data();
     if (m_cardlist_i > (data.size() - 1) || data.empty()) {
         m_session_flags[Status::LOADING] = false;
-        m_app_window.on_board_view();
+
+        spdlog::get("app")->debug(
+            "[AppContext.idle_load_session] Session (\"{}\") has been fully "
+            "loaded",
+            m_current_board->get_name());
         return false;
     }
 
@@ -167,9 +171,8 @@ bool AppContext::idle_clear_session() {
         m_session_flags[Status::CLEARING] = false;
         m_session_flags[Status::BUSY] = false;
 
-        spdlog::get("app")->debug("[AppContext] Board Widget has been cleared");
-        spdlog::get("app")->debug("[AppContext] m_cards after clearing: {}",
-                                  m_cards.size());
+        spdlog::get("app")->debug(
+            "[AppContext.idle_clear_session] Board view is free");
         return false;
     }
 
@@ -180,15 +183,15 @@ bool AppContext::idle_clear_session() {
 bool AppContext::timeout_save_session() {
     if (!m_current_board) {
         // There is no board to save, stop this timeout procedure
-        spdlog::get("app")->warn(
-            "[AppContext] Attempted to save board, however it is now "
-            "unavailable. Stop timeout save procedure");
+        spdlog::get("app")->error(
+            "[AppContext.timeout_save_session] Current board session is "
+            "invalid and cannot be saved. Stopping saving task");
         return false;
     } else if (m_current_board->modified()) {
         if (m_board_save_thread.joinable()) {
             spdlog::get("app")->debug(
-                "[AppContext] Attempted to schedule saver worker"
-                "thread, however, it has not been joined");
+                "[AppContext.timeout_save_session] Cannot schedule new saver "
+                "thread. Saver thread is still joinable");
             return true;
         } else {
             m_board_save_thread = std::thread{[this]() {
@@ -196,12 +199,14 @@ bool AppContext::timeout_save_session() {
                 m_save_board_dispatcher.emit();
             }};
             spdlog::get("app")->debug(
-                "[AppContext] saver worker thread has been scheduled");
+                "[AppContext.timeout_save_session] Saver worker thread has "
+                "been scheduled");
             return true;
         }
     } else {
         spdlog::get("app")->debug(
-            "[AppContext] No modifications registered. Don't schedule a saver "
+            "[AppContext.timeout_save_session] No modifications registered. "
+            "Don't schedule a saver "
             "worker thread");
         return true;
     }
@@ -216,7 +221,6 @@ bool AppContext::timeout_update_cards() {
         }
 
         if (m_next_card_i > size - 1) {
-            spdlog::get("app")->debug("[AppContext] Resetting m_next_card_i");
             m_next_card_i = 0;
         }
 
@@ -226,7 +230,8 @@ bool AppContext::timeout_update_cards() {
         card->set_tooltip_markup(card->create_details_text());
 
         spdlog::get("app")->debug(
-            "[AppContext] CardWidget \"{}\"'s UI has been updated",
+            "[AppContext.timeout_update_cards] CardWidget \"{}\"'s UI has been "
+            "updated",
             card->get_card()->get_name());
 
         m_next_card_i++;
@@ -236,7 +241,7 @@ bool AppContext::timeout_update_cards() {
 
     // We stop running at this point
     spdlog::get("app")->debug(
-        "[App Context] Stopping timeout card updates task");
+        "[AppContext.timeout_update_cards] Stop card update task");
     return false;
 }
 

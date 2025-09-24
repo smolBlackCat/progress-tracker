@@ -1,8 +1,5 @@
 #include "board.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include <chrono>
 #include <filesystem>
 
@@ -51,7 +48,8 @@ void Board::set_background(const std::string& image_filename) {
 }
 
 void Board::set_background(const Color& color) {
-    m_background = color_to_string(color);
+    const std::string color_string = color_to_string(color);
+    m_background = color_string;
     modify();
     m_background_signal.emit(m_background);
 }

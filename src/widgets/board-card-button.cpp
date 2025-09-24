@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 #include <utils.h>
+
 #include <string>
 
 ui::BoardCardButton::BoardCardButton(LocalBoard board_entry)
@@ -57,13 +58,11 @@ void ui::BoardCardButton::set_background(const std::string& background) {
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
             Color colour = string_to_color(background);
             solid_colour->fill(rgb_to_hex(colour));
-            board_thumbnail.set(solid_colour);
+            board_thumbnail.set_pixbuf(solid_colour);
             break;
         }
         case BackgroundType::IMAGE: {
-            auto board_bg_image = Gdk::Pixbuf::create_from_file(
-                compressed_thumb_filename(background), 256, 256, false);
-            board_thumbnail.set(board_bg_image);
+            board_thumbnail.set_filename(compressed_thumb_filename(background));
             break;
         }
         case BackgroundType::INVALID: {
@@ -71,10 +70,10 @@ void ui::BoardCardButton::set_background(const std::string& background) {
                 Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, 256, 256);
             Color colour{0, 0, 0, 1};
             solid_colour->fill(rgb_to_hex(colour));
-            board_thumbnail.set(solid_colour);
+            board_thumbnail.set_pixbuf(solid_colour);
             spdlog::get("ui")->warn(
-                "[BoardCardButton] Cannot load background for Board \"{}\". "
-                "Falling back to default color",
+                "[BoardCardButton.set_background] Cannot load background for "
+                "Board \"{}\". Falling back to default color",
                 board_name.get_text().c_str());
             break;
         }

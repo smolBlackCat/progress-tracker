@@ -1,3 +1,5 @@
+#include "card-widget.h"
+
 #include <dialog/card-dialog.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
@@ -5,7 +7,6 @@
 
 #include <numeric>
 
-#include "card-widget.h"
 #include "cardlist-widget.h"
 
 extern "C" {
@@ -47,9 +48,6 @@ void CardWidget::CardPopover::mass_color_select(CardWidget* key,
     for (const auto& popover : popovers) {
         popover->set_selected_color(color, false);
     }
-
-    spdlog::get("ui")->debug("[CardPopover] Set color to {} for all popovers",
-                             color.to_string().c_str());
 }
 
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
@@ -155,16 +153,12 @@ void CardWidget::CardPopover::disable_color_signals() {
     for (auto& [color_label, data] : color_buttons) {
         std::get<2>(data).block();
     }
-
-    spdlog::get("ui")->debug("[CardPopover] Color signals disabled");
 }
 
 void CardWidget::CardPopover::enable_color_signals() {
     for (auto& [color_label, data] : color_buttons) {
         std::get<2>(data).unblock();
     }
-
-    spdlog::get("ui")->debug("[CardPopover] Color signals enabled");
 }
 
 std::function<void()> CardWidget::CardPopover::color_setting_thunk(
@@ -172,8 +166,6 @@ std::function<void()> CardWidget::CardPopover::color_setting_thunk(
     return std::function<void()>([card, checkbutton, color]() {
         if (checkbutton->get_active()) {
             card->set_cover_color(color);
-            spdlog::get("ui")->debug("[CardPopover] Set color to {}",
-                                     color.to_string().c_str());
         }
     });
 }
@@ -496,13 +488,6 @@ void CardWidget::set_title(const std::string& label) {
 
 void CardWidget::set_cardlist(CardlistWidget* new_parent) {
     if (new_parent) {
-        if (this->parent) {
-            spdlog::get("ui")->debug(
-                "[CardWidget] CardWidget \"{}\" changed parents: "
-                "(CardlistWidget \"{}\") -> (CardlistWidget \"{}\")",
-                card->get_name(), this->parent->cardlist()->get_name(),
-                new_parent->cardlist()->get_name());
-        }
         this->parent = new_parent;
     }
 }
@@ -510,9 +495,6 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
 void CardWidget::set_cover_color(const Gdk::RGBA& color) {
     card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
                           color.get_blue() * 255, 1.0});
-
-    spdlog::get("ui")->debug("[CardWidget] CardWidget \"{}\" has set color: {}",
-                             card->get_name(), color.to_string().c_str());
 }
 
 void CardWidget::remove_from_parent() {
@@ -698,15 +680,23 @@ void CardWidget::on_remove_handle(std::shared_ptr<Task> task) {
 void CardWidget::due_date_handler(Date old, Date new_) {
     if (new_.ok()) {
         due_date_label.set_visible();
-
         due_date_label.set_label(_("Due: ") + format_date_str(new_));
+
+        if (old.ok()) {
+            spdlog::get("app")->info(
+                "Scheduled new due date for Card(\"{}\"): (\"{}\") -> "
+                "(\"{}\")",
+                card->get_name(), std::format("{}", old),
+                std::format("{}", new_));
+        } else {
+            spdlog::get("app")->info("Card(\"{}\") due date set to ({})",
+                                     card->get_name(), std::format("{}", new_));
+        }
     } else {
         due_date_label.set_visible(false);
+        spdlog::get("app")->info("Unset due date for Card (\"{}\")",
+                                 card->get_name());
     }
-
-    spdlog::get("ui")->debug(std::format(
-        "[CardWidget] CardWidget \"{}\"'s due date label update: {} -> {}",
-        card->get_name(), old, new_));
 }
 
 void CardWidget::color_handler(Color old, Color new_) {
@@ -716,8 +706,14 @@ void CardWidget::color_handler(Color old, Color new_) {
                     float(std::get<2>(new_)) / 255, float(std::get<3>(new_)));
         __set_cover_color(c);
         CardWidget::CardPopover::mass_color_select(this, c);
+
+        spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
+                                 card->get_name(), c.to_string().c_str());
     } else {
         __clear_cover_color();
+
+        spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
+                                card->get_name());
     }
 }
 
@@ -739,9 +735,8 @@ void CardWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
             this->parent->board.set_scroll();
 
-            spdlog::get("ui")->debug(
-                "[CardWidget] CardWidget \"{}\" is being dragged",
-                card->get_name());
+            spdlog::get("ui")->debug("[CardWidget.dnd] (\"{}\"): On drag",
+                                     card->get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -750,7 +745,7 @@ void CardWidget::setup_drag_and_drop() {
             this->parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardWidget] CardWidget \"{}\" dragging has been canceled",
+                "[CardWidget.dnd] (\"{}\"): Canceled drag event",
                 card->get_name());
             return true;
         },
@@ -760,7 +755,7 @@ void CardWidget::setup_drag_and_drop() {
             this->parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardWidget] CardWidget \"{}\" stopped being dragged",
+                "[CardWidget.dnd] (\"{}\") Stopped being dragged",
                 card->get_name());
         });
     add_controller(drag_source_c);
@@ -779,7 +774,7 @@ void CardWidget::setup_drag_and_drop() {
 
                 if (dropped_card_widget == this) {
                     spdlog::warn(
-                        "[CardWidget] CardWidget \"{}\" has been dropped to "
+                        "[CardWidget.dnd] (\"{}\") has been dropped on "
                         "itself",
                         card->get_name());
 
@@ -789,7 +784,13 @@ void CardWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                if (this->parent->is_child(*dropped_card_widget)) {
+                spdlog::get("app")->info(
+                    "Card (\"{}\") has been dropped on Card (\"{}\")",
+                    dropped_card_widget->get_card()->get_name(),
+                    card->get_name());
+
+                if (dropped_card_widget->get_cardlist_widget() ==
+                    this->parent) {
                     this->parent->reorder(*dropped_card_widget, *this);
                 } else {
                     auto dropped_card = dropped_card_widget->get_card();
@@ -811,6 +812,7 @@ void CardWidget::setup_drag_and_drop() {
     add_controller(drop_target_c);
 }
 
+// FIXME: There's absolutely no use anymore
 void CardWidget::open_color_dialog() {
     color_dialog->choose_rgba(
         *static_cast<Gtk::Window*>(get_root()),
@@ -818,15 +820,11 @@ void CardWidget::open_color_dialog() {
             try {
                 set_cover_color(color_dialog->choose_rgba_finish(result));
             } catch (Gtk::DialogError& err) {
-                spdlog::get("ui")->warn(
-                    "[CardWidget] CardWidget \"{}\" has failed to set color: "
-                    "{}",
-                    card->get_name(), err.what());
             }
         });
 
     spdlog::get("ui")->debug(
-        "[CardWidget] CardWidget \"{}\" has opened color dialog",
+        "[CardWidget.open_color_dialog] (\"{}\"): Color dialog opened",
         card->get_name());
 }
 
@@ -843,7 +841,7 @@ void CardWidget::on_rename() {
     card_entry.add_controller(focus_controller);
 
     spdlog::get("ui")->debug(
-        "[CardWidget] CardWidget \"{}\" has entered rename mode",
+        "[CardWidget.on_rename] (\"{}\"): Entered rename mode",
         card->get_name());
 }
 
@@ -852,14 +850,19 @@ void CardWidget::off_rename() {
     card_entry_revealer.set_reveal_child(false);
 
     spdlog::get("ui")->debug(
-        "[CardWidget] CardWidget \"{}\" has exited rename mode",
+        "[CardWidget.on_rename] (\"{}\"): Exited rename mode",
         card->get_name());
 }
 
 void CardWidget::on_confirm_changes() {
     if (card_entry.get_text().compare(card_label.get_label()) != 0) {
+        const std::string old = card->get_name();
+
         card->set_name(card_entry.get_text());
         card_label.set_label(card_entry.get_text());
+
+        spdlog::get("app")->info("Card (\"{}\") renamed to (\"{}\")", old,
+                                 card->get_name());
     }
     is_new = false;
 }
@@ -913,11 +916,7 @@ void CardWidget::__clear_cover_color() {
     card_cover_revealer.set_reveal_child(false);
 
     CardWidget::CardPopover::mass_color_select(this, Gdk::RGBA{});
-
-    spdlog::get("ui")->debug("[CardWidget] CardWidget \"{}\" has cleared color",
-                             card->get_name());
 }
 
 void CardWidget::cleanup() { root_box.unparent(); }
 }  // namespace ui
-

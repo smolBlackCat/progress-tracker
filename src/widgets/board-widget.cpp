@@ -60,13 +60,6 @@ void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
 
         m_connections.emplace_back(board->signal_background().connect(
             sigc::mem_fun(*this, &BoardWidget::__set_background)));
-
-        spdlog::get("ui")->debug("[BoardWidget] Board \"{}\" has been set",
-                                 board->get_name());
-    } else {
-        spdlog::get("ui")->warn(
-            "[BoardWidget] Board or BoardCardButton is "
-            "not set properly");
     }
 }
 
@@ -107,31 +100,30 @@ void ui::BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
                 m_root.reorder_child_after(next, *sibling_sibling);
             }
 
-            spdlog::get("ui")->debug(
-                "[BoardWidget] CardListWidget \"{}\" was inserted before "
-                "CardListWidget \"{}\"",
+            spdlog::get("app")->info(
+                "Reordered Card list (\"{}\") before Card list (\"{}\")",
                 next.cardlist()->get_name(), sibling.cardlist()->get_name());
             break;
         }
         case ReorderingType::UPDOWN: {
             m_root.reorder_child_after(next, sibling);
-            spdlog::get("ui")->debug(
-                "[BoardWidget] CardListWidget \"{}\" was inserted after "
-                "CardListWidget \"{}\"",
+            spdlog::get("app")->info(
+                "Reordered Card list (\"{}\") after Card list (\"{}\")",
                 next.cardlist()->get_name(), sibling.cardlist()->get_name());
             break;
         }
         case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn("[BoardWidget] Cannot reorder cardlists:");
+            spdlog::get("app")->warn(
+                "[BoardWidget.reorder] Cannot reorder (\"{}\") and (\"{}\")",
+                next.cardlist()->get_name(), sibling.cardlist()->get_name());
             break;
         }
     }
 }
 
 void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
-    spdlog::get("ui")->debug(
-        "[BoardWidget] CardlistWidget \"{}\" has been removed",
-        cardlist.cardlist()->get_name());
+    spdlog::get("app")->info("Removed CardList (\"{}\")",
+                             cardlist.cardlist()->get_name());
 
     m_root.remove(cardlist);
     std::erase(m_cardlists, &cardlist);
@@ -144,8 +136,6 @@ void ui::BoardWidget::clear() {
                   [](auto& connection) { connection.disconnect(); });
     m_connections.clear();
     m_board = nullptr;
-
-    spdlog::get("ui")->info("[BoardWidget] Board view has been cleared");
 }
 
 void ui::BoardWidget::save(bool clear_after_save) {
@@ -162,6 +152,7 @@ void ui::BoardWidget::set_scroll(bool scroll) { m_on_scroll = scroll; }
 
 ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
                                                       bool editing_mode) {
+    spdlog::get("app")->info("Added Card list (\"{}\")", cardlist.get_name());
     return __add_cardlist(m_board->container().append(cardlist), editing_mode);
 }
 
@@ -183,12 +174,7 @@ ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
         m_board->container().insert_after(cardlist, *sibling->cardlist()),
         false);
     m_cardlists.push_back(new_cardlist);
-
     m_root.insert_child_after(*new_cardlist, *sibling);
-
-    spdlog::get("ui")->debug(
-        "[BoardWidget] CardlistWidget \"{}\" has been added",
-        cardlist.get_name());
 
     add_cardlist_signal.emit(new_cardlist);
 
@@ -313,13 +299,8 @@ ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
     auto new_cardlist =
         Gtk::make_managed<ui::CardlistWidget>(*this, cardlist, editing_mode);
     m_cardlists.push_back(new_cardlist);
-
     m_root.append(*new_cardlist);
     m_root.reorder_child_after(m_add_button, *new_cardlist);
-
-    spdlog::get("ui")->debug(
-        "[BoardWidget] CardlistWidget \"{}\" has been added",
-        cardlist->get_name());
 
     add_cardlist_signal.emit(new_cardlist);
 
