@@ -12,7 +12,8 @@ def get_dlls(MSYSTEM):
         )
         dlls_infos = map(
             lambda line: line.strip(),
-            filter(lambda line: "ucrt64" in line, ldd_output.decode().split("\n")),
+            filter(lambda line: "ucrt64" in line,
+                   ldd_output.decode().split("\n")),
         )
         for dll_info in dlls_infos:
             dlls.append(dll_info.split("=>")[0].strip())
@@ -24,7 +25,8 @@ def get_dlls(MSYSTEM):
         ).stdout.replace(b"\t", b"")
         dlls_infos = map(
             lambda line: line.strip(),
-            filter(lambda line: "mingw32" in line, ntldd_output.decode().split("\n")),
+            filter(lambda line: "mingw32" in line,
+                   ntldd_output.decode().split("\n")),
         )
         for dll_info in dlls_infos:
             dlls.append(dll_info.split("=>")[0].strip())
@@ -37,6 +39,9 @@ def get_dlls(MSYSTEM):
         "libiconv-2.dll",
         "libcharset-1.dll",
         "zlib1.dll",
+        "vulkan-1.dll",
+        "libcrypto-3-x64.dll",
+        "libssl-3-x64.dll"
     ]
     return dlls + missing_dlls
 
