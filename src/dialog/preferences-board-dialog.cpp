@@ -5,6 +5,7 @@
 #include <utils.h>
 
 #include "adwaita.h"
+#include "dialog/board-dialog.h"
 
 namespace ui {
 
@@ -13,7 +14,6 @@ PreferencesBoardDialog::PreferencesBoardDialog(BoardWidget& board_widget)
     adw_dialog_set_title(ADW_DIALOG(board_dialog->gobj()),
                          _("Board Preferences"));
     footer_button->set_label(_("Save"));
-    load_board();
 }
 
 PreferencesBoardDialog::~PreferencesBoardDialog() {}
@@ -49,6 +49,11 @@ void PreferencesBoardDialog::load_board() {
 PreferencesBoardDialog* PreferencesBoardDialog::create(
     BoardWidget& board_widget) {
     return new PreferencesBoardDialog(board_widget);
+}
+
+void PreferencesBoardDialog::open(Gtk::Window& parent) {
+    BoardDialog::open(parent);
+    load_board();
 }
 
 void PreferencesBoardDialog::on_footer_button_click() { on_save_changes(); }

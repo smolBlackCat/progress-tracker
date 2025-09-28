@@ -6,6 +6,7 @@
 #include <widgets/board-widget.h>
 
 #include "core/board-manager.h"
+#include "dialog/board-dialog.h"
 #include "dialog/card-dialog.h"
 
 class AppContext;
@@ -130,6 +131,7 @@ protected:
     std::vector<BoardCardButton*> entry_buttons;
 #endif
 
+    BoardDialog *create_board, *edit_board;
     CardDetailsDialog card_dialog;
 
     /**

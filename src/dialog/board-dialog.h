@@ -24,7 +24,7 @@ public:
      *
      * @param parent Reference to the parent Gtk::Window.
      */
-    void open(Gtk::Window& parent);
+    virtual void open(Gtk::Window& parent);
 
 protected:
     /**

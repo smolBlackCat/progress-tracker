@@ -25,6 +25,8 @@ public:
      */
     static PreferencesBoardDialog* create(BoardWidget& board_widget);
 
+    void open(Gtk::Window& parent) override;
+
     /**
      * @brief Destructor.
      */
