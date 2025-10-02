@@ -123,15 +123,6 @@ before proceeding.
    cpack
    ```
 
-## Support
-
-Consider supporting my work here. Balancing college life and software
-maintainance is a lot of work, so if you like what I do, you can pay me a cup
-of coffee (or a donut).
-
-[![paypal-image]][paypal-link]
-
-[paypal-link]: https://www.paypal.com/donate/?hosted_button_id=9E5ELM2GFRU7U
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
 [progress-flathub]: https://flathub.org/apps/io.github.smolblackcat.Progress
 [github-release]: https://github.com/smolBlackCat/progress-tracker/releases
@@ -141,4 +132,3 @@ of coffee (or a donut).
 [github-licence]: https://img.shields.io/github/license/smolBlackCat/progress-tracker
 [build-status]: https://img.shields.io/github/actions/workflow/status/smolBlackCat/progress-tracker/progress-ci.yml
 [msys-download]: https://www.msys2.org/
-[paypal-image]: https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg
