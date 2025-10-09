@@ -123,6 +123,11 @@ before proceeding.
    cpack
    ```
 
+## Consider Supporting the Project
+
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T71MK1CZ)
+
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
 [progress-flathub]: https://flathub.org/apps/io.github.smolblackcat.Progress
 [github-release]: https://github.com/smolBlackCat/progress-tracker/releases
