@@ -25,7 +25,7 @@ jobs:
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-python
-            mingw-w64-ucrt-x86_64-gtkmm4
+            mingw-w64-ucrt-x86_64-gtkmm-4.0
             mingw-w64-ucrt-x86_64-libadwaita
             mingw-w64-ucrt-x86_64-tinyxml2
             mingw-w64-ucrt-x86_64-gettext
