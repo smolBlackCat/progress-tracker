@@ -5,20 +5,21 @@ Simple Kanban board manager
 [![GitHub Release][github-release-badge]][github-release]
 [![Flathub Downloads][flatpak-release-badge]][progress-flathub]
 [![GitHub License][github-licence]](LICENSE)
+![Build Status][build-status]
 
 ![App Windows](pictures/progress-app-presentation.png)
 
 Progress is a Kanban board management app designed to be simple yet flexible for
 most workflows. Whether you're managing software projects or organsing
-daily tasks, Progress keeps things straightforward. It is built in
-C++ with GTK4 and LibAdwaita.
+daily tasks, Progress keeps things straightforward. Built with C++ with GTK4
+and LibAdwaita.
 
 ## Dependencies
 
-* gtkmm-4 (>= 4.15.0)
+* gtkmm-4 (>= 4.10.0)
 * libadwaita1 (>= 1.5)
-* tinyxml2 (>= 11.0.0)
-* spdlog (>= 1.15)
+* tinyxml2 (>= 10.0.0)
+* spdlog (>= 1.12)
 * crossguid (built-in)
 
 ## Installation
@@ -27,11 +28,15 @@ C++ with GTK4 and LibAdwaita.
 
 [![flathub-badge]][progress-flathub]
 
+```sh
+flatpak install flathub io.github.smolblackcat.Progress
+```
+
 ### Debian-based
 
-A Debian package can be found and installed in the Progress's releases page. It
-is built on a *Debian Testing* box, so some dependencies may not be available to
-your Debian-based or Ubuntu-based distribution.
+Progress is available for installation on Debian/Ubuntu based systems. Note that
+the package is built on Ubuntu 24.04 and might not work on every Debian-based
+system. For instance, this package may or may not work on Debian Stable.
 
 ### Arch Linux (AUR)
 
@@ -46,12 +51,12 @@ yay -S progress-tracker
 
 For Windows systems, Progress is available as a standard Windows installer
 executable or as a compressed file containing the application's binary and its
-dependencies. These builds target x64 systems, so make sure the host operating
-system is also x64.
+dependencies. These builds target 64-bit systems, so make sure the host operating
+system is also 64-bit.
 
-### Building from Source
+### Building From Source
 
-Alternative for those who may want to contribute to the project somehow or want
+Alternative for those who want to contribute to the project somehow or want
 a custom build. Ensure all dependencies are installed beforehand and verify
 whether the system's C++ compiler is C++20 compliant.
 
@@ -60,7 +65,7 @@ whether the system's C++ compiler is C++20 compliant.
 1. Install the dependencies
 
    ```sh
-   # Use your package manager
+   # Catch2 is not necessary if you're not going to build tests
    sudo apt install cmake libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev \
     libspdlog-dev gettext catch2
    ```
@@ -71,7 +76,7 @@ whether the system's C++ compiler is C++20 compliant.
    git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
    ```
 
-3. Configure and compile project.
+3. Configure and compile the project.
 
    ```sh
    cd progress-tracker/
@@ -80,9 +85,11 @@ whether the system's C++ compiler is C++20 compliant.
    cmake --build build/
    ```
 
-4. Install the Project
+4. Install the project
 
    ```sh
+   # There's no need for sudo if you set to a local install prefix
+   # (e.g. ~/.local/)
    sudo ninja install -C build/
    sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
    ```
