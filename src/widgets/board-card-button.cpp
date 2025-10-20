@@ -24,6 +24,7 @@ ui::BoardCardButton::BoardCardButton(LocalBoard board_entry)
     set_background(board_entry.board->get_background());
     board_thumbnail.set_size_request(256, 256);
     board_thumbnail.set_margin_top(10);
+    board_thumbnail.set_content_fit(Gtk::ContentFit::SCALE_DOWN);
 
     local_board_entry.board->signal_name_changed().connect(
         [this]() { set_name_(local_board_entry.board->get_name()); });
