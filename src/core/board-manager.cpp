@@ -307,7 +307,7 @@ void BoardManager::local_remove(const std::shared_ptr<Board>& board) {
 void BoardManager::local_save(const std::shared_ptr<Board>& board) {
     for (auto it = m_local_boards.begin(); it != m_local_boards.end(); it++) {
         LocalBoard local_board = *it;
-        if (*(local_board.board) == *board) {
+        if (*(local_board.board) == *board && board->modified()) {
             __local_save(local_board);
             save_board_signal.emit(local_board);
             return;
