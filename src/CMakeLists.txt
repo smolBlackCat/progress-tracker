@@ -73,9 +73,9 @@ if (BUILD_APP)
     add_dependencies(progress-tracker progress-resources)
 
     if(WIN32)
-        find_program(PYTHON NAMES python3 python)
+        find_program(SH NAMES sh)
         add_custom_command(TARGET progress-tracker POST_BUILD
-                       COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/build-aux/setup-gtk-environment.py
+                       COMMAND ${SH} ${CMAKE_SOURCE_DIR}/build-aux/setup-gtk-environment.sh
                        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         add_custom_command(TARGET progress-tracker POST_BUILD
                        COMMAND cp ${CMAKE_SOURCE_DIR}/data/io.github.smolblackcat.Progress.svg share/icons/
