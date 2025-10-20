@@ -216,6 +216,8 @@ void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
     auto board_card_button = Gtk::make_managed<BoardCardButton>(board_entry);
     auto fb_child_p = Gtk::make_managed<Gtk::FlowBoxChild>();
     fb_child_p->set_child(*board_card_button);
+    fb_child_p->set_valign(Gtk::Align::CENTER);
+    fb_child_p->set_halign(Gtk::Align::CENTER);
     fb_child_p->set_focusable(false);
     boards_grid_p->append(*fb_child_p);
     board_card_button->signal_clicked().connect(
