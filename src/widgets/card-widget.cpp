@@ -713,7 +713,7 @@ void CardWidget::color_handler(Color old, Color new_) {
         __clear_cover_color();
 
         spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
-                                card->get_name());
+                                 card->get_name());
     }
 }
 
@@ -830,10 +830,20 @@ void CardWidget::open_color_dialog() {
 
 void CardWidget::open_card_details_dialog() {
     auto& parent_window = *(static_cast<ProgressWindow*>(get_root()));
+
+    // This is a workaround for the issue where the Card widget maintains its
+    // rename mode state on even when the user explicited entered card details
+    // dialog
+    off_rename();
+
     parent_window.show_card_dialog(this);
 }
 
 void CardWidget::on_rename() {
+    // FIXME: Adding and removing the control focus fixes the bug where we
+    // cannot rename a card through its menu options. Every time the user
+    // (before this workaround) hit the rename button, the card would quickly
+    // enter and leave rename mode, not allowing changes at all.
     card_entry.remove_controller(focus_controller);
     card_entry_revealer.set_reveal_child(true);
     card_label.set_visible(false);
