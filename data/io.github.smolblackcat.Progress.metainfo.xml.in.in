@@ -68,34 +68,19 @@
   </categories>
 
   <releases>
-    <release date="2025-??-??" version="1.7.0">
+    <release date="2025-10-23" version="1.7">
       <description>
-        <p>What's new in Progress 1.7.0</p>
-        <p>This minor release is actually quite big and important because it
-          adds features that may enable the users to use Progress across more
-          different workflows</p>
+        <p>What's new in Progress 1.7</p>
+        <p>This release introduces a smoother, faster, and more refined experience across the entire
+          app. Boards load more reliably, dialogs are easier to use, and new shortcuts managing
+          your work effortless.</p>
         <ul>
-          <li>Cards have received a revamp, making it more useful
-            for various workflows. The new features include:</li>
-          <ul>
-            <li>Coloured card covers</li>
-            <li>Card notes</li>
-            <li>Deadline settings</li>
-            <li>Sub-tasks</li>
-            <li>Dedicated dialog for card editing</li>
-          </ul>
-          <li>UI has been greatly improved</li>
-          <ul>
-            <li>Dark mode and light mode styles have improved</li>
-            <li>Board dialog has received a new UI design</li>
-          </ul>
-          <li>Applications shortcuts have been introduced. Users can now
-            interact and move cards, card lists and tasks using the
-            keyboard</li>
-          <li>Data model have been updated to be backwards-compatible with
-            boards created by previous Progress versions</li>
-          <li>Drag and drop mechanism have been improved</li>
-          <li>Various bugs and memory leaks have been fixed</li>
+          <li>Redesigned board dialogs for easier editing</li>
+          <li>Added completion and due date indicators to cards</li>
+          <li>Introduced a new Card Details dialog for managing metadata</li>
+          <li>Improved keyboard shortcuts, including Ctrl+N for new cards and lists</li>
+          <li>Load and saving boards are more reliable and will not hang the app</li>
+          <li>Fixed crashes, visual glitches, and improved overall stability</li>
         </ul>
       </description>
     </release>
