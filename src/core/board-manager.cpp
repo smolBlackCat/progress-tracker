@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <memory>
+#include <mutex>
 #include <regex>
 #include <thread>
 
@@ -225,8 +226,9 @@ BoardManager::BoardManager(const std::string& board_dir)
             "Failed to load boards: Boards folder cannot be resolved"};
     }
 
+    // FIXME: The current state of the core is incomplete.
     std::thread([this]() {
-        std::lock_guard<std::mutex> lock(this->valid_mutex);
+        std::lock_guard<std::mutex> valid_mutex_guard{this->valid_mutex};
         for (const auto& dir_entry :
              std::filesystem::directory_iterator(BOARD_DIR)) {
             const std::string board_filename = dir_entry.path().string();
@@ -272,7 +274,7 @@ std::shared_ptr<Board> BoardManager::local_open(const std::string& filename) {
 }
 
 const std::vector<LocalBoard>& BoardManager::local_boards() const {
-    if (!m_loaded) {
+    if (!loaded()) {
         throw std::logic_error{"Board is not valid"};
     }
     return m_local_boards;
@@ -293,15 +295,17 @@ std::string BoardManager::local_add(const std::string& name,
 }
 
 void BoardManager::local_remove(const std::shared_ptr<Board>& board) {
-    for (auto it = m_local_boards.begin(); it != m_local_boards.end(); it++) {
-        LocalBoard local_board = *it;
-        if (*(local_board.board) == *board) {
-            m_local_boards.erase(it);
-            fs::remove(local_board.filename);
-            remove_board_signal.emit(local_board);
-            return;
+    if (loaded())
+        for (auto it = m_local_boards.begin(); it != m_local_boards.end();
+             it++) {
+            LocalBoard local_board = *it;
+            if (*(local_board.board) == *board) {
+                m_local_boards.erase(it);
+                fs::remove(local_board.filename);
+                remove_board_signal.emit(local_board);
+                return;
+            }
         }
-    }
 }
 
 void BoardManager::local_save(const std::shared_ptr<Board>& board) {
@@ -325,7 +329,10 @@ void BoardManager::local_close(const std::shared_ptr<Board>& board) {
     }
 }
 
-bool BoardManager::loaded() const { return m_loaded; }
+bool BoardManager::loaded() const {
+    std::lock_guard<std::mutex> lg{valid_mutex};
+    return m_loaded;
+}
 
 sigc::signal<void(LocalBoard)>& BoardManager::signal_add_board() {
     return add_board_signal;

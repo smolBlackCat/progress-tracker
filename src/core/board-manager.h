@@ -79,7 +79,7 @@ protected:
     sigc::signal<void(LocalBoard)> save_board_signal;
 
 private:
-    std::mutex valid_mutex;
+    mutable std::mutex valid_mutex;
     volatile bool m_loaded = false;
     void __local_save(const LocalBoard& local);
 };
