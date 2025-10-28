@@ -229,6 +229,24 @@ BoardManager::BoardManager(const std::string& board_dir)
     // FIXME: The current state of the core is incomplete.
     std::thread([this]() {
         std::lock_guard<std::mutex> valid_mutex_guard{this->valid_mutex};
+
+        // We only need to perform this check on Linux environments since this
+        // version is still loading from %APPDATA%
+#ifndef WIN32
+        std::string old_dir = progress_boards_folder_old();
+        if (fs::exists(old_dir) && !fs::is_empty(old_dir)) {
+            // Old version boards were found. Move them to the new placement
+            // before loading everything
+            for (const auto& dir_entry : fs::directory_iterator(old_dir)) {
+                std::string filename = dir_entry.path().filename();
+                if (filename.ends_with(".xml")) {
+                    fs::path dst = fs::path{BOARD_DIR} / filename;
+                    fs::rename(dir_entry.path(), dst);
+                }
+            }
+        }
+#endif
+
         for (const auto& dir_entry :
              std::filesystem::directory_iterator(BOARD_DIR)) {
             const std::string board_filename = dir_entry.path().string();
