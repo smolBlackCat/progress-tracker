@@ -68,6 +68,19 @@
   </categories>
 
   <releases>
+    <release date="2025-10-30" version="1.7.1">
+      <description>
+        <p>What's new in Progress 1.7.1</p>
+        <p>
+          This small release introduces keyboard focus improvements and missing
+          compatibility with boards created by older versions
+        </p>
+        <ul>
+          <li>This release now load boards created in previous versions</li>
+          <li>Enhance Ctrl+Delete focus behavior</li>
+        </ul>
+      </description>
+    </release>
     <release date="2025-10-23" version="1.7">
       <description>
         <p>What's new in Progress 1.7</p>
