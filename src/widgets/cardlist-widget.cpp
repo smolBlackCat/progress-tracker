@@ -220,8 +220,15 @@ void CardlistWidget::remove(CardWidget& card) {
     spdlog::get("app")->info("Card (\"{}\") removed from CardList (\"{}\")",
                              card.get_card()->get_name(),
                              m_cardlist->get_name());
-    if (Gtk::Widget* previous_sibling = card.get_prev_sibling()) {
-        previous_sibling->grab_focus();
+
+    // Focus should be passed to the immediate sibling
+    Gtk::Widget* next_card = card.get_next_sibling();
+    Gtk::Widget* prev_card = card.get_prev_sibling();
+    if (prev_card) {
+        prev_card->grab_focus();
+    } else if (next_card && !G_TYPE_CHECK_INSTANCE_TYPE(
+                                next_card->gobj(), Gtk::Button::get_type())) {
+        next_card->grab_focus();
     }
 
     m_root.remove(card);

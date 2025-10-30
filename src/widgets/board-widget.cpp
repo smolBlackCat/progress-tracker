@@ -125,8 +125,13 @@ void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
     spdlog::get("app")->info("Removed CardList (\"{}\")",
                              cardlist.cardlist()->get_name());
 
-    if (Gtk::Widget* previous_sibling = cardlist.get_prev_sibling()) {
-        previous_sibling->grab_focus();
+    Gtk::Widget* prev_clist = cardlist.get_prev_sibling();
+    Gtk::Widget* next_clist = cardlist.get_next_sibling();
+    if (prev_clist) {
+        prev_clist->grab_focus();
+    } else if (next_clist && !G_TYPE_CHECK_INSTANCE_TYPE(
+                                 next_clist->gobj(), Gtk::Button::get_type())) {
+        next_clist->grab_focus();
     }
 
     m_root.remove(cardlist);
