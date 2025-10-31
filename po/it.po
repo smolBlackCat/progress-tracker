@@ -1,14 +1,14 @@
 # ITALIAN TRANSLATION.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2024.
+# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2024,2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 15:58-0300\n"
-"PO-Revision-Date: 2024-04-28 13:17+0100\n"
+"PO-Revision-Date: 2025-10-31 13:17+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -23,7 +23,7 @@ msgstr ""
 
 #: data/io.github.smolblackcat.Progress.desktop.in.in:5
 msgid "_Kanban style todo app"
-msgstr ""
+msgstr "_App per le cose da fare in stile Kanban"
 
 #: data/io.github.smolblackcat.Progress.desktop.in.in:7
 msgid "_Kanban;Todo;Progress;"
@@ -31,26 +31,26 @@ msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
 msgid "Kanban board application"
-msgstr ""
+msgstr ""Applicazione della bacheca Kanban"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:7
 msgid "Gabriel de Moura"
-msgstr ""
+msgstr "Gabriel de Moura"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:29
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:44
 msgid "Dedicate a board for each of your projects"
-msgstr ""
+msgstr "Dedica una bacheca a ciascuno dei tuoi progetti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:34
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:49
 msgid "Organize your tasks in your own way"
-msgstr ""
+msgstr "Organizza le tue attività a modo tuo"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:39
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:54
 msgid "Fill your cards with adequate information"
-msgstr ""
+msgstr "Riempi le tue card con informazioni adeguate"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:59
 msgid ""
@@ -59,28 +59,34 @@ msgid ""
 "framework to organize tasks effectively while also being simple and easy to "
 "use."
 msgstr ""
+"Che tu sia uno sviluppatore di software, un project manager o semplicemente qualcuno "
+"che ama tenere traccia dei propri obiettivi personali, Progress ti offre il framework "
+"essenziale per organizzare le attività in modo efficace, pur essendo semplice e facile " 
+"da usare."
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:73
 msgid "What's new in Progress 1.7.1"
-msgstr ""
+msgstr "Novità di Progress 1.7.1"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:74
 msgid ""
 "This small release introduces keyboard focus improvements and missing "
 "compatibility with boards created by older versions"
 msgstr ""
+"Questa piccola versione introduce miglioramenti nella messa a fuoco della tastiera "
+"e la mancante compatibilità con le schede create con versioni precedenti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:79
 msgid "This release now load boards created in previous versions"
-msgstr ""
+msgstr "Questa versione ora carica le schede create nelle versioni precedenti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:80
 msgid "Enhance Ctrl+Delete focus behavior"
-msgstr ""
+msgstr "Migliora il comportamento di messa a fuoco Ctrl+Canc"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:86
 msgid "What's new in Progress 1.7"
-msgstr ""
+msgstr "Novità di Progress 1.7"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:87
 msgid ""
@@ -88,182 +94,190 @@ msgid ""
 "across the entire app. Boards load more reliably, dialogs are easier to use, "
 "and new shortcuts managing your work effortless."
 msgstr ""
+"Questa versione introduce un'esperienza più fluida, veloce e raffinata "
+"in tutta l'app. Le bacheche si caricano in modo più affidabile, le finestre di dialogo sono più facili da usare "
+"e nuove scorciatoie per gestire il tuo lavoro senza sforzo."
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:91
 msgid "Redesigned board dialogs for easier editing"
-msgstr ""
+msgstr "Finestre di dialogo della bacheca riprogettate per una modifica più semplice"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:92
 msgid "Added completion and due date indicators to cards"
-msgstr ""
+msgstr "Aggiunti indicatori di completamento e data di scadenza alle schede"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:93
 msgid "Introduced a new Card Details dialog for managing metadata"
-msgstr ""
+msgstr "Introdotta una nuova finestra di dialogo Dettagli scheda per la gestione dei metadati"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:94
 msgid "Improved keyboard shortcuts, including Ctrl+N for new cards and lists"
-msgstr ""
+msgstr "Scorciatoie da tastiera migliorate, tra cui Ctrl+N per nuove schede ed elenchi"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:95
 msgid "Load and saving boards are more reliable and will not hang the app"
-msgstr ""
+msgstr "Le schede di caricamento e salvataggio sono più affidabili e non bloccano l'app"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:96
 msgid "Fixed crashes, visual glitches, and improved overall stability"
-msgstr ""
+msgstr "Risolti crash, problemi visivi e migliorata stabilità generale"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:102
 msgid "What's new in Progress 1.6.0"
-msgstr ""
+msgstr "Novità di Progress 1.6.0"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:104
 msgid "Added Polish Translation"
-msgstr ""
+msgstr "Aggiunta traduzione polacca"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:105
 msgid "Fixed rendering artifact (Windows)"
-msgstr ""
+msgstr "Risolto l'artefatto di rendering (Windows)"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:111
 msgid "What's new in Progress 1.5.2"
-msgstr ""
+msgstr "Novità di Progress 1.5.2"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:113
 msgid ""
 "Fix bug where application would crash after dropping a cardlist onto itself"
 msgstr ""
+"Correzione del bug per cui l'applicazione si bloccava dopo aver trascinato un elenco di schede su se stessa"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:120
 msgid "What's new in Progress 1.5.1"
-msgstr ""
+msgstr "Novità di Progress 1.5.1"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:122
 msgid ""
 "Fix bug where the board's background was set only if the board's name was "
 "also modified"
 msgstr ""
+"Correzione del bug per cui lo sfondo della bacheca veniva impostato solo se il nome della bacheca era "
+"modificato"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:129
 msgid "What's new in Progress 1.5.0"
-msgstr ""
+msgstr "Novità di Progress 1.5.0"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:131
 msgid "Board buttons will now appear in the order of modification"
-msgstr ""
+msgstr "I pulsanti della bacheca ora appariranno nell'ordine di modifica"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:132
 msgid ""
 "Preferences Board Dialog will only generate a new name file if the board's "
 "name was changed"
 msgstr ""
+"La finestra di dialogo Preferenze della bacheca genererà un nuovo file di nomi solo se "
+"il nome della bacheca è stato modificato."
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:139
 msgid "What's new in Progress 1.4.1"
-msgstr ""
+msgstr "Novità di Progress 1.4.1"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:141
 msgid "Locale directory resolution optimised"
-msgstr ""
+msgstr "Risoluzione della directory locale ottimizzata"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:147
 msgid "What's new in Progress 1.4"
-msgstr ""
+msgstr "Novità di Progress 1.4"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:149
 msgid "Spanish translation has been updated"
-msgstr ""
+msgstr "La traduzione in spagnolo è stata aggiornata"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:155
 msgid "What's new in Progress 1.3"
-msgstr ""
+msgstr "Novità di Progress 1.3"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:157
 msgid "Italian translation has been updated"
-msgstr ""
+msgstr "La traduzione italiana è stata aggiornata"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:158
 msgid "Russian Translation has been added"
-msgstr ""
+msgstr "È stata aggiunta la traduzione in russo"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:159
 msgid "Ukranian Translation has been added"
-msgstr ""
+msgstr "È stata aggiunta la traduzione in ucraino"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:160
 msgid "Card widgets have gotten an UI rework"
-msgstr ""
+msgstr "I widget delle schede hanno ricevuto una rielaborazione dell'interfaccia utente"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:161
 msgid "A cancel button has been added to cancel creation and renaming"
-msgstr ""
+msgstr "È stato aggiunto un pulsante Annulla per annullare la creazione e la ridenominazione"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:167
 msgid "The current minor releases brings some additions and improvements"
-msgstr ""
+msgstr "Le attuali versioni minori apportano alcune aggiunte e miglioramenti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:169
 msgid "Utilise Adwaita About Dialogs"
-msgstr ""
+msgstr "Utilizza Adwaita per Informazioni sui dialoghi"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:170
 msgid "Added Bulgarian Translation"
-msgstr ""
+msgstr "Aggiunta traduzione bulgara"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:171
 msgid "Added Turkish Translation"
-msgstr ""
+msgstr "Aggiunta traduzione in turco"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:172
 msgid "Progress will not fail to start in case the boards are corrupted"
-msgstr ""
+msgstr "Progress non mancherà di avviarsi nel caso in cui le schede siano corrotte"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:173
 msgid "Added tooltips"
-msgstr ""
+msgstr "Aggiunti suggerimenti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:179
 msgid "Bug Fixes and Improvements"
-msgstr ""
+msgstr "Correzioni di bug e miglioramenti"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:181
 msgid "Board grid UI enhance"
-msgstr ""
+msgstr "Miglioramento dell'interfaccia utente della griglia della scheda"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:182
 msgid "Fix segmentation fault error when moving cards onto themselves"
-msgstr ""
+msgstr "Corretto l'errore di segmentazione quando si spostano le schede su se stesse"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:183
 msgid "Progress is better integrated on GNOME systems"
-msgstr ""
+msgstr "Progress è meglio integrato nei sistemi GNOME"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:184
 msgid "Add Dutch translation"
-msgstr ""
+msgstr "Aggiungi traduzione in olandese"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:185
 msgid "Add Italian translation"
-msgstr ""
+msgstr "Aggiunta traduzione in italiano"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:186
 msgid "Add Spanish translation"
-msgstr ""
+msgstr "Aggiunta traduzione in spagnolo"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:192
 msgid "First official release of Progress 1.0"
-msgstr ""
+msgstr "Prima versione ufficiale di Progress 1.0"
 
 #: src/window.cpp:59
 #, c++-format
 msgid "{} board selected"
 msgid_plural "{} boards selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} bacheca selezionata"
+msgstr[1] "{} bacheche selezionate"
 
 #: src/window.cpp:63 src/window.cpp:251
 msgid "No board has been selected yet"
-msgstr ""
+msgstr "Non è stata ancora selezionata alcuna bacheca"
 
 #: src/window.cpp:316
 msgid "De Moura © All rights reserved"
@@ -275,16 +289,16 @@ msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
 #: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
-msgstr ""
+msgstr "Aggiungi attività"
 
 #: src/dialog/card-dialog.cpp:186 src/widgets/task-widget.cpp:134
 msgid "New Task"
-msgstr ""
+msgstr "Nuova attvità"
 
 #: src/dialog/card-dialog.cpp:237 src/dialog/card-dialog.cpp:265
 #: src/resources/ui/card-details-dialog.ui:63
 msgid "Set Due Date"
-msgstr ""
+msgstr "Imposta data di scadenza"
 
 #: src/dialog/board-dialog.cpp:53
 msgid "Select a file"
@@ -296,7 +310,7 @@ msgstr "File di immagini"
 
 #: src/dialog/create_board_dialog.cpp:10
 msgid "Create New Board"
-msgstr ""
+msgstr "Crea una nuova bacheca"
 
 #: src/dialog/create_board_dialog.cpp:22
 #: src/dialog/preferences-board-dialog.cpp:67
@@ -305,7 +319,7 @@ msgstr "Non sono ammessi nomi di bacheche vuote"
 
 #: src/dialog/preferences-board-dialog.cpp:15
 msgid "Board Preferences"
-msgstr ""
+msgstr "Preferenze della bacheca"
 
 #: src/dialog/preferences-board-dialog.cpp:16
 msgid "Save"
@@ -337,7 +351,7 @@ msgstr "Elimina bacheche"
 
 #: src/resources/ui/app-window.ui:120 src/resources/ui/app-window.ui:136
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Scorciatoie da tastiera"
 
 #: src/resources/ui/app-window.ui:124 src/resources/ui/app-window.ui:140
 msgid "About Progress"
@@ -349,135 +363,135 @@ msgstr "Modifica bacheca"
 
 #: src/resources/ui/app-window.ui:154
 msgid "Board Grid View"
-msgstr ""
+msgstr "Visualizzazione griglia della bacheca"
 
 #: src/resources/ui/app-window.ui:160
 msgid "Allows the user the user to delete boards by selecting them"
-msgstr ""
+msgstr "Consente all'utente di eliminare le bacheche selezionandole"
 
 #: src/resources/ui/app-window.ui:162
 msgid "Enable deletion"
-msgstr ""
+msgstr "Abilita eliminazione"
 
 #: src/resources/ui/app-window.ui:168
 msgid "Open dialog to create a new board"
-msgstr ""
+msgstr "Apri la finestra di dialogo per creare una nuova bacheca"
 
 #: src/resources/ui/app-window.ui:175
 msgid "Board View"
-msgstr ""
+msgstr "Vista della bacheca"
 
 #: src/resources/ui/app-window.ui:180
 msgid "Open preferences dialog"
-msgstr ""
+msgstr "Apri preferenze di dialogo"
 
 #: src/resources/ui/app-window.ui:186
 msgid "Automatically save the board and head to the board grid view"
-msgstr ""
+msgstr "Salva automaticamente la bacheca e vai alla visualizzazione griglia della bacheca"
 
 #: src/resources/ui/app-window.ui:187
 msgid "Go home"
-msgstr ""
+msgstr "Vai alla home"
 
 #: src/resources/ui/app-window.ui:194
 msgid "Card Shortcuts"
-msgstr ""
+msgstr "Scorciatoie delle schede"
 
 #: src/resources/ui/app-window.ui:199
 msgid "Add a new card next to the focused card"
-msgstr ""
+msgstr "Aggiungi una nuova carta accanto alla scheda evidenziata"
 
 #: src/resources/ui/app-window.ui:205
 msgid "It opens a dialog presenting the card extra settings"
-msgstr ""
+msgstr "Apre una finestra di dialogo che presenta le impostazioni extra della scheda"
 
 #: src/resources/ui/app-window.ui:206
 msgid "See card details"
-msgstr ""
+msgstr "Vedi dettagli della scheda"
 
 #: src/resources/ui/app-window.ui:212
 msgid "Rename card"
-msgstr ""
+msgstr "Rinomina scheda"
 
 #: src/resources/ui/app-window.ui:218
 msgid "Opens a color dialog so the user can set the card's cover's color"
-msgstr ""
+msgstr "Apre una finestra di dialogo dei colori in modo che l'utente possa impostare il colore della copertina della scheda"
 
 #: src/resources/ui/app-window.ui:219
 msgid "Set color"
-msgstr ""
+msgstr "Imposta colore"
 
 #: src/resources/ui/app-window.ui:225
 msgid "Deletes current focused card"
-msgstr ""
+msgstr "Elimina la scheda attualmente evidenziata"
 
 #: src/resources/ui/app-window.ui:231
 msgid "Reorder card within cardlist"
-msgstr ""
+msgstr "Riordina la scheda nell'elenco delle schede"
 
 #: src/resources/ui/app-window.ui:237
 msgid "Moves a card to previous or next cardlist"
-msgstr ""
+msgstr "Sposta una scheda all'elenco delle scheda precedente o successivo"
 
 #: src/resources/ui/app-window.ui:244
 msgid "Cardlist Shortcuts"
-msgstr ""
+msgstr "Scorciatoie elenco schede "
 
 #: src/resources/ui/app-window.ui:249
 msgid "Rename the focused cardlist"
-msgstr ""
+msgstr "Rinomina l'elenco delle schede evidenziate"
 
 #: src/resources/ui/app-window.ui:255
 msgid "Add a new cardlist next to the focused cardlist"
-msgstr ""
+msgstr "Aggiungi un nuovo elenco di carte accanto all'elenco di schede evidenziato"
 
 #: src/resources/ui/app-window.ui:261
 msgid "Deletes cardlist from board"
-msgstr ""
+msgstr "Elimina l'elenco delle schede dalla bacheca"
 
 #: src/resources/ui/app-window.ui:267
 msgid "Move cardlist across the board"
-msgstr ""
+msgstr "Sposta l'elenco delle carte sulla bacheca"
 
 #: src/resources/ui/app-window.ui:274
 msgid "Task Shortcuts"
-msgstr ""
+msgstr "Scorciatoie per le attività"
 
 #: src/resources/ui/app-window.ui:279
 msgid "Rename task"
-msgstr ""
+msgstr "Rinomina attività"
 
 #: src/resources/ui/app-window.ui:285
 msgid "Add new task next to focused task"
-msgstr ""
+msgstr "Aggiungi nuova attività accanto all'attività evidenziata"
 
 #: src/resources/ui/app-window.ui:291
 msgid "Delete task from card"
-msgstr ""
+msgstr "Elimina l'attività dalla scheda"
 
 #: src/resources/ui/app-window.ui:297
 msgid "Convert task to card"
-msgstr ""
+msgstr "Converti l'attività in scheda"
 
 #: src/resources/ui/app-window.ui:303
 msgid "Move task across the checklist"
-msgstr ""
+msgstr "spostare l'attività nella checklist"
 
 #: src/resources/ui/card-details-dialog.ui:39
 msgid "Card Title"
-msgstr ""
+msgstr "Titolo della scheda"
 
 #: src/resources/ui/card-details-dialog.ui:55
 msgid "Deadline"
-msgstr ""
+msgstr "Scadenza"
 
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
-msgstr ""
+msgstr "Data di scadenza non impostata"
 
 #: src/resources/ui/card-details-dialog.ui:91
 msgid "Mark this card complete"
-msgstr ""
+msgstr "Segna questa scheda come completata"
 
 #: src/resources/ui/card-details-dialog.ui:108
 msgid "Checklist"
@@ -485,27 +499,27 @@ msgstr ""
 
 #: src/resources/ui/card-details-dialog.ui:142 src/widgets/card-widget.cpp:650
 msgid "Notes"
-msgstr ""
+msgstr "Note"
 
 #: src/resources/ui/card-details-dialog.ui:175
 msgid "Delete Card"
-msgstr ""
+msgstr "Elimina scheda"
 
 #: src/resources/ui/card-details-dialog.ui:186 src/widgets/card-widget.cpp:73
 msgid "Card Details"
-msgstr ""
+msgstr "Dettagli scheda"
 
 #: src/resources/ui/board-dialog.ui:34
 msgid "Board Title"
-msgstr ""
+msgstr "Titolo della bacheca"
 
 #: src/resources/ui/board-dialog.ui:53
 msgid "Board Background"
-msgstr ""
+msgstr "Sfondo della bacheca"
 
 #: src/resources/ui/board-dialog.ui:76
 msgid "Click to set a board background"
-msgstr ""
+msgstr "Fai clic per impostare uno sfondo della bacheca"
 
 #: src/resources/ui/board-dialog.ui:88
 msgid "Create Board"
@@ -513,11 +527,11 @@ msgstr "Crea bacheca"
 
 #: src/resources/ui/board-dialog.ui:101
 msgid "Set Color"
-msgstr ""
+msgstr "Imposta colore"
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
-msgstr ""
+msgstr "Imposta immagine"
 
 #: src/widgets/board-widget.cpp:22
 msgid "Add List"
@@ -529,27 +543,27 @@ msgstr "Nuovo elenco di schede"
 
 #: src/widgets/card-widget.cpp:35
 msgid "Red"
-msgstr ""
+msgstr "Rosso"
 
 #: src/widgets/card-widget.cpp:36
 msgid "Orange"
-msgstr ""
+msgstr "Arancio"
 
 #: src/widgets/card-widget.cpp:37
 msgid "Yellow"
-msgstr ""
+msgstr "Giallo"
 
 #: src/widgets/card-widget.cpp:38
 msgid "Green"
-msgstr ""
+msgstr "Verde"
 
 #: src/widgets/card-widget.cpp:39
 msgid "Blue"
-msgstr ""
+msgstr "Blu"
 
 #: src/widgets/card-widget.cpp:40
 msgid "Purple"
-msgstr ""
+msgstr "Viola"
 
 #: src/widgets/card-widget.cpp:68 src/widgets/editable-label-header.cpp:78
 #: src/widgets/task-widget.cpp:75
@@ -563,7 +577,7 @@ msgstr "Rimuovi"
 
 #: src/widgets/card-widget.cpp:96
 msgid "Unset Color"
-msgstr ""
+msgstr "Colore non impostato"
 
 #: src/widgets/card-widget.cpp:245 src/widgets/card-widget.cpp:322
 #: src/widgets/cardlist-widget.cpp:84
@@ -572,59 +586,59 @@ msgstr "Nuova scheda"
 
 #: src/widgets/card-widget.cpp:279
 msgid "Card Options"
-msgstr ""
+msgstr "Opzioni scheda"
 
 #: src/widgets/card-widget.cpp:471 src/widgets/card-widget.cpp:683
 msgid "Due: "
-msgstr ""
+msgstr "Scadenza: "
 
 #: src/widgets/card-widget.cpp:565
 msgid "<b>%1 day</b> remaining"
 msgid_plural "<b>%1 days</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 giorno</b> rimanente"
+msgstr[1] "<b>%1 giorni</b> rimanenti"
 
 #: src/widgets/card-widget.cpp:574
 msgid "<b>%1 month</b> remaining"
 msgid_plural "<b>%1 months</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 mese</b> rimanente"
+msgstr[1] "<b>%1 mesi</b> rimanenti"
 
 #: src/widgets/card-widget.cpp:583
 msgid "<b>%1 year</b> remaining"
 msgid_plural "<b>%1 years</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 anno</b> rimanente"
+msgstr[1] "<b>%1 anni</b> rimanenti"
 
 #: src/widgets/card-widget.cpp:590
 msgid "This card is past due date <b>%1 day ago</b>"
 msgid_plural "This card is past due date <b>%1 days ago</b>"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Questa scheda è scaduta <b>%1 giorno fa</b>"
+msgstr[1] "Questa scheda è scaduta <b>%1 giorni fa</b>"
 
 #: src/widgets/card-widget.cpp:601
 msgid "This card is past due date <b>%1 month</b> ago"
 msgid_plural "This card is past due date <b>%1 months</b> ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Questa scheda è scaduta <b>%1 mese</b> fa"
+msgstr[1] "Questa scheda è scaduta <b>%1 mesi</b> fa"
 
 #: src/widgets/card-widget.cpp:612
 msgid "This card is past due date <b>%1 year</b> ago"
 msgid_plural "This card is past due date <b>%1 years</b> ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Questa scheda è scaduta <b>%1 anno</b> fa"
+msgstr[1] "Questa scheda è scaduta <b>%1 anni</b> fa"
 
 #: src/widgets/card-widget.cpp:629
 msgid "%1%% complete"
-msgstr ""
+msgstr "%1%% completato"
 
 #: src/widgets/card-widget.cpp:641
 msgid "This card is complete"
-msgstr ""
+msgstr "Questa scheda è completa"
 
 #: src/widgets/card-widget.cpp:643
 msgid "The card is due today"
-msgstr ""
+msgstr "La scheda scade oggi"
 
 #: src/widgets/cardlist-widget.cpp:38
 msgid "Add card"
@@ -632,11 +646,11 @@ msgstr "Aggiungi scheda"
 
 #: src/widgets/cardlist-widget.cpp:109
 msgid "New Cardlist"
-msgstr ""
+msgstr "Nuovo elenco di schede"
 
 #: src/widgets/task-widget.cpp:77
 msgid "Convert to card"
-msgstr ""
+msgstr "Converti in scheda"
 
 #~ msgid "It was not possible to load this board"
 #~ msgstr "Non è stato possibile caricare questa bacheca"
