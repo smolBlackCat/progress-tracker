@@ -1,0 +1,4 @@
+build/
+rel-build/
+.cache/
+.git
