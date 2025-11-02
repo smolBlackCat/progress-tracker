@@ -31,7 +31,7 @@ msgstr ""
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
 msgid "Kanban board application"
-msgstr ""Applicazione della bacheca Kanban"
+msgstr "Applicazione della bacheca Kanban"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:7
 msgid "Gabriel de Moura"
