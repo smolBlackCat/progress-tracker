@@ -52,6 +52,7 @@ jobs:
           cpack
           mv *.exe dev-build/
           mv *.zip dev-build/
+          mv *.sha512 dev-build/
           if [ "${{matrix.development-modes}}" == "ON" ]; then
             echo "FILENAME=devel" >> $GITHUB_ENV
           else
