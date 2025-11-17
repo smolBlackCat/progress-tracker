@@ -68,6 +68,15 @@
   </categories>
 
   <releases>
+    <release date="2025-11-17" version="1.7.2">
+      <description>
+        <p>What's new in Progress 1.7.2</p>
+        <p>
+          This patch release fix a crash after trying to convert a task
+          into a card.
+        </p>
+      </description>
+    </release>
     <release date="2025-10-30" version="1.7.1">
       <description>
         <p>What's new in Progress 1.7.1</p>
