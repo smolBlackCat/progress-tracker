@@ -88,19 +88,20 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
     return task_widget;
 }
 
-void CardDetailsDialog::remove_task(TaskWidget& task) {
+void CardDetailsDialog::remove_task(TaskWidget& task_widget) {
     auto card = cur_card_widget->get_card();
+    auto task = task_widget.task();
 
-    if (Gtk::Widget* previous_sibling = task.get_prev_sibling()) {
+    if (Gtk::Widget* previous_sibling = task_widget.get_prev_sibling()) {
         previous_sibling->grab_focus();
     }
 
-    card->container().remove(*task.task());
-    tasks_box->remove(task);
-    std::erase(tasks_tracker, &task);
+    card->container().remove(*task);
+    tasks_box->remove(task_widget);
+    std::erase(tasks_tracker, &task_widget);
 
     spdlog::get("app")->info("Task (\"{}\") removed from Card (\"{}\")",
-                             task.task()->get_name(), card->get_name());
+                             task->get_name(), card->get_name());
 }
 
 void CardDetailsDialog::reorder_task_widget(TaskWidget& next,

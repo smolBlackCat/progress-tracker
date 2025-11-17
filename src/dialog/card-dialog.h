@@ -47,7 +47,7 @@ public:
      *
      * @param task TaskWidget object reference to be removed.
      */
-    void remove_task(TaskWidget& task);
+    void remove_task(TaskWidget& task_widget);
 
     /**
      * @brief Reorders task widgets within the checklist area.
