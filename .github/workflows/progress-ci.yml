@@ -101,6 +101,7 @@ jobs:
           mkdir dev-build
           mv *.deb dev-build
           mv *.tar.xz dev-build
+          mv *.sha512 dev-build
           if [ "${{matrix.development-modes}}" == "ON" ]; then
             echo "FILENAME=devel" >> $GITHUB_ENV
           else
