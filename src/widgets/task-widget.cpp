@@ -34,11 +34,12 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
       TaskInit{},
       BaseItem{Gtk::Orientation::HORIZONTAL, 3},
       m_card_dialog{card_details_dialog},
+      m_card_widget{card_details_dialog.get_card_widget()},
       m_task{task},
-      focus_controller{Gtk::EventControllerFocus::create()},
+      m_focus_controller{Gtk::EventControllerFocus::create()},
       m_menu_model{Gio::Menu::create()},
       m_action_group{Gio::SimpleActionGroup::create()},
-      is_new{is_new} {
+      m_is_new{is_new} {
     m_popover.set_menu_model(m_menu_model);
     set_margin_start(5);
     set_margin_end(5);
@@ -69,8 +70,6 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     m_checkbutton.signal_toggled().connect(
         sigc::mem_fun(*this, &TaskWidget::on_checkbox));
     m_checkbutton.set_active(task->get_done());
-    task->signal_done().connect(
-        sigc::mem_fun(*this, &TaskWidget::done_handler));
 
     m_menu_model->append(_("Rename"), "task-widget.rename");
     m_menu_model->append(_("Remove"), "task-widget.remove");
@@ -112,11 +111,11 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
             }
         },
         false);
-    m_entry.add_controller(key_controller);
-
-    focus_controller->signal_leave().connect(
+    m_focus_controller->signal_leave().connect(
         sigc::mem_fun(*this, &TaskWidget::off_rename));
-    m_entry.add_controller(focus_controller);
+
+    m_entry.add_controller(key_controller);
+    m_entry.add_controller(m_focus_controller);
 
     using TaskShortcut =
         std::pair<const char*,
@@ -194,14 +193,14 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
 std::shared_ptr<Task> TaskWidget::task() const { return m_task; }
 
 void TaskWidget::on_rename() {
-    m_entry.remove_controller(focus_controller);
+    m_entry.remove_controller(m_focus_controller);
     m_entry_revealer.set_reveal_child();
     m_label.set_visible(false);
 
     m_entry.set_text(m_task->get_name());
     m_entry.grab_focus();
 
-    m_entry.add_controller(focus_controller);
+    m_entry.add_controller(m_focus_controller);
 
     spdlog::get("ui")->debug(
         "[TaskWidget.on_rename] (\"{}\"): Entered rename mode",
@@ -222,12 +221,10 @@ void TaskWidget::off_rename() {
         const std::string old_name = m_task->get_name();
         m_task->set_name(new_label);
 
-        // FIXME: This large call only for getting the card's name is awful.
-        // This is result of bad design.
         spdlog::get("app")->info(
             "Task (\"{}\") from Card (\"{}\") renamed to (\"{}\")", old_name,
-            m_card_dialog.get_card_widget()->get_card()->get_name(), new_label);
-        is_new = false;
+            m_card_widget->get_card()->get_name(), new_label);
+        m_is_new = false;
     }
 
     spdlog::get("ui")->debug(
@@ -235,8 +232,12 @@ void TaskWidget::off_rename() {
         m_task->get_name());
 }
 
-// TODO: Reassess the need for handlers in the widget implementation
-void TaskWidget::done_handler(bool done) {
+void TaskWidget::on_remove() { m_card_dialog.remove_task(*this); }
+
+void TaskWidget::on_checkbox() {
+    bool done = m_checkbutton.get_active();
+    this->m_task->set_done(done);
+
     if (done) {
         m_label.set_markup(
             Glib::ustring::compose("<s>%1</s>", m_task->get_name()));
@@ -246,33 +247,24 @@ void TaskWidget::done_handler(bool done) {
         remove_css_class("complete-task");
     }
 
-    // FIXME: This one is a awful-looking call
-    spdlog::get("app")->info(
-        "Task (\"{}\") from Card (\"{}\") set as {}", m_task->get_name(),
-        m_card_dialog.get_card_widget()->get_card()->get_name(),
-        (done ? "complete" : "incomplete"));
-}
+    spdlog::get("app")->info("Task (\"{}\") from Card (\"{}\") set as {}",
+                             m_task->get_name(),
+                             m_card_widget->get_card()->get_name(),
+                             (done ? "complete" : "incomplete"));
 
-void TaskWidget::on_remove() { m_card_dialog.remove_task(*this); }
-
-void TaskWidget::on_checkbox() {
-    this->m_task->set_done(m_checkbutton.get_active());
-    m_card_dialog.get_card_widget()->update_complete_tasks_label();
+    m_card_widget->update_complete_tasks_label();
 }
 
 void TaskWidget::on_convert() {
-    CardWidget& card_widget = *m_card_dialog.get_card_widget();
     spdlog::get("app")->info(
         "Task (\"{}\") from Card (\"{}\") converted into a card",
-        m_task->get_name(),
-        m_card_dialog.get_card_widget()->get_card()->get_name());
+        m_task->get_name(), m_card_widget->get_card()->get_name());
     auto cardlist_widget =
-        const_cast<CardlistWidget*>(card_widget.get_cardlist_widget());
-    auto cardlist_model = cardlist_widget->cardlist();
+        const_cast<CardlistWidget*>(m_card_widget->get_cardlist_widget());
     auto task_as_card =
         cardlist_widget->append_new_card(Card{m_task->get_name()});
 
-    cardlist_widget->reorder(*task_as_card, card_widget);
+    cardlist_widget->reorder(*task_as_card, *m_card_widget);
     m_card_dialog.remove_task(*this);
 }
 

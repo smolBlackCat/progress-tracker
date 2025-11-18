@@ -45,11 +45,6 @@ public:
 
 protected:
     /**
-     * @brief Handles the task done signal event
-     */
-    void done_handler(bool done);
-
-    /**
      * @brief Handles the rename action.
      */
     void on_rename();
@@ -88,16 +83,16 @@ protected:
     Gtk::Entry m_entry;
     Gtk::CheckButton m_checkbutton;
     Gtk::PopoverMenu m_popover;
-    const Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
+    const Glib::RefPtr<Gtk::EventControllerFocus> m_focus_controller;
 
     CardDetailsDialog& m_card_dialog;
+    CardWidget* m_card_widget;
 
     const Glib::RefPtr<Gio::Menu> m_menu_model;
     const Glib::RefPtr<Gio::SimpleActionGroup> m_action_group;
 
     std::shared_ptr<Task> m_task;
-    bool is_new;
+    bool m_is_new;
 };
 
 }  // namespace ui
-
