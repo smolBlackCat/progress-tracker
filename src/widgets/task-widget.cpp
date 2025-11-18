@@ -29,7 +29,7 @@ TaskInit::TaskInit()
     : Glib::ExtraClassInit{task_class_init, nullptr, task_init} {}
 
 TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
-                       const std::shared_ptr<Task>& task, bool is_new)
+                       const std::shared_ptr<Task>& task)
     : Glib::ObjectBase{"TaskWidget"},
       TaskInit{},
       BaseItem{Gtk::Orientation::HORIZONTAL, 3},
@@ -38,8 +38,7 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
       m_task{task},
       m_focus_controller{Gtk::EventControllerFocus::create()},
       m_menu_model{Gio::Menu::create()},
-      m_action_group{Gio::SimpleActionGroup::create()},
-      m_is_new{is_new} {
+      m_action_group{Gio::SimpleActionGroup::create()} {
     m_popover.set_menu_model(m_menu_model);
     set_margin_start(5);
     set_margin_end(5);
@@ -184,10 +183,6 @@ TaskWidget::TaskWidget(CardDetailsDialog& card_details_dialog,
     add_controller(shortcut_controller);
 
     setup_drag_and_drop();
-
-    if (is_new) {
-        on_rename();
-    }
 }
 
 std::shared_ptr<Task> TaskWidget::task() const { return m_task; }
@@ -224,7 +219,6 @@ void TaskWidget::off_rename() {
         spdlog::get("app")->info(
             "Task (\"{}\") from Card (\"{}\") renamed to (\"{}\")", old_name,
             m_card_widget->get_card()->get_name(), new_label);
-        m_is_new = false;
     }
 
     spdlog::get("ui")->debug(

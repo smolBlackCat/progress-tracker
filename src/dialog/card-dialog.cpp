@@ -67,7 +67,7 @@ CardDetailsDialog::~CardDetailsDialog() {}
 
 TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     TaskWidget* task_widget =
-        _add_task(m_card_widget->get_card()->container().append(task), false);
+        _add_task(m_card_widget->get_card()->container().append(task));
     spdlog::get("app")->info("Task (\"{}\") added to card (\"{}\")",
                              task.get_name(),
                              m_card_widget->get_card()->get_name());
@@ -79,7 +79,7 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
                                                      TaskWidget* sibling) {
     auto new_task = m_card_widget->get_card()->container().insert_after(
         task, *sibling->task());
-    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task, false);
+    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task);
     m_tasks_box->insert_child_after(*task_widget, *sibling);
     m_tasks_tracker.push_back(task_widget);
     m_card_widget->update_complete_tasks_label();
@@ -182,8 +182,7 @@ CardWidget* CardDetailsDialog::get_card_widget() { return m_card_widget; }
 
 void CardDetailsDialog::on_add_task() {
     _add_task(
-        m_card_widget->get_card()->container().append(Task{_("New Task")}),
-        false);
+        m_card_widget->get_card()->container().append(Task{_("New Task")}));
 
     spdlog::get("app")->info("New task appended to Card (\"{}\")",
                              m_card_widget->get_card()->get_name());
@@ -269,9 +268,8 @@ void CardDetailsDialog::clear() {
     spdlog::get("ui")->debug("[CardDetailsDialog.clear] Dialog cleaned");
 }
 
-TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task,
-                                         bool is_new) {
-    auto task_widget = Gtk::make_managed<TaskWidget>(*this, task, is_new);
+TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task) {
+    auto task_widget = Gtk::make_managed<TaskWidget>(*this, task);
     m_tasks_box->append(*task_widget);
     m_tasks_box->reorder_child_after(m_checklist_add_button, *task_widget);
     m_tasks_tracker.push_back(task_widget);

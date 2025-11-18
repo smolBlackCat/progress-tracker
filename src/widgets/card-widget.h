@@ -36,11 +36,8 @@ public:
      * @brief Constructs a CardWidget object.
      *
      * @param card a smart pointer pointing to a Card object.
-     * @param is_new flag indicating whether this object is being created from
-     * scratch rather than being loaded from a Progress board file. True means
-     * the Card did not come from a file otherwise False.
      */
-    CardWidget(std::shared_ptr<Card> card, bool is_new = false);
+    CardWidget(std::shared_ptr<Card> card);
 
     /**
      * @brief Sets the title of the card.
@@ -185,7 +182,6 @@ protected:
 
     friend class CardPopover;
 
-    bool is_new;
     Gtk::Box root_box;
     Gtk::Revealer card_cover_revealer, card_entry_revealer;
     Gtk::Picture card_cover_picture;
@@ -261,11 +257,6 @@ protected:
     void on_confirm_changes();
 
     /**
-     * @brief Cancels changes made to the card.
-     */
-    void on_cancel_changes();
-
-    /**
      * @brief Changes the complete tasks label color depending on the amount of
      * tasks complete. Green if all tasks are complete, Yellow if half of the
      * tasks are complete and Red if less than half of the tasks are complete.
@@ -288,4 +279,3 @@ protected:
 };
 
 }  // namespace ui
-

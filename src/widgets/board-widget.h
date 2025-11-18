@@ -153,8 +153,7 @@ public:
      */
     std::shared_ptr<Board> board() const;
 
-    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist,
-                                   bool editing_mode = false);
+    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist);
 
     sigc::signal<void(CardlistWidget*)>& signal_cardlist_added();
     sigc::signal<void(CardlistWidget*)>& signal_cardlist_removed();

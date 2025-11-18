@@ -40,8 +40,7 @@ public:
      * should start in editing mode. Default is false.
      */
     CardlistWidget(BoardWidget& parent_board,
-                   const std::shared_ptr<CardList>& cardlist,
-                   bool editing_mode = false);
+                   const std::shared_ptr<CardList>& cardlist);
 
     /**
      * @brief Reorders card widget "next" after card widget "sibling".
@@ -102,8 +101,7 @@ public:
     BoardWidget& board;
 
 protected:
-    CardWidget* __add(const std::shared_ptr<Card>& card,
-                      bool editing_mode = false);
+    CardWidget* __add(const std::shared_ptr<Card>& card);
 
     /**
      * @brief Sets up drag and drop functionality for the card list widget.
@@ -128,7 +126,6 @@ protected:
     sigc::signal<void(CardWidget*)> remove_card_signal;
 
     ssize_t card_index = 0;
-    bool m_new;
 };
 
 }  // namespace ui

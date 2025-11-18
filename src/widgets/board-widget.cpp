@@ -185,7 +185,7 @@ void ui::BoardWidget::set_scroll(bool scroll) { m_on_scroll = scroll; }
 ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
                                                       bool editing_mode) {
     spdlog::get("app")->info("Added Card list (\"{}\")", cardlist.get_name());
-    return __add_cardlist(m_board->container().append(cardlist), editing_mode);
+    return __add_cardlist(m_board->container().append(cardlist));
 }
 
 ui::CardlistWidget* ui::BoardWidget::pop() {
@@ -203,8 +203,7 @@ ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
     const CardList& cardlist, ui::CardlistWidget* sibling) {
     auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
         *this,
-        m_board->container().insert_after(cardlist, *sibling->cardlist()),
-        false);
+        m_board->container().insert_after(cardlist, *sibling->cardlist()));
     m_cardlists.push_back(new_cardlist);
     m_root.insert_child_after(*new_cardlist, *sibling);
 
@@ -324,9 +323,8 @@ void ui::BoardWidget::__set_background(const std::string& background) {
 #endif
 
 ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
-    const std::shared_ptr<CardList>& cardlist, bool editing_mode) {
-    auto new_cardlist =
-        Gtk::make_managed<ui::CardlistWidget>(*this, cardlist, editing_mode);
+    const std::shared_ptr<CardList>& cardlist) {
+    auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
     m_cardlists.push_back(new_cardlist);
     m_root.append(*new_cardlist);
     m_root.reorder_child_after(m_add_button, *new_cardlist);

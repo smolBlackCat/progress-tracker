@@ -192,13 +192,12 @@ inline std::string format_date_str(Date date) {
     return date_str;
 }
 
-CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
+CardWidget::CardWidget(std::shared_ptr<Card> card)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
       card{card},
       parent{nullptr},
-      is_new{is_new},
       root_box{Gtk::Orientation::VERTICAL},
       card_cover_revealer{},
       card_entry_revealer{},
@@ -285,11 +284,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
     // CardWidget Setup
 
     set_title(card->get_name());
-
-    if (is_new) {
-        on_rename();  // Open card on rename mode by default whenever a new card
-                      // is created
-    }
 
     card_cover_revealer.property_child_revealed().signal_changed().connect(
         [this]() {
@@ -418,7 +412,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card, bool is_new)
                         break;
                     }
                     case GDK_KEY_Escape: {
-                        this->on_cancel_changes();
                         this->off_rename();
                         break;
                     }
@@ -873,13 +866,6 @@ void CardWidget::on_confirm_changes() {
 
         spdlog::get("app")->info("Card (\"{}\") renamed to (\"{}\")", old,
                                  card->get_name());
-    }
-    is_new = false;
-}
-
-void CardWidget::on_cancel_changes() {
-    if (is_new) {
-        remove_from_parent();
     }
 }
 

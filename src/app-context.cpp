@@ -150,12 +150,11 @@ bool AppContext::idle_load_session() {
     }
 
     ui::CardlistWidget *cardlist_widget = Gtk::make_managed<ui::CardlistWidget>(
-        m_board_widget, data[m_cardlist_i], false);
+        m_board_widget, data[m_cardlist_i]);
     m_board_widget.append(*cardlist_widget);
 
     for (const auto &card : cardlist_widget->cardlist()->container()) {
-        ui::CardWidget *card_widget =
-            Gtk::make_managed<ui::CardWidget>(card, false);
+        ui::CardWidget *card_widget = Gtk::make_managed<ui::CardWidget>(card);
         cardlist_widget->append(*card_widget);
     }
     m_cardlist_i++;

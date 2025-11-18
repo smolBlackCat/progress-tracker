@@ -34,7 +34,7 @@ public:
      * editing mode
      */
     TaskWidget(CardDetailsDialog& card_details_dialog,
-               const std::shared_ptr<Task>& task, bool editing_mode = false);
+               const std::shared_ptr<Task>& task);
 
     /**
      * @brief Returns the Task instance pointer
@@ -92,7 +92,6 @@ protected:
     const Glib::RefPtr<Gio::SimpleActionGroup> m_action_group;
 
     std::shared_ptr<Task> m_task;
-    bool m_is_new;
 };
 
 }  // namespace ui

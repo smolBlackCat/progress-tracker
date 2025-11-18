@@ -30,8 +30,7 @@ CardlistInit::CardlistInit()
     : Glib::ExtraClassInit(cardlist_class_init, nullptr, cardlist_init) {}
 
 CardlistWidget::CardlistWidget(BoardWidget& board,
-                               const std::shared_ptr<CardList>& cardlist,
-                               bool is_new)
+                               const std::shared_ptr<CardList>& cardlist)
     : Glib::ObjectBase{"CardlistWidget"},
       CardlistInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
@@ -40,7 +39,6 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
       m_cards{},
       board{board},
       m_cardlist{cardlist},
-      m_new{is_new},
       m_header{cardlist->get_name(), "title-2", "title-2"},
       m_scr_window{} {
     set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
@@ -49,24 +47,14 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
     set_size_request(CARDLIST_MAX_WIDTH, -1);
     setup_drag_and_drop();
 
-    if (is_new) {
-        m_header.to_editing_mode();
-    }
     m_header.add_option_button(_("Remove"), "remove",
                                [this]() { this->board.remove(*this); });
     m_header.signal_on_confirm().connect([this](std::string label) {
         std::string old_name = this->m_cardlist->get_name();
         this->m_cardlist->set_name(label);
-        this->m_new = false;
 
         spdlog::get("app")->info("Card list (\"{}\") renamed to (\"{}\")",
                                  old_name, this->m_cardlist->get_name());
-    });
-    m_header.signal_on_cancel().connect([this](std::string label) {
-        if (this->m_new) {
-            spdlog::get("app")->info("New card list creation canceled");
-            this->board.remove(*this);
-        }
     });
 
     // FIXME: We're getting EditableLabelHeader instance's menus, but honestly,
@@ -256,8 +244,7 @@ CardWidget* CardlistWidget::append_new_card(const Card& card) {
 CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
                                                   ui::CardWidget* sibling) {
     auto cardwidget = Gtk::make_managed<CardWidget>(
-        m_cardlist->container().insert_after(card, *sibling->get_card()),
-        false);
+        m_cardlist->container().insert_after(card, *sibling->get_card()));
     m_cards.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     m_root.insert_child_after(*cardwidget, *sibling);
@@ -400,9 +387,8 @@ void CardlistWidget::cleanup() {
     m_scr_window.unparent();
 }
 
-CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card,
-                                  bool editing_mode) {
-    auto cardwidget = Gtk::make_managed<CardWidget>(card, editing_mode);
+CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card) {
+    auto cardwidget = Gtk::make_managed<CardWidget>(card);
     m_cards.push_back(cardwidget);
     cardwidget->set_cardlist(this);
     m_root.append(*cardwidget);
