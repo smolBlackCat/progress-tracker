@@ -10,28 +10,25 @@
 #include "cardlist-widget.h"
 #include "core/colorable.h"
 
+#ifdef WIN32
 ui::BoardWidget::BoardWidget(BoardManager& manager)
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
       m_manager{manager},
-#ifdef WIN32
       picture{},
       scr{},
       overlay{},
-#endif
       m_add_button{_("Add List")},
       m_css_provider{Gtk::CssProvider::create()} {
-
-#ifdef WIN32
     set_child(overlay);
     picture.set_keep_aspect_ratio(false);
+
     overlay.set_child(picture);
-    scr.set_child(m_root);
     overlay.add_overlay(scr);
     overlay.set_expand(true);
-#else
-    set_child(m_root);
-#endif
+
+    scr.set_child(m_root);
+
     Gtk::Widget::set_name("board-root");
 
     __setup_auto_scrolling();
@@ -39,10 +36,6 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.set_halign(Gtk::Align::START);
     m_root.set_spacing(25);
     m_root.set_margin(10);
-
-    Gtk::StyleProvider::add_provider_for_display(
-        get_display(), m_css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    m_css_provider->load_from_data(CSS_FORMAT);
 
     m_add_button.signal_clicked().connect(
         [this]() { add_new_cardlist(CardList{_("New CardList")}, false); });
@@ -52,6 +45,36 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
 
     m_root.append(m_add_button);
 }
+#else
+ui::BoardWidget::BoardWidget(BoardManager& manager)
+    : Gtk::ScrolledWindow{},
+      m_root{Gtk::Orientation::HORIZONTAL},
+      m_manager{manager},
+      m_add_button{_("Add List")},
+      m_css_provider{Gtk::CssProvider::create()} {
+    Gtk::StyleProvider::add_provider_for_display(
+        get_display(), m_css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    m_css_provider->load_from_data(BOARD_BACKGROUND);
+
+    set_child(m_root);
+
+    Gtk::Widget::set_name("board-root");
+
+    __setup_auto_scrolling();
+
+    m_root.set_halign(Gtk::Align::START);
+    m_root.set_spacing(25);
+    m_root.set_margin(10);
+
+    m_add_button.signal_clicked().connect(
+        [this]() { add_new_cardlist(CardList{_("New CardList")}, false); });
+    m_add_button.set_valign(Gtk::Align::START);
+    m_add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
+    m_add_button.add_css_class("opaque");
+
+    m_root.append(m_add_button);
+}
+#endif
 
 void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
     if (board) {
@@ -257,12 +280,11 @@ void ui::BoardWidget::__setup_auto_scrolling() {
 
 #ifdef WIN32
 
+// FIXME: Unstable background setting on Windows
 void ui::BoardWidget::__set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
-            m_css_provider->load_from_data(
-                std::format(CSS_FORMAT_RGB, background));
             picture.set_visible(false);
             break;
         }
@@ -272,8 +294,6 @@ void ui::BoardWidget::__set_background(const std::string& background) {
             break;
         }
         case BackgroundType::INVALID: {
-            m_css_provider->load_from_data(
-                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
             picture.set_visible(false);
             break;
         }
@@ -286,17 +306,17 @@ void ui::BoardWidget::__set_background(const std::string& background) {
     switch (bg_type) {
         case BackgroundType::COLOR: {
             m_css_provider->load_from_data(
-                std::format(CSS_FORMAT_RGB, background));
+                std::format(BOARD_BACKGROUND_RGB, background));
             break;
         }
         case BackgroundType::IMAGE: {
             m_css_provider->load_from_data(std::format(
-                CSS_FORMAT_FILE, compressed_bg_filename(background)));
+                BOARD_BACKGROUND_IMAGE, compressed_bg_filename(background)));
             break;
         }
         case BackgroundType::INVALID: {
             m_css_provider->load_from_data(
-                std::format(CSS_FORMAT_RGB, Board::BACKGROUND_DEFAULT));
+                std::format(BOARD_BACKGROUND_RGB, Board::BACKGROUND_DEFAULT));
             break;
         }
     }

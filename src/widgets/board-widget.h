@@ -11,16 +11,16 @@ class CardlistWidget;
  */
 class BoardWidget : public Gtk::ScrolledWindow {
 public:
-    static constexpr const char* CSS_FORMAT =
+    static constexpr const char* BOARD_BACKGROUND =
         "#board-root {transition-property: background-image, "
         "background-color;}";
-    static constexpr const char* CSS_FORMAT_FILE =
+    static constexpr const char* BOARD_BACKGROUND_IMAGE =
         "#board-root {{transition-property: background-image, "
         "background-color; "
         "background-size: cover;"
         "background-repeat: no-repeat;"
         "background-image: url(\"file:{}\");}}";
-    static constexpr const char* CSS_FORMAT_RGB =
+    static constexpr const char* BOARD_BACKGROUND_RGB =
         "#board-root {{transition-property: background-image, "
         "background-color; "
         "background-color: {};}}";
