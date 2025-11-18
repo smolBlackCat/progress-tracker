@@ -7,7 +7,7 @@
 
 namespace ui {
 
-class TaskWidget;
+class TaskWidget;   
 class CardWidget;
 
 /**
@@ -115,30 +115,21 @@ protected:
      */
     void clear();
 
-    Glib::RefPtr<Gtk::Builder>
-        builder;  ///< Builder for constructing the UI elements.
+    Glib::RefPtr<Gtk::Builder> builder;
 
-    Glib::RefPtr<Glib::Object>
-        adw_dialog;                    ///< Reference to the AdwDialog object.
-    Gtk::Entry* card_title_entry;      ///< Entry widget for the card title.
-    Gtk::Button checklist_add_button;  ///< Button to add new tasks to the
-                                       ///< checklist.
-    Gtk::Button *unset_due_date_button,
-        *card_delete_button;  ///< Buttons for unsetting the due date and
-                              ///< deleting the card.
-    Gtk::MenuButton*
-        date_menubutton;      ///< Menu button for setting the due date.
-    Gtk::Calendar* calendar;  ///< Calendar widget for selecting the due date.
-    Gtk::Revealer* checkbutton_revealer;  ///< Revealer for the check button.
-    Gtk::CheckButton*
-        checkbutton;      ///< Check button for marking tasks as completed.
-    Gtk::Box* tasks_box;  ///< Box container for the task widgets.
-    Glib::RefPtr<Gtk::TextBuffer>
-        notes_textbuffer;  ///< Text buffer for the card notes.
+    Glib::RefPtr<Glib::Object> m_adw_dialog;
+    Gtk::Entry* m_title_entry;
+    Gtk::Button m_checklist_add_button;
+    Gtk::Button *m_unset_due_date_button, *m_card_delete_button;
+    Gtk::MenuButton* m_date_menubutton;
+    Gtk::Calendar* m_calendar;
+    Gtk::Revealer* m_checkbutton_revealer;
+    Gtk::CheckButton* m_checkbutton;
+    Gtk::Box* m_tasks_box;
+    Glib::RefPtr<Gtk::TextBuffer> m_notes_textbuffer;
 
-    CardWidget* cur_card_widget;  ///< Pointer to the current CardWidget.
-    std::vector<TaskWidget*>
-        tasks_tracker;  ///< Vector tracking the TaskWidget objects.
+    CardWidget* m_card_widget;
+    std::vector<TaskWidget*> m_tasks_tracker;
 
 private:
     /**
@@ -154,4 +145,3 @@ private:
 };
 
 }  // namespace ui
-
