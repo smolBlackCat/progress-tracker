@@ -165,21 +165,22 @@ protected:
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
 
-    sigc::signal<void(CardlistWidget*)> add_cardlist_signal,
-        remove_cardlist_signal;
+    sigc::signal<void(CardlistWidget*)> m_add_cardlist_signal,
+        m_remove_cardlist_signal;
 
 #ifdef WIN32
-    Gtk::Overlay overlay;
-    Gtk::Picture picture;
-    Gtk::ScrolledWindow scr;
+    Gtk::Overlay m_overlay;
+    Gtk::Picture m_picture;
+    Gtk::ScrolledWindow m_scr;
 #endif
+
     Gtk::Button m_add_button;
     std::shared_ptr<Board> m_board = nullptr;
     Glib::RefPtr<Gtk::CssProvider> m_css_provider;
 
     // FIXME: This may be redundant
     std::vector<ui::CardlistWidget*> m_cardlists;
-    double x, y;
+    double m_x, m_y;
     bool m_on_scroll = false;
 };
 

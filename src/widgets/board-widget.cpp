@@ -21,13 +21,13 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
       m_add_button{_("Add List")},
       m_css_provider{Gtk::CssProvider::create()} {
     set_child(overlay);
-    picture.set_keep_aspect_ratio(false);
+    m_picture.set_keep_aspect_ratio(false);
 
-    overlay.set_child(picture);
-    overlay.add_overlay(scr);
-    overlay.set_expand(true);
+    m_overlay.set_child(m_picture);
+    m_overlay.add_overlay(scr);
+    m_overlay.set_expand(true);
 
-    scr.set_child(m_root);
+    m_scr.set_child(m_root);
 
     Gtk::Widget::set_name("board-root");
 
@@ -107,7 +107,7 @@ void ui::BoardWidget::append(CardlistWidget& child) {
     m_root.append(child);
     m_root.reorder_child_after(m_add_button, child);
 
-    add_cardlist_signal.emit(&child);
+    m_add_cardlist_signal.emit(&child);
 }
 
 void ui::BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
@@ -207,7 +207,7 @@ ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
     m_cardlists.push_back(new_cardlist);
     m_root.insert_child_after(*new_cardlist, *sibling);
 
-    add_cardlist_signal.emit(new_cardlist);
+    m_add_cardlist_signal.emit(new_cardlist);
 
     return new_cardlist;
 }
@@ -226,12 +226,12 @@ std::shared_ptr<Board> ui::BoardWidget::board() const { return m_board; }
 
 sigc::signal<void(ui::CardlistWidget*)>&
 ui::BoardWidget::signal_cardlist_added() {
-    return add_cardlist_signal;
+    return m_add_cardlist_signal;
 }
 
 sigc::signal<void(ui::CardlistWidget*)>&
 ui::BoardWidget::signal_cardlist_removed() {
-    return remove_cardlist_signal;
+    return m_remove_cardlist_signal;
 }
 
 void ui::BoardWidget::__setup_auto_scrolling() {
@@ -239,19 +239,19 @@ void ui::BoardWidget::__setup_auto_scrolling() {
 
     drop_controller_motion_c->signal_motion().connect(
         [this](double x, double y) {
-            this->x = x;
-            this->y = y;
+            this->m_x = x;
+            this->m_y = y;
         });
 #ifdef WIN32
-    scr.add_controller(drop_controller_motion_c);
+    m_scr.add_controller(drop_controller_motion_c);
 #else
     add_controller(drop_controller_motion_c);
 #endif
     Glib::signal_timeout().connect(
         [this]() {
 #ifdef WIN32
-            double cur_max_width = scr.get_width();
-            auto hadjustment = scr.get_hadjustment();
+            double cur_max_width = m_scr.get_width();
+            auto hadjustment = m_scr.get_hadjustment();
 #else
             double cur_max_width = get_width();
             auto hadjustment = get_hadjustment();
@@ -260,12 +260,12 @@ void ui::BoardWidget::__setup_auto_scrolling() {
             double upper = hadjustment->get_upper();
 
             if (m_on_scroll) {
-                if (x >= (cur_max_width * 0.8)) {
+                if (m_x >= (cur_max_width * 0.8)) {
                     double new_value =
                         hadjustment->get_value() + SCROLL_SPEED_FACTOR;
                     hadjustment->set_value(new_value >= upper ? upper
                                                               : new_value);
-                } else if (x <= (cur_max_width * 0.2)) {
+                } else if (m_x <= (cur_max_width * 0.2)) {
                     double new_value =
                         hadjustment->get_value() - SCROLL_SPEED_FACTOR;
                     hadjustment->set_value(new_value <= lower ? lower
@@ -284,16 +284,16 @@ void ui::BoardWidget::__set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
-            picture.set_visible(false);
+            m_picture.set_visible(false);
             break;
         }
         case BackgroundType::IMAGE: {
-            picture.set_filename(compressed_bg_filename(background));
-            picture.set_visible(true);
+            m_picture.set_filename(compressed_bg_filename(background));
+            m_picture.set_visible(true);
             break;
         }
         case BackgroundType::INVALID: {
-            picture.set_visible(false);
+            m_picture.set_visible(false);
             break;
         }
     }
@@ -329,7 +329,7 @@ ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
     m_root.append(*new_cardlist);
     m_root.reorder_child_after(m_add_button, *new_cardlist);
 
-    add_cardlist_signal.emit(new_cardlist);
+    m_add_cardlist_signal.emit(new_cardlist);
 
     return new_cardlist;
 }

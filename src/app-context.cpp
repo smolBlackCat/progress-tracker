@@ -225,7 +225,7 @@ bool AppContext::timeout_update_cards() {
 
         auto card = m_cards[m_next_card_i];
 
-        card->update_due_date_label();
+        card->update_deadline_label();
         card->set_tooltip_markup(card->create_details_text());
 
         spdlog::get("app")->debug(

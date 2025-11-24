@@ -70,13 +70,13 @@ public:
      * situation. Red if it is past due date, green if it is complete and plain
      * color if it is due but not yet complete.
      */
-    void update_due_date_label();
+    void update_deadline_label();
 
     /**
      * @brief Updates the label informing the number of complete tasks for this
      * card.
      */
-    void update_complete_tasks_label();
+    void update_completion_label();
 
     /**
      * @brief Retrieves the title of the card.
@@ -182,36 +182,20 @@ protected:
 
     friend class CardPopover;
 
-    Gtk::Box root_box;
-    Gtk::Revealer card_cover_revealer, card_entry_revealer;
-    Gtk::Picture card_cover_picture;
-    Gtk::Label card_label, complete_tasks_label, due_date_label;
-    Gtk::Entry card_entry;
-    Gtk::MenuButton card_menu_button;
-    CardPopover card_menu_popover, card_menu_popover2;
+    Gtk::Box m_root;
+    Gtk::Revealer m_card_cover_revealer, m_card_entry_revealer;
+    Gtk::Picture m_card_cover_picture;
+    Gtk::Label m_card_label, m_completion_label, m_deadline_label;
+    Gtk::Entry m_card_entry;
+    Gtk::MenuButton m_card_menu_button;
+    CardPopover m_fixed_card_popover, m_mouse_card_popover;
 
-    Glib::RefPtr<Gtk::EventControllerFocus> focus_controller;
-    Glib::RefPtr<Gtk::EventControllerKey> key_controller;
-    Glib::RefPtr<Gtk::GestureClick> click_controller;
-    Glib::RefPtr<Gtk::ColorDialog> color_dialog;
+    Glib::RefPtr<Gtk::EventControllerFocus> m_focus_ctrl;
+    Glib::RefPtr<Gtk::EventControllerKey> m_key_ctrl;
+    Glib::RefPtr<Gtk::GestureClick> m_click_ctrl;
 
-    ui::CardlistWidget* parent;
-    std::shared_ptr<Card> card;
-
-    /**
-     * @brief Handles the task appending event. It updates the tasks complete
-     * label
-     *
-     * @param task shared pointer to the task being appended.
-     */
-    void on_append_handle(std::shared_ptr<Task> task);
-
-    /**
-     * @brief Handles the task removal event
-     *
-     * @param task shared pointer to the task being removed.
-     */
-    void on_remove_handle(std::shared_ptr<Task> task);
+    ui::CardlistWidget* m_cardlist_widget;
+    std::shared_ptr<Card> m_card;
 
     /**
      * @brief Updates the label informing the due date for this card.
@@ -230,11 +214,6 @@ protected:
      * @brief Sets up drag and drop functionality for the card widget.
      */
     void setup_drag_and_drop();
-
-    /**
-     * @brief Opens the color dialog for selecting card cover color.
-     */
-    void open_color_dialog();
 
     /**
      * @brief Opens the card details dialog.
@@ -276,6 +255,9 @@ protected:
     void __clear_cover_color();
 
     void cleanup() override;
+
+private:
+    void setup_widgets();
 };
 
 }  // namespace ui

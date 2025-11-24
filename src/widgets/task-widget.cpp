@@ -246,7 +246,7 @@ void TaskWidget::on_checkbox() {
                              m_card_widget->get_card()->get_name(),
                              (done ? "complete" : "incomplete"));
 
-    m_card_widget->update_complete_tasks_label();
+    m_card_widget->update_completion_label();
 }
 
 void TaskWidget::on_convert() {

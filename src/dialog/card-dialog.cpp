@@ -41,6 +41,7 @@ CardDetailsDialog::CardDetailsDialog()
     m_checkbutton->signal_toggled().connect([this]() {
         this->m_card_widget->get_card()->set_complete(
             this->m_checkbutton->get_active());
+        this->m_card_widget->update_deadline_label();
     });
     m_calendar->signal_day_selected().connect(
         sigc::mem_fun(*this, &CardDetailsDialog::on_set_due_date));
@@ -82,7 +83,7 @@ TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
     auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task);
     m_tasks_box->insert_child_after(*task_widget, *sibling);
     m_tasks_tracker.push_back(task_widget);
-    m_card_widget->update_complete_tasks_label();
+    m_card_widget->update_completion_label();
 
     return task_widget;
 }
@@ -98,6 +99,8 @@ void CardDetailsDialog::remove_task(TaskWidget& task_widget) {
     card->container().remove(*task);
     m_tasks_box->remove(task_widget);
     std::erase(m_tasks_tracker, &task_widget);
+
+    m_card_widget->update_completion_label();
 
     spdlog::get("app")->info("Task (\"{}\") removed from Card (\"{}\")",
                              task->get_name(), card->get_name());
