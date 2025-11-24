@@ -233,10 +233,8 @@ void CardDetailsDialog::on_delete_card() {
 }
 
 void CardDetailsDialog::on_unset_due_date() {
-    auto card_ptr = m_card_widget->get_card();
-
     m_date_menubutton->set_label(_("Set Due Date"));
-    card_ptr->set_due_date(Date{});
+    m_card_widget->set_deadline(Date{});
     m_checkbutton_revealer->set_reveal_child(false);
 }
 
@@ -250,7 +248,7 @@ void CardDetailsDialog::on_set_due_date() {
     m_calendar->get_date().get_ymd(y, m, d);
     auto new_date = Date{year{y}, month{static_cast<unsigned int>(m)},
                          day{static_cast<unsigned int>(d)}};
-    card_ptr->set_due_date(new_date);
+    m_card_widget->set_deadline(new_date);
     m_checkbutton_revealer->set_reveal_child(true);
     update_due_date_label();
 }

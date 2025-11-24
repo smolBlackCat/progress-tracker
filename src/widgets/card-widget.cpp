@@ -230,13 +230,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
     m_deadline_label.property_label().signal_changed().connect(
         sigc::mem_fun(*this, &CardWidget::update_deadline_label));
 
-    // FIXME: I have deleted code connecting to other card signals. I don't
-    // think the widget code have to be so tight to the core component
-    card->signal_color().connect(
-        sigc::mem_fun(*this, &CardWidget::color_handler));
-    card->signal_due_date().connect(
-        sigc::mem_fun(*this, &CardWidget::due_date_handler));
-
     using CardShortcut =
         std::pair<const char*,
                   std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
@@ -408,8 +401,48 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
 }
 
 void CardWidget::set_cover_color(const Gdk::RGBA& color) {
-    m_card->set_color(Color{color.get_red() * 255, color.get_green() * 255,
-                            color.get_blue() * 255, 1.0});
+    Color new_color = Color{color.get_red() * 255, color.get_green() * 255,
+                            color.get_blue() * 255, 1.0};
+    m_card->set_color(new_color);
+
+    if (color != Gdk::RGBA{}) {
+        __set_cover_color(color);
+        CardWidget::CardPopover::mass_color_select(this, color);
+
+        spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
+                                 m_card->get_name(), color.to_string().c_str());
+    } else {
+        __clear_cover_color();
+
+        spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
+                                 m_card->get_name());
+    }
+}
+
+void CardWidget::set_deadline(const Date& new_date) {
+    Date old = m_card->get_due_date();
+
+    m_card->set_due_date(new_date);
+    if (new_date.ok()) {
+        m_deadline_label.set_visible();
+        m_deadline_label.set_label(_("Due: ") + format_date_str(new_date));
+
+        if (old.ok()) {
+            spdlog::get("app")->info(
+                "Scheduled new due date for Card(\"{}\"): (\"{}\") -> "
+                "(\"{}\")",
+                m_card->get_name(), std::format("{}", old),
+                std::format("{}", new_date));
+        } else {
+            spdlog::get("app")->info("Card(\"{}\") due date set to ({})",
+                                     m_card->get_name(),
+                                     std::format("{}", new_date));
+        }
+    } else {
+        m_deadline_label.set_visible(false);
+        spdlog::get("app")->info("Unset due date for Card (\"{}\")",
+                                 m_card->get_name());
+    }
 }
 
 void CardWidget::remove_from_parent() {
@@ -584,47 +617,6 @@ std::shared_ptr<Card> CardWidget::get_card() { return m_card; }
 
 CardlistWidget const* CardWidget::get_cardlist_widget() const {
     return m_cardlist_widget;
-}
-
-void CardWidget::due_date_handler(Date old, Date new_) {
-    if (new_.ok()) {
-        m_deadline_label.set_visible();
-        m_deadline_label.set_label(_("Due: ") + format_date_str(new_));
-
-        if (old.ok()) {
-            spdlog::get("app")->info(
-                "Scheduled new due date for Card(\"{}\"): (\"{}\") -> "
-                "(\"{}\")",
-                m_card->get_name(), std::format("{}", old),
-                std::format("{}", new_));
-        } else {
-            spdlog::get("app")->info("Card(\"{}\") due date set to ({})",
-                                     m_card->get_name(),
-                                     std::format("{}", new_));
-        }
-    } else {
-        m_deadline_label.set_visible(false);
-        spdlog::get("app")->info("Unset due date for Card (\"{}\")",
-                                 m_card->get_name());
-    }
-}
-
-void CardWidget::color_handler(Color old, Color new_) {
-    if (new_ != NO_COLOR) {
-        Gdk::RGBA c(float(std::get<0>(new_)) / 255,
-                    float(std::get<1>(new_)) / 255,
-                    float(std::get<2>(new_)) / 255, float(std::get<3>(new_)));
-        __set_cover_color(c);
-        CardWidget::CardPopover::mass_color_select(this, c);
-
-        spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
-                                 m_card->get_name(), c.to_string().c_str());
-    } else {
-        __clear_cover_color();
-
-        spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
-                                 m_card->get_name());
-    }
 }
 
 void CardWidget::setup_drag_and_drop() {

@@ -61,6 +61,11 @@ public:
     void set_cover_color(const Gdk::RGBA& color);
 
     /**
+     * @brief Sets the card deadline
+     */
+    void set_deadline(const Date& new_date);
+
+    /**
      * @brief Removes itself from the associated CardlistWidget object.
      */
     void remove_from_parent();
@@ -198,19 +203,6 @@ protected:
     std::shared_ptr<Card> m_card;
 
     /**
-     * @brief Updates the label informing the due date for this card.
-     */
-    void due_date_handler(Date old, Date new_);
-
-    /**
-     * @brief Handles the color change event.
-     *
-     * @param old_color old color.
-     * @param new_color new color.
-     */
-    void color_handler(Color old, Color new_);
-
-    /**
      * @brief Sets up drag and drop functionality for the card widget.
      */
     void setup_drag_and_drop();
@@ -244,20 +236,12 @@ protected:
      */
     void update_complete_tasks_style(unsigned long n_complete_tasks);
 
-    /**
-     * @brief Sets the card's color
-     */
-    void __set_cover_color(const Gdk::RGBA& color);
-
-    /**
-     * @brief Clears the card cover color.
-     */
-    void __clear_cover_color();
-
     void cleanup() override;
 
 private:
     void setup_widgets();
+    void __set_cover_color(const Gdk::RGBA& color);
+    void __clear_cover_color();
 };
 
 }  // namespace ui
