@@ -222,14 +222,9 @@ void CardDetailsDialog::on_save() {
 }
 
 void CardDetailsDialog::on_delete_card() {
-    // Removing the card from the cardlist implies deleting it. Saves at least
-    // one reference for logging purposes
-    const std::shared_ptr<Card> card = m_card_widget->get_card();
-
-    m_card_widget->remove_from_parent();
-    m_card_widget = nullptr;
-
+    CardWidget* tmp = m_card_widget;
     close();
+    tmp->remove_from_parent();
 }
 
 void CardDetailsDialog::on_unset_due_date() {
