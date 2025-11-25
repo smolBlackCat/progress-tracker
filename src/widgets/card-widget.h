@@ -234,7 +234,7 @@ protected:
      *
      * @param n_complete_tasks number of completed tasks.
      */
-    void update_complete_tasks_style(unsigned long n_complete_tasks);
+    void set_completion_label_color(unsigned long n_complete_tasks);
 
     void cleanup() override;
 

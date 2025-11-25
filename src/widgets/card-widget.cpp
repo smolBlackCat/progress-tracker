@@ -484,7 +484,7 @@ void CardWidget::update_completion_label() {
                             });
         m_completion_label.set_label(std::format(
             "{}/{}", n_complete_tasks, m_card->container().get_data().size()));
-        update_complete_tasks_style(n_complete_tasks);
+        set_completion_label_color(n_complete_tasks);
     } else {
         m_completion_label.set_visible(false);
     }
@@ -763,7 +763,7 @@ void CardWidget::on_confirm_changes() {
     }
 }
 
-void CardWidget::update_complete_tasks_style(unsigned long n_complete_tasks) {
+void CardWidget::set_completion_label_color(unsigned long n_complete_tasks) {
     std::string css_class;
     const float threshold = m_card->container().get_data().size() / 2.0F;
 
