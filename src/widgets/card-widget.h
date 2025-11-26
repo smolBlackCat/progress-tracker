@@ -122,7 +122,7 @@ protected:
      * - A colour selection radiobutton group
      * - Delete card
      */
-    class CardPopover : public Gtk::Popover {
+    class CardPopover : public Gtk::PopoverMenu {
     public:
         // FIXME: The current popover code interface design is bad. This will
         // increase memory little by little
@@ -141,6 +141,8 @@ protected:
          * @param card The card widget to set the color for.
          */
         CardPopover(CardWidget* card);
+
+        ~CardPopover() override;
 
         void popup();
 
@@ -164,7 +166,8 @@ protected:
         void enable_color_signals();
 
     protected:
-        static std::map<CardWidget*, std::vector<CardPopover*>> card_popovers;
+        static std::map<CardWidget*, std::vector<CardPopover*>>
+            registered_card_popovers;
 
         /**
          * @brief Helper method for creating a color setting closure to set the
@@ -177,12 +180,9 @@ protected:
         std::function<void()> color_setting_thunk(CardWidget* card,
                                                   Gtk::CheckButton* checkbutton,
                                                   Gdk::RGBA color);
-        CardWidget* card_widget;
-        Gtk::Box root;
-        std::map<const char*, Gtk::Button*> action_buttons;
-        std::map<const char*,
-                 std::tuple<Gtk::CheckButton*, const char*, sigc::connection>>
-            color_buttons;
+        CardWidget* m_card_widget;
+        std::map<std::string, std::tuple<Gtk::CheckButton*, sigc::connection>>
+            m_color_radio_button_map;
     };
 
     friend class CardPopover;

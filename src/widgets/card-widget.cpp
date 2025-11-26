@@ -32,36 +32,34 @@ CardInit::CardInit()
 
 const std::map<const char*, std::pair<const char*, const char*>>
     CardWidget::CardPopover::CARD_COLORS = {
-        {"red", {_("Red"), "#a51d2d"}},
-        {"orange", {_("Orange"), "#c64600"}},
-        {"yellow", {_("Yellow"), "#e5a50a"}},
-        {"green", {_("Green"), "#26a269"}},
-        {"blue", {_("Blue"), "#1a5fb4"}},
-        {"purple", {_("Purple"), "#200941"}}};
+        {"empty", {_("Unset Color"), "rgba(0,0,0,0)"}},
+        {"red", {_("Red"), "rgb(165, 29, 45)"}},
+        {"orange", {_("Orange"), "rgb(198, 70, 0)"}},
+        {"yellow", {_("Yellow"), "rgb(229, 165, 10)"}},
+        {"green", {_("Green"), "rgb(38, 162, 105)"}},
+        {"blue", {_("Blue"), "rgb(26, 95, 180)"}},
+        {"purple", {_("Purple"), "rgb(32, 9, 65)"}}};
 
 std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
-    CardWidget::CardPopover::card_popovers{};
+    CardWidget::CardPopover::registered_card_popovers{};
 
 void CardWidget::CardPopover::mass_color_select(CardWidget* key,
                                                 Gdk::RGBA color) {
-    const std::vector<CardPopover*>& popovers = card_popovers[key];
+    const std::vector<CardPopover*>& popovers = registered_card_popovers[key];
     for (const auto& popover : popovers) {
         popover->set_selected_color(color, false);
     }
 }
 
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
-    : Gtk::Popover{},
-      card_widget{card_widget},
-      root{Gtk::Orientation::VERTICAL} {
-    if (!card_popovers.contains(card_widget)) {
-        card_popovers[card_widget] = std::vector<CardPopover*>{this};
+    : Gtk::PopoverMenu{}, m_card_widget{card_widget} {
+    if (!registered_card_popovers.contains(card_widget)) {
+        registered_card_popovers[card_widget] = std::vector<CardPopover*>{this};
     } else {
-        card_popovers[card_widget].push_back(this);
+        registered_card_popovers[card_widget].push_back(this);
     }
 
     set_has_arrow(false);
-    set_child(root);
     set_position(Gtk::PositionType::BOTTOM);
 
     const std::array<ButtonAction, 3> button_actions = {
@@ -76,88 +74,94 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
                          this->popdown();
                      }},
         ButtonAction{"remove", _("Remove"), [this, card_widget] {
-                         card_widget->remove_from_parent();
                          this->popdown();
+                         card_widget->remove_from_parent();
                      }}};
 
-    for (const auto& [key, label, action] : button_actions) {
-        auto button = Gtk::make_managed<Gtk::Button>(label);
-        button->set_has_frame(false);
-        button->signal_clicked().connect(action);
-        root.append(*button);
+    auto menu_model = Gio::Menu::create();
+    auto action_group = Gio::SimpleActionGroup::create();
 
-        action_buttons[key] = button;
+    for (const auto& [key, label, action] : button_actions) {
+        menu_model->append(label, std::format("card-popover.{}", key));
+        action_group->add_action(key, action);
     }
+
+    auto color_buttons_menu = Gio::MenuItem::create("Colors", "");
+    color_buttons_menu->set_attribute_value(
+        "custom", Glib::create_variant<Glib::ustring>("colors"));
+    menu_model->insert_item(2, color_buttons_menu);
 
     // Setup Colors Radio
     Gtk::Box color_box{Gtk::Orientation::HORIZONTAL};
+    color_box.set_spacing(2);
+    color_box.set_margin(4);
 
-    Gtk::CheckButton* prev = Gtk::make_managed<Gtk::CheckButton>();
-    prev->set_tooltip_text(_("Unset Color"));
-    sigc::connection unset_color_cnn =
-        prev->signal_toggled().connect([prev, card_widget]() {
-            if (prev->get_active()) {
-                card_widget->get_card()->set_color(NO_COLOR);
-            }
-        });
-    color_box.append(*prev);
+    Gtk::CheckButton* prev = nullptr;
 
-    // In this current context, no colour whatsoever means an invisible color.
-    // This helps the popover check if a colour has been set
-    color_buttons["Unset"] =
-        std::make_tuple(prev, "rgba(0,0,0,0)", unset_color_cnn);
-
-    for (const auto& [key, color_pair] : CARD_COLORS) {
+    for (const auto& [color_id, color_pair] : CARD_COLORS) {
         auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
+        const std::string color_label = _(color_pair.first);
+        const std::string color_hex_code = color_pair.second;
+        const Gdk::RGBA color = Gdk::RGBA{color_hex_code};
 
-        checkbutton->set_tooltip_text(_(color_pair.first));
+        checkbutton->set_tooltip_text(color_label);
         sigc::connection color_setting_cnn =
-            checkbutton->signal_toggled().connect(color_setting_thunk(
-                card_widget, checkbutton, Gdk::RGBA{color_pair.second}));
-        checkbutton->add_css_class(key);
-        checkbutton->add_css_class("accent-color-btn");
+            checkbutton->signal_toggled().connect(
+                color_setting_thunk(card_widget, checkbutton, color));
+        if (std::string{color_id} != "empty") {
+            checkbutton->add_css_class(color_id);
+            checkbutton->add_css_class("accent-color-btn");
+        }
         color_box.append(*checkbutton);
-        checkbutton->set_group(*prev);
+        if (prev) checkbutton->set_group(*prev);
         prev = checkbutton;
 
-        color_buttons[color_pair.first] =
-            std::make_tuple(checkbutton, color_pair.second, color_setting_cnn);
+        m_color_radio_button_map[color.to_string()] =
+            std::make_tuple(checkbutton, color_setting_cnn);
     }
     auto frame = Gtk::make_managed<Gtk::Frame>();
     frame->set_child(color_box);
-    root.insert_child_after(*frame, *action_buttons["card-details"]);
+
+    set_menu_model(menu_model);
+    insert_action_group("card-popover", action_group);
+
+    add_child(*frame, "colors");
 }
 
-void CardWidget::CardPopover::popup() {
-    Gtk::Popover::popup();
-    action_buttons["rename"]->grab_focus();
+CardWidget::CardPopover::~CardPopover() {
+    std::erase(registered_card_popovers[m_card_widget], this);
+    if (registered_card_popovers[m_card_widget].empty()) {
+        registered_card_popovers.erase(m_card_widget);
+    }
+
+    spdlog::get("app")->debug("Registered Popovers: {}",
+                              registered_card_popovers.size());
 }
+
+void CardWidget::CardPopover::popup() { Gtk::PopoverMenu::popup(); }
 
 void CardWidget::CardPopover::set_selected_color(Gdk::RGBA color,
                                                  bool trigger) {
-    if (!trigger) disable_color_signals();
-    for (auto& [label, colour_tuple] : color_buttons) {
-        if (Gdk::RGBA(std::get<1>(colour_tuple)) == color) {
-            // Select the Checkbutton pointer refering to this colour and set it
-            // as active
-            std::get<0>(colour_tuple)->set_active(true);
-            if (!trigger) enable_color_signals();
-            return;
-        }
+    auto color_checkbutton =
+        std::get<0>(m_color_radio_button_map[color.to_string()]);
+    if (!trigger) {
+        disable_color_signals();
+        color_checkbutton->set_active();
+        enable_color_signals();
+    } else {
+        color_checkbutton->set_active();
     }
-    if (!trigger) enable_color_signals();
-    std::get<0>(color_buttons["Unset"])->set_active(true);
 }
 
 void CardWidget::CardPopover::disable_color_signals() {
-    for (auto& [color_label, data] : color_buttons) {
-        std::get<2>(data).block();
+    for (auto& [color_label, data] : m_color_radio_button_map) {
+        std::get<1>(data).block();
     }
 }
 
 void CardWidget::CardPopover::enable_color_signals() {
-    for (auto& [color_label, data] : color_buttons) {
-        std::get<2>(data).unblock();
+    for (auto& [color_label, data] : m_color_radio_button_map) {
+        std::get<1>(data).unblock();
     }
 }
 
@@ -402,7 +406,7 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
 
 void CardWidget::set_cover_color(const Gdk::RGBA& color) {
     Color new_color = Color{color.get_red() * 255, color.get_green() * 255,
-                            color.get_blue() * 255, 1.0};
+                            color.get_blue() * 255, color.get_alpha()};
     m_card->set_color(new_color);
 
     if (color != Gdk::RGBA{}) {
@@ -680,8 +684,8 @@ void CardWidget::setup_drag_and_drop() {
                         "itself",
                         m_card->get_name());
 
-                    // After dropping, the receiver card still has the style set
-                    // by DropControllerMotion. Reset
+                    // After dropping, the receiver card still has the style
+                    // set by DropControllerMotion. Reset
                     this->remove_css_class("card-to-drop");
                     return true;
                 }
@@ -703,8 +707,8 @@ void CardWidget::setup_drag_and_drop() {
                     this->m_cardlist_widget->reorder(*dropped_copy, *this);
                 }
 
-                // After dropping, the receiver card still has the style set by
-                // DropControllerMotion. Reset
+                // After dropping, the receiver card still has the style set
+                // by DropControllerMotion. Reset
                 this->remove_css_class("card-to-drop");
 
                 return true;
@@ -718,9 +722,9 @@ void CardWidget::setup_drag_and_drop() {
 void CardWidget::open_card_details_dialog() {
     auto& parent_window = *(static_cast<ProgressWindow*>(get_root()));
 
-    // This is a workaround for the issue where the Card widget maintains its
-    // rename mode state on even when the user explicited entered card details
-    // dialog
+    // This is a workaround for the issue where the Card widget maintains
+    // its rename mode state on even when the user explicited entered card
+    // details dialog
     off_rename();
 
     parent_window.show_card_dialog(this);
@@ -729,8 +733,8 @@ void CardWidget::open_card_details_dialog() {
 void CardWidget::on_rename() {
     // FIXME: Adding and removing the control focus fixes the bug where we
     // cannot rename a card through its menu options. Every time the user
-    // (before this workaround) hit the rename button, the card would quickly
-    // enter and leave rename mode, not allowing changes at all.
+    // (before this workaround) hit the rename button, the card would
+    // quickly enter and leave rename mode, not allowing changes at all.
     m_card_entry.remove_controller(m_focus_ctrl);
     m_card_entry_revealer.set_reveal_child(true);
     m_card_label.set_visible(false);
