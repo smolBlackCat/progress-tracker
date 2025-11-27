@@ -24,6 +24,11 @@ public:
 };
 
 /**
+ * @brief Color options for a CardWidget cover
+ */
+enum class CoverColor { UNSET, BLUE, RED, ORANGE, GREEN, YELLOW, PURPLE };
+
+/**
  * @brief Widget that represents a single card.
  */
 class CardWidget : public CardInit, public BaseItem {
@@ -31,6 +36,8 @@ public:
     const static std::array<std::string, 3> TASKS_LABEL_CSS_CLASSES;
 
     const static std::array<std::string, 3> DATE_LABEL_CSS_CLASSES;
+
+    const static std::map<CoverColor, Gdk::RGBA> CARD_COLORS;
 
     /**
      * @brief Constructs a CardWidget object.
@@ -58,7 +65,7 @@ public:
      *
      * @param color rgba object representing the color.
      */
-    void set_cover_color(const Gdk::RGBA& color);
+    void set_cover_color(CoverColor color);
 
     /**
      * @brief Sets the card deadline
@@ -124,16 +131,11 @@ protected:
      */
     class CardPopover : public Gtk::PopoverMenu {
     public:
-        // FIXME: The current popover code interface design is bad. This will
-        // increase memory little by little
-        const static std::map<const char*, std::pair<const char*, const char*>>
-            CARD_COLORS;
-
         /**
          * @brief Updates all CardPopover instances color
          */
         static void mass_color_select(CardWidget* key_card_widget,
-                                      Gdk::RGBA color);
+                                      CoverColor color);
 
         /**
          * @brief Constructor for CardPopover class.
@@ -144,8 +146,6 @@ protected:
 
         ~CardPopover() override;
 
-        void popup();
-
         /**
          * @brief Marks one of the color radio buttons as selected. If a color
          * that does not belong to CARD_COLORS, this call is ignored.
@@ -153,7 +153,7 @@ protected:
          * @param color The color to set.
          * @param trigger Whether to trigger the color change signal.
          */
-        void set_selected_color(Gdk::RGBA color, bool trigger = true);
+        void set_selected_color(CoverColor color, bool trigger = true);
 
         /**
          * @brief Disable this card popover colour setting signals
@@ -179,9 +179,9 @@ protected:
          */
         std::function<void()> color_setting_thunk(CardWidget* card,
                                                   Gtk::CheckButton* checkbutton,
-                                                  Gdk::RGBA color);
+                                                  CoverColor color);
         CardWidget* m_card_widget;
-        std::map<std::string, std::tuple<Gtk::CheckButton*, sigc::connection>>
+        std::map<CoverColor, std::tuple<Gtk::CheckButton*, sigc::connection>>
             m_color_radio_button_map;
     };
 

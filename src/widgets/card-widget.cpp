@@ -30,25 +30,71 @@ namespace ui {
 CardInit::CardInit()
     : Glib::ExtraClassInit(card_class_init, nullptr, card_init) {}
 
-const std::map<const char*, std::pair<const char*, const char*>>
-    CardWidget::CardPopover::CARD_COLORS = {
-        {"empty", {_("Unset Color"), "rgba(0,0,0,0)"}},
-        {"red", {_("Red"), "rgb(165, 29, 45)"}},
-        {"orange", {_("Orange"), "rgb(198, 70, 0)"}},
-        {"yellow", {_("Yellow"), "rgb(229, 165, 10)"}},
-        {"green", {_("Green"), "rgb(38, 162, 105)"}},
-        {"blue", {_("Blue"), "rgb(26, 95, 180)"}},
-        {"purple", {_("Purple"), "rgb(32, 9, 65)"}}};
+const std::map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
+    {CoverColor::UNSET, Gdk::RGBA{"rgba(0,0,0,0)"}},
+    {CoverColor::RED, Gdk::RGBA{"rgb(165, 29, 45)"}},
+    {CoverColor::ORANGE, Gdk::RGBA{"rgb(198, 70, 0)"}},
+    {CoverColor::YELLOW, Gdk::RGBA{"rgb(229, 165, 10)"}},
+    {CoverColor::GREEN, Gdk::RGBA{"rgb(38, 162, 105)"}},
+    {CoverColor::BLUE, Gdk::RGBA{"rgb(26, 95, 180)"}},
+    {CoverColor::PURPLE, Gdk::RGBA{"rgb(32, 9, 65)"}}};
 
 std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
     CardWidget::CardPopover::registered_card_popovers{};
 
 void CardWidget::CardPopover::mass_color_select(CardWidget* key,
-                                                Gdk::RGBA color) {
+                                                CoverColor color) {
     const std::vector<CardPopover*>& popovers = registered_card_popovers[key];
     for (const auto& popover : popovers) {
         popover->set_selected_color(color, false);
     }
+}
+
+std::string label_for_color(CoverColor color) {
+    switch (color) {
+        case CoverColor::UNSET:
+            return _("Unset Color");
+
+        case CoverColor::BLUE:
+            return _("Blue");
+
+        case CoverColor::RED:
+            return _("Red");
+
+        case CoverColor::ORANGE:
+            return _("Orange");
+
+        case CoverColor::GREEN:
+            return _("Green");
+
+        case CoverColor::YELLOW:
+            return _("Yellow");
+
+        case CoverColor::PURPLE:
+            return _("Purple");
+    }
+}
+
+std::string cover_color_css(CoverColor color) {
+    switch (color) {
+        case CoverColor::UNSET:
+            return "unset";
+        case CoverColor::BLUE:
+            return "blue";
+        case CoverColor::RED:
+            return "red";
+        case CoverColor::ORANGE:
+            return "orange";
+        case CoverColor::GREEN:
+            return "green";
+        case CoverColor::YELLOW:
+            return "yellow";
+        case CoverColor::PURPLE:
+            return "purple";
+    }
+
+    // Should never happen, but let’s keep the world from catching fire.
+    return "unknown";
 }
 
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
@@ -98,25 +144,22 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
 
     Gtk::CheckButton* prev = nullptr;
 
-    for (const auto& [color_id, color_pair] : CARD_COLORS) {
+    for (const auto& [color_id, color] : CARD_COLORS) {
         auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
-        const std::string color_label = _(color_pair.first);
-        const std::string color_hex_code = color_pair.second;
-        const Gdk::RGBA color = Gdk::RGBA{color_hex_code};
 
-        checkbutton->set_tooltip_text(color_label);
+        checkbutton->set_tooltip_text(label_for_color(color_id));
         sigc::connection color_setting_cnn =
             checkbutton->signal_toggled().connect(
-                color_setting_thunk(card_widget, checkbutton, color));
-        if (std::string{color_id} != "empty") {
-            checkbutton->add_css_class(color_id);
+                color_setting_thunk(card_widget, checkbutton, color_id));
+        if (color_id != CoverColor::UNSET) {
+            checkbutton->add_css_class(cover_color_css(color_id));
             checkbutton->add_css_class("accent-color-btn");
         }
         color_box.append(*checkbutton);
         if (prev) checkbutton->set_group(*prev);
         prev = checkbutton;
 
-        m_color_radio_button_map[color.to_string()] =
+        m_color_radio_button_map[color_id] =
             std::make_tuple(checkbutton, color_setting_cnn);
     }
     auto frame = Gtk::make_managed<Gtk::Frame>();
@@ -138,12 +181,9 @@ CardWidget::CardPopover::~CardPopover() {
                               registered_card_popovers.size());
 }
 
-void CardWidget::CardPopover::popup() { Gtk::PopoverMenu::popup(); }
-
-void CardWidget::CardPopover::set_selected_color(Gdk::RGBA color,
+void CardWidget::CardPopover::set_selected_color(CoverColor color,
                                                  bool trigger) {
-    auto color_checkbutton =
-        std::get<0>(m_color_radio_button_map[color.to_string()]);
+    auto color_checkbutton = std::get<0>(m_color_radio_button_map[color]);
     if (!trigger) {
         disable_color_signals();
         color_checkbutton->set_active();
@@ -166,7 +206,7 @@ void CardWidget::CardPopover::enable_color_signals() {
 }
 
 std::function<void()> CardWidget::CardPopover::color_setting_thunk(
-    CardWidget* card, Gtk::CheckButton* checkbutton, Gdk::RGBA color) {
+    CardWidget* card, Gtk::CheckButton* checkbutton, CoverColor color) {
     return std::function<void()>([card, checkbutton, color]() {
         if (checkbutton->get_active()) {
             card->set_cover_color(color);
@@ -194,6 +234,19 @@ inline std::string format_date_str(Date date) {
     std::strftime(date_str, sizeof(date_str), "%d %b, %Y", std::gmtime(&time));
 
     return date_str;
+}
+
+CoverColor rgb_to_cover_color(Color rgb) {
+    const std::map<Color, CoverColor> CARD_COLORS = {
+        {Color(0, 0, 0, 0), CoverColor::UNSET},
+        {Color(165, 29, 45, 1), CoverColor::RED},
+        {Color(198, 70, 0, 1), CoverColor::ORANGE},
+        {Color(229, 165, 10, 1), CoverColor::YELLOW},
+        {Color(38, 162, 105, 1), CoverColor::GREEN},
+        {Color(26, 95, 180, 1), CoverColor::BLUE},
+        {Color(32, 9, 65, 1), CoverColor::PURPLE}};
+
+    return CARD_COLORS.at(rgb);
 }
 
 CardWidget::CardWidget(std::shared_ptr<Card> card)
@@ -364,18 +417,16 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
     add_controller(m_click_ctrl);
 
     if (card->is_color_set()) {
-        Color card_color = card->get_color();
-        Gdk::RGBA card_color_rgba = Gdk::RGBA{
-            std::get<0>(card_color) / 255.0F, std::get<1>(card_color) / 255.0F,
-            std::get<2>(card_color) / 255.0F, std::get<3>(card_color)};
+        Color color = card->get_color();
+        CoverColor cover_color = rgb_to_cover_color(color);
 
-        __set_cover_color(card_color_rgba);
+        __set_cover_color(CARD_COLORS.at(cover_color));
 
-        m_fixed_card_popover.set_selected_color(card_color_rgba, false);
-        m_mouse_card_popover.set_selected_color(card_color_rgba, false);
+        m_fixed_card_popover.set_selected_color(cover_color, false);
+        m_mouse_card_popover.set_selected_color(cover_color, false);
     } else {
-        m_fixed_card_popover.set_selected_color(Gdk::RGBA{}, false);
-        m_mouse_card_popover.set_selected_color(Gdk::RGBA{}, false);
+        m_fixed_card_popover.set_selected_color(CoverColor::UNSET, false);
+        m_mouse_card_popover.set_selected_color(CoverColor::UNSET, false);
     }
 
     const Date card_date = card->get_due_date();
@@ -404,19 +455,23 @@ void CardWidget::set_cardlist(CardlistWidget* new_parent) {
     }
 }
 
-void CardWidget::set_cover_color(const Gdk::RGBA& color) {
-    Color new_color = Color{color.get_red() * 255, color.get_green() * 255,
-                            color.get_blue() * 255, color.get_alpha()};
+void CardWidget::set_cover_color(CoverColor color) {
+    Gdk::RGBA rgb_color = CARD_COLORS.at(color);
+    Color new_color =
+        Color{rgb_color.get_red() * 255, rgb_color.get_green() * 255,
+              rgb_color.get_blue() * 255, rgb_color.get_alpha()};
     m_card->set_color(new_color);
 
-    if (color != Gdk::RGBA{}) {
-        __set_cover_color(color);
+    if (color != CoverColor::UNSET) {
+        __set_cover_color(rgb_color);
         CardWidget::CardPopover::mass_color_select(this, color);
 
         spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
-                                 m_card->get_name(), color.to_string().c_str());
+                                 m_card->get_name(),
+                                 rgb_color.to_string().c_str());
     } else {
         __clear_cover_color();
+        CardWidget::CardPopover::mass_color_select(this, CoverColor::UNSET);
 
         spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
                                  m_card->get_name());
@@ -797,10 +852,6 @@ void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
     color_frame_pixbuf->fill(rgb_to_hex(m_card->get_color()));
 
-    if (m_card_cover_picture.get_paintable()) {
-        m_card_cover_picture.set_paintable(nullptr);
-    }
-
     m_card_cover_picture.set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     m_card_cover_revealer.set_reveal_child(true);
@@ -808,8 +859,7 @@ void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
 
 void CardWidget::__clear_cover_color() {
     m_card_cover_revealer.set_reveal_child(false);
-
-    CardWidget::CardPopover::mass_color_select(this, Gdk::RGBA{});
+    m_card_cover_picture.set_paintable(nullptr);
 }
 
 void CardWidget::cleanup() { m_root.unparent(); }
