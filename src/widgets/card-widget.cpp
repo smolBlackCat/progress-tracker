@@ -24,55 +24,28 @@ static void card_init(GTypeInstance* instance, void* g_class) {
 }
 }
 
-using ButtonAction =
-    std::tuple<const char*, const char*, std::function<void()>>;
-
 namespace ui {
 CardInit::CardInit()
     : Glib::ExtraClassInit(card_class_init, nullptr, card_init) {}
-
-const std::map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
-    {CoverColor::UNSET, Gdk::RGBA{"rgba(0,0,0,0)"}},
-    {CoverColor::RED, Gdk::RGBA{"rgb(165, 29, 45)"}},
-    {CoverColor::ORANGE, Gdk::RGBA{"rgb(198, 70, 0)"}},
-    {CoverColor::YELLOW, Gdk::RGBA{"rgb(229, 165, 10)"}},
-    {CoverColor::GREEN, Gdk::RGBA{"rgb(38, 162, 105)"}},
-    {CoverColor::BLUE, Gdk::RGBA{"rgb(26, 95, 180)"}},
-    {CoverColor::PURPLE, Gdk::RGBA{"rgb(32, 9, 65)"}}};
-
-std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
-    CardWidget::CardPopover::registered_card_popovers{};
-
-void CardWidget::CardPopover::mass_color_select(CardWidget* key,
-                                                CoverColor color) {
-    const std::vector<CardPopover*>& popovers = registered_card_popovers[key];
-    for (const auto& popover : popovers) {
-        popover->set_selected_color(color, false);
-    }
-}
 
 std::string label_for_color(CoverColor color) {
     switch (color) {
         case CoverColor::UNSET:
             return _("Unset Color");
-
         case CoverColor::BLUE:
             return _("Blue");
-
         case CoverColor::RED:
             return _("Red");
-
         case CoverColor::ORANGE:
             return _("Orange");
-
         case CoverColor::GREEN:
             return _("Green");
-
         case CoverColor::YELLOW:
             return _("Yellow");
-
         case CoverColor::PURPLE:
             return _("Purple");
+        default:
+            return "Unknown";
     }
 }
 
@@ -92,11 +65,122 @@ std::string cover_color_css(CoverColor color) {
             return "yellow";
         case CoverColor::PURPLE:
             return "purple";
+        default:
+            return "unknown";
+    }
+}
+
+std::string format_date_str(Date date) {
+    const std::time_t time =
+        std::chrono::system_clock::to_time_t(std::chrono::sys_days(date));
+
+    char date_str[30];
+    std::strftime(date_str, sizeof(date_str), "%d %b, %Y", std::gmtime(&time));
+
+    return date_str;
+}
+
+CoverColor rgb_to_cover_color(Color rgb) {
+    const std::map<Color, CoverColor> CARD_COLORS = {
+        {NO_COLOR, CoverColor::UNSET},      {RED_COLOR, CoverColor::RED},
+        {ORANGE_COLOR, CoverColor::ORANGE}, {YELLOW_COLOR, CoverColor::YELLOW},
+        {GREEN_COLOR, CoverColor::GREEN},   {BLUE_COLOR, CoverColor::BLUE},
+        {PURPLE_COLOR, CoverColor::PURPLE}};
+
+    return CARD_COLORS.at(rgb);
+}
+
+std::string truncate(const std::string& text) {
+    const int TRUNCATE_SIZE = 40;
+
+    if (text.size() <= TRUNCATE_SIZE) {
+        return text;
     }
 
-    // Should never happen, but let’s keep the world from catching fire.
-    return "unknown";
+    std::string truncated_text = text.substr(0, TRUNCATE_SIZE - 3);
+    truncated_text += "...";
+
+    return truncated_text;
 }
+
+std::string time_info_text(const Date& cur_date, const Date& card_due_date) {
+    auto now = sys_days(cur_date);
+    auto days = sys_days(card_due_date);
+    auto delta_days = (days - now).count();
+
+    std::string due_date_text;
+
+    if (delta_days > 0 && delta_days < 30) {
+        due_date_text =
+            Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
+                                       "<b>%1 day</b> remaining",
+                                       "<b>%1 days</b> remaining", delta_days)),
+                                   delta_days) +
+            "\n\n";
+    } else if (delta_days > 0 && delta_days >= 30 && delta_days < 365) {
+        long months_from_delta =
+            delta_days / 30;  // Assume every month has 30 days
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(ngettext("<b>%1 month</b> remaining",
+                                              "<b>%1 months</b> remaining",
+                                              months_from_delta)),
+                months_from_delta) +
+            "\n\n";
+    } else if (delta_days > 0 && delta_days >= 365) {
+        long years_from_delta = delta_days / 365;  // Ignore leap years
+        due_date_text = Glib::ustring::compose(
+                            Glib::locale_to_utf8(ngettext(
+                                "<b>%1 year</b> remaining",
+                                "<b>%1 years</b> remaining", years_from_delta)),
+                            years_from_delta) +
+                        "\n\n";
+    } else if (delta_days > -30) {
+        due_date_text = Glib::ustring::compose(
+                            Glib::locale_to_utf8(ngettext(
+                                "This card is past due date <b>%1 day ago</b>",
+                                "This card is past due date <b>%1 days ago</b>",
+                                -delta_days)),
+                            -delta_days) +
+                        "\n\n";
+    } else if (delta_days <= -30 && delta_days > -365) {
+        long months_from_delta =
+            delta_days / 30;  // Assume every month has 30 days
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(
+                    ngettext("This card is past due date <b>%1 month</b> ago",
+                             "This card is past due date <b>%1 months</b> "
+                             "ago",
+                             -months_from_delta)),
+                -months_from_delta) +
+            "\n\n";
+    } else if (delta_days <= -365) {
+        long years_from_delta = delta_days / 365;  // Ignore leap years
+        due_date_text =
+            Glib::ustring::compose(
+                Glib::locale_to_utf8(
+                    ngettext("This card is past due date <b>%1 year</b> ago",
+                             "This card is past due date <b>%1 years</b> ago",
+                             -years_from_delta)),
+                -years_from_delta) +
+            "\n\n";
+    }
+
+    return due_date_text;
+}
+
+const std::map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
+    {CoverColor::UNSET, Gdk::RGBA{"rgba(0,0,0,0)"}},
+    {CoverColor::RED, Gdk::RGBA{"rgb(165, 29, 45)"}},
+    {CoverColor::ORANGE, Gdk::RGBA{"rgb(198, 70, 0)"}},
+    {CoverColor::YELLOW, Gdk::RGBA{"rgb(229, 165, 10)"}},
+    {CoverColor::GREEN, Gdk::RGBA{"rgb(38, 162, 105)"}},
+    {CoverColor::BLUE, Gdk::RGBA{"rgb(26, 95, 180)"}},
+    {CoverColor::PURPLE, Gdk::RGBA{"rgb(32, 9, 65)"}}};
+
+std::map<CardWidget*, std::vector<CardWidget::CardPopover*>>
+    CardWidget::CardPopover::registered_card_popovers{};
 
 CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
     : Gtk::PopoverMenu{}, m_card_widget{card_widget} {
@@ -108,6 +192,9 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
 
     set_has_arrow(false);
     set_position(Gtk::PositionType::BOTTOM);
+
+    using ButtonAction =
+        std::tuple<const char*, const char*, std::function<void()>>;
 
     const std::array<ButtonAction, 3> button_actions = {
         ButtonAction{"rename", _("Rename"),
@@ -185,24 +272,21 @@ CardWidget::CardPopover::~CardPopover() {
 void CardWidget::CardPopover::set_selected_color(CoverColor color,
                                                  bool trigger) {
     auto color_checkbutton = std::get<0>(m_color_radio_button_map[color]);
+    auto checkbutton_cnn = std::get<1>(m_color_radio_button_map[color]);
     if (!trigger) {
-        disable_color_signals();
+        checkbutton_cnn.block();
         color_checkbutton->set_active();
-        enable_color_signals();
+        checkbutton_cnn.unblock();
     } else {
         color_checkbutton->set_active();
-    }
-}
 
-void CardWidget::CardPopover::disable_color_signals() {
-    for (auto& [color_label, data] : m_color_radio_button_map) {
-        std::get<1>(data).block();
-    }
-}
-
-void CardWidget::CardPopover::enable_color_signals() {
-    for (auto& [color_label, data] : m_color_radio_button_map) {
-        std::get<1>(data).unblock();
+        // Update all related popovers to this popover but do not trigger their
+        // signal
+        for (auto sibling : registered_card_popovers[m_card_widget]) {
+            if (sibling != this) {
+                sibling->set_selected_color(color, false);
+            }
+        }
     }
 }
 
@@ -226,26 +310,6 @@ const std::array<std::string, 3> CardWidget::TASKS_LABEL_CSS_CLASSES = {
     "complete-tasks-indicator-almost",
     "complete-tasks-indicator-incomplete",
 };
-
-inline std::string format_date_str(Date date) {
-    const std::time_t time =
-        std::chrono::system_clock::to_time_t(std::chrono::sys_days(date));
-
-    char date_str[30];
-    std::strftime(date_str, sizeof(date_str), "%d %b, %Y", std::gmtime(&time));
-
-    return date_str;
-}
-
-CoverColor rgb_to_cover_color(Color rgb) {
-    const std::map<Color, CoverColor> CARD_COLORS = {
-        {NO_COLOR, CoverColor::UNSET},      {RED_COLOR, CoverColor::RED},
-        {ORANGE_COLOR, CoverColor::ORANGE}, {YELLOW_COLOR, CoverColor::YELLOW},
-        {GREEN_COLOR, CoverColor::GREEN},   {BLUE_COLOR, CoverColor::BLUE},
-        {PURPLE_COLOR, CoverColor::PURPLE}};
-
-    return CARD_COLORS.at(rgb);
-}
 
 CardWidget::CardWidget(std::shared_ptr<Card> card)
     : Glib::ObjectBase{"CardWidget"},
@@ -462,14 +526,12 @@ void CardWidget::set_cover_color(CoverColor color) {
 
     if (color != CoverColor::UNSET) {
         __set_cover_color(rgb_color);
-        CardWidget::CardPopover::mass_color_select(this, color);
 
         spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
                                  m_card->get_name(),
                                  rgb_color.to_string().c_str());
     } else {
         __clear_cover_color();
-        CardWidget::CardPopover::mass_color_select(this, CoverColor::UNSET);
 
         spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
                                  m_card->get_name());
@@ -548,86 +610,6 @@ void CardWidget::update_completion_label() {
 }
 
 std::string CardWidget::get_title() const { return m_card_label.get_label(); }
-
-std::string truncate(const std::string& text) {
-    const int TRUNCATE_SIZE = 40;
-
-    if (text.size() <= TRUNCATE_SIZE) {
-        return text;
-    }
-
-    std::string truncated_text = text.substr(0, TRUNCATE_SIZE - 3);
-    truncated_text += "...";
-
-    return truncated_text;
-}
-
-std::string time_info_text(const Date& cur_date, const Date& card_due_date) {
-    auto now = sys_days(cur_date);
-    auto days = sys_days(card_due_date);
-    auto delta_days = (days - now).count();
-
-    std::string due_date_text;
-
-    if (delta_days > 0 && delta_days < 30) {
-        due_date_text =
-            Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
-                                       "<b>%1 day</b> remaining",
-                                       "<b>%1 days</b> remaining", delta_days)),
-                                   delta_days) +
-            "\n\n";
-    } else if (delta_days > 0 && delta_days >= 30 && delta_days < 365) {
-        long months_from_delta =
-            delta_days / 30;  // Assume every month has 30 days
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(ngettext("<b>%1 month</b> remaining",
-                                              "<b>%1 months</b> remaining",
-                                              months_from_delta)),
-                months_from_delta) +
-            "\n\n";
-    } else if (delta_days > 0 && delta_days >= 365) {
-        long years_from_delta = delta_days / 365;  // Ignore leap years
-        due_date_text = Glib::ustring::compose(
-                            Glib::locale_to_utf8(ngettext(
-                                "<b>%1 year</b> remaining",
-                                "<b>%1 years</b> remaining", years_from_delta)),
-                            years_from_delta) +
-                        "\n\n";
-    } else if (delta_days > -30) {
-        due_date_text = Glib::ustring::compose(
-                            Glib::locale_to_utf8(ngettext(
-                                "This card is past due date <b>%1 day ago</b>",
-                                "This card is past due date <b>%1 days ago</b>",
-                                -delta_days)),
-                            -delta_days) +
-                        "\n\n";
-    } else if (delta_days <= -30 && delta_days > -365) {
-        long months_from_delta =
-            delta_days / 30;  // Assume every month has 30 days
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(
-                    ngettext("This card is past due date <b>%1 month</b> ago",
-                             "This card is past due date <b>%1 months</b> "
-                             "ago",
-                             -months_from_delta)),
-                -months_from_delta) +
-            "\n\n";
-    } else if (delta_days <= -365) {
-        long years_from_delta = delta_days / 365;  // Ignore leap years
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(
-                    ngettext("This card is past due date <b>%1 year</b> ago",
-                             "This card is past due date <b>%1 years</b> ago",
-                             -years_from_delta)),
-                -years_from_delta) +
-            "\n\n";
-    }
-
-    return due_date_text;
-}
 
 std::string CardWidget::create_details_text() const {
     using namespace std::chrono;

@@ -132,12 +132,6 @@ protected:
     class CardPopover : public Gtk::PopoverMenu {
     public:
         /**
-         * @brief Updates all CardPopover instances color
-         */
-        static void mass_color_select(CardWidget* key_card_widget,
-                                      CoverColor color);
-
-        /**
          * @brief Constructor for CardPopover class.
          *
          * @param card The card widget to set the color for.
@@ -147,23 +141,22 @@ protected:
         ~CardPopover() override;
 
         /**
-         * @brief Marks one of the color radio buttons as selected. If a color
-         * that does not belong to CARD_COLORS, this call is ignored.
+         * @brief Selects the radio button corresponding to the given color.
          *
-         * @param color The color to set.
-         * @param trigger Whether to trigger the color change signal.
+         * If trigger is true, this method activates the color’s radio button
+         * and emits the related color-change signal. It also updates all
+         * sibling popovers associated with the same CardWidget by setting their
+         * selected color without emitting additional signals.
+         *
+         * If trigger is false, the color’s radio button is activated silently
+         * (the signal handler is temporarily blocked), and only this popover is
+         * updated.
+         *
+         * @param color   The color to select.
+         * @param trigger Whether to emit the color-change signal.
          */
+
         void set_selected_color(CoverColor color, bool trigger = true);
-
-        /**
-         * @brief Disable this card popover colour setting signals
-         */
-        void disable_color_signals();
-
-        /**
-         * @brief Enable this card popover colour setting signals
-         */
-        void enable_color_signals();
 
     protected:
         static std::map<CardWidget*, std::vector<CardPopover*>>
