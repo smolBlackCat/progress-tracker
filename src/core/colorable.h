@@ -8,6 +8,13 @@ typedef std::tuple<unsigned char, unsigned char, unsigned char, float> Color;
 
 static const Color NO_COLOR(0, 0, 0, 0.0);
 
+const static Color RED_COLOR    = Color{165, 29,  45,  1};
+const static Color ORANGE_COLOR = Color{198, 70,  0,   1};
+const static Color YELLOW_COLOR = Color{229, 165, 10,  1};
+const static Color GREEN_COLOR  = Color{38,  162, 105, 1};
+const static Color BLUE_COLOR   = Color{26,  95,  180, 1};
+const static Color PURPLE_COLOR = Color{32,  9,   65,  1};
+
 /**
  * @brief Describes items that may have colours
  */

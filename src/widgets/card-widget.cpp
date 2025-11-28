@@ -8,6 +8,7 @@
 #include <numeric>
 
 #include "cardlist-widget.h"
+#include "core/colorable.h"
 
 extern "C" {
 static void card_class_init(void* g_class, void* data) {
@@ -238,13 +239,10 @@ inline std::string format_date_str(Date date) {
 
 CoverColor rgb_to_cover_color(Color rgb) {
     const std::map<Color, CoverColor> CARD_COLORS = {
-        {Color(0, 0, 0, 0), CoverColor::UNSET},
-        {Color(165, 29, 45, 1), CoverColor::RED},
-        {Color(198, 70, 0, 1), CoverColor::ORANGE},
-        {Color(229, 165, 10, 1), CoverColor::YELLOW},
-        {Color(38, 162, 105, 1), CoverColor::GREEN},
-        {Color(26, 95, 180, 1), CoverColor::BLUE},
-        {Color(32, 9, 65, 1), CoverColor::PURPLE}};
+        {NO_COLOR, CoverColor::UNSET},      {RED_COLOR, CoverColor::RED},
+        {ORANGE_COLOR, CoverColor::ORANGE}, {YELLOW_COLOR, CoverColor::YELLOW},
+        {GREEN_COLOR, CoverColor::GREEN},   {BLUE_COLOR, CoverColor::BLUE},
+        {PURPLE_COLOR, CoverColor::PURPLE}};
 
     return CARD_COLORS.at(rgb);
 }
