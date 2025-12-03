@@ -68,6 +68,22 @@
   </categories>
 
   <releases>
+    <release date="2025-12-03" version="1.7.3">
+      <description>
+        <p>What's new in Progress 1.7.3</p>
+        <p>
+          This patch release includes minor style changes and behavior enhancements.
+        </p>
+        <ul>
+          <li>
+            The cards menu buttons are consistent with all the menu buttons in the application
+          </li>
+          <li>
+            Color radio button group implementation has been refactored
+          </li>
+        </ul>
+      </description>
+    </release>
     <release date="2025-11-17" version="1.7.2">
       <description>
         <p>What's new in Progress 1.7.2</p>
