@@ -15,16 +15,19 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
       m_manager{manager},
-      picture{},
-      scr{},
-      overlay{},
+      m_picture{},
+      m_scr{},
+      m_overlay{},
       m_add_button{_("Add List")},
       m_css_provider{Gtk::CssProvider::create()} {
-    set_child(overlay);
+    Gtk::StyleProvider::add_provider_for_display(
+        get_display(), m_css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    m_css_provider->load_from_data(BOARD_BACKGROUND);
+    set_child(m_overlay);
     m_picture.set_keep_aspect_ratio(false);
 
     m_overlay.set_child(m_picture);
-    m_overlay.add_overlay(scr);
+    m_overlay.add_overlay(m_scr);
     m_overlay.set_expand(true);
 
     m_scr.set_child(m_root);
@@ -284,6 +287,8 @@ void ui::BoardWidget::__set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
+            m_css_provider->load_from_data(
+                std::format(BOARD_BACKGROUND_RGB, background));
             m_picture.set_visible(false);
             break;
         }
