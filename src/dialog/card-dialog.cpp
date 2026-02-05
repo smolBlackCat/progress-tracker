@@ -72,6 +72,7 @@ TaskWidget* CardDetailsDialog::add_task(const Task& task) {
     spdlog::get("app")->info("Task (\"{}\") added to card (\"{}\")",
                              task.get_name(),
                              m_card_widget->get_card()->get_name());
+    m_card_widget->update_completion_label();
 
     return task_widget;
 }
@@ -186,6 +187,8 @@ CardWidget* CardDetailsDialog::get_card_widget() { return m_card_widget; }
 void CardDetailsDialog::on_add_task() {
     _add_task(
         m_card_widget->get_card()->container().append(Task{_("New Task")}));
+
+    m_card_widget->update_completion_label();
 
     spdlog::get("app")->info("New task appended to Card (\"{}\")",
                              m_card_widget->get_card()->get_name());
