@@ -8,6 +8,8 @@
 
 #include <cstdlib>
 
+#include "glibmm/priorities.h"
+
 Glib::RefPtr<ui::Application> ui::Application::create() {
     return Glib::RefPtr<ui::Application>(new Application());
 }
@@ -57,15 +59,17 @@ void ui::Application::on_activate() {
     // Scheduling an idle task that'll check whether all boards were loaded
     // before actually loading them into the application. This workaround works
     // but it can be enhanced by improving the core itself to be thread-safe.
-    Glib::signal_idle().connect([this]() {
-        if (m_manager.loaded()) {
-            for (const auto& local_entry : m_manager.local_boards()) {
-                main_window->add_local_board_entry(local_entry);
+    Glib::signal_idle().connect(
+        [this]() {
+            if (m_manager.loaded()) {
+                for (const auto& local_entry : m_manager.local_boards()) {
+                    main_window->add_local_board_entry(local_entry);
+                }
+                return false;
+            } else {
+                return true;
             }
-            return false;
-        } else {
-            return true;
-        }
-    });
+        },
+        Glib::PRIORITY_LOW);
     spdlog::get("app")->info("App started");
 }

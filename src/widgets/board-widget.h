@@ -157,6 +157,7 @@ public:
 
     sigc::signal<void(CardlistWidget*)>& signal_cardlist_added();
     sigc::signal<void(CardlistWidget*)>& signal_cardlist_removed();
+    sigc::signal<void()>& signal_scroll_changed();
 
 protected:
     void __setup_auto_scrolling();
@@ -164,9 +165,12 @@ protected:
 
     BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
+    sigc::connection m_scrolling_cnn;
 
     sigc::signal<void(CardlistWidget*)> m_add_cardlist_signal,
         m_remove_cardlist_signal;
+
+    sigc::signal<void()> m_scroll_signal;
 
 #ifdef WIN32
     Gtk::Overlay m_overlay;

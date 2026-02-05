@@ -6,8 +6,8 @@
 
 #include "sigc++/adaptors/track_obj.h"
 
-AppContext::AppContext(ui::ProgressWindow &app_window,
-                       ui::BoardWidget &board_widget, BoardManager &manager)
+AppContext::AppContext(ui::ProgressWindow& app_window,
+                       ui::BoardWidget& board_widget, BoardManager& manager)
     : m_app_window(app_window),
       m_board_widget(board_widget),
       m_manager(manager) {
@@ -20,16 +20,16 @@ AppContext::AppContext(ui::ProgressWindow &app_window,
         sigc::mem_fun(*this, &AppContext::register_cardlist_container_update));
 }
 
-void AppContext::open_session(const std::string &filename) {
+void AppContext::open_session(const std::string& filename) {
     spdlog::get("app")->debug(
         "[AppContext.open_session] Dispatch board session starter thread");
     m_board_load_thread = std::thread{[this, filename]() {
         try {
             this->m_current_board = this->m_manager.local_open(filename);
-        } catch (std::invalid_argument &err) {
+        } catch (std::invalid_argument& err) {
             this->m_current_board = nullptr;
         }
-        // Calls on_board_loaded
+
         m_load_board_dispatcher.emit();
     }};
 }
@@ -68,6 +68,7 @@ void AppContext::reset_session_state() {
     m_idle_load_session_cnn.disconnect();
     m_timeout_save_cnn.disconnect();
     m_timeout_cards_update_cnn.disconnect();
+    m_suspended_tracker_cnn.disconnect();
     m_board_widget.clear();
     m_current_board = nullptr;
 }
@@ -95,6 +96,10 @@ void AppContext::on_session_loaded() {
         m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &AppContext::timeout_update_cards),
             AppContext::UPDATE_INTERVAL);
+
+        m_suspended_tracker_cnn =
+            m_app_window.property_suspended().signal_changed().connect(
+                sigc::mem_fun(*this, &AppContext::toggle_timeout_update_cards));
     } else {
         // Board has failed to load. Go back to previous state
         spdlog::get("app")->warn(
@@ -121,6 +126,16 @@ void AppContext::on_session_saved() {
                              m_current_board->get_name());
 }
 
+void AppContext::toggle_timeout_update_cards() {
+    if (m_app_window.is_suspended()) {
+        m_timeout_cards_update_cnn.disconnect();
+    } else {
+        m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &AppContext::timeout_update_cards),
+            AppContext::UPDATE_INTERVAL);
+    }
+}
+
 bool AppContext::idle_load_session() {
     if (!m_current_board) {
         spdlog::get("app")->error(
@@ -138,7 +153,9 @@ bool AppContext::idle_load_session() {
         return true;
     }
 
-    const auto &data = m_current_board->container().get_data();
+    const auto& data = m_current_board->container().get_data();
+    // FIXME: This is logically confusing. m_cardlist_i gives the idea of an
+    // indexer but it is actually working as a counter
     if (m_cardlist_i > (data.size() - 1) || data.empty()) {
         m_session_flags[Status::LOADING] = false;
 
@@ -146,15 +163,17 @@ bool AppContext::idle_load_session() {
             "[AppContext.idle_load_session] Session (\"{}\") has been fully "
             "loaded",
             m_current_board->get_name());
+
+        m_idle_load_session_cnn.disconnect();
         return false;
     }
 
-    ui::CardlistWidget *cardlist_widget = Gtk::make_managed<ui::CardlistWidget>(
+    ui::CardlistWidget* cardlist_widget = Gtk::make_managed<ui::CardlistWidget>(
         m_board_widget, data[m_cardlist_i]);
     m_board_widget.append(*cardlist_widget);
 
-    for (const auto &card : cardlist_widget->cardlist()->container()) {
-        ui::CardWidget *card_widget = Gtk::make_managed<ui::CardWidget>(card);
+    for (const auto& card : cardlist_widget->cardlist()->container()) {
+        ui::CardWidget* card_widget = Gtk::make_managed<ui::CardWidget>(card);
         cardlist_widget->append(*card_widget);
     }
     m_cardlist_i++;
@@ -229,7 +248,8 @@ bool AppContext::timeout_update_cards() {
         card->set_tooltip_markup(card->create_details_text());
 
         spdlog::get("app")->debug(
-            "[AppContext.timeout_update_cards] CardWidget \"{}\"'s UI has been "
+            "[AppContext.timeout_update_cards] CardWidget \"{}\"'s UI has "
+            "been "
             "updated",
             card->get_card()->get_name());
 
@@ -245,15 +265,15 @@ bool AppContext::timeout_update_cards() {
 }
 
 void AppContext::register_cardlist_container_update(
-    ui::CardlistWidget *cardlist) {
+    ui::CardlistWidget* cardlist) {
     cardlist->signal_card_added().connect(sigc::track_obj(
-        [this](ui::CardWidget *card) {
+        [this](ui::CardWidget* card) {
             this->m_cards.push_back(card);
             card->signal_destroy().connect(
                 [this, card]() { std::erase(this->m_cards, card); });
         },
         *cardlist));
     cardlist->signal_card_removed().connect(sigc::track_obj(
-        [this](ui::CardWidget *card) { std::erase(this->m_cards, card); },
+        [this](ui::CardWidget* card) { std::erase(this->m_cards, card); },
         *cardlist));
 }

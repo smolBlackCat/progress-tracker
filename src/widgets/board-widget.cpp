@@ -169,7 +169,9 @@ void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
 void ui::BoardWidget::clear() {
     std::for_each(m_connections.begin(), m_connections.end(),
                   [](auto& connection) { connection.disconnect(); });
+    m_scrolling_cnn.disconnect();
     m_connections.clear();
+
     m_board = nullptr;
 }
 
@@ -183,7 +185,10 @@ void ui::BoardWidget::save(bool clear_after_save) {
     }
 }
 
-void ui::BoardWidget::set_scroll(bool scroll) { m_on_scroll = scroll; }
+void ui::BoardWidget::set_scroll(bool scroll) {
+    m_on_scroll = scroll;
+    m_scroll_signal.emit();
+}
 
 ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
                                                       bool editing_mode) {
@@ -191,6 +196,9 @@ ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
     return __add_cardlist(m_board->container().append(cardlist));
 }
 
+// FIXME: This was a workaround that should not exist. This method return
+// dangling pointers only to indicate that something was deleted, with no
+// practical use whatsoever
 ui::CardlistWidget* ui::BoardWidget::pop() {
     if (m_cardlists.empty()) {
         return nullptr;
@@ -237,6 +245,10 @@ ui::BoardWidget::signal_cardlist_removed() {
     return m_remove_cardlist_signal;
 }
 
+sigc::signal<void()>& ui::BoardWidget::signal_scroll_changed() {
+    return m_scroll_signal;
+}
+
 void ui::BoardWidget::__setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
 
@@ -250,34 +262,43 @@ void ui::BoardWidget::__setup_auto_scrolling() {
 #else
     add_controller(drop_controller_motion_c);
 #endif
-    Glib::signal_timeout().connect(
-        [this]() {
-#ifdef WIN32
-            double cur_max_width = m_scr.get_width();
-            auto hadjustment = m_scr.get_hadjustment();
-#else
-            double cur_max_width = get_width();
-            auto hadjustment = get_hadjustment();
-#endif
-            double lower = hadjustment->get_lower();
-            double upper = hadjustment->get_upper();
 
+    m_scroll_signal.connect(sigc::track_obj(
+        [this]() {
             if (m_on_scroll) {
-                if (m_x >= (cur_max_width * 0.8)) {
-                    double new_value =
-                        hadjustment->get_value() + SCROLL_SPEED_FACTOR;
-                    hadjustment->set_value(new_value >= upper ? upper
-                                                              : new_value);
-                } else if (m_x <= (cur_max_width * 0.2)) {
-                    double new_value =
-                        hadjustment->get_value() - SCROLL_SPEED_FACTOR;
-                    hadjustment->set_value(new_value <= lower ? lower
-                                                              : new_value);
-                }
+                m_scrolling_cnn = Glib::signal_timeout().connect(
+                    [this]() {
+#ifdef WIN32
+                        double cur_max_width = m_scr.get_width();
+                        auto hadjustment = m_scr.get_hadjustment();
+#else
+                        double cur_max_width = get_width();
+                        auto hadjustment = get_hadjustment();
+#endif
+                        double lower = hadjustment->get_lower();
+                        double upper = hadjustment->get_upper();
+
+                        spdlog::get("app")->debug("Compute scrolling");
+
+                        if (m_x >= (cur_max_width * 0.8)) {
+                            double new_value =
+                                hadjustment->get_value() + SCROLL_SPEED_FACTOR;
+                            hadjustment->set_value(
+                                new_value >= upper ? upper : new_value);
+                        } else if (m_x <= (cur_max_width * 0.2)) {
+                            double new_value =
+                                hadjustment->get_value() - SCROLL_SPEED_FACTOR;
+                            hadjustment->set_value(
+                                new_value <= lower ? lower : new_value);
+                        }
+                        return true;
+                    },
+                    10);
+            } else {
+                m_scrolling_cnn.disconnect();
             }
-            return true;
         },
-        10);
+        *this));
 }
 
 #ifdef WIN32

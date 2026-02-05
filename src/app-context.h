@@ -35,15 +35,15 @@ public:
     static constexpr int SAVE_INTERVAL = 1000 * 10;
     static constexpr int UPDATE_INTERVAL = 1000 * 3;
 
-    AppContext(ui::ProgressWindow &app_window, ui::BoardWidget &board_widget,
-               BoardManager &manager);
+    AppContext(ui::ProgressWindow& app_window, ui::BoardWidget& board_widget,
+               BoardManager& manager);
 
     /**
      * @brief Starts a kanban board session
      *
      * @param filename file path where Progress board is located
      */
-    void open_session(const std::string &filename);
+    void open_session(const std::string& filename);
 
     /**
      * @brief Ends a kanban board session
@@ -68,20 +68,30 @@ protected:
      */
     void on_session_saved();
 
+    /**
+     * @brief Toggles the timeout UI update procedure.
+     *
+     * @details Whenever the window is suspended, there is no need for further
+     * UI updates since they won't be visible to the user. The proper solution
+     * is to disconnect the procedure from the timeout signal whenever the
+     * window is minimised, and reconnect it when the window is maximised again
+     */
+    void toggle_timeout_update_cards();
+
     bool idle_load_session();
     bool idle_clear_session();
     bool timeout_save_session();
     bool timeout_update_cards();
 
-    ui::ProgressWindow &m_app_window;
-    ui::BoardWidget &m_board_widget;
+    ui::ProgressWindow& m_app_window;
+    ui::BoardWidget& m_board_widget;
 
     // Board loading and saving
-    BoardManager &m_manager;
+    BoardManager& m_manager;
     std::thread m_board_save_thread, m_board_load_thread;
     Glib::Dispatcher m_load_board_dispatcher, m_save_board_dispatcher;
     sigc::connection m_timeout_save_cnn, m_timeout_cards_update_cnn,
-        m_idle_load_session_cnn;
+        m_idle_load_session_cnn, m_suspended_tracker_cnn;
 
     // BoardWidget context
     std::shared_ptr<Board> m_current_board;
@@ -90,7 +100,7 @@ protected:
         {Status::CLEARING, false},
         {Status::BUSY, false},
     };
-    std::vector<ui::CardWidget *> m_cards;
+    std::vector<ui::CardWidget*> m_cards;
     ssize_t m_next_card_i = 0;
     ssize_t m_cardlist_i = 0;
 
