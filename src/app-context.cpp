@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <window.h>
 
+#include "gtk/gtk.h"
 #include "sigc++/adaptors/track_obj.h"
 
 AppContext::AppContext(ui::ProgressWindow& app_window,
@@ -68,7 +69,12 @@ void AppContext::reset_session_state() {
     m_idle_load_session_cnn.disconnect();
     m_timeout_save_cnn.disconnect();
     m_timeout_cards_update_cnn.disconnect();
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     m_suspended_tracker_cnn.disconnect();
+#else
+    g_signal_handler_disconnect(m_app_window.gobj(),
+                                m_suspended_tracker_handler_id);
+#endif
     m_board_widget.clear();
     m_current_board = nullptr;
 }
@@ -77,6 +83,8 @@ void AppContext::on_session_loaded() {
     if (m_board_load_thread.joinable()) {
         m_board_load_thread.join();
     }
+
+    auto s = m_app_window.gobj();
 
     if (m_current_board) {
         spdlog::get("app")->info("Kanban Board Session (\"{}\") started",
@@ -96,10 +104,19 @@ void AppContext::on_session_loaded() {
         m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &AppContext::timeout_update_cards),
             AppContext::UPDATE_INTERVAL);
-
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         m_suspended_tracker_cnn =
             m_app_window.property_suspended().signal_changed().connect(
                 sigc::mem_fun(*this, &AppContext::toggle_timeout_update_cards));
+#else
+        m_suspended_tracker_handler_id = g_signal_connect(
+            m_app_window.gobj(), "notify::suspended",
+            G_CALLBACK(+[](GtkWindow* self, GParamSpec* pspec, gpointer data) {
+                reinterpret_cast<AppContext*>(data)
+                    ->toggle_timeout_update_cards();
+            }),
+            this);
+#endif
     } else {
         // Board has failed to load. Go back to previous state
         spdlog::get("app")->warn(
@@ -126,6 +143,7 @@ void AppContext::on_session_saved() {
                              m_current_board->get_name());
 }
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
 void AppContext::toggle_timeout_update_cards() {
     if (m_app_window.is_suspended()) {
         m_timeout_cards_update_cnn.disconnect();
@@ -135,6 +153,17 @@ void AppContext::toggle_timeout_update_cards() {
             AppContext::UPDATE_INTERVAL);
     }
 }
+#else
+void AppContext::toggle_timeout_update_cards() {
+    if (gtk_window_is_suspended(GTK_WINDOW(m_app_window.gobj()))) {
+        m_timeout_cards_update_cnn.disconnect();
+    } else {
+        m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &AppContext::timeout_update_cards),
+            AppContext::UPDATE_INTERVAL);
+    }
+}
+#endif
 
 bool AppContext::idle_load_session() {
     if (!m_current_board) {

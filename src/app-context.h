@@ -1,10 +1,13 @@
 #pragma once
 
+#include <glib.h>
 #include <widgets/board-widget.h>
 #include <widgets/card-widget.h>
 #include <widgets/cardlist-widget.h>
 
 #include <thread>
+
+#include "gtkmm/version.h"
 
 namespace ui {
 class ProgressWindow;
@@ -91,7 +94,13 @@ protected:
     std::thread m_board_save_thread, m_board_load_thread;
     Glib::Dispatcher m_load_board_dispatcher, m_save_board_dispatcher;
     sigc::connection m_timeout_save_cnn, m_timeout_cards_update_cnn,
-        m_idle_load_session_cnn, m_suspended_tracker_cnn;
+        m_idle_load_session_cnn;
+
+#if GTKMM_CHECK_VERSION(4, 12, 0)
+    sigc::connection m_suspended_tracker_cnn;
+#else
+    long m_suspended_tracker_handler_id = 0;
+#endif
 
     // BoardWidget context
     std::shared_ptr<Board> m_current_board;
