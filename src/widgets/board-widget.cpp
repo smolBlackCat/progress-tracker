@@ -175,16 +175,6 @@ void ui::BoardWidget::clear() {
     m_board = nullptr;
 }
 
-void ui::BoardWidget::save(bool clear_after_save) {
-    if (m_board->modified()) {
-        m_manager.local_save(m_board);
-    }
-
-    if (clear_after_save) {
-        clear();
-    }
-}
-
 void ui::BoardWidget::set_scroll(bool scroll) {
     m_on_scroll = scroll;
     m_scroll_signal.emit();

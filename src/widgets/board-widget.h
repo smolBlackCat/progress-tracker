@@ -89,14 +89,6 @@ public:
     void clear();
 
     /**
-     * @brief Calls BoardManager saving variants depending on the Board type
-     * (e.g. local or external)
-     *
-     * @param clear indicates whether to clear the board widget after saving
-     */
-    void save(bool clear_after_save = true);
-
-    /**
      * @brief Describes whether the board should be able to scroll
      * horizontally
      *

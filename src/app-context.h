@@ -81,6 +81,11 @@ protected:
      */
     void toggle_timeout_update_cards();
 
+    /**
+     * @brief Save the current session if there is one
+     * */
+    bool on_window_closed();
+
     bool idle_load_session();
     bool idle_clear_session();
     bool timeout_save_session();

@@ -101,8 +101,6 @@ void PreferencesBoardDialog::on_save_changes() {
             new_background);
     }
 
-    board_widget.save(false);
-
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui

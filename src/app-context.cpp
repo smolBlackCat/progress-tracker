@@ -12,6 +12,8 @@ AppContext::AppContext(ui::ProgressWindow& app_window,
     : m_app_window(app_window),
       m_board_widget(board_widget),
       m_manager(manager) {
+    m_app_window.signal_close_request().connect(
+        sigc::mem_fun(*this, &AppContext::on_window_closed), true);
     m_load_board_dispatcher.connect(
         sigc::mem_fun(*this, &AppContext::on_session_loaded));
     m_save_board_dispatcher.connect(
@@ -164,6 +166,26 @@ void AppContext::toggle_timeout_update_cards() {
     }
 }
 #endif
+
+bool AppContext::on_window_closed() {
+    if (!(m_session_flags[Status::CLEARING] ||
+          m_session_flags[Status::LOADING]) &&
+        m_session_flags[Status::BUSY]) {
+        if (m_board_save_thread.joinable()) {
+            spdlog::get("app")->debug(
+                "[AppContext.on_window_closed] User requested window closing "
+                "but a thread has been scheduled. join it");
+            m_board_save_thread.join();
+        } else {
+            spdlog::get("app")->debug(
+                "[AppContext.on_window_closed] User request window closing. "
+                "Saving the session");
+            m_manager.local_save(m_current_board);
+        }
+    }
+
+    return false;
+}
 
 bool AppContext::idle_load_session() {
     if (!m_current_board) {

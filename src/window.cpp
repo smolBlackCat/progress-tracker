@@ -352,9 +352,6 @@ void ProgressWindow::load_appropriate_style() {
 bool ProgressWindow::on_close() {
     set_visible(false);
 
-    if (app_stack_p->get_visible_child_name() == "board-page") {
-        board_widget.save();
-    }
     int height, width;
     this->get_default_size(width, height);
 
@@ -366,6 +363,6 @@ bool ProgressWindow::on_close() {
         "On close status:\n\twindow-maximized: {}\n\twindow-height: "
         "{}\n\twindow-width: {}",
         is_maximized(), height, width);
-    return true;
+    return false;
 }
 }  // namespace ui
