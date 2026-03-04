@@ -177,7 +177,7 @@ void ui::BoardWidget::clear() {
 
 void ui::BoardWidget::set_scroll(bool scroll) {
     m_on_scroll = scroll;
-    m_scroll_signal.emit();
+    m_scroll_changed_signal.emit();
 }
 
 ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
@@ -230,15 +230,6 @@ ui::BoardWidget::signal_cardlist_added() {
     return m_add_cardlist_signal;
 }
 
-sigc::signal<void(ui::CardlistWidget*)>&
-ui::BoardWidget::signal_cardlist_removed() {
-    return m_remove_cardlist_signal;
-}
-
-sigc::signal<void()>& ui::BoardWidget::signal_scroll_changed() {
-    return m_scroll_signal;
-}
-
 void ui::BoardWidget::__setup_auto_scrolling() {
     auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
 
@@ -253,7 +244,7 @@ void ui::BoardWidget::__setup_auto_scrolling() {
     add_controller(drop_controller_motion_c);
 #endif
 
-    m_scroll_signal.connect(sigc::track_obj(
+    m_scroll_changed_signal.connect(sigc::track_obj(
         [this]() {
             if (m_on_scroll) {
                 m_scrolling_cnn = Glib::signal_timeout().connect(
