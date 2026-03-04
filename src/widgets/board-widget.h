@@ -31,10 +31,8 @@ public:
 
     /**
      * @brief BoardWidget constructor
-     *
-     * @param manager BoardManager reference
      */
-    BoardWidget(BoardManager& manager);
+    BoardWidget();
 
     /**
      * @brief Loads all widgets composing a BoardWidget from a board object
@@ -153,7 +151,6 @@ protected:
     void __setup_auto_scrolling();
     void __set_background(const std::string& background);
 
-    BoardManager& m_manager;
     std::vector<sigc::connection> m_connections;
     sigc::connection m_scrolling_cnn;
 

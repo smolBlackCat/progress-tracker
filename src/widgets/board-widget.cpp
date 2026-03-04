@@ -49,10 +49,9 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.append(m_add_button);
 }
 #else
-ui::BoardWidget::BoardWidget(BoardManager& manager)
+ui::BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
-      m_manager{manager},
       m_add_button{_("Add List")},
       m_css_provider{Gtk::CssProvider::create()} {
     Gtk::StyleProvider::add_provider_for_display(

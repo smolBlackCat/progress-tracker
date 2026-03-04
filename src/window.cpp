@@ -20,7 +20,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                BoardManager& manager)
     : Gtk::ApplicationWindow{cobject},
       m_manager{manager},
-      board_widget{manager},
+      board_widget{},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
       board_delete_button{b->get_widget<Gtk::Button>("delete-button")},
