@@ -4,7 +4,7 @@
   <name>Progress</name>
   <summary>Kanban board application</summary>
   <developer id="io.github.smolblackcat">
-    <name>Gabriel de Moura</name>
+    <name translate="no">Gabriel de Moura</name>
   </developer>
 
   <url type="homepage">https://github.com/smolBlackCat/progress-tracker</url>
@@ -65,7 +65,7 @@
 
   <releases>
     <release date="2025-12-03" version="1.7.3">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.7.3</p>
         <p>
           This patch release includes minor style changes and behavior enhancements.
@@ -81,7 +81,7 @@
       </description>
     </release>
     <release date="2025-11-17" version="1.7.2">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.7.2</p>
         <p>
           This patch release fix a crash after trying to convert a task
@@ -90,7 +90,7 @@
       </description>
     </release>
     <release date="2025-10-30" version="1.7.1">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.7.1</p>
         <p>
           This small release introduces keyboard focus improvements and missing
@@ -103,7 +103,7 @@
       </description>
     </release>
     <release date="2025-10-23" version="1.7">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.7</p>
         <p>This release introduces a smoother, faster, and more refined experience across the entire
           app. Boards load more reliably, dialogs are easier to use, and new shortcuts managing
@@ -119,7 +119,7 @@
       </description>
     </release>
     <release date="2024-07-30" version="1.6.0">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.6.0</p>
         <ul>
           <li>Added Polish Translation</li>
@@ -128,7 +128,7 @@
       </description>
     </release>
     <release date="2024-06-14" version="1.5.2">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.5.2</p>
         <ul>
           <li>Fix bug where application would crash after dropping a cardlist
@@ -137,7 +137,7 @@
       </description>
     </release>
     <release date="2024-06-28" version="1.5.1">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.5.1</p>
         <ul>
           <li>Fix bug where the board's background was set only if the board's
@@ -146,7 +146,7 @@
       </description>
     </release>
     <release date="2024-06-23" version="1.5.0">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.5.0</p>
         <ul>
           <li>Board buttons will now appear in the order of modification</li>
@@ -156,7 +156,7 @@
       </description>
     </release>
     <release date="2024-06-07" version="1.4.1">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.4.1</p>
         <ul>
           <li>Locale directory resolution optimised</li>
@@ -164,7 +164,7 @@
       </description>
     </release>
     <release date="2024-05-27" version="1.4">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.4</p>
         <ul>
           <li>Spanish translation has been updated</li>
@@ -172,7 +172,7 @@
       </description>
     </release>
     <release date="2024-05-06" version="1.3">
-      <description>
+      <description translate="no">
         <p>What's new in Progress 1.3</p>
         <ul>
           <li>Italian translation has been updated</li>
@@ -184,7 +184,7 @@
       </description>
     </release>
     <release date="2024-04-28" version="1.2">
-      <description>
+      <description translate="no">
         <p>The current minor releases brings some additions and improvements</p>
         <ul>
           <li>Utilise Adwaita About Dialogs</li>
@@ -196,7 +196,7 @@
       </description>
     </release>
     <release date="2024-04-01" version="1.1">
-      <description>
+      <description translate="no">
         <p>Bug Fixes and Improvements</p>
         <ul>
           <li>Board grid UI enhance</li>
@@ -209,7 +209,7 @@
       </description>
     </release>
     <release date="2024-03-16" version="1.0">
-      <description>
+      <description translate="no">
         <p>
           First official release of Progress 1.0
         </p>
