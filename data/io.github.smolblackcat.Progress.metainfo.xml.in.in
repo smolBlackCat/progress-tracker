@@ -62,10 +62,6 @@
       organize tasks effectively while also being simple and easy to use.
     </p>
   </description>
-  <categories>
-    <category>ProjectManagement</category>
-    <category>Office</category>
-  </categories>
 
   <releases>
     <release date="2025-12-03" version="1.7.3">
