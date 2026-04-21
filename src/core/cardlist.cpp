@@ -2,6 +2,15 @@
 
 #include "guid.hpp"
 
+std::shared_ptr<CardList> CardList::create(const std::string& name) {
+    return std::shared_ptr<CardList>(new CardList{name});
+}
+
+std::shared_ptr<CardList> CardList::create(const std::string& name,
+                                           const xg::Guid& uuid) {
+    return std::shared_ptr<CardList>(new CardList{name, uuid});
+}
+
 CardList::CardList(const std::string& name) : CardList{name, xg::newGuid()} {}
 
 CardList::CardList(const std::string& name, const xg::Guid uuid)

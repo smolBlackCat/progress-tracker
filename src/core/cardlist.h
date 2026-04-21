@@ -9,21 +9,11 @@
  */
 class CardList : public Item, public Modifiable {
 public:
-    /**
-     * @brief CardList constructor;
-     *
-     * @param name name of the card list
-     */
-    CardList(const std::string& name);
+    static std::shared_ptr<CardList> create(const std::string& name);
+    static std::shared_ptr<CardList> create(const std::string& name,
+                                            const xg::Guid& uuid);
 
-    /**
-     * @brief CardList constructor;
-     *
-     * @param name name of the card list
-     * @param uuid unique identifier of the card list
-     */
-    CardList(const std::string& name, const xg::Guid uuid);
-
+    CardList() = delete;
     ~CardList() override;
 
     void set_name(const std::string& name) override;
@@ -45,6 +35,20 @@ public:
     ItemContainer<Card>& container();
 
 protected:
+    /**
+     * @brief CardList constructor;
+     *
+     * @param name name of the card list
+     */
+    CardList(const std::string& name);
+
+    /**
+     * @brief CardList constructor;
+     *
+     * @param name name of the card list
+     * @param uuid unique identifier of the card list
+     */
+    CardList(const std::string& name, const xg::Guid uuid);
     ItemContainer<Card> cards;
 
     bool m_modified = false;

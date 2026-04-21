@@ -3,6 +3,27 @@
 #include <numeric>
 #include <utility>
 
+std::shared_ptr<Card> Card::create(const std::string& name, const Date& date,
+                                   bool complete, const Color& color) {
+    return std::shared_ptr<Card>(new Card{name, date, complete, color});
+}
+
+std::shared_ptr<Card> Card::create(const std::string& name, const Date& date,
+                                   const xg::Guid uuid, bool complete,
+                                   const Color& color) {
+    return std::shared_ptr<Card>(new Card{name, date, uuid, complete, color});
+}
+
+std::shared_ptr<Card> Card::create(const std::string& name,
+                                   const Color& color) {
+    return std::shared_ptr<Card>(new Card{name, color});
+}
+
+std::shared_ptr<Card> Card::create(const std::string& name, const xg::Guid uuid,
+                                   const Color& color) {
+    return std::shared_ptr<Card>(new Card{name, uuid, color});
+}
+
 Card::Card(const std::string& name, const Date& date, bool complete,
            const Color& color)
     : Card{name, date, xg::newGuid(), complete, color} {}
@@ -11,19 +32,6 @@ Card::Card(const std::string& name, const Date& date, const xg::Guid uuid,
            bool complete, const Color& color)
     : Item{name, uuid}, m_complete{complete}, m_due_date{date} {
     this->color = color;
-
-    m_tasks.signal_append().connect([](const std::shared_ptr<Task> /*clist*/) {
-        // previously logged: task append
-    });
-    m_tasks.signal_remove().connect([](const std::shared_ptr<Task> /*clist*/) {
-        // previously logged: task remove
-    });
-    m_tasks.signal_reorder().connect(
-        [](const std::shared_ptr<Task> /*task_next*/,
-           const std::shared_ptr<Task> /*task_sibling*/,
-           ReorderingType /*reordering*/) {
-            // previously logged: task reorder
-        });
 }
 
 Card::Card(const std::string& name, const Color& color)

@@ -8,41 +8,37 @@ ItemContainer<T>::ItemContainer() : m_data() {}
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
-std::shared_ptr<T> ItemContainer<T>::append(const T& item) {
+void ItemContainer<T>::append(std::shared_ptr<T>& item) {
     for (auto& i_item : m_data) {
-        if (*i_item == item) {
-            return nullptr;
-        }
-    }
-
-    auto new_item = std::make_shared<T>(item);
-    m_data.push_back(std::make_shared<T>(item));
-    modify();
-    on_append_signal.emit(new_item);
-    return m_data.back();
-}
-
-template <typename T>
-    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
-void ItemContainer<T>::remove(const T& item) {
-    for (auto it = m_data.begin(); it != m_data.end(); it++) {
-        if (item == *(*it)) {
-            m_data.erase(it);
-            modify();
-            on_remove_signal.emit(*it);
+        if (i_item == item) {
             return;
         }
     }
+
+    m_data.push_back(item);
+    modify();
+    on_append_signal.emit(item);
 }
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
-std::shared_ptr<T> ItemContainer<T>::insert_after(const T& item,
-                                                  const T& sibling) {
+void ItemContainer<T>::remove(std::shared_ptr<T>& item) {
+    ssize_t n = std::erase(m_data, item);
+
+    if (n >= 1) {
+        modify();
+        on_remove_signal.emit(item);
+    }
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+void ItemContainer<T>::insert_after(std::shared_ptr<T>& item,
+                                    std::shared_ptr<T>& sibling) {
     ssize_t index = -1;
     ssize_t c = 0;
     for (const auto& item : m_data) {
-        if (*item == sibling) {
+        if (item == sibling) {
             index = c;
             break;
         }
@@ -50,27 +46,25 @@ std::shared_ptr<T> ItemContainer<T>::insert_after(const T& item,
         c++;
     }
 
-    if (index == -1) return nullptr;
+    if (index == -1) return;
 
-    std::shared_ptr<T> item_s = std::make_shared<T>(item);
     if (index == (m_data.size() - 1)) {
-        m_data.push_back(item_s);
+        m_data.push_back(item);
     } else {
         auto sibling_it = (m_data.begin() + index + 1);
-        m_data.insert(sibling_it, item_s);
+        m_data.insert(sibling_it, item);
     }
-
-    return item_s;
+    modify();
 }
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
-std::shared_ptr<T> ItemContainer<T>::insert_before(const T& item,
-                                                   const T& sibling) {
+void ItemContainer<T>::insert_before(std::shared_ptr<T>& item,
+                                     std::shared_ptr<T>& sibling) {
     ssize_t index = -1;
     ssize_t c = 0;
     for (const auto& item : m_data) {
-        if (*item == sibling) {
+        if (item == sibling) {
             index = c;
             break;
         }
@@ -78,27 +72,26 @@ std::shared_ptr<T> ItemContainer<T>::insert_before(const T& item,
         c++;
     }
 
-    if (index == -1) return nullptr;
+    if (index == -1) return;
 
     auto sibling_it = (m_data.begin() + index);
-    std::shared_ptr<T> item_s = std::make_shared<T>(item);
 
-    m_data.insert(sibling_it, item_s);
-
-    return item_s;
+    m_data.insert(sibling_it, item);
+    modify();
 }
 
 template <typename T>
     requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
-ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
+void ItemContainer<T>::reorder_after(std::shared_ptr<T>& next,
+                                     std::shared_ptr<T>& sibling) {
     ssize_t next_i = -1;
     ssize_t sibling_i = -1;
 
     ssize_t c = 0;
     for (auto& item : m_data) {
-        if (*item == next) {
+        if (item == next) {
             next_i = c;
-        } else if (*item == sibling) {
+        } else if (item == sibling) {
             sibling_i = c;
         }
         c++;
@@ -106,34 +99,53 @@ ReorderingType ItemContainer<T>::reorder(const T& next, const T& sibling) {
 
     bool any_absent = next_i == -1 || sibling_i == -1;
     bool is_same = next_i == sibling_i;
+    bool already_in_place = next_i > sibling_i;
 
-    if (any_absent || is_same) {
-        return ReorderingType::INVALID;
+    if (any_absent || is_same || already_in_place) {
+        on_reorder_signal.emit(next, sibling, ReorderingType::INVALID);
+        return;
     }
 
-    std::shared_ptr<T> next_v = m_data[next_i];
-    std::shared_ptr<T> sibling_v = m_data[sibling_i];
+    std::shared_ptr<T> temp = next;
+    std::erase(m_data, next);
 
-    m_data.erase(m_data.begin() + next_i);
+    m_data.insert(std::next(m_data.begin(), sibling_i), next);
+    modify();
+    on_reorder_signal.emit(next, sibling, ReorderingType::AFTER);
+}
 
-    ReorderingType reordering;
-    if (next_i > sibling_i) {
-        // Down to up reordering
-        m_data.insert(m_data.begin() + (sibling_i == 0 ? 0 : sibling_i),
-                      next_v);
-        reordering = ReorderingType::DOWNUP;
-        modify();
-        on_reorder_signal.emit(next_v, sibling_v, reordering);
-        return reordering;
-    } else if (next_i < sibling_i) {
-        // Up to down reordering
-        m_data.insert(m_data.begin() + sibling_i, next_v);
-        reordering = ReorderingType::UPDOWN;
-        modify();
-        on_reorder_signal.emit(next_v, sibling_v, reordering);
-        return reordering;
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+void ItemContainer<T>::reorder_before(std::shared_ptr<T>& next,
+                                      std::shared_ptr<T>& sibling) {
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
+
+    ssize_t c = 0;
+    for (auto& item : m_data) {
+        if (item == next) {
+            next_i = c;
+        } else if (item == sibling) {
+            sibling_i = c;
+        }
+        c++;
     }
-    return ReorderingType::INVALID;
+
+    bool any_absent = next_i == -1 || sibling_i == -1;
+    bool is_same = next_i == sibling_i;
+    bool already_in_place = next_i < sibling_i;
+
+    if (any_absent || is_same || already_in_place) {
+        on_reorder_signal.emit(next, sibling, ReorderingType::INVALID);
+        return;
+    }
+
+    std::shared_ptr<T> temp = next;
+    std::erase(m_data, next);
+
+    m_data.insert(std::next(m_data.begin(), sibling_i), next);
+    modify();
+    on_reorder_signal.emit(next, sibling, ReorderingType::BEFORE);
 }
 
 template <typename T>
@@ -185,6 +197,12 @@ bool ItemContainer<T>::modified() const {
         if (item->modified()) return true;
     }
     return m_modified;
+}
+
+template <typename T>
+    requires std::is_base_of_v<Item, T> && std::is_base_of_v<Modifiable, T>
+ssize_t ItemContainer<T>::size() const {
+    return m_data.size();
 }
 
 template <typename T>

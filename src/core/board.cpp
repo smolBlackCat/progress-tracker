@@ -11,6 +11,17 @@ namespace fs = std::filesystem;
 
 const std::string Board::BACKGROUND_DEFAULT = "rgba(0,0,0,1)";
 
+std::shared_ptr<Board> Board::create(const std::string& name,
+                                     const std::string& background) {
+    return std::shared_ptr<Board>(new Board{name, background});
+}
+
+std::shared_ptr<Board> Board::create(const std::string& name,
+                                     const std::string& background,
+                                     const xg::Guid& uuid) {
+    return std::shared_ptr<Board>(new Board{name, background, uuid});
+}
+
 BackgroundType Board::get_background_type(const std::string& background) {
     if (fs::exists(background)) {
         return BackgroundType::IMAGE;
@@ -19,7 +30,7 @@ BackgroundType Board::get_background_type(const std::string& background) {
 }
 
 Board::Board(const std::string& name, const std::string& background,
-             const xg::Guid uuid)
+             const xg::Guid& uuid)
     : Item{name, uuid}, m_background{background} {
     if (!fs::exists(m_background)) {
         // Ensures background color is valid RGBA code
