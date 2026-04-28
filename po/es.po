@@ -8,46 +8,47 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-14 18:19-0300\n"
-"PO-Revision-Date: 2024-05-10 20:17-0400\n"
+"PO-Revision-Date: 2026-04-25 11:05-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
 
 #: data/io.github.smolblackcat.Progress.desktop.in.in:3
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:4
 msgid "Progress"
-msgstr ""
+msgstr "Progress"
 
 #: data/io.github.smolblackcat.Progress.desktop.in.in:5
 msgid "Kanban style todo app"
-msgstr ""
+msgstr "Aplicación de tareas pendientes estilo Kanban"
 
 #: data/io.github.smolblackcat.Progress.desktop.in.in:7
 msgid "Kanban;Todo;Progress;"
-msgstr ""
+msgstr "Kanban;Tareas pendientes;Progress;"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:5
 msgid "Kanban board application"
-msgstr ""
+msgstr "Aplicación de tablero Kanban"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:29
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:44
 msgid "Dedicate a board for each of your projects"
-msgstr ""
+msgstr "Dedica un tablero a cada uno de tus proyectos"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:34
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:49
 msgid "Organize your tasks in your own way"
-msgstr ""
+msgstr "Organiza tus tareas a tu manera"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:39
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:54
 msgid "Fill your cards with adequate information"
-msgstr ""
+msgstr "Rellena tus tarjetas con la información necesaria"
 
 #: data/io.github.smolblackcat.Progress.metainfo.xml.in.in:59
 msgid ""
@@ -56,17 +57,21 @@ msgid ""
 "framework to organize tasks effectively while also being simple and easy to "
 "use."
 msgstr ""
+"Tanto si eres desarrollador de software, gestor de proyectos o simplemente "
+"alguien a quien le gusta llevar un seguimiento de sus objetivos personales, "
+"Progress te ofrece el marco esencial para organizar tus tareas de forma "
+"eficaz, sin dejar de ser una herramienta sencilla y fácil de usar."
 
 #: src/window.cpp:59
 #, c++-format
 msgid "{} board selected"
 msgid_plural "{} boards selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} tablero seleccionado"
+msgstr[1] "{} tableros seleccionados"
 
 #: src/window.cpp:63 src/window.cpp:251
 msgid "No board has been selected yet"
-msgstr ""
+msgstr "Aún no se ha seleccionado ninguna tablero"
 
 #: src/window.cpp:316
 msgid "De Moura © All rights reserved"
@@ -78,20 +83,20 @@ msgstr "haggen88"
 
 #: src/dialog/card-dialog.cpp:15
 msgid "Add Task"
-msgstr ""
+msgstr "Añadir tarea"
 
 #: src/dialog/card-dialog.cpp:189 src/widgets/task-widget.cpp:132
 msgid "New Task"
-msgstr ""
+msgstr "Nueva tarea"
 
 #: src/dialog/card-dialog.cpp:234 src/dialog/card-dialog.cpp:262
 #: src/resources/ui/card-details-dialog.ui:63
 msgid "Set Due Date"
-msgstr ""
+msgstr "Establecer fecha de vencimiento"
 
 #: src/dialog/board-dialog.cpp:53
 msgid "Select a file"
-msgstr "Seleccione un archivo"
+msgstr "Seleccione un archivoSeleccione un archivo"
 
 #: src/dialog/board-dialog.cpp:58
 msgid "Image Files"
@@ -99,7 +104,7 @@ msgstr "Archivos de imagen"
 
 #: src/dialog/create_board_dialog.cpp:10
 msgid "Create New Board"
-msgstr ""
+msgstr "Crear nuevo tablero"
 
 #: src/dialog/create_board_dialog.cpp:22
 #: src/dialog/preferences-board-dialog.cpp:67
@@ -108,7 +113,7 @@ msgstr "No se permiten nombres de tablero vacíos"
 
 #: src/dialog/preferences-board-dialog.cpp:15
 msgid "Board Preferences"
-msgstr ""
+msgstr "Preferencias del tablero"
 
 #: src/dialog/preferences-board-dialog.cpp:16
 msgid "Save"
@@ -140,7 +145,7 @@ msgstr "Eliminar Tableros"
 
 #: src/resources/ui/app-window.ui:120 src/resources/ui/app-window.ui:136
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Atajos de teclado"
 
 #: src/resources/ui/app-window.ui:124 src/resources/ui/app-window.ui:140
 msgid "About Progress"
@@ -152,163 +157,169 @@ msgstr "Editar tablero"
 
 #: src/resources/ui/app-window.ui:154
 msgid "Board Grid View"
-msgstr ""
+msgstr "Vista en cuadrícula del tablero"
 
 #: src/resources/ui/app-window.ui:160
 msgid "Allows the user the user to delete boards by selecting them"
-msgstr ""
+msgstr "Permite al usuario eliminar tableros seleccionándolos"
 
 #: src/resources/ui/app-window.ui:162
 msgid "Enable deletion"
-msgstr ""
+msgstr "Habilitar eliminación"
 
 #: src/resources/ui/app-window.ui:168
 msgid "Open dialog to create a new board"
-msgstr ""
+msgstr "Abrir el cuadro de diálogo para crear un nuevo tablero"
 
 #: src/resources/ui/app-window.ui:175
 msgid "Board View"
-msgstr ""
+msgstr "Vista del tablero"
 
 #: src/resources/ui/app-window.ui:180
 msgid "Open preferences dialog"
-msgstr ""
+msgstr "Abrir el cuadro de diálogo de preferencias"
 
 #: src/resources/ui/app-window.ui:186
 msgid "Automatically save the board and head to the board grid view"
 msgstr ""
+"Guarda automáticamente el tablero y ve a la vista de cuadrícula del tablero"
 
 #: src/resources/ui/app-window.ui:187
 msgid "Go home"
-msgstr ""
+msgstr "Inicio"
 
 #: src/resources/ui/app-window.ui:194
 msgid "Card Shortcuts"
-msgstr ""
+msgstr "Atajos de tarjeta"
 
 #: src/resources/ui/app-window.ui:199
 msgid "Add a new card next to the focused card"
-msgstr ""
+msgstr "Agrega una nueva tarjeta junto a la tarjeta seleccionada"
 
 #: src/resources/ui/app-window.ui:205
 msgid "It opens a dialog presenting the card extra settings"
 msgstr ""
+"Abre un cuadro de diálogo que muestra la configuración adicional de la "
+"tarjeta"
 
 #: src/resources/ui/app-window.ui:206
 msgid "See card details"
-msgstr ""
+msgstr "Ver detalles de la tarjeta"
 
 #: src/resources/ui/app-window.ui:212
 msgid "Rename card"
-msgstr ""
+msgstr "Cambiar el nombre de la tarjeta"
 
 #: src/resources/ui/app-window.ui:218
 msgid "Opens a color dialog so the user can set the card's cover's color"
 msgstr ""
+"Abre un cuadro de diálogo de colores para que el usuario pueda configurar el "
+"color de la portada de la tarjeta"
 
 #: src/resources/ui/app-window.ui:219
 msgid "Set color"
-msgstr ""
+msgstr "Establecer color"
 
 #: src/resources/ui/app-window.ui:225
 msgid "Deletes current focused card"
-msgstr ""
+msgstr "Elimina la tarjeta seleccionada"
 
 #: src/resources/ui/app-window.ui:231
 msgid "Reorder card within cardlist"
-msgstr ""
+msgstr "Reordenar la tarjeta dentro de la lista de tarjetas"
 
 #: src/resources/ui/app-window.ui:237
 msgid "Moves a card to previous or next cardlist"
-msgstr ""
+msgstr "Mueve una tarjeta a la lista anterior o siguiente"
 
 #: src/resources/ui/app-window.ui:244
 msgid "Cardlist Shortcuts"
-msgstr ""
+msgstr "Accesos directos a la lista de cartas"
 
 #: src/resources/ui/app-window.ui:249
 msgid "Rename the focused cardlist"
-msgstr ""
+msgstr "Cambiar el nombre de la lista de tarjetas seleccionada"
 
 #: src/resources/ui/app-window.ui:255
 msgid "Add a new cardlist next to the focused cardlist"
 msgstr ""
+"Añadir una nueva lista de tarjetas junto a la lista de cartas seleccionada"
 
 #: src/resources/ui/app-window.ui:261
 msgid "Deletes cardlist from board"
-msgstr ""
+msgstr "Elimina la lista de tarjetas del tablero"
 
 #: src/resources/ui/app-window.ui:267
 msgid "Move cardlist across the board"
-msgstr ""
+msgstr "Mover la lista de tarjetas por todo el tablero"
 
 #: src/resources/ui/app-window.ui:274
 msgid "Task Shortcuts"
-msgstr ""
+msgstr "Atajos de tareas"
 
 #: src/resources/ui/app-window.ui:279
 msgid "Rename task"
-msgstr ""
+msgstr "Cambiar el nombre de la tarea"
 
 #: src/resources/ui/app-window.ui:285
 msgid "Add new task next to focused task"
-msgstr ""
+msgstr "Añadir una nueva tarea junto a la tarea seleccionada"
 
 #: src/resources/ui/app-window.ui:291
 msgid "Delete task from card"
-msgstr ""
+msgstr "Eliminar tarea de la tarjeta"
 
 #: src/resources/ui/app-window.ui:297
 msgid "Convert task to card"
-msgstr ""
+msgstr "Convertir tarea en tarjeta"
 
 #: src/resources/ui/app-window.ui:303
 msgid "Move task across the checklist"
-msgstr ""
+msgstr "Mover la tarea en la lista de verificación"
 
 #: src/resources/ui/card-details-dialog.ui:39
 msgid "Card Title"
-msgstr ""
+msgstr "Título de la tarjeta"
 
 #: src/resources/ui/card-details-dialog.ui:55
 msgid "Deadline"
-msgstr ""
+msgstr "Fecha límite"
 
 #: src/resources/ui/card-details-dialog.ui:72
 msgid "Unset Due Date"
-msgstr ""
+msgstr "Fecha de vencimiento no establecida"
 
 #: src/resources/ui/card-details-dialog.ui:91
 msgid "Mark this card complete"
-msgstr ""
+msgstr "Marca esta tarjeta como completada"
 
 #: src/resources/ui/card-details-dialog.ui:108
 msgid "Checklist"
-msgstr ""
+msgstr "Lista de verificación"
 
 #: src/resources/ui/card-details-dialog.ui:142 src/widgets/card-widget.cpp:642
 msgid "Notes"
-msgstr ""
+msgstr "Notas"
 
 #: src/resources/ui/card-details-dialog.ui:175
 msgid "Delete Card"
-msgstr ""
+msgstr "Eliminar tarjeta"
 
 #: src/resources/ui/card-details-dialog.ui:186 src/widgets/card-widget.cpp:205
 msgid "Card Details"
-msgstr ""
+msgstr "Detalles de la tarjeta"
 
 #: src/resources/ui/board-dialog.ui:34
 msgid "Board Title"
-msgstr ""
+msgstr "Título del tablero"
 
 #: src/resources/ui/board-dialog.ui:53
 msgid "Board Background"
-msgstr ""
+msgstr "Fondo del tablero"
 
 #: src/resources/ui/board-dialog.ui:76
 msgid "Click to set a board background"
-msgstr ""
+msgstr "Haz clic para establecer un fondo de tablero"
 
 #: src/resources/ui/board-dialog.ui:88
 msgid "Create Board"
@@ -316,11 +327,11 @@ msgstr "Crear tablero"
 
 #: src/resources/ui/board-dialog.ui:101
 msgid "Set Color"
-msgstr ""
+msgstr "Establecer color"
 
 #: src/resources/ui/board-dialog.ui:105
 msgid "Set Image"
-msgstr ""
+msgstr "Establecer imagen"
 
 #: src/widgets/board-widget.cpp:21 src/widgets/board-widget.cpp:56
 msgid "Add List"
@@ -332,67 +343,67 @@ msgstr "Nueva lista de tarjetas"
 
 #: src/widgets/card-widget.cpp:34
 msgid "Unset Color"
-msgstr ""
+msgstr "Color no establecido"
 
 #: src/widgets/card-widget.cpp:36
 msgid "Blue"
-msgstr ""
+msgstr "Azul"
 
 #: src/widgets/card-widget.cpp:38
 msgid "Red"
-msgstr ""
+msgstr "Rojo"
 
 #: src/widgets/card-widget.cpp:40
 msgid "Orange"
-msgstr ""
+msgstr "Naranjo"
 
 #: src/widgets/card-widget.cpp:42
 msgid "Green"
-msgstr ""
+msgstr "Verde"
 
 #: src/widgets/card-widget.cpp:44
 msgid "Yellow"
-msgstr ""
+msgstr "Amarillo"
 
 #: src/widgets/card-widget.cpp:46
 msgid "Purple"
-msgstr ""
+msgstr "Púrpura"
 
 #: src/widgets/card-widget.cpp:116
 msgid "<b>%1 day</b> remaining"
 msgid_plural "<b>%1 days</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 día</b> restante"
+msgstr[1] "<b>%1 día</b> restantes"
 
 #: src/widgets/card-widget.cpp:125
 msgid "<b>%1 month</b> remaining"
 msgid_plural "<b>%1 months</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 mes</b> restante"
+msgstr[1] "<b>%1 meses</b> restantes"
 
 #: src/widgets/card-widget.cpp:134
 msgid "<b>%1 year</b> remaining"
 msgid_plural "<b>%1 years</b> remaining"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<b>%1 año</b> restante"
+msgstr[1] "<b>%1 años</b> restantes"
 
 #: src/widgets/card-widget.cpp:141
 msgid "This card is past due date <b>%1 day ago</b>"
 msgid_plural "This card is past due date <b>%1 days ago</b>"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Esta tarjeta lleva <b>%1 día de retraso</b>"
+msgstr[1] "Esta tarjeta lleva <b>%1 días de retraso</b>"
 
 #: src/widgets/card-widget.cpp:152
 msgid "This card is past due date <b>%1 month</b> ago"
 msgid_plural "This card is past due date <b>%1 months</b> ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Esta tarjeta lleva <b>%1 mes de retraso</b>"
+msgstr[1] "Esta tarjeta lleva <b>%1 meses de retraso</b>"
 
 #: src/widgets/card-widget.cpp:163
 msgid "This card is past due date <b>%1 year</b> ago"
 msgid_plural "This card is past due date <b>%1 years</b> ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Esta tarjeta lleva vencida <b>%1 año</b>"
+msgstr[1] "Esta tarjeta lleva vencida <b>%1 años</b>"
 
 #: src/widgets/card-widget.cpp:200 src/widgets/editable-label-header.cpp:78
 #: src/widgets/task-widget.cpp:73
@@ -411,23 +422,23 @@ msgstr "Nueva tarjeta"
 
 #: src/widgets/card-widget.cpp:496 src/widgets/card-widget.cpp:547
 msgid "Due: "
-msgstr ""
+msgstr "Fecha de entrega: "
 
 #: src/widgets/card-widget.cpp:621
 msgid "%1%% complete"
-msgstr ""
+msgstr "%1%% completo"
 
 #: src/widgets/card-widget.cpp:633
 msgid "This card is complete"
-msgstr ""
+msgstr "Esta tarjeta está completa"
 
 #: src/widgets/card-widget.cpp:635
 msgid "The card is due today"
-msgstr ""
+msgstr "La tarjeta vence hoy"
 
 #: src/widgets/card-widget.cpp:906
 msgid "Card Options"
-msgstr ""
+msgstr "Opciones de tarjeta"
 
 #: src/widgets/cardlist-widget.cpp:37
 msgid "Add card"
@@ -435,11 +446,11 @@ msgstr "Añadir tarjeta"
 
 #: src/widgets/cardlist-widget.cpp:97
 msgid "New Cardlist"
-msgstr ""
+msgstr "Nueva lista de tarjetas"
 
 #: src/widgets/task-widget.cpp:75
 msgid "Convert to card"
-msgstr ""
+msgstr "Convertir en tarjeta"
 
 #~ msgid "It was not possible to load this board"
 #~ msgstr "No ha sido posible cargar este tablero"
