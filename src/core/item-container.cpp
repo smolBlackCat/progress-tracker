@@ -37,8 +37,13 @@ void ItemContainer<T>::insert_after(std::shared_ptr<T>& item,
                                     std::shared_ptr<T>& sibling) {
     ssize_t index = -1;
     ssize_t c = 0;
-    for (const auto& item : m_data) {
-        if (item == sibling) {
+    for (const auto& item_ : m_data) {
+
+        if (item_ == item) {
+            return;
+        }
+
+        if (item_ == sibling) {
             index = c;
             break;
         }
@@ -63,8 +68,13 @@ void ItemContainer<T>::insert_before(std::shared_ptr<T>& item,
                                      std::shared_ptr<T>& sibling) {
     ssize_t index = -1;
     ssize_t c = 0;
-    for (const auto& item : m_data) {
-        if (item == sibling) {
+    for (const auto& item_ : m_data) {
+
+        if (item_ == item) {
+            return;
+        }
+
+        if (item_ == sibling) {
             index = c;
             break;
         }
