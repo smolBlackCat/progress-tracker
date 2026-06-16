@@ -1,9 +1,18 @@
 #include "task.h"
 
+std::shared_ptr<Task> Task::create(const std::string& name, bool done) {
+    return std::shared_ptr<Task>(new Task{name, done});
+}
+
+std::shared_ptr<Task> Task::create(const std::string& name,
+                                   const xg::Guid& uuid, bool done) {
+    return std::shared_ptr<Task>(new Task{name, uuid, done});
+}
+
 Task::Task(const std::string& name, bool done)
     : Item{name, xg::newGuid()}, m_done{done} {}
 
-Task::Task(const std::string& name, const xg::Guid uuid, bool done)
+Task::Task(const std::string& name, const xg::Guid& uuid, bool done)
     : Item{name, uuid}, m_done{done} {}
 
 bool Task::get_done() const { return m_done; }

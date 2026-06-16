@@ -24,8 +24,9 @@ public:
      * @param complete completion status of the card
      * @param color color of the card
      */
-    Card(const std::string& name, const Date& date, bool complete = false,
-         const Color& color = NO_COLOR);
+    static std::shared_ptr<Card> create(const std::string& name,
+                                        const Date& date, bool complete = false,
+                                        const Color& color = NO_COLOR);
 
     /**
      * @brief Card constructor
@@ -36,8 +37,10 @@ public:
      * @param complete completion status of the card
      * @param color color of the card
      */
-    Card(const std::string& name, const Date& date, const xg::Guid uuid,
-         bool complete = false, const Color& color = NO_COLOR);
+    static std::shared_ptr<Card> create(const std::string& name,
+                                        const Date& date, const xg::Guid uuid,
+                                        bool complete = false,
+                                        const Color& color = NO_COLOR);
 
     /**
      * @brief Card constructor
@@ -45,7 +48,8 @@ public:
      * @param name name of the card
      * @param color color of the card
      */
-    Card(const std::string& name, const Color& color = NO_COLOR);
+    static std::shared_ptr<Card> create(const std::string& name,
+                                        const Color& color = NO_COLOR);
 
     /**
      * @brief Card constructor
@@ -54,9 +58,11 @@ public:
      * @param uuid unique identifier of the card
      * @param color color of the card
      */
-    Card(const std::string& name, const xg::Guid uuid,
-         const Color& color = NO_COLOR);
+    static std::shared_ptr<Card> create(const std::string& name,
+                                        const xg::Guid uuid,
+                                        const Color& color = NO_COLOR);
 
+    Card() = delete;
     ~Card() override;
 
     void set_name(const std::string& name) override;
@@ -142,6 +148,47 @@ public:
     sigc::signal<void(bool)>& signal_complete();
 
 protected:
+    /**
+     * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param date deadline date of the card
+     * @param complete completion status of the card
+     * @param color color of the card
+     */
+    Card(const std::string& name, const Date& date, bool complete = false,
+         const Color& color = NO_COLOR);
+
+    /**
+     * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param date deadline date of the card
+     * @param uuid unique identifier of the card
+     * @param complete completion status of the card
+     * @param color color of the card
+     */
+    Card(const std::string& name, const Date& date, const xg::Guid uuid,
+         bool complete = false, const Color& color = NO_COLOR);
+
+    /**
+     * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param color color of the card
+     */
+    Card(const std::string& name, const Color& color = NO_COLOR);
+
+    /**
+     * @brief Card constructor
+     *
+     * @param name name of the card
+     * @param uuid unique identifier of the card
+     * @param color color of the card
+     */
+    Card(const std::string& name, const xg::Guid uuid,
+         const Color& color = NO_COLOR);
+
     std::string m_notes;
     ItemContainer<Task> m_tasks;
     Date m_due_date;

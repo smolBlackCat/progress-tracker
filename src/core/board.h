@@ -20,6 +20,12 @@ class BoardManager;
  */
 class Board : public Item, public Modifiable {
 public:
+    static std::shared_ptr<Board> create(const std::string& name,
+                                  const std::string& background);
+    static std::shared_ptr<Board> create(const std::string& name,
+                                  const std::string& background,
+                                  const xg::Guid& uuid);
+
     /**
      * @brief Returns the type of a given background
      *
@@ -31,12 +37,8 @@ public:
     static const std::string BACKGROUND_DEFAULT;
 
     friend BoardManager;
-    friend std::shared_ptr<Board> unitialized_board(const std::string& filename);
-
-    Board() = delete;
-    Board(const std::string& name, const std::string& background);
-    Board(const std::string& name, const std::string& background,
-          const xg::Guid uuid);
+    friend std::shared_ptr<Board> unitialized_board(
+        const std::string& filename);
 
     ~Board();
 
@@ -81,6 +83,11 @@ public:
     sigc::signal<void(std::string)>& signal_description();
 
 protected:
+    Board() = delete;   
+    Board(const std::string& name, const std::string& background);
+    Board(const std::string& name, const std::string& background,
+          const xg::Guid& uuid);
+
     std::string m_background, m_description;
     time_point<system_clock, seconds> m_last_modified;
     ItemContainer<CardList> m_cardlists;

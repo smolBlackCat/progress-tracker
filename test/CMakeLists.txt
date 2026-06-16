@@ -1,5 +1,6 @@
 list(APPEND TEST_EXECUTABLES
     board-test
+    container-test
     cardlist-test
     card-test
     colorable-test

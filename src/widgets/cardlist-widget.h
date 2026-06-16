@@ -1,7 +1,5 @@
 #pragma once
 
-#include <core/card.h>
-#include <core/cardlist.h>
 #include <glibmm/extraclassinit.h>
 #include <gtkmm.h>
 
@@ -35,12 +33,12 @@ public:
      * @brief CardlistWidget constructor
      *
      * @param parent_board BoardWidget reference
-     * @param cardlist CardList data
-     * @param editing_mode Boolean indicating whether the card list widget
-     * should start in editing mode. Default is false.
+     *
+     * @param title cardlist's title
      */
-    CardlistWidget(BoardWidget& parent_board,
-                   const std::shared_ptr<CardList>& cardlist);
+    CardlistWidget(BoardWidget& parent_board, const std::string& title);
+
+    void set_title(const std::string& title);
 
     /**
      * @brief Reorders card widget "next" after card widget "sibling".
@@ -50,64 +48,47 @@ public:
      */
     void reorder(ui::CardWidget& next, ui::CardWidget& sibling);
 
+    void remove(CardWidget& card);
+
     /**
-     * @brief Removes CardWidget instance
+     * @brief Adds a card widget to the end of the cardlist widget. This method
+     * will not do anything if the card has a parent
      *
-     * @param card CardWidget reference to remove
+     * @param card card widget
      */
-    void remove(ui::CardWidget& card);
+    void append(CardWidget& card);
+    void insert_after(CardWidget& card, CardWidget& sibling);
 
     /**
-     * @brief Appends a CardWidget object reference.
+     * @brief Adds a card widget to the end of the cardlist widget. This method
+     * differs from append in that it accepts cards with their defined parents
      */
-    void append(ui::CardWidget& card);
+    void receive(CardWidget& card);
 
     /**
-     * @brief appends a new card object to the underlying cardlist object and a
-     * CardWidget object
-     */
-    ui::CardWidget* append_new_card(const Card& card);
-
-    ui::CardWidget* insert_new_card_after(const Card& card,
-                                          ui::CardWidget* sibling);
-
-    /**
-     * @brief Determines whether this CardlistWidget instance is the given
-     * CardWidget instance's parent
+     * @brief Adds a card from another cardlist after another card in this
+     * cardlist. The visitor card must necessarily belong to another cardlist
      *
-     * @param card CardWidget instance reference
-     *
-     * @return True if this instance is card's parent, otherwise false
+     * @param card visitor card
+     * @param sibling card which visitor card is placed after
      */
+    void receive_after(CardWidget& card, CardWidget& sibling);
+
+    const std::string& get_name() const;
+
     bool is_child(ui::CardWidget& card);
 
-    /**
-     * @brief Access the card widgets tracker vector.
-     *
-     * @return Reference to the vector of CardWidget pointers.
-     */
-    const std::vector<ui::CardWidget*>& cards();
-
-    /**
-     * @brief Retrieves the underlying CardList smart pointer.
-     *
-     * @return Reference to the CardList smart pointer.
-     */
-    const std::shared_ptr<CardList>& cardlist();
-
-    sigc::signal<void(CardWidget*)>& signal_card_added();
+    sigc::signal<void(std::string, std::string)>& signal_name_changed();
+    sigc::signal<void(CardWidget*, int)>& signal_card_added();
     sigc::signal<void(CardWidget*)>& signal_card_removed();
+    sigc::signal<void(CardWidget*, CardWidget*, bool)>& signal_card_reorder();
+    sigc::signal<void(CardWidget*, CardlistWidget*, CardWidget*)>&
+    signal_card_received();
 
     BoardWidget& board;
 
 protected:
-    CardWidget* __add(const std::shared_ptr<Card>& card);
-
-    /**
-     * @brief Sets up drag and drop functionality for the card list widget.
-     */
     void setup_drag_and_drop();
-
     void cleanup() override;
 
     // Widgets
@@ -117,16 +98,25 @@ protected:
     Gtk::PopoverMenu m_popover;
     Gtk::Box m_root;
 
-    // Data
-    std::shared_ptr<CardList> m_cardlist;
-    std::vector<ui::CardWidget*> m_cards;
-
     // Signals
-    sigc::signal<void(CardWidget*)> add_card_signal;
-    sigc::signal<void(CardWidget*)> remove_card_signal;
+    sigc::signal<void(std::string, std::string)> m_name_changed_signal;
 
-    ssize_t card_index = 0;
+    sigc::signal<void(CardWidget*, int)> m_card_add_signal;
+    sigc::signal<void(CardWidget*)> m_card_remove_signal;
+
+    /**
+     * void(next, sibling, up)
+     *
+     * `up` is a bit flag that indicates whether the next is put before or after
+     * the sibling. This bit is true if and only if next is placed before
+     * sibling, otherwise false.*/
+    sigc::signal<void(CardWidget*, CardWidget*, bool)> m_card_reorder_signal;
+
+    // void(incoming_card, incoming_from, sibling)
+    sigc::signal<void(CardWidget*, CardlistWidget*, CardWidget*)>
+        m_card_received_signal;
+
+    // Data
+    std::string m_name;
 };
-
 }  // namespace ui
-

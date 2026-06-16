@@ -3,8 +3,6 @@
 #include <core/card.h>
 #include <gtkmm.h>
 
-#include <memory>
-
 #include "base-item.h"
 #include "cardlist-widget.h"
 #include "glibmm/extraclassinit.h"
@@ -37,21 +35,47 @@ public:
 
     const static std::array<std::string, 3> DATE_LABEL_CSS_CLASSES;
 
-    const static std::map<CoverColor, Gdk::RGBA> CARD_COLORS;
+    const static std::unordered_map<CoverColor, Gdk::RGBA> CARD_COLORS;
+
+    /**
+     * @brief Helper method for creating a tooltip text for the card widget.
+     *
+     * @return the tooltip text string.
+     */
+    static std::string card_widget_tooltip_text(int n_task = 0,
+                                                int n_tasks_complete = 0,
+                                                Glib::Date deadline = {},
+                                                bool complete = false,
+                                                const std::string& notes = {});
 
     /**
      * @brief Constructs a CardWidget object.
      *
-     * @param card a smart pointer pointing to a Card object.
+     * @param title card's title
+     *
+     * @param cover_color card's cover color
+     *
+     * @param deadline card's deadline. When deadline is a valid date
+     * representation, the set complete value is valid.
+     *
+     * @param complete flags whether the card is marked as complete. This flag
+     * is only considered if a deadline is set, othewise it will be ignored
+     *
+     * @param n_tasks number of tasks related to this card
+     *
+     * @param n_tasks_complete number of tasks complete. Cannot be greater than
+     * the amount of tasks
      */
-    CardWidget(std::shared_ptr<Card> card);
+    CardWidget(const std::string& title, Gdk::RGBA cover_color = {},
+               Glib::Date deadline = {}, bool complete = false, int n_tasks = 0,
+               int n_tasks_complete = 0);
 
     /**
      * @brief Sets the title of the card.
      *
      * @param label new title for the card.
      */
-    void set_title(const std::string& label);
+    void set_title(const std::string& title);
 
     /**
      * @brief Sets a new parent to this card.
@@ -65,60 +89,53 @@ public:
      *
      * @param color rgba object representing the color.
      */
-    void set_cover_color(CoverColor color);
+    void set_cover_color(Gdk::RGBA color);
 
     /**
      * @brief Sets the card deadline
+     *
+     * @param new_date card's deadline
+     * @param complete whether the card should be marked as complete
      */
-    void set_deadline(const Date& new_date);
+    void set_deadline_label(const Glib::Date& new_date = {},
+                            bool complete = false);
+
+    /**
+     * @param Sets the completion label visible and sets the ratio of
+     * complete/tasks as a label
+     */
+    void set_completion_label(int n_tasks, int n_tasks_complete);
+
+    /**
+     * @param Marks this card as complete. This method only has effect if there
+     * is a deadline set
+     */
+    void set_complete(bool complete = true);
+
+    /**
+     * @brief Updates the deadline label if and only if a deadline is set
+     */
+    void update_deadline_label();
 
     /**
      * @brief Removes itself from the associated CardlistWidget object.
      */
     void remove_from_parent();
 
-    /**
-     * @brief Changes the due date label color depending on the card's
-     * situation. Red if it is past due date, green if it is complete and plain
-     * color if it is due but not yet complete.
-     */
-    void update_deadline_label();
-
-    /**
-     * @brief Updates the label informing the number of complete tasks for this
-     * card.
-     */
-    void update_completion_label();
-
-    /**
-     * @brief Retrieves the title of the card.
-     *
-     * @return the card's title string.
-     */
     std::string get_title() const;
 
-    /**
-     * @brief Helper method for creating a tooltip text for the card widget.
-     *
-     * @return the tooltip text string.
-     */
-    std::string create_details_text() const;
+    Gdk::RGBA get_cover_color() const;
 
-    /**
-     * @brief Retrieves the underlying Card object from which this widget
-     * represents.
-     *
-     * @return shared pointer to the Card object.
-     */
-    std::shared_ptr<Card> get_card();
+    bool get_complete() const;
+    bool is_deadline_set() const;
 
-    /**
-     * @brief Retrieves the CardlistWidget from which this widget is associated
-     * with.
-     *
-     * @return pointer to the associated CardlistWidget.
-     */
-    CardlistWidget const* get_cardlist_widget() const;
+    CardlistWidget* parent() const;
+
+    sigc::signal<void(std::string, std::string)>& signal_name_changed();
+    sigc::signal<void(Gdk::RGBA, Gdk::RGBA)>& signal_color_changed();
+    sigc::signal<void(CardWidget*, CardlistWidget*)>& signal_card_received();
+    sigc::signal<void()>& signal_card_dialog_opened();
+    sigc::signal<void()>& signal_card_dialog_closed();
 
 protected:
     /** @brief Implements the card's popover menu
@@ -180,6 +197,7 @@ protected:
 
     friend class CardPopover;
 
+    // Widgets
     Gtk::Box m_root;
     Gtk::Revealer m_card_cover_revealer, m_card_entry_revealer;
     Gtk::Picture m_card_cover_picture;
@@ -188,22 +206,25 @@ protected:
     Gtk::MenuButton m_card_menu_button;
     CardPopover m_fixed_card_popover, m_mouse_card_popover;
 
+    // Signals
+    sigc::signal<void(std::string, std::string)> m_name_changed_signal;
+    sigc::signal<void(Gdk::RGBA, Gdk::RGBA)> m_color_changed_signal;
+
+    // incoming_card, sibling, incoming_parent
+    sigc::signal<void(CardWidget*, CardlistWidget*)> m_card_received_signal;
+
+    // Controllers
     Glib::RefPtr<Gtk::EventControllerFocus> m_focus_ctrl;
     Glib::RefPtr<Gtk::EventControllerKey> m_key_ctrl;
     Glib::RefPtr<Gtk::GestureClick> m_click_ctrl;
 
-    ui::CardlistWidget* m_cardlist_widget;
-    std::shared_ptr<Card> m_card;
+    Glib::Date m_date;
+    Gdk::RGBA m_color;
+    bool m_complete;
+    ui::CardlistWidget* m_parent;
 
-    /**
-     * @brief Sets up drag and drop functionality for the card widget.
-     */
     void setup_drag_and_drop();
-
-    /**
-     * @brief Opens the card details dialog.
-     */
-    void open_card_details_dialog();
+    void open_card_dialog();
 
     /**
      * @brief Enables renaming of the card.
@@ -227,7 +248,7 @@ protected:
      *
      * @param n_complete_tasks number of completed tasks.
      */
-    void set_completion_label_color(unsigned long n_complete_tasks);
+    void update_completion_label(int n_tasks, int n_tasks_complete);
 
     void cleanup() override;
 
@@ -236,5 +257,4 @@ private:
     void __set_cover_color(const Gdk::RGBA& color);
     void __clear_cover_color();
 };
-
 }  // namespace ui

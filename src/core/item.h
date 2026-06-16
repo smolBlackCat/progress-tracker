@@ -4,12 +4,6 @@
 #include <guid.hpp>
 #include <string>
 
-enum class ReorderingType {
-    UPDOWN,
-    DOWNUP,
-    INVALID,
-};
-
 /**
  * @class Item
  *

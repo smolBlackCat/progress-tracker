@@ -8,10 +8,10 @@
 #include <format>
 
 #include "cardlist-widget.h"
-#include "core/colorable.h"
 
+namespace ui {
 #ifdef WIN32
-ui::BoardWidget::BoardWidget(BoardManager& manager)
+BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
       m_manager{manager},
@@ -40,8 +40,11 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.set_spacing(25);
     m_root.set_margin(10);
 
-    m_add_button.signal_clicked().connect(
-        [this]() { add_new_cardlist(CardList{_("New CardList")}, false); });
+    m_add_button.signal_clicked().connect([this]() {
+        CardlistWidget* new_cardlist =
+            Gtk::make_managed<CardlistWidget>(*this, _("New CardList"));
+        append(*new_cardlist);
+    });
     m_add_button.set_valign(Gtk::Align::START);
     m_add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
     m_add_button.add_css_class("opaque");
@@ -49,10 +52,9 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.append(m_add_button);
 }
 #else
-ui::BoardWidget::BoardWidget(BoardManager& manager)
+BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
-      m_manager{manager},
       m_add_button{_("Add List")},
       m_css_provider{Gtk::CssProvider::create()} {
     Gtk::StyleProvider::add_provider_for_display(
@@ -69,8 +71,12 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
     m_root.set_spacing(25);
     m_root.set_margin(10);
 
-    m_add_button.signal_clicked().connect(
-        [this]() { add_new_cardlist(CardList{_("New CardList")}, false); });
+    m_add_button.signal_clicked().connect([this]() {
+        CardlistWidget* new_cardlist =
+            Gtk::make_managed<CardlistWidget>(*this, _("New CardList"));
+        append(*new_cardlist);
+    });
+
     m_add_button.set_valign(Gtk::Align::START);
     m_add_button.set_size_request(CardlistWidget::CARDLIST_MAX_WIDTH);
     m_add_button.add_css_class("opaque");
@@ -79,241 +85,26 @@ ui::BoardWidget::BoardWidget(BoardManager& manager)
 }
 #endif
 
-void ui::BoardWidget::set(const std::shared_ptr<Board>& board) {
-    if (board) {
-        this->m_board = board;
-        __set_background(board->get_background());
-
-        m_connections.emplace_back(board->signal_background().connect(
-            sigc::mem_fun(*this, &BoardWidget::__set_background)));
-    }
-}
-
-void ui::BoardWidget::set_name(const std::string& board_name) {
-    if (m_board) {
-        m_board->set_name(board_name);
-    }
-}
-
-void ui::BoardWidget::set_background(const std::string& background) {
-    BackgroundType bg_type = Board::get_background_type(background);
-    if (bg_type == BackgroundType::COLOR) {
-        m_board->set_background(string_to_color(background));
-    } else if (bg_type == BackgroundType::IMAGE) {
-        m_board->set_background(background);
-    }
-}
-
-void ui::BoardWidget::append(CardlistWidget& child) {
-    m_cardlists.push_back(&child);
-
-    m_root.append(child);
-    m_root.reorder_child_after(m_add_button, child);
-
-    m_add_cardlist_signal.emit(&child);
-}
-
-void ui::BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
-    ReorderingType reordering =
-        m_board->container().reorder(*next.cardlist(), *sibling.cardlist());
-
-    switch (reordering) {
-        case ReorderingType::DOWNUP: {
-            auto sibling_sibling = sibling.get_prev_sibling();
-            if (!sibling_sibling) {
-                m_root.reorder_child_at_start(next);
-            } else {
-                m_root.reorder_child_after(next, *sibling_sibling);
-            }
-
-            spdlog::get("app")->info(
-                "Reordered Card list (\"{}\") before Card list (\"{}\")",
-                next.cardlist()->get_name(), sibling.cardlist()->get_name());
-            break;
-        }
-        case ReorderingType::UPDOWN: {
-            m_root.reorder_child_after(next, sibling);
-            spdlog::get("app")->info(
-                "Reordered Card list (\"{}\") after Card list (\"{}\")",
-                next.cardlist()->get_name(), sibling.cardlist()->get_name());
-            break;
-        }
-        case ReorderingType::INVALID: {
-            spdlog::get("app")->warn(
-                "[BoardWidget.reorder] Cannot reorder (\"{}\") and (\"{}\")",
-                next.cardlist()->get_name(), sibling.cardlist()->get_name());
-            break;
-        }
-    }
-}
-
-void ui::BoardWidget::remove(ui::CardlistWidget& cardlist) {
-    spdlog::get("app")->info("Removed CardList (\"{}\")",
-                             cardlist.cardlist()->get_name());
-
-    Gtk::Widget* prev_clist = cardlist.get_prev_sibling();
-    Gtk::Widget* next_clist = cardlist.get_next_sibling();
-    if (prev_clist) {
-        prev_clist->grab_focus();
-    } else if (next_clist && !G_TYPE_CHECK_INSTANCE_TYPE(
-                                 next_clist->gobj(), Gtk::Button::get_type())) {
-        next_clist->grab_focus();
-    }
-
-    m_root.remove(cardlist);
-    std::erase(m_cardlists, &cardlist);
-
-    m_board->container().remove(*cardlist.cardlist());
-}
-
-void ui::BoardWidget::clear() {
-    std::for_each(m_connections.begin(), m_connections.end(),
-                  [](auto& connection) { connection.disconnect(); });
-    m_scrolling_cnn.disconnect();
-    m_connections.clear();
-
-    m_board = nullptr;
-}
-
-void ui::BoardWidget::save(bool clear_after_save) {
-    if (m_board->modified()) {
-        m_manager.local_save(m_board);
-    }
-
-    if (clear_after_save) {
-        clear();
-    }
-}
-
-void ui::BoardWidget::set_scroll(bool scroll) {
-    m_on_scroll = scroll;
-    m_scroll_signal.emit();
-}
-
-ui::CardlistWidget* ui::BoardWidget::add_new_cardlist(const CardList& cardlist,
-                                                      bool editing_mode) {
-    spdlog::get("app")->info("Added Card list (\"{}\")", cardlist.get_name());
-    return __add_cardlist(m_board->container().append(cardlist));
-}
-
-// FIXME: This was a workaround that should not exist. This method return
-// dangling pointers only to indicate that something was deleted, with no
-// practical use whatsoever
-ui::CardlistWidget* ui::BoardWidget::pop() {
-    if (m_cardlists.empty()) {
-        return nullptr;
-    }
-
-    auto cardlist = m_cardlists.back();
-    m_root.remove(*cardlist);
-    m_cardlists.pop_back();
-    return cardlist;
-}
-
-ui::CardlistWidget* ui::BoardWidget::insert_new_cardlist_after(
-    const CardList& cardlist, ui::CardlistWidget* sibling) {
-    auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(
-        *this,
-        m_board->container().insert_after(cardlist, *sibling->cardlist()));
-    m_cardlists.push_back(new_cardlist);
-    m_root.insert_child_after(*new_cardlist, *sibling);
-
-    m_add_cardlist_signal.emit(new_cardlist);
-
-    return new_cardlist;
-}
-
-std::string ui::BoardWidget::get_background() const {
-    return m_board->get_background();
-}
-
-std::string ui::BoardWidget::get_name() const { return m_board->get_name(); }
-
-bool ui::BoardWidget::scroll() const { return m_on_scroll; }
-
-bool ui::BoardWidget::empty() const { return m_cardlists.empty(); }
-
-std::shared_ptr<Board> ui::BoardWidget::board() const { return m_board; }
-
-sigc::signal<void(ui::CardlistWidget*)>&
-ui::BoardWidget::signal_cardlist_added() {
-    return m_add_cardlist_signal;
-}
-
-sigc::signal<void(ui::CardlistWidget*)>&
-ui::BoardWidget::signal_cardlist_removed() {
-    return m_remove_cardlist_signal;
-}
-
-sigc::signal<void()>& ui::BoardWidget::signal_scroll_changed() {
-    return m_scroll_signal;
-}
-
-void ui::BoardWidget::__setup_auto_scrolling() {
-    auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
-
-    drop_controller_motion_c->signal_motion().connect(
-        [this](double x, double y) {
-            this->m_x = x;
-            this->m_y = y;
-        });
-#ifdef WIN32
-    m_scr.add_controller(drop_controller_motion_c);
-#else
-    add_controller(drop_controller_motion_c);
-#endif
-
-    m_scroll_signal.connect(sigc::track_obj(
-        [this]() {
-            if (m_on_scroll) {
-                m_scrolling_cnn = Glib::signal_timeout().connect(
-                    [this]() {
-#ifdef WIN32
-                        double cur_max_width = m_scr.get_width();
-                        auto hadjustment = m_scr.get_hadjustment();
-#else
-                        double cur_max_width = get_width();
-                        auto hadjustment = get_hadjustment();
-#endif
-                        double lower = hadjustment->get_lower();
-                        double upper = hadjustment->get_upper();
-
-                        spdlog::get("app")->debug("Compute scrolling");
-
-                        if (m_x >= (cur_max_width * 0.8)) {
-                            double new_value =
-                                hadjustment->get_value() + SCROLL_SPEED_FACTOR;
-                            hadjustment->set_value(
-                                new_value >= upper ? upper : new_value);
-                        } else if (m_x <= (cur_max_width * 0.2)) {
-                            double new_value =
-                                hadjustment->get_value() - SCROLL_SPEED_FACTOR;
-                            hadjustment->set_value(
-                                new_value <= lower ? lower : new_value);
-                        }
-                        return true;
-                    },
-                    10);
-            } else {
-                m_scrolling_cnn.disconnect();
-            }
-        },
-        *this));
+void BoardWidget::set_name(const std::string& board_name) {
+    m_name_changed_signal.emit(m_name, board_name);
+    m_name = board_name;
 }
 
 #ifdef WIN32
-
-// FIXME: Unstable background setting on Windows
-void ui::BoardWidget::__set_background(const std::string& background) {
+void BoardWidget::set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
+            m_background_changed_signal.emit(m_background, background);
+            m_background = background;
             m_css_provider->load_from_data(
                 std::format(BOARD_BACKGROUND_RGB, background));
             m_picture.set_visible(false);
             break;
         }
         case BackgroundType::IMAGE: {
+            m_background_changed_signal.emit(m_background, background);
+            m_background = background;
             m_picture.set_filename(compressed_bg_filename(background));
             m_picture.set_visible(true);
             break;
@@ -325,16 +116,19 @@ void ui::BoardWidget::__set_background(const std::string& background) {
     }
 }
 #else
-
-void ui::BoardWidget::__set_background(const std::string& background) {
+void BoardWidget::set_background(const std::string& background) {
     BackgroundType bg_type = Board::get_background_type(background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
+            m_background_changed_signal.emit(m_background, background);
+            m_background = background;
             m_css_provider->load_from_data(
                 std::format(BOARD_BACKGROUND_RGB, background));
             break;
         }
         case BackgroundType::IMAGE: {
+            m_background_changed_signal.emit(m_background, background);
+            m_background = background;
             m_css_provider->load_from_data(std::format(
                 BOARD_BACKGROUND_IMAGE, compressed_bg_filename(background)));
             break;
@@ -348,14 +142,173 @@ void ui::BoardWidget::__set_background(const std::string& background) {
 }
 #endif
 
-ui::CardlistWidget* ui::BoardWidget::__add_cardlist(
-    const std::shared_ptr<CardList>& cardlist) {
-    auto new_cardlist = Gtk::make_managed<ui::CardlistWidget>(*this, cardlist);
-    m_cardlists.push_back(new_cardlist);
-    m_root.append(*new_cardlist);
-    m_root.reorder_child_after(m_add_button, *new_cardlist);
+void BoardWidget::append(CardlistWidget& child) {
+    m_root.append(child);
+    m_root.reorder_child_after(m_add_button, child);
 
-    m_add_cardlist_signal.emit(new_cardlist);
-
-    return new_cardlist;
+    m_cardlist_added_signal.emit(&child, -1);
 }
+
+void BoardWidget::insert_after(CardlistWidget& widget,
+                               CardlistWidget& sibling) {
+    ssize_t index = 0;
+    if (!sibling.get_next_sibling()) {
+        index = -1;
+    } else {
+        for (Gtk::Widget* cardlist = m_root.get_first_child();
+             cardlist && cardlist != &sibling;
+             (cardlist = cardlist->get_next_sibling(), index++));
+    }
+
+    m_root.insert_child_after(widget, sibling);
+    m_cardlist_added_signal.emit(&widget, index);
+}
+
+void BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
+
+    ssize_t c_i = 0;
+    for (Gtk::Widget* cardlist = m_root.get_first_child(); cardlist;
+         cardlist = cardlist->get_next_sibling()) {
+        if (&next == cardlist) {
+            next_i = c_i;
+        } else if (&sibling == cardlist) {
+            sibling_i = c_i;
+        }
+        c_i++;
+    }
+
+    if ((next_i) == -1 || (sibling_i == -1)) {
+        return;
+    }
+
+    bool up = false;
+    if (sibling.get_prev_sibling() == &next) {
+        m_root.reorder_child_after(next, sibling);
+    } else if (sibling.get_next_sibling() == &next) {
+        m_root.reorder_child_after(sibling, next);
+        up = true;
+    } else {
+        // Widgets are not neighbours. How to reorder them now depends on their
+        // index
+        if (next_i > sibling_i) {  // Move the widget up
+            sibling.get_prev_sibling() == nullptr
+                ? m_root.reorder_child_at_start(next)
+                : m_root.reorder_child_after(next, *sibling.get_prev_sibling());
+            up = true;
+        } else {  // Move the widget down
+            m_root.reorder_child_after(next, sibling);
+        }
+    }
+
+    m_cardlist_reorder_signal.emit(&next, &sibling, up);
+}
+
+void BoardWidget::remove(CardlistWidget& cardlist) {
+    spdlog::get("app")->info("Removed CardList (\"{}\")", cardlist.get_name());
+
+    Gtk::Widget* prev_clist = cardlist.get_prev_sibling();
+    Gtk::Widget* next_clist = cardlist.get_next_sibling();
+    if (prev_clist) {
+        prev_clist->grab_focus();
+    } else if (next_clist && !G_TYPE_CHECK_INSTANCE_TYPE(
+                                 next_clist->gobj(), Gtk::Button::get_type())) {
+        next_clist->grab_focus();
+    }
+
+    m_cardlist_remove_signal.emit(&cardlist);
+    m_root.remove(cardlist);
+}
+
+void BoardWidget::set_scroll(bool scroll) {
+    m_on_scroll = scroll;
+    m_scroll_changed_signal.emit();
+}
+
+void BoardWidget::pop() {
+    if (Gtk::Widget* cardlist = m_add_button.get_prev_sibling()) {
+        m_cardlist_remove_signal.emit(static_cast<CardlistWidget*>(cardlist));
+        m_root.remove(*cardlist);
+    }
+}
+
+const std::string& BoardWidget::get_background() const { return m_background; }
+
+const std::string& BoardWidget::get_name() const { return m_name; }
+
+bool BoardWidget::scroll() const { return m_on_scroll; }
+
+bool BoardWidget::empty() const { return !m_add_button.get_prev_sibling(); }
+
+sigc::signal<void(std::string, std::string)>&
+BoardWidget::signal_name_changed() {
+    return m_name_changed_signal;
+}
+
+sigc::signal<void(std::string, std::string)>&
+BoardWidget::signal_background_changed() {
+    return m_background_changed_signal;
+}
+
+sigc::signal<void(CardlistWidget*, int)>& BoardWidget::signal_added_cardlist() {
+    return m_cardlist_added_signal;
+}
+
+sigc::signal<void(CardlistWidget*)>& BoardWidget::signal_remove_cardlist() {
+    return m_cardlist_remove_signal;
+}
+
+sigc::signal<void(CardlistWidget*, CardlistWidget*, bool)>&
+BoardWidget::signal_reorder() {
+    return m_cardlist_reorder_signal;
+}
+
+void BoardWidget::__setup_auto_scrolling() {
+    auto drop_controller_motion_c = Gtk::DropControllerMotion::create();
+
+    drop_controller_motion_c->signal_motion().connect(
+        [this](double x, double y) {
+            this->m_x = x;
+            this->m_y = y;
+        });
+#ifdef WIN32
+    m_scr.add_controller(drop_controller_motion_c);
+#else
+    add_controller(drop_controller_motion_c);
+#endif
+
+    m_scroll_changed_signal.connect([this]() {
+        if (m_on_scroll) {
+            m_timeout_scroller = Glib::signal_timeout().connect(
+                [this]() {
+#ifdef WIN32
+                    double cur_max_width = m_scr.get_width();
+                    auto hadjustment = m_scr.get_hadjustment();
+#else
+                    double cur_max_width = get_width();
+                    auto hadjustment = get_hadjustment();
+#endif
+                    double lower = hadjustment->get_lower();
+                    double upper = hadjustment->get_upper();
+
+                    if (m_x >= (cur_max_width * 0.8)) {
+                        double new_value =
+                            hadjustment->get_value() + SCROLL_SPEED_FACTOR;
+                        hadjustment->set_value(new_value >= upper ? upper
+                                                                  : new_value);
+                    } else if (m_x <= (cur_max_width * 0.2)) {
+                        double new_value =
+                            hadjustment->get_value() - SCROLL_SPEED_FACTOR;
+                        hadjustment->set_value(new_value <= lower ? lower
+                                                                  : new_value);
+                    }
+                    return true;
+                },
+                10);
+        } else {
+            m_timeout_scroller.disconnect();
+        }
+    });
+}
+}  // namespace ui

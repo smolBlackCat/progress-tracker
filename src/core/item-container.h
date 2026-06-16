@@ -7,6 +7,12 @@
 #include "item.h"
 #include "modifiable.h"
 
+enum class ReorderingType {
+    AFTER,
+    BEFORE,
+    INVALID,
+};
+
 /**
  * @brief ItemContainer is a template class that implements a set of behaviours
  * pertinent to container of items.
@@ -29,7 +35,7 @@ public:
      *
      * @return A shared pointer to the appended item.
      */
-    virtual std::shared_ptr<T> append(const T& item);
+    virtual void append(std::shared_ptr<T>& item);
 
     /**
      * @brief Removes an item from the container.
@@ -40,41 +46,23 @@ public:
      *
      * @param item The item to remove.
      */
-    virtual void remove(const T& item);
+    virtual void remove(std::shared_ptr<T>& item);
 
-    /**
-     * @brief Inserts an item after a sibling item.
-     *
-     * @param item The item to insert.
-     * @param sibling The sibling item after which to insert the item.
-     */
-    virtual std::shared_ptr<T> insert_after(const T& item, const T& sibling);
+    virtual void insert_after(std::shared_ptr<T>& item,
+                              std::shared_ptr<T>& sibling);
+    virtual void insert_before(std::shared_ptr<T>& item,
+                               std::shared_ptr<T>& sibling);
 
-    /**
-     * @brief Inserts an item before a sibling item.
-     *
-     * @param item The item to insert.
-     * @param sibling The sibling item before which to insert the item.
-     */
-    virtual std::shared_ptr<T> insert_before(const T& item, const T& sibling);
+    virtual void reorder_after(std::shared_ptr<T>& next,
+                               std::shared_ptr<T>& sibling);
 
-    /**
-     * @brief Reorders an item and sibling item.
-     *
-     * @details The reordering performed depends on whether the item in next
-     * comes before or after the sibling item. If the item in next comes before
-     * the sibling item, the item is moved to the position before the sibling
-     * item. If the item in next comes after the sibling item, the item is moved
-     * to the position after the sibling item.
-     *
-     * @param next The item to reorder.
-     * @param sibling The sibling item after or before which to reorder the
-     * item.
-     *
-     * @return The type of reordering performed.
-     */
-    virtual ReorderingType reorder(const T& next, const T& sibling);
+    virtual void reorder_before(std::shared_ptr<T>& next,
+                                std::shared_ptr<T>& sibling);
 
+    void modify(bool m = true) override;
+
+    ssize_t size() const;
+    
     /**
      * @brief Returns a reference to the container's data.
      *
@@ -88,8 +76,6 @@ public:
      * @return A const reference to the container's data.
      */
     const std::vector<std::shared_ptr<T>>& get_data() const;
-
-    void modify(bool m = true) override;
 
     /**
      * @brief Returns the container's modified state.

@@ -101,8 +101,7 @@ std::shared_ptr<Board> unitialized_board(const std::string& filename) {
                         filename)};
     }
 
-    std::shared_ptr<Board> board =
-        std::make_shared<Board>(name, background, uuid);
+    std::shared_ptr<Board> board = Board::create(name, background, uuid);
     auto lm_filepath = std::chrono::clock_cast<std::chrono::system_clock,
                                                std::chrono::file_clock>(
         std::filesystem::last_write_time(filename));
@@ -137,9 +136,9 @@ void full_load(const std::string& filename,
                 filename, list_element->GetLineNum())};
         }
 
-        CardList cur_cardlist{
+        auto cur_cardlist = CardList::create(
             cur_cardlist_name,
-            cur_cardlist_uuid ? xg::Guid{cur_cardlist_uuid} : xg::newGuid()};
+            cur_cardlist_uuid ? xg::Guid{cur_cardlist_uuid} : xg::newGuid());
         auto card_element = list_element->FirstChildElement("card");
 
         while (card_element) {
@@ -174,39 +173,38 @@ void full_load(const std::string& filename,
                 date = Date{std::chrono::floor<std::chrono::days>(secs)};
             }
 
-            Card cur_card{
-                cur_card_name,
-                date,
+            auto cur_card = Card::create(
+                cur_card_name, date,
                 cur_card_uuid ? xg::Guid{cur_card_uuid} : xg::newGuid(),
                 cur_card_complete,
-                cur_card_color ? string_to_color(cur_card_color) : NO_COLOR,
-            };
+                cur_card_color ? string_to_color(cur_card_color) : NO_COLOR);
 
             auto task_element = card_element->FirstChildElement("task");
             while (task_element) {
                 auto task_element_uuid = task_element->Attribute("uuid");
-                cur_card.container().append(
-                    Task{task_element->Attribute("name"),
-                         task_element_uuid ? xg::Guid{task_element_uuid}
-                                           : xg::newGuid(),
-                         task_element->BoolAttribute("done")});
+                auto task =
+                    Task::create(task_element->Attribute("name"),
+                                 task_element_uuid ? xg::Guid{task_element_uuid}
+                                                   : xg::newGuid(),
+                                 task_element->BoolAttribute("done"));
+                cur_card->container().append(task);
                 task_element = task_element->NextSiblingElement("task");
             }
 
             auto notes_element = card_element->FirstChildElement("notes");
             if (notes_element) {
-                cur_card.set_notes(
+                cur_card->set_notes(
                     !notes_element->GetText() ? "" : notes_element->GetText());
             }
 
-            cur_card.modify(false);
-            cur_card.container().modify(false);
+            cur_card->modify(false);
+            cur_card->container().modify(false);
 
-            cur_cardlist.container().append(cur_card);
+            cur_cardlist->container().append(cur_card);
             card_element = card_element->NextSiblingElement("card");
         }
-        cur_cardlist.modify(false);
-        cur_cardlist.container().modify(false);
+        cur_cardlist->modify(false);
+        cur_cardlist->container().modify(false);
 
         board->container().append(cur_cardlist);
 

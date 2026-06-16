@@ -29,17 +29,15 @@ struct CardlistPayload {
 CardlistInit::CardlistInit()
     : Glib::ExtraClassInit(cardlist_class_init, nullptr, cardlist_init) {}
 
-CardlistWidget::CardlistWidget(BoardWidget& board,
-                               const std::shared_ptr<CardList>& cardlist)
+CardlistWidget::CardlistWidget(BoardWidget& board, const std::string& name)
     : Glib::ObjectBase{"CardlistWidget"},
       CardlistInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
       m_add_card_button{_("Add card")},
       m_root{Gtk::Orientation::VERTICAL},
-      m_cards{},
       board{board},
-      m_cardlist{cardlist},
-      m_header{cardlist->get_name(), "title-2", "title-2"},
+      m_header{name, "title-2", "title-2"},
+      m_name{name},
       m_scr_window{} {
     set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
     add_css_class("cardlist");
@@ -49,13 +47,8 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_header.add_option_button(_("Remove"), "remove",
                                [this]() { this->board.remove(*this); });
-    m_header.signal_on_confirm().connect([this](std::string label) {
-        std::string old_name = this->m_cardlist->get_name();
-        this->m_cardlist->set_name(label);
-
-        spdlog::get("app")->info("Card list (\"{}\") renamed to (\"{}\")",
-                                 old_name, this->m_cardlist->get_name());
-    });
+    m_header.signal_on_confirm().connect(
+        sigc::mem_fun(*this, &CardlistWidget::set_title));
 
     // FIXME: We're getting EditableLabelHeader instance's menus, but honestly,
     // that is quite dirty, primarily when the other widgets implement their
@@ -68,8 +61,10 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     m_add_card_button.set_valign(Gtk::Align::CENTER);
     m_add_card_button.set_hexpand(true);
-    m_add_card_button.signal_clicked().connect(
-        [this]() { this->append_new_card(Card{_("New Card")}); });
+    m_add_card_button.signal_clicked().connect([this]() {
+        CardWidget* card = Gtk::make_managed<CardWidget>(_("New Card"));
+        append(*card);
+    });
     m_root.append(m_add_card_button);
 
     m_header.insert_at_start(*this);
@@ -93,8 +88,10 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
           }},
          {"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              auto cardlist_widget = this->board.insert_new_cardlist_after(
-                  CardList{_("New Cardlist")}, this);
+              CardlistWidget* cardlist_widget =
+                  Gtk::make_managed<CardlistWidget>(this->board,
+                                                    _("New Cardlist"));
+              this->board.insert_after(*cardlist_widget, *this);
               cardlist_widget->grab_focus();
 
               return true;
@@ -144,15 +141,6 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
 
     add_controller(shortcut_controller);
 
-    auto drop_motion_controller = Gtk::DropControllerMotion::create();
-    // drop_motion_controller->signal_motion().connect([this](double x, double
-    // y) {
-    //     this->add_css_class("cardlist-to-drop");
-    // });
-    // drop_motion_controller->signal_leave().connect(
-    //     [this]() { this->remove_css_class("cardlist-to-drop"); });
-    add_controller(drop_motion_controller);
-
     auto gesture_click = Gtk::GestureClick::create();
 
     gesture_click->set_button(0);
@@ -167,51 +155,62 @@ CardlistWidget::CardlistWidget(BoardWidget& board,
     add_controller(gesture_click);
 }
 
-void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
-    ReorderingType reordering =
-        m_cardlist->container().reorder(*next.get_card(), *sibling.get_card());
+void CardlistWidget::set_title(const std::string& name) {
+    std::string old_name = m_name;
+    m_name = name;
 
-    switch (reordering) {
-        case ReorderingType::DOWNUP: {
-            auto sibling_sibling = sibling.get_prev_sibling();
-            if (!sibling_sibling) {
-                m_root.reorder_child_at_start(next);
-            } else {
-                m_root.reorder_child_after(next, *sibling_sibling);
-            }
-            spdlog::get("app")->info(
-                "Reordered Card (\"{}\") before Card (\"{}\") in Card "
-                "list(\"{}\")",
-                next.get_card()->get_name(), sibling.get_card()->get_name(),
-                m_cardlist->get_name());
-            break;
+    m_name_changed_signal.emit(old_name, m_name);
+}
+
+void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
+
+    ssize_t c_i = 0;
+    for (Gtk::Widget* cur_card = m_root.get_first_child(); cur_card;
+         cur_card = cur_card->get_next_sibling()) {
+        if (&next == cur_card) {
+            next_i = c_i;
+        } else if (&sibling == cur_card) {
+            sibling_i = c_i;
         }
-        case ReorderingType::UPDOWN: {
+        c_i++;
+    }
+
+    if ((next_i == -1) || (sibling_i == -1)) {
+        return;
+    }
+
+    bool up = false;
+    if (sibling.get_prev_sibling() == &next) {
+        m_root.reorder_child_after(next, sibling);
+    } else if (sibling.get_next_sibling() == &next) {
+        m_root.reorder_child_after(sibling, next);
+        up = true;
+    } else {
+        // Widgets are not neighbours. How to reorder them now depends on their
+        // index
+        if (next_i > sibling_i) {  // Move the widget up
+            sibling.get_prev_sibling() == nullptr
+                ? m_root.reorder_child_at_start(next)
+                : m_root.reorder_child_after(next, *sibling.get_prev_sibling());
+                up = true;
+        } else {  // Move the widget down
             m_root.reorder_child_after(next, sibling);
-            spdlog::get("app")->info(
-                "Reordered Card (\"{}\") after Card (\"{}\") in Card "
-                "list(\"{}\")",
-                next.get_card()->get_name(), sibling.get_card()->get_name(),
-                m_cardlist->get_name());
-            break;
-        }
-        case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn(
-                "[CardlistWidget.reorder] Cannot reorder (\"{}\") and (\"{}\")",
-                next.get_card()->get_name(), sibling.get_card()->get_name());
-            break;
         }
     }
+
+    m_card_reorder_signal.emit(&next, &sibling, up);
 }
 
 void CardlistWidget::remove(CardWidget& card) {
     spdlog::get("app")->info("Card (\"{}\") removed from CardList (\"{}\")",
-                             card.get_card()->get_name(),
-                             m_cardlist->get_name());
+                             card.get_title(), get_name());
 
     // Focus should be passed to the immediate sibling
     Gtk::Widget* next_card = card.get_next_sibling();
     Gtk::Widget* prev_card = card.get_prev_sibling();
+
     if (prev_card) {
         prev_card->grab_focus();
     } else if (next_card && !G_TYPE_CHECK_INSTANCE_TYPE(
@@ -219,52 +218,101 @@ void CardlistWidget::remove(CardWidget& card) {
         next_card->grab_focus();
     }
 
+    m_card_remove_signal.emit(&card);
     m_root.remove(card);
-    m_cardlist->container().remove(*card.get_card());
-    std::erase(m_cards, &card);
-
-    remove_card_signal.emit(&card);
 }
 
 void CardlistWidget::append(CardWidget& card) {
-    m_cards.push_back(&card);
-    card.set_cardlist(this);
-    m_root.append(card);
-    m_root.reorder_child_after(m_add_card_button, card);
+    if (!card.parent()) {
+        card.set_cardlist(this);
+        m_root.append(card);
+        m_root.reorder_child_after(m_add_card_button, card);
 
-    add_card_signal.emit(&card);
+        m_card_add_signal.emit(&card, -1);
+    }
 }
 
-CardWidget* CardlistWidget::append_new_card(const Card& card) {
-    spdlog::get("app")->info("Added Card (\"{}\") to Card list (\"{}\")",
-                             card.get_name(), m_cardlist->get_name());
-    return __add(m_cardlist->container().append(card));
+void CardlistWidget::insert_after(CardWidget& card, CardWidget& sibling) {
+    if (!card.parent() && sibling.parent() == this) {
+        ssize_t index = 0;
+        for (Gtk::Widget* card = m_root.get_first_child(); card != &sibling;
+             card = card->get_next_sibling())
+            index++;
+        m_root.insert_child_after(card, sibling);
+        card.set_cardlist(this);
+
+        m_card_add_signal.emit(&card, index);
+    }
 }
 
-CardWidget* CardlistWidget::insert_new_card_after(const Card& card,
-                                                  ui::CardWidget* sibling) {
-    auto cardwidget = Gtk::make_managed<CardWidget>(
-        m_cardlist->container().insert_after(card, *sibling->get_card()));
-    m_cards.push_back(cardwidget);
-    cardwidget->set_cardlist(this);
-    m_root.insert_child_after(*cardwidget, *sibling);
+void CardlistWidget::receive(CardWidget& card) {
+    if (card.parent()) {
+        CardlistWidget* old_parent = card.parent();
+        card.reference();
+        card.parent()->signal_card_removed().block();
+        card.remove_from_parent();
 
-    add_card_signal.emit(cardwidget);
+        card.set_cardlist(this);
+        m_root.append(card);
+        m_root.reorder_child_after(m_add_card_button, card);
 
-    return cardwidget;
+        card.parent()->signal_card_removed().unblock();
+        card.unreference();
+
+        m_card_received_signal.emit(&card, old_parent, nullptr);
+    }
 }
+
+void CardlistWidget::receive_after(CardWidget& card, CardWidget& sibling) {
+    if (card.parent() && sibling.parent() == this) {
+        CardlistWidget* old_parent = card.parent();
+        card.reference();
+        card.parent()->signal_card_removed().block();
+
+        card.remove_from_parent();
+        card.set_cardlist(this);
+        m_root.append(card);
+        m_root.reorder_child_after(card, sibling);
+
+        card.parent()->signal_card_removed().unblock();
+        card.unreference();
+
+        m_card_received_signal.emit(&card, old_parent, &sibling);
+    }
+}
+
+const std::string& CardlistWidget::get_name() const { return m_name; }
 
 bool CardlistWidget::is_child(CardWidget& card) {
-    for (auto& card_ : m_cards) {
-        if (&card == card_) return true;
+    for (Gtk::Widget* cur_card = m_root.get_first_child(); cur_card;
+         cur_card = cur_card->get_next_sibling()) {
+        if (cur_card == &card) {
+            return true;
+        }
     }
     return false;
 }
 
-const std::vector<CardWidget*>& CardlistWidget::cards() { return m_cards; }
+sigc::signal<void(std::string, std::string)>&
+CardlistWidget::signal_name_changed() {
+    return m_name_changed_signal;
+}
 
-const std::shared_ptr<CardList>& CardlistWidget::cardlist() {
-    return m_cardlist;
+sigc::signal<void(CardWidget*, int)>& CardlistWidget::signal_card_added() {
+    return m_card_add_signal;
+}
+sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
+    return m_card_remove_signal;
+}
+
+sigc::signal<void(CardWidget*, CardWidget*, bool)>&
+CardlistWidget::signal_card_reorder() {
+    return m_card_reorder_signal;
+}
+
+sigc::signal<void(CardWidget*, CardlistWidget*, CardWidget*)>&
+CardlistWidget::signal_card_received() {
+    return m_card_received_signal;
 }
 
 void CardlistWidget::setup_drag_and_drop() {
@@ -285,7 +333,7 @@ void CardlistWidget::setup_drag_and_drop() {
             this->board.set_scroll();
 
             spdlog::get("ui")->debug("[CardlistWidget.dnd] (\"{}\"): On drag",
-                                     this->cardlist()->get_name());
+                                     get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -296,7 +344,7 @@ void CardlistWidget::setup_drag_and_drop() {
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget.dnd] (\"{}\"): Canceled drag event",
-                this->cardlist()->get_name());
+                get_name());
             return true;
         },
         false);
@@ -307,7 +355,7 @@ void CardlistWidget::setup_drag_and_drop() {
 
             spdlog::get("ui")->debug(
                 "[CardlistWidget.dnd] (\"{}\"): Stopped being draggeed",
-                this->cardlist()->get_name());
+                get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     m_header.add_controller(drag_source_c);
@@ -329,7 +377,7 @@ void CardlistWidget::setup_drag_and_drop() {
                     spdlog::get("app")->warn(
                         "[CardlistWidget.dnd] Card list(\"{}\") has been "
                         "dropped on itself.",
-                        this->cardlist()->get_name());
+                        get_name());
                     this->remove_css_class("cardlist-to-drop");
                     return true;
                 }
@@ -341,8 +389,7 @@ void CardlistWidget::setup_drag_and_drop() {
 
                 spdlog::get("app")->info(
                     "Card list (\"{}\") dropped on Card list (\"{}\")",
-                    dropped_cardlist->cardlist()->get_name(),
-                    this->cardlist()->get_name());
+                    dropped_cardlist->get_name(), get_name());
                 return true;
             }
             return false;
@@ -362,14 +409,10 @@ void CardlistWidget::setup_drag_and_drop() {
 
                 auto dropped_card = dropped_value.get();
                 if (!this->is_child(*dropped_card)) {
-                    auto card_in_dropped = dropped_card->get_card();
-                    dropped_card->remove_from_parent();
-                    this->append_new_card(*card_in_dropped);
-
+                    receive(*dropped_card);
                     spdlog::get("app")->info(
-                        "Card (\"{}\") dropped on card list (\"{}\")",
-                        dropped_card->get_card()->get_name(),
-                        this->cardlist()->get_name());
+                        "[TODO] Card (\"{}\") dropped on card list (\"{}\")",
+                        dropped_card->get_title(), get_name());
                 }
 
                 this->remove_css_class("cardlist-to-drop");
@@ -385,24 +428,5 @@ void CardlistWidget::cleanup() {
     m_header.unparent();
     m_popover.unparent();
     m_scr_window.unparent();
-}
-
-CardWidget* CardlistWidget::__add(const std::shared_ptr<Card>& card) {
-    auto cardwidget = Gtk::make_managed<CardWidget>(card);
-    m_cards.push_back(cardwidget);
-    cardwidget->set_cardlist(this);
-    m_root.append(*cardwidget);
-    m_root.reorder_child_after(m_add_card_button, *cardwidget);
-
-    add_card_signal.emit(cardwidget);
-
-    return cardwidget;
-}
-
-sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_added() {
-    return add_card_signal;
-}
-sigc::signal<void(CardWidget*)>& CardlistWidget::signal_card_removed() {
-    return remove_card_signal;
 }
 }  // namespace ui

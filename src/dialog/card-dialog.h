@@ -3,50 +3,35 @@
 #include <core/task.h>
 #include <gtkmm.h>
 
-#include <memory>
+#include <chrono>
+#include <utility>
 
 namespace ui {
 
-class TaskWidget;   
+class TaskWidget;
 class CardWidget;
-
 /**
- * @brief Class implementing a Dialog presenting the card details.
- *
- * @details The CardDetailsDialog (AdwDialog) main task is to present the
- * user all details belonging to a given card, like its name, extra tasks
- * and general notes about the card.
+ * @brief Card Dialog
  */
-class CardDetailsDialog {
+class CardDialog {
 public:
-    /**
-     * @brief Creates a new CardDetailsDialog instance.
-     *
-     * @param card_widget Reference to the CardWidget associated with this
-     * dialog.
-     * @return Pointer to the created CardDetailsDialog instance.
-     */
-    static CardDetailsDialog* create(CardWidget& card_widget);
-
     /**
      * @brief Default CardDetailsDialog constructor.
      */
-    CardDetailsDialog();
+    CardDialog();
 
     /**
      * @brief Destructor.
      */
-    ~CardDetailsDialog();
+    ~CardDialog();
 
-    TaskWidget* add_task(const Task& task);
+    void set_title(const std::string& title);
+    void set_notes(const std::string& notes);
+    void set_deadline(const Glib::Date& deadline = {});
+    void set_complete(bool complete = true);
 
-    TaskWidget* insert_new_task_after(const Task& task, TaskWidget* sibling);
-
-    /**
-     * @brief Removes a TaskWidget from the checklist area of the dialog.
-     *
-     * @param task TaskWidget object reference to be removed.
-     */
+    void append(TaskWidget& task);
+    void insert_after(TaskWidget& next, TaskWidget& sibling);
     void remove_task(TaskWidget& task_widget);
 
     /**
@@ -57,7 +42,7 @@ public:
      * @param sibling Reference to the TaskWidget to be placed before the
      * next.
      */
-    void reorder_task_widget(TaskWidget& next, TaskWidget& sibling);
+    void reorder(TaskWidget& next, TaskWidget& sibling);
 
     /**
      * @brief Opens the details of a card widget.
@@ -67,27 +52,30 @@ public:
      */
     void open(Gtk::Window& parent, CardWidget* card_widget);
 
-    /**
-     * @brief Saves the changes made to the card details.
-     */
-    void on_save();
-
-    /**
-     * @brief Closes the card details dialog.
-     */
     void close();
 
-    /**
-     * @brief Updates the due date label in the dialog.
-     */
-    void update_due_date_label();
+    std::string get_title() const;
+    std::string get_notes() const;
+    std::chrono::year_month_day get_deadline() const;
+    bool get_complete() const;
+    std::pair<int, int> get_completion_ratio() const;
 
     /**
      * @brief Returns the CardWidget object pointer.
      *
      * @return Pointer to the CardWidget object.
      */
-    CardWidget* get_card_widget();
+    CardWidget* card_widget();
+
+    sigc::signal<void(std::string, std::string)>& signal_name_changed();
+    sigc::signal<void(std::string, std::string)>& signal_notes_changed();
+    sigc::signal<void(Glib::Date, Glib::Date)>& signal_deadline_changed();
+    sigc::signal<void()>& signal_complete_changed();
+    sigc::signal<void(TaskWidget*, int)>& signal_task_added();
+    sigc::signal<void(TaskWidget*)>& signal_task_removed();
+    sigc::signal<void(TaskWidget*, TaskWidget*, bool)>& signal_task_reordered();
+    sigc::signal<void(CardWidget*)>& signal_open();
+    sigc::signal<void()>& signal_closed();
 
 protected:
     /**
@@ -115,8 +103,8 @@ protected:
      */
     void clear();
 
+    // Widgets
     Glib::RefPtr<Gtk::Builder> builder;
-
     Glib::RefPtr<Glib::Object> m_adw_dialog;
     Gtk::Entry* m_title_entry;
     Gtk::Button m_checklist_add_button;
@@ -128,19 +116,22 @@ protected:
     Gtk::Box* m_tasks_box;
     Glib::RefPtr<Gtk::TextBuffer> m_notes_textbuffer;
 
-    CardWidget* m_card_widget;
-    std::vector<TaskWidget*> m_tasks_tracker;
+    // Signals
+    sigc::signal<void(std::string, std::string)> m_name_changed_signal;
+    sigc::signal<void(std::string, std::string)> m_notes_changed_signal;
+    sigc::signal<void(Glib::Date, Glib::Date)> m_deadline_changed_signal;
+    sigc::signal<void()> m_complete_changed_signal;
+    sigc::signal<void(TaskWidget*, int)> m_task_add_signal;
+    sigc::signal<void(TaskWidget*)> m_task_remove_signal;
+    sigc::signal<void(TaskWidget*, TaskWidget*, bool up)> m_task_reorder_signal;
+    sigc::signal<void(CardWidget*)> m_card_dialog_opened_signal;
+    sigc::signal<void()> m_card_dialog_closed_signal;
 
-private:
-    /**
-     * @brief Adds a new task to the checklist.
-     *
-     * @param task Shared pointer to the Task object.
-     * @param is_new Boolean flag indicating if this is a new task.
-     *
-     * @return Pointer to the newly added TaskWidget.
-     */
-    TaskWidget* _add_task(const std::shared_ptr<Task>& task);
+    CardWidget* m_card_widget;
+
+    std::chrono::year_month_day m_deadline;
+    int m_n_tasks_complete = 0;
+    int m_n_tasks = 0;
 };
 
 }  // namespace ui

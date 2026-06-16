@@ -8,22 +8,14 @@
  */
 class Task : public Item, public Modifiable {
 public:
-    /**
-     * @brief Task constructor
-     *
-     * @param name The name of the task
-     * @param done Whether the task is done or not
-     */
-    Task(const std::string& name, bool done = false);
+    static std::shared_ptr<Task> create(const std::string& name,
+                                        bool done = false);
+    static std::shared_ptr<Task> create(const std::string& name,
+                                        const xg::Guid& uuid,
+                                        bool done = false);
 
-    /**
-     * @brief Task constructor
-     *
-     * @param name The name of the task
-     * @param uuid The unique identifier of the task
-     * @param done Whether the task is done or not
-     */
-    Task(const std::string& name, const xg::Guid uuid, bool done = false);
+    Task() = delete;
+    ~Task() = default;
 
     void set_name(const std::string& name) override;
 
@@ -51,6 +43,23 @@ public:
     sigc::signal<void(bool)>& signal_done();
 
 protected:
+    /**
+     * @brief Task constructor
+     *
+     * @param name The name of the task
+     * @param done Whether the task is done or not
+     */
+    Task(const std::string& name, bool done = false);
+
+    /**
+     * @brief Task constructor
+     *
+     * @param name The name of the task
+     * @param uuid The unique identifier of the task
+     * @param done Whether the task is done or not
+     */
+    Task(const std::string& name, const xg::Guid& uuid, bool done = false);
+
     bool m_done;
     bool m_modified = false;
 

@@ -71,18 +71,19 @@ int main(int argc, char* argv[]) {
         auto board = bm.local_open(cur_board_filename);
 
         for (short j = 0; j < std::get<1>(params); ++j) {
-            auto cardlist = board->container().append(
-                CardList{std::format("CardList {}", j)});
+            auto cardlist = CardList::create(std::format("CardList {}", j));
+            board->container().append(cardlist);
             for (short k = 0; k < std::get<2>(params); ++k) {
-                auto card = cardlist->container().append(
-                    Card{std::format("Card {}", k)});
+                auto card = Card::create(std::format("Card {}", k));
+                cardlist->container().append(card);
                 card->set_color(Color{165, 29, 45, 1.0});
                 card->set_due_date(Date(2025y, June, 5d));
                 card->set_notes(
                     "Progress is supposed to be simple and I love my "
                     "girlfriend a lot");
                 for (short l = 0; l < std::get<3>(params); ++l) {
-                    card->container().append(Task{std::format("Task {}", l)});
+                    auto task = Task::create(std::format("Task {}", l));
+                    card->container().append(task);
                 }
             }
         }

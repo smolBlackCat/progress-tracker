@@ -20,7 +20,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                                BoardManager& manager)
     : Gtk::ApplicationWindow{cobject},
       m_manager{manager},
-      board_widget{manager},
+      board_widget{},
       home_button_p{b->get_widget<Gtk::Button>("home-button")},
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
       board_delete_button{b->get_widget<Gtk::Button>("delete-button")},
@@ -36,7 +36,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
       progress_settings{progress_settings},
-      card_dialog{},
+      m_card_dialog{},
       create_board{CreateBoardDialog::create(m_manager)},
       edit_board{PreferencesBoardDialog::create(board_widget)},
       sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
@@ -320,11 +320,9 @@ void ProgressWindow::show_about_dialog() {
         "https://github.com/smolBlackCat/progress-tracker", NULL);
 }
 
-void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
-    card_dialog.open(*this, card_widget);
-}
-
 void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
+
+CardDialog& ProgressWindow::card_dialog() { return m_card_dialog; }
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();
@@ -352,9 +350,6 @@ void ProgressWindow::load_appropriate_style() {
 bool ProgressWindow::on_close() {
     set_visible(false);
 
-    if (app_stack_p->get_visible_child_name() == "board-page") {
-        board_widget.save();
-    }
     int height, width;
     this->get_default_size(width, height);
 
@@ -366,6 +361,6 @@ bool ProgressWindow::on_close() {
         "On close status:\n\twindow-maximized: {}\n\twindow-height: "
         "{}\n\twindow-width: {}",
         is_maximized(), height, width);
-    return true;
+    return false;
 }
 }  // namespace ui
