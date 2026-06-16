@@ -1,11 +1,9 @@
 #include "preferences-board-dialog.h"
 
+#include <adwaita.h>
 #include <glibmm/i18n.h>
 #include <spdlog/spdlog.h>
 #include <utils.h>
-
-#include "adwaita.h"
-#include "dialog/board-dialog.h"
 
 namespace ui {
 
@@ -19,18 +17,20 @@ PreferencesBoardDialog::PreferencesBoardDialog(BoardWidget& board_widget)
 PreferencesBoardDialog::~PreferencesBoardDialog() {}
 
 void PreferencesBoardDialog::load_board() {
-    board_title_entry->set_text(board_widget.get_name());
-    BackgroundType bg_type =
-        Board::get_background_type(board_widget.get_background());
+    std::string board_name = board_widget.get_name();
+    std::string board_background = board_widget.get_background();
+
+    board_title_entry->set_text(board_name);
+    BackgroundType bg_type = Board::get_background_type(board_background);
     switch (bg_type) {
         case BackgroundType::COLOR: {
             this->bg_type = bg_type;
-            set_picture(Gdk::RGBA{board_widget.get_background()});
+            set_picture(Gdk::RGBA{board_background});
             break;
         }
         case BackgroundType::IMAGE: {
             this->bg_type = bg_type;
-            image_filename = board_widget.get_background();
+            image_filename = board_background;
             set_picture(image_filename);
             break;
         }
@@ -39,7 +39,7 @@ void PreferencesBoardDialog::load_board() {
             spdlog::get("ui")->warn(
                 "[PreferencesBoardDialog.load_board] Cannot load Board "
                 "(\"{}\") background. Falling back to default",
-                board_widget.get_name());
+                board_name);
             set_picture(Gdk::RGBA{});
             break;
         }
@@ -59,7 +59,6 @@ void PreferencesBoardDialog::open(Gtk::Window& parent) {
 void PreferencesBoardDialog::on_footer_button_click() { on_save_changes(); }
 
 void PreferencesBoardDialog::on_save_changes() {
-    const std::string old_name = board_widget.board()->get_name();
     const std::string new_name = board_title_entry->get_text();
 
     if (new_name.empty()) {
@@ -69,15 +68,8 @@ void PreferencesBoardDialog::on_save_changes() {
         return;
     }
 
-    if (new_name != old_name) {
-        parent->set_title(new_name);
-        board_widget.set_name(new_name);
+    board_widget.set_name(new_name);
 
-        spdlog::get("app")->info("Board (\"{}\") renamed to (\"{}\")", old_name,
-                                 new_name);
-    }
-
-    const std::string old_background = board_widget.board()->get_background();
     std::string new_background;
     switch (bg_type) {
         case BackgroundType::COLOR: {
@@ -93,13 +85,7 @@ void PreferencesBoardDialog::on_save_changes() {
         }
     }
 
-    if (new_background != old_background) {
-        board_widget.set_background(new_background);
-
-        spdlog::get("app")->info(
-            "Board (\"{}\") background changed to (\"{}\")", new_name,
-            new_background);
-    }
+    board_widget.set_background(new_background);
 
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }

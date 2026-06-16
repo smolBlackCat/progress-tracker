@@ -3,9 +3,12 @@
 #include <core/board-manager.h>
 #include <gtkmm.h>
 
+#include <utility>
+
 namespace ui {
 class CardlistWidget;
 
+using CardlistWidgetLocation = std::pair<CardlistWidget*, int>;
 /**
  * @brief Widget that holds a list of CardLists
  */
@@ -27,19 +30,10 @@ public:
 
     static constexpr int SCROLL_SPEED_FACTOR = 6;
 
-    Gtk::Box m_root;
-
     /**
      * @brief BoardWidget constructor
      */
     BoardWidget();
-
-    /**
-     * @brief Loads all widgets composing a BoardWidget from a board object
-     *
-     * @param board shared pointer to the board object
-     */
-    void set(const std::shared_ptr<Board>& board);
 
     /**
      * @brief Updates board' name
@@ -64,6 +58,11 @@ public:
     void append(CardlistWidget& child);
 
     /**
+     * @brief Inserts widget after sibling
+     */
+    void insert_after(CardlistWidget& widget, CardlistWidget& sibling);
+
+    /**
      * @brief Reorders two CardlistWidget objects.
      *
      * @param next widget to be put after sibling
@@ -81,12 +80,6 @@ public:
     void remove(ui::CardlistWidget& cardlist);
 
     /**
-     * @brief Cleans the BoardWidget, thus deleting al widgets associated with
-     * it
-     */
-    void clear();
-
-    /**
      * @brief Describes whether the board should be able to scroll
      * horizontally
      *
@@ -96,33 +89,23 @@ public:
     void set_scroll(bool scroll = true);
 
     /**
-     * @brief Adds a new CardlistWidget widget based on the CardList object.
-     *
-     * @param cardlist CardList object
-     * @param editing_mode bool indicating whether the cardlist is
-     * completely new (has not been loaded from a file) or not
-     * @return pointer to the newly added CardlistWidget
+     * @brief Pops the cardlist out of this BoardWidget instance
      */
-    ui::CardlistWidget* add_new_cardlist(const CardList& cardlist,
-                                         bool editing_mode = false);
-    ui::CardlistWidget* pop();
-
-    ui::CardlistWidget* insert_new_cardlist_after(const CardList& cardlist,
-                                                  ui::CardlistWidget* sibling);
+    void pop();
 
     /**
      * @brief Retrieves the background string
      *
-     * @return reference to the background string
+     * @return board background, either a color code or a image path
      */
-    std::string get_background() const;
+    const std::string& get_background() const;
 
     /**
      * @brief Retrieves the board's name
      *
-     * @return reference to the board's name string
+     * @return board name
      */
-    std::string get_name() const;
+    const std::string& get_name() const;
 
     /**
      * @brief Returns true if the board is set up to horizontally scroll
@@ -136,25 +119,35 @@ public:
      */
     bool empty() const;
 
-    /**
-     * @brief Retrieves the current board object
-     *
-     * @return shared pointer to the current board object
-     */
-    std::shared_ptr<Board> board() const;
+    sigc::signal<void(std::string, std::string)>& signal_name_changed();
+    sigc::signal<void(std::string, std::string)>& signal_background_changed();
 
-    CardlistWidget* __add_cardlist(const std::shared_ptr<CardList>& cardlist);
-
-    sigc::signal<void(CardlistWidget*)>& signal_cardlist_added();
+    sigc::signal<void(CardlistWidget*, int)>& signal_added_cardlist();
+    sigc::signal<void(CardlistWidget*)>& signal_remove_cardlist();
+    sigc::signal<void(CardlistWidget*, CardlistWidget*, bool)>& signal_reorder();
 
 protected:
     void __setup_auto_scrolling();
-    void __set_background(const std::string& background);
 
-    std::vector<sigc::connection> m_connections;
-    sigc::connection m_scrolling_cnn;
+    std::string m_name;
+    std::string m_background;
 
-    sigc::signal<void(CardlistWidget*)> m_add_cardlist_signal;
+    sigc::connection m_timeout_scroller;
+
+    sigc::signal<void(std::string, std::string)> m_name_changed_signal;
+    sigc::signal<void(std::string, std::string)> m_background_changed_signal;
+
+    sigc::signal<void(CardlistWidget*, int)> m_cardlist_added_signal;
+    sigc::signal<void(CardlistWidget*)> m_cardlist_remove_signal;
+
+    /**
+     * void(next, sibling, up)
+     *
+     * `up` is a bit flag that indicates whether the next is put before or after
+     * the sibling. This bit is true if and only if next is placed before
+     * sibling, otherwise false.*/
+    sigc::signal<void(CardlistWidget*, CardlistWidget*, bool)>
+        m_cardlist_reorder_signal;
 
     sigc::signal<void()> m_scroll_changed_signal;
 
@@ -164,12 +157,11 @@ protected:
     Gtk::ScrolledWindow m_scr;
 #endif
 
+    Gtk::Box m_root;
     Gtk::Button m_add_button;
-    std::shared_ptr<Board> m_board = nullptr;
     Glib::RefPtr<Gtk::CssProvider> m_css_provider;
 
-    // FIXME: This may be redundant
-    std::vector<ui::CardlistWidget*> m_cardlists;
+    // Necessary for drag-and-drop
     double m_x, m_y;
     bool m_on_scroll = false;
 };

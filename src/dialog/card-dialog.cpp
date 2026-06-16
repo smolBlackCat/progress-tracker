@@ -5,13 +5,14 @@
 #include <widgets/card-widget.h>
 #include <widgets/task-widget.h>
 
-#include <ctime>
+#include <chrono>
 
+#include "glibmm/datetime.h"
 #include "glibmm/ustring.h"
 
 namespace ui {
 
-CardDetailsDialog::CardDetailsDialog()
+CardDialog::CardDialog()
     : m_checklist_add_button{_("Add Task")},
       builder{Gtk::Builder::create_from_resource(
           "/io/github/smolblackcat/Progress/card-details-dialog.ui")},
@@ -32,31 +33,25 @@ CardDetailsDialog::CardDetailsDialog()
       m_adw_dialog{builder->get_object("card-dialog")} {
     // Signal connections
     m_checklist_add_button.signal_clicked().connect(
-        sigc::mem_fun(*this, &CardDetailsDialog::on_add_task));
+        sigc::mem_fun(*this, &CardDialog::on_add_task));
     m_card_delete_button->signal_clicked().connect(
-        sigc::mem_fun(*this, &CardDetailsDialog::on_delete_card));
+        sigc::mem_fun(*this, &CardDialog::on_delete_card));
     m_unset_due_date_button->signal_clicked().connect(
-        sigc::mem_fun(*this, &CardDetailsDialog::on_unset_due_date));
+        sigc::mem_fun(*this, &CardDialog::on_unset_due_date));
 
-    m_checkbutton->signal_toggled().connect([this]() {
-        this->m_card_widget->get_card()->set_complete(
-            this->m_checkbutton->get_active());
-        this->m_card_widget->update_deadline_label();
-    });
+    m_checkbutton->signal_toggled().connect(
+        sigc::mem_fun(m_complete_changed_signal, &sigc::signal<void()>::emit));
     m_calendar->signal_day_selected().connect(
-        sigc::mem_fun(*this, &CardDetailsDialog::on_set_due_date));
+        sigc::mem_fun(*this, &CardDialog::on_set_due_date));
 
-    g_signal_connect(m_adw_dialog->gobj(), "closed",
-                     G_CALLBACK(+[](AdwDialog* self, gpointer data) {
-                         reinterpret_cast<CardDetailsDialog*>(data)
-                             ->get_card_widget()
-                             ->grab_focus();
-                         reinterpret_cast<CardDetailsDialog*>(data)->on_save();
-                         reinterpret_cast<CardDetailsDialog*>(data)->clear();
-
-                         spdlog::get("app")->info("Card dialog closed");
-                     }),
-                     this);
+    g_signal_connect(
+        m_adw_dialog->gobj(), "closed",
+        G_CALLBACK(+[](AdwDialog* self, gpointer data) {
+            reinterpret_cast<CardDialog*>(data)->card_widget()->grab_focus();
+            reinterpret_cast<CardDialog*>(data)->signal_closed().emit();
+            reinterpret_cast<CardDialog*>(data)->clear();
+        }),
+        this);
 
     m_checklist_add_button.set_margin_start(4);
     m_checklist_add_button.set_margin_end(4);
@@ -64,214 +59,263 @@ CardDetailsDialog::CardDetailsDialog()
     m_tasks_box->append(m_checklist_add_button);
 }
 
-CardDetailsDialog::~CardDetailsDialog() {}
+CardDialog::~CardDialog() {}
 
-TaskWidget* CardDetailsDialog::add_task(const Task& task) {
-    TaskWidget* task_widget =
-        _add_task(m_card_widget->get_card()->container().append(task));
-    spdlog::get("app")->info("Task (\"{}\") added to card (\"{}\")",
-                             task.get_name(),
-                             m_card_widget->get_card()->get_name());
-    m_card_widget->update_completion_label();
+void CardDialog::set_title(const std::string& title) {
+    if (!title.empty()) {
+        const std::string old_text = m_title_entry->get_text();
+        m_title_entry->set_text(title);
 
-    return task_widget;
+        m_name_changed_signal.emit(old_text, title);
+    }
 }
 
-TaskWidget* CardDetailsDialog::insert_new_task_after(const Task& task,
-                                                     TaskWidget* sibling) {
-    auto new_task = m_card_widget->get_card()->container().insert_after(
-        task, *sibling->task());
-    auto task_widget = Gtk::make_managed<TaskWidget>(*this, new_task);
-    m_tasks_box->insert_child_after(*task_widget, *sibling);
-    m_tasks_tracker.push_back(task_widget);
-    m_card_widget->update_completion_label();
+void CardDialog::set_notes(const std::string& notes) {
+    const std::string old_notes = m_notes_textbuffer->get_text();
+    m_notes_textbuffer->set_text(notes);
 
-    return task_widget;
+    m_notes_changed_signal.emit(old_notes, notes);
 }
 
-void CardDetailsDialog::remove_task(TaskWidget& task_widget) {
-    auto card = m_card_widget->get_card();
-    auto task = task_widget.task();
+void CardDialog::set_deadline(const Glib::Date& deadline) {
+    const Glib::DateTime old_datetime = m_calendar->get_date();
+    const Glib::Date old_date(
+        old_datetime.get_day_of_month(),
+        static_cast<Glib::Date::Month>(old_datetime.get_month()),
+        old_datetime.get_year());
 
+    if (deadline.valid()) {
+        m_date_menubutton->set_label(deadline.format_string("%x"));
+
+        Glib::DateTime datetime = Glib::DateTime::create_local(
+            deadline.get_year(), deadline.get_month_as_int(),
+            deadline.get_day(), 0, 0, 0);
+        m_calendar->set_date(datetime);
+        m_deadline = std::chrono::year_month_day{
+            std::chrono::year{int(datetime.get_year())},
+            std::chrono::month{unsigned(datetime.get_month())},
+            std::chrono::day{unsigned(datetime.get_day_of_month())}};
+        m_checkbutton_revealer->set_reveal_child();
+    } else {
+        on_unset_due_date();
+    }
+
+    m_deadline_changed_signal.emit(old_date, deadline);
+}
+
+void CardDialog::set_complete(bool complete) {
+    m_checkbutton->set_active(complete);
+}
+
+void CardDialog::append(TaskWidget& task) {
+    m_tasks_box->append(task);
+    m_tasks_box->reorder_child_after(m_checklist_add_button, task);
+
+    task.signal_complete_changed().connect(sigc::track_obj(
+        [this, &task]() { m_n_tasks_complete += task.get_complete() ? 1 : -1; },
+        task));
+
+    m_n_tasks++;
+    m_n_tasks_complete += task.get_complete() ? 1 : 0;
+
+    m_task_add_signal.emit(&task, -1);
+}
+
+// FIXME: This method (probably the similar ones too) do not have defined
+// measures against non-child siblings
+void CardDialog::insert_after(TaskWidget& next, TaskWidget& sibling) {
+    int index = 0;
+    for (Gtk::Widget* task = m_tasks_box->get_first_child();
+         task && task != &sibling; task = task->get_next_sibling())
+        index++;
+
+    m_tasks_box->insert_child_after(next, sibling);
+
+    next.signal_complete_changed().connect(sigc::track_obj(
+        [this, &next]() { m_n_tasks_complete += next.get_complete() ? 1 : -1; },
+        next));
+
+    m_n_tasks++;
+    m_n_tasks_complete += next.get_complete() ? 1 : 0;
+
+    m_task_add_signal.emit(&next, index);
+}
+
+void CardDialog::remove_task(TaskWidget& task_widget) {
     if (Gtk::Widget* previous_sibling = task_widget.get_prev_sibling()) {
         previous_sibling->grab_focus();
     }
 
-    card->container().remove(*task);
+    // Whatever needs to be done with TaskWidget will be done first
+    m_task_remove_signal.emit(&task_widget);
+
+    m_n_tasks--;
+    m_n_tasks_complete -= task_widget.get_complete() ? 1 : 0;
+
     m_tasks_box->remove(task_widget);
-    std::erase(m_tasks_tracker, &task_widget);
-
-    m_card_widget->update_completion_label();
-
-    spdlog::get("app")->info("Task (\"{}\") removed from Card (\"{}\")",
-                             task->get_name(), card->get_name());
 }
 
-void CardDetailsDialog::reorder_task_widget(TaskWidget& next,
-                                            TaskWidget& sibling) {
-    ReorderingType reordering = m_card_widget->get_card()->container().reorder(
-        *next.task(), *sibling.task());
+void CardDialog::reorder(TaskWidget& next, TaskWidget& sibling) {
+    ssize_t next_i = -1;
+    ssize_t sibling_i = -1;
 
-    switch (reordering) {
-        case ReorderingType::DOWNUP: {
-            auto sibling_sibling = sibling.get_prev_sibling();
-            if (!sibling_sibling) {
-                m_tasks_box->reorder_child_at_start(next);
-            } else {
-                m_tasks_box->reorder_child_after(next, *sibling_sibling);
-            }
-
-            spdlog::get("app")->info(
-                "Reordered task (\"{}\") before task (\"{}\") in Card(\"{}\")",
-                next.task()->get_name(), sibling.task()->get_name(),
-                m_card_widget->get_card()->get_name());
+    ssize_t c_i = 0;
+    for (Gtk::Widget* task = m_tasks_box->get_first_child(); task;
+         task = task->get_next_sibling()) {
+        if ((next_i) != -1 && (sibling_i != -1)) {
             break;
         }
-        case ReorderingType::UPDOWN: {
-            m_tasks_box->reorder_child_after(next, sibling);
-            spdlog::get("app")->info(
-                "Reordered task (\"{}\") after task (\"{}\") in Card(\"{}\")",
-                next.task()->get_name(), sibling.task()->get_name(),
-                m_card_widget->get_card()->get_name());
-            break;
+
+        if (&next == task) {
+            next_i = c_i;
+        } else if (&sibling == task) {
+            sibling_i = c_i;
         }
-        case ReorderingType::INVALID: {
-            spdlog::get("ui")->warn(
-                "[CardDetailsDialog.reorder] Cannot reorder (\"{}\") and "
-                "(\"{}\")",
-                next.task()->get_name(), sibling.task()->get_name());
-            break;
-        }
-    }
-}
-
-void CardDetailsDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
-    // Load the card contents into the dialog
-    m_card_widget = card_widget;
-    auto card_ptr = this->m_card_widget->get_card();
-
-    if (card_ptr->get_due_date().ok()) {
-        update_due_date_label();
-        m_checkbutton_revealer->set_reveal_child(true);
-        m_checkbutton->set_active(card_ptr->get_complete());
+        c_i++;
     }
 
-    m_title_entry->set_text(card_ptr->get_name());
-    for (auto& task : card_ptr->container()) {
-        _add_task(task);
-    }
-    m_notes_textbuffer->set_text(card_ptr->get_notes());
-
-    adw_dialog_present(ADW_DIALOG(m_adw_dialog->gobj()),
-                       static_cast<Gtk::Widget&>(parent).gobj());
-
-    spdlog::get("app")->info("Card dialog opened for card (\"{}\")",
-                             card_widget->get_card()->get_name());
-}
-
-void CardDetailsDialog::close() {
-    adw_dialog_close(ADW_DIALOG(m_adw_dialog->gobj()));
-}
-
-void CardDetailsDialog::update_due_date_label() {
-    auto sys_days =
-        std::chrono::sys_days(m_card_widget->get_card()->get_due_date());
-    std::time_t time = std::chrono::system_clock::to_time_t(sys_days);
-    char date_str[255];
-    strftime(date_str, 255, "%x", std::gmtime(&time));
-    m_date_menubutton->set_label(Glib::ustring{date_str});
-}
-
-CardWidget* CardDetailsDialog::get_card_widget() { return m_card_widget; }
-
-void CardDetailsDialog::on_add_task() {
-    _add_task(
-        m_card_widget->get_card()->container().append(Task{_("New Task")}));
-
-    m_card_widget->update_completion_label();
-
-    spdlog::get("app")->info("New task appended to Card (\"{}\")",
-                             m_card_widget->get_card()->get_name());
-}
-
-void CardDetailsDialog::on_save() {
-    if (!m_card_widget) {
+    if ((next_i) == -1 || (sibling_i == -1)) {
         return;
     }
 
-    auto card = m_card_widget->get_card();
-    std::string new_card_name = m_title_entry->get_text();
-    std::string new_notes = m_notes_textbuffer->get_text();
-
-    bool changes = false;
-
-    if (card->get_name() != new_card_name) {
-        m_card_widget->set_title(new_card_name);
-        card->set_name(new_card_name);
-        changes = true;
+    bool up = false;
+    if (sibling.get_prev_sibling() == &next) {
+        m_tasks_box->reorder_child_after(next, sibling);
+    } else if (sibling.get_next_sibling() == &next) {
+        m_tasks_box->reorder_child_after(sibling, next);
+        up = true;
+    } else {
+        // Widgets are not neighbours. How to reorder them now depends on their
+        // index
+        if (next_i > sibling_i) {  // Move the widget up
+            sibling.get_prev_sibling() == nullptr
+                ? m_tasks_box->reorder_child_at_start(next)
+                : m_tasks_box->reorder_child_after(next,
+                                                   *sibling.get_prev_sibling());
+            up = true;
+        } else {  // Move the widget down
+            m_tasks_box->reorder_child_after(next, sibling);
+        }
     }
 
-    if (card->get_notes() != new_notes) {
-        card->set_notes(new_notes);
-        changes = true;
-    }
-
-    m_card_widget->set_tooltip_markup(m_card_widget->create_details_text());
-
-    if (changes) {
-        spdlog::get("app")->info("Changes made to card (\"{}\") saved",
-                                 card->get_name());
-    }
+    m_task_reorder_signal.emit(&next, &sibling, up);
 }
 
-void CardDetailsDialog::on_delete_card() {
+void CardDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
+    m_card_widget = card_widget;
+
+    m_card_dialog_opened_signal.emit(card_widget);
+
+    adw_dialog_present(ADW_DIALOG(m_adw_dialog->gobj()),
+                       static_cast<Gtk::Widget&>(parent).gobj());
+}
+
+void CardDialog::close() { adw_dialog_close(ADW_DIALOG(m_adw_dialog->gobj())); }
+
+CardWidget* CardDialog::card_widget() { return m_card_widget; }
+
+sigc::signal<void(std::string, std::string)>&
+CardDialog::signal_name_changed() {
+    return m_name_changed_signal;
+}
+
+sigc::signal<void(std::string, std::string)>&
+CardDialog::signal_notes_changed() {
+    return m_notes_changed_signal;
+}
+
+sigc::signal<void(Glib::Date, Glib::Date)>&
+CardDialog::signal_deadline_changed() {
+    return m_deadline_changed_signal;
+}
+
+sigc::signal<void()>& CardDialog::signal_complete_changed() {
+    return m_complete_changed_signal;
+}
+
+sigc::signal<void(TaskWidget*, int)>& CardDialog::signal_task_added() {
+    return m_task_add_signal;
+}
+
+sigc::signal<void(TaskWidget*)>& CardDialog::signal_task_removed() {
+    return m_task_remove_signal;
+}
+
+sigc::signal<void(TaskWidget*, TaskWidget*, bool)>&
+CardDialog::signal_task_reordered() {
+    return m_task_reorder_signal;
+}
+
+sigc::signal<void(CardWidget*)>& CardDialog::signal_open() {
+    return m_card_dialog_opened_signal;
+}
+
+sigc::signal<void()>& CardDialog::signal_closed() {
+    return m_card_dialog_closed_signal;
+}
+
+void CardDialog::on_add_task() {
+    auto new_task = Gtk::make_managed<TaskWidget>(*this, _("New Task"));
+    append(*new_task);
+}
+
+std::string CardDialog::get_title() const { return m_title_entry->get_text(); }
+
+std::string CardDialog::get_notes() const {
+    return m_notes_textbuffer->get_text();
+}
+
+std::chrono::year_month_day CardDialog::get_deadline() const {
+    return m_deadline;
+}
+
+bool CardDialog::get_complete() const { return m_checkbutton->get_active(); }
+
+std::pair<int, int> CardDialog::get_completion_ratio() const {
+    return {m_n_tasks_complete, m_n_tasks};
+}
+
+void CardDialog::on_delete_card() {
     CardWidget* tmp = m_card_widget;
     close();
     tmp->remove_from_parent();
 }
 
-void CardDetailsDialog::on_unset_due_date() {
+void CardDialog::on_unset_due_date() {
     m_date_menubutton->set_label(_("Set Due Date"));
-    m_card_widget->set_deadline(Date{});
+    m_deadline = std::chrono::year_month_day{};
+    m_card_widget->set_deadline_label();
+    m_card_widget->set_complete(false);
     m_checkbutton_revealer->set_reveal_child(false);
 }
 
-void CardDetailsDialog::on_set_due_date() {
-    using namespace std::chrono;
-    using namespace std::chrono_literals;
-
-    auto card_ptr = m_card_widget->get_card();
-
+void CardDialog::on_set_due_date() {
+    auto datetime = m_calendar->get_date();
     int y, m, d;
-    m_calendar->get_date().get_ymd(y, m, d);
-    auto new_date = Date{year{y}, month{static_cast<unsigned int>(m)},
-                         day{static_cast<unsigned int>(d)}};
-    m_card_widget->set_deadline(new_date);
+    datetime.get_ymd(y, m, d);
+    auto new_date = Glib::Date(d, static_cast<Glib::Date::Month>(m), y);
+    m_deadline = std::chrono::year_month_day{std::chrono::year{y},
+                                             std::chrono::month{unsigned(m)},
+                                             std::chrono::day{unsigned(d)}};
+    m_card_widget->set_deadline_label(new_date, get_complete());
     m_checkbutton_revealer->set_reveal_child(true);
-    update_due_date_label();
+    m_date_menubutton->set_label(new_date.format_string("%x"));
 }
 
-void CardDetailsDialog::clear() {
+void CardDialog::clear() {
     m_title_entry->set_text("");
-    for (TaskWidget* task_widget : m_tasks_tracker) {
-        m_tasks_box->remove(*task_widget);
+    for (Gtk::Widget* task = m_checklist_add_button.get_prev_sibling(); task;
+         task = m_checklist_add_button.get_prev_sibling()) {
+        m_tasks_box->remove(*task);
     }
-    m_tasks_tracker.clear();
+
+    m_n_tasks = m_n_tasks_complete = 0;
+
     m_notes_textbuffer->set_text("");
 
     m_date_menubutton->set_label(_("Set Due Date"));
     m_checkbutton_revealer->set_reveal_child(false);
 
     m_card_widget = nullptr;
-
-    spdlog::get("ui")->debug("[CardDetailsDialog.clear] Dialog cleaned");
-}
-
-TaskWidget* CardDetailsDialog::_add_task(const std::shared_ptr<Task>& task) {
-    auto task_widget = Gtk::make_managed<TaskWidget>(*this, task);
-    m_tasks_box->append(*task_widget);
-    m_tasks_box->reorder_child_after(m_checklist_add_button, *task_widget);
-    m_tasks_tracker.push_back(task_widget);
-    return task_widget;
 }
 }  // namespace ui

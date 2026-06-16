@@ -5,10 +5,9 @@
 #include <spdlog/spdlog.h>
 #include <window.h>
 
-#include <numeric>
+#include <unordered_map>
 
 #include "cardlist-widget.h"
-#include "core/colorable.h"
 
 extern "C" {
 static void card_class_init(void* g_class, void* data) {
@@ -80,14 +79,22 @@ std::string format_date_str(Date date) {
     return date_str;
 }
 
-CoverColor rgb_to_cover_color(Color rgb) {
-    const std::map<Color, CoverColor> CARD_COLORS = {
-        {NO_COLOR, CoverColor::UNSET},      {RED_COLOR, CoverColor::RED},
-        {ORANGE_COLOR, CoverColor::ORANGE}, {YELLOW_COLOR, CoverColor::YELLOW},
-        {GREEN_COLOR, CoverColor::GREEN},   {BLUE_COLOR, CoverColor::BLUE},
-        {PURPLE_COLOR, CoverColor::PURPLE}};
-
-    return CARD_COLORS.at(rgb);
+// FIXME: This is only a workaround. Find better solution later
+CoverColor rgba_to_cover_color(Gdk::RGBA rgb) {
+    const std::array<std::pair<Gdk::RGBA, CoverColor>, 7> COLORS = {
+        std::pair{Gdk::RGBA{}, CoverColor::UNSET},
+        {Gdk::RGBA{"rgb(165, 29, 45)"}, CoverColor::RED},
+        {Gdk::RGBA{"rgb(198, 70, 0)"}, CoverColor::ORANGE},
+        {Gdk::RGBA{"rgb(229, 165, 10)"}, CoverColor::YELLOW},
+        {Gdk::RGBA{"rgb(38, 162, 105)"}, CoverColor::GREEN},
+        {Gdk::RGBA{"rgb(26, 95, 180)"}, CoverColor::BLUE},
+        {Gdk::RGBA{"rgb(32, 9, 65)"}, CoverColor::PURPLE}};
+    for (const auto [c, cc] : COLORS) {
+        if (c == rgb) {
+            return cc;
+        }
+    }
+    return CoverColor::UNSET;
 }
 
 std::string truncate(const std::string& text) {
@@ -103,10 +110,8 @@ std::string truncate(const std::string& text) {
     return truncated_text;
 }
 
-std::string time_info_text(const Date& cur_date, const Date& card_due_date) {
-    auto now = sys_days(cur_date);
-    auto days = sys_days(card_due_date);
-    auto delta_days = (days - now).count();
+std::string time_info_text(const Glib::Date& now, const Glib::Date& deadline) {
+    int delta_days = now.days_between(deadline);
 
     std::string due_date_text;
 
@@ -170,7 +175,7 @@ std::string time_info_text(const Date& cur_date, const Date& card_due_date) {
     return due_date_text;
 }
 
-const std::map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
+const std::unordered_map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
     {CoverColor::UNSET, Gdk::RGBA{"rgba(0,0,0,0)"}},
     {CoverColor::RED, Gdk::RGBA{"rgb(165, 29, 45)"}},
     {CoverColor::ORANGE, Gdk::RGBA{"rgb(198, 70, 0)"}},
@@ -204,7 +209,7 @@ CardWidget::CardPopover::CardPopover(CardWidget* card_widget)
                      }},
         ButtonAction{"card-details", _("Card Details"),
                      [this, card_widget] {
-                         card_widget->open_card_details_dialog();
+                         card_widget->open_card_dialog();
                          this->popdown();
                      }},
         ButtonAction{"remove", _("Remove"), [this, card_widget] {
@@ -264,9 +269,6 @@ CardWidget::CardPopover::~CardPopover() {
     if (registered_card_popovers[m_card_widget].empty()) {
         registered_card_popovers.erase(m_card_widget);
     }
-
-    spdlog::get("app")->debug("Registered Popovers: {}",
-                              registered_card_popovers.size());
 }
 
 void CardWidget::CardPopover::set_selected_color(CoverColor color,
@@ -294,7 +296,7 @@ std::function<void()> CardWidget::CardPopover::color_setting_thunk(
     CardWidget* card, Gtk::CheckButton* checkbutton, CoverColor color) {
     return std::function<void()>([card, checkbutton, color]() {
         if (checkbutton->get_active()) {
-            card->set_cover_color(color);
+            card->set_cover_color(CARD_COLORS.at(color));
         }
     });
 }
@@ -311,12 +313,57 @@ const std::array<std::string, 3> CardWidget::TASKS_LABEL_CSS_CLASSES = {
     "complete-tasks-indicator-incomplete",
 };
 
-CardWidget::CardWidget(std::shared_ptr<Card> card)
+std::string CardWidget::card_widget_tooltip_text(int n_task,
+                                                 int n_tasks_complete,
+                                                 Glib::Date deadline,
+                                                 bool complete,
+                                                 const std::string& notes) {
+    std::ostringstream details_text;
+
+    if (n_task > 0) {
+        details_text << Glib::ustring::compose(
+                            _("%1%% complete"),
+                            Glib::ustring::format(
+                                std::fixed, std::setprecision(0),
+                                (n_tasks_complete / n_task) * 100))
+                     << "\n\n";
+    }
+
+    if (deadline.valid()) {
+        Glib::Date cur_date{};
+        cur_date.set_time_current();
+        if (complete) {
+            details_text << _("This card is complete") << "\n\n";
+        } else if (deadline == cur_date) {
+            details_text << _("The card is due today") << "\n\n";
+        } else {
+            details_text << time_info_text(cur_date, deadline);
+        }
+    }
+
+    if (!notes.empty()) {
+        details_text << "<b>" << _("Notes") << "</b>" << ": " << truncate(notes)
+                     << "\n\n";
+    }
+
+    std::string final_text = details_text.str();
+
+    if (!final_text.empty()) {
+        final_text.resize(final_text.size() - 2);
+    }
+
+    return final_text;
+}
+
+// TODO: There is still work to be done
+// * Re-invent popovers implementation
+CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
+                       Glib::Date deadline, bool complete, int n_tasks,
+                       int n_tasks_complete)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
-      m_card{card},
-      m_cardlist_widget{nullptr},
+      m_parent{nullptr},
       m_root{Gtk::Orientation::VERTICAL},
       m_card_cover_revealer{},
       m_card_entry_revealer{},
@@ -330,11 +377,29 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
       m_mouse_card_popover{this},
       m_key_ctrl{Gtk::EventControllerKey::create()},
       m_click_ctrl{Gtk::GestureClick::create()},
-      m_focus_ctrl{Gtk::EventControllerFocus::create()} {
+      m_focus_ctrl{Gtk::EventControllerFocus::create()},
+      m_complete{complete} {
     setup_widgets();
 
     // CardWidget Setup
-    set_title(card->get_name());
+    set_title(title);
+    if (cover_color != Gdk::RGBA{}) {
+        __set_cover_color(cover_color);
+        m_fixed_card_popover.set_selected_color(
+            rgba_to_cover_color(cover_color), false);
+        m_mouse_card_popover.set_selected_color(
+            rgba_to_cover_color(cover_color), false);
+    }
+
+    if (deadline.valid()) {
+        set_deadline_label(deadline);
+    }
+
+    if (n_tasks > 0 && n_tasks_complete <= n_tasks) {
+        set_completion_label(n_tasks, n_tasks_complete);
+    }
+
+    set_tooltip_markup(card_widget_tooltip_text());
 
     m_focus_ctrl->signal_leave().connect(
         sigc::mem_fun(*this, &CardWidget::off_rename));
@@ -356,14 +421,14 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
     const std::array<CardShortcut, 9> card_shortcuts = {
         {{"<Control>N",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              auto card_widget = m_cardlist_widget->insert_new_card_after(
-                  Card{_("New Card")}, this);
+              auto card_widget = Gtk::make_managed<CardWidget>(_("New Card"));
+              m_parent->insert_after(*card_widget, *this);
               card_widget->grab_focus();
               return true;
           }},
          {"<Control>D",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              this->open_card_details_dialog();
+              this->open_card_dialog();
               return true;
           }},
          {"<Control>R",
@@ -381,7 +446,7 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
               CardWidget* previous_card =
                   static_cast<CardWidget*>(this->get_prev_sibling());
               if (previous_card) {
-                  this->m_cardlist_widget->reorder(*previous_card, *this);
+                  this->m_parent->reorder(*previous_card, *this);
               } else {
                   this->error_bell();
               }
@@ -392,8 +457,8 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
               Widget* next = this->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
-                  this->m_cardlist_widget->reorder(
-                      *this, *static_cast<CardWidget*>(next));
+                  this->m_parent->reorder(*this,
+                                          *static_cast<CardWidget*>(next));
               } else {
                   this->error_bell();
               }
@@ -402,11 +467,9 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
          {"<Control>Left",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
               CardlistWidget* prev_parent = static_cast<CardlistWidget*>(
-                  this->m_cardlist_widget->get_prev_sibling());
+                  this->m_parent->get_prev_sibling());
               if (prev_parent) {
-                  this->remove_from_parent();
-                  auto this_card = prev_parent->append_new_card(*this->m_card);
-                  this_card->grab_focus();
+                  prev_parent->receive(*this);
               } else {
                   this->error_bell();
               }
@@ -414,15 +477,10 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
           }},
          {"<Control>Right",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              Widget* next_parent = this->m_cardlist_widget->get_next_sibling();
+              Widget* next_parent = this->m_parent->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
                                               Gtk::Button::get_type())) {
-                  CardlistWidget* next_cardlist =
-                      static_cast<CardlistWidget*>(next_parent);
-                  this->remove_from_parent();
-                  auto this_card =
-                      next_cardlist->append_new_card(*this->m_card);
-                  this_card->grab_focus();
+                  static_cast<CardlistWidget*>(next_parent)->receive(*this);
               } else {
                   this->error_bell();
               }
@@ -477,32 +535,6 @@ CardWidget::CardWidget(std::shared_ptr<Card> card)
 
     m_card_entry.add_controller(m_key_ctrl);
     add_controller(m_click_ctrl);
-
-    if (card->is_color_set()) {
-        Color color = card->get_color();
-        CoverColor cover_color = rgb_to_cover_color(color);
-
-        __set_cover_color(CARD_COLORS.at(cover_color));
-
-        m_fixed_card_popover.set_selected_color(cover_color, false);
-        m_mouse_card_popover.set_selected_color(cover_color, false);
-    } else {
-        m_fixed_card_popover.set_selected_color(CoverColor::UNSET, false);
-        m_mouse_card_popover.set_selected_color(CoverColor::UNSET, false);
-    }
-
-    const Date card_date = card->get_due_date();
-    if (card_date.ok()) {
-        m_deadline_label.set_label(_("Due: ") + format_date_str(card_date));
-        m_deadline_label.set_visible();
-    }
-
-    if (!card->container().get_data().empty()) {
-        m_completion_label.set_visible();
-        update_completion_label();
-    }
-
-    set_tooltip_markup(create_details_text());
     setup_drag_and_drop();
 }
 
@@ -513,149 +545,101 @@ void CardWidget::set_title(const std::string& label) {
 
 void CardWidget::set_cardlist(CardlistWidget* new_parent) {
     if (new_parent) {
-        this->m_cardlist_widget = new_parent;
+        this->m_parent = new_parent;
     }
 }
 
-void CardWidget::set_cover_color(CoverColor color) {
-    Gdk::RGBA rgb_color = CARD_COLORS.at(color);
-    Color new_color =
-        Color{rgb_color.get_red() * 255, rgb_color.get_green() * 255,
-              rgb_color.get_blue() * 255, rgb_color.get_alpha()};
-    m_card->set_color(new_color);
+void CardWidget::set_cover_color(Gdk::RGBA color) {
+    const Gdk::RGBA old_color = m_color;
 
-    if (color != CoverColor::UNSET) {
-        __set_cover_color(rgb_color);
-
-        spdlog::get("app")->info("Card (\"{}\") cover color set to (\"{}\")",
-                                 m_card->get_name(),
-                                 rgb_color.to_string().c_str());
+    if (color != Gdk::RGBA{}) {
+        __set_cover_color(color);
     } else {
         __clear_cover_color();
-
-        spdlog::get("app")->info("Card (\"{}\") cover color set to empty",
-                                 m_card->get_name());
     }
+
+    m_color_changed_signal.emit(old_color, color);
 }
 
-void CardWidget::set_deadline(const Date& new_date) {
-    Date old = m_card->get_due_date();
-
-    m_card->set_due_date(new_date);
-    if (new_date.ok()) {
+void CardWidget::set_deadline_label(const Glib::Date& new_date, bool complete) {
+    if (new_date.valid()) {
         m_deadline_label.set_visible();
-        m_deadline_label.set_label(_("Due: ") + format_date_str(new_date));
-
-        if (old.ok()) {
-            spdlog::get("app")->info(
-                "Scheduled new due date for Card(\"{}\"): (\"{}\") -> "
-                "(\"{}\")",
-                m_card->get_name(), std::format("{}", old),
-                std::format("{}", new_date));
-        } else {
-            spdlog::get("app")->info("Card(\"{}\") due date set to ({})",
-                                     m_card->get_name(),
-                                     std::format("{}", new_date));
-        }
+        m_deadline_label.set_label(_("Due: ") +
+                                   new_date.format_string("%d %b, %Y"));
+        m_date = new_date;
+        m_complete = complete;
+        update_deadline_label();
     } else {
         m_deadline_label.set_visible(false);
-        spdlog::get("app")->info("Unset due date for Card (\"{}\")",
-                                 m_card->get_name());
+        m_complete = false;
     }
 }
 
-void CardWidget::remove_from_parent() {
-    if (m_cardlist_widget) {
-        m_cardlist_widget->remove(*this);
-    }
-}
-
-void CardWidget::update_deadline_label() {
-    if (m_card->get_due_date().ok()) {
-        std::string css_class;
-
-        if (m_card->get_complete())
-            css_class = "due-date-complete";
-        else if (m_card->past_due_date())
-            css_class = "past-due-date";
-        else
-            css_class = "due-date";
-
-        for (const auto& css : DATE_LABEL_CSS_CLASSES) {
-            if (m_deadline_label.has_css_class(css)) {
-                if (css_class == css) return;  // Has already been set
-
-                m_deadline_label.remove_css_class(css);
-            }
-        }
-        m_deadline_label.add_css_class(css_class);
-    }
-}
-
-void CardWidget::update_completion_label() {
-    if (!m_card->container().get_data().empty()) {
+void CardWidget::set_completion_label(int n_tasks, int n_tasks_complete) {
+    if (n_tasks) {
         m_completion_label.set_visible(true);
-        float n_complete_tasks =
-            std::accumulate(m_card->container().get_data().begin(),
-                            m_card->container().get_data().end(), 0,
-                            [](int acc, const std::shared_ptr<Task>& task) {
-                                return task->get_done() ? ++acc : acc;
-                            });
-        m_completion_label.set_label(std::format(
-            "{}/{}", n_complete_tasks, m_card->container().get_data().size()));
-        set_completion_label_color(n_complete_tasks);
+        m_completion_label.set_label(
+            std::format("{}/{}", n_tasks_complete, n_tasks));
+        update_completion_label(n_tasks, n_tasks_complete);
     } else {
         m_completion_label.set_visible(false);
     }
 }
 
-std::string CardWidget::get_title() const { return m_card_label.get_label(); }
-
-std::string CardWidget::create_details_text() const {
-    using namespace std::chrono;
-
-    std::ostringstream details_text;
-
-    if (!m_card->container().get_data().empty()) {
-        details_text << Glib::ustring::compose(
-                            _("%1%% complete"),
-                            Glib::ustring::format(std::fixed,
-                                                  std::setprecision(0),
-                                                  m_card->get_completion()))
-                     << "\n\n";
-    }
-
-    auto card_due_date = m_card->get_due_date();
-    if (card_due_date.ok()) {
-        auto sys_clock_now = sys_days(floor<days>(system_clock::now()));
-        Date cur_date = Date{sys_clock_now};
-        if (m_card->get_complete()) {
-            details_text << _("This card is complete") << "\n\n";
-        } else if (card_due_date == cur_date) {
-            details_text << _("The card is due today") << "\n\n";
-        } else {
-            details_text << time_info_text(cur_date, card_due_date);
-        }
-    }
-
-    if (!m_card->get_notes().empty()) {
-        details_text << "<b>" << _("Notes") << "</b>" << ": "
-                     << truncate(m_card->get_notes()) << "\n\n";
-    }
-
-    std::string final_text = details_text.str();
-
-    if (!final_text.empty()) {
-        final_text.resize(final_text.size() - 2);
-    }
-
-    return final_text;
+void CardWidget::set_complete(bool complete) {
+    if (m_date.valid()) m_complete = complete;
 }
 
-std::shared_ptr<Card> CardWidget::get_card() { return m_card; }
+void CardWidget::remove_from_parent() {
+    if (m_parent) {
+        m_parent->remove(*this);
+    }
+}
 
-CardlistWidget const* CardWidget::get_cardlist_widget() const {
-    return m_cardlist_widget;
+void CardWidget::update_deadline_label() {
+    std::string css_class;
+    Glib::Date today;
+    today.set_time_current();
+
+    if (m_complete)
+        css_class = "due-date-complete";
+    else if (today > m_date)
+        css_class = "past-due-date";
+    else
+        css_class = "due-date";
+
+    for (const auto& css : DATE_LABEL_CSS_CLASSES) {
+        if (m_deadline_label.has_css_class(css)) {
+            if (css_class == css) return;  // Has already been set
+
+            m_deadline_label.remove_css_class(css);
+        }
+    }
+    m_deadline_label.add_css_class(css_class);
+}
+
+std::string CardWidget::get_title() const { return m_card_label.get_label(); }
+
+Gdk::RGBA CardWidget::get_cover_color() const { return m_color; }
+
+bool CardWidget::get_complete() const { return m_complete; }
+
+CardlistWidget* CardWidget::parent() const { return m_parent; }
+
+bool CardWidget::is_deadline_set() const { return m_date.valid(); }
+
+sigc::signal<void(std::string, std::string)>&
+CardWidget::signal_name_changed() {
+    return m_name_changed_signal;
+}
+
+sigc::signal<void(Gdk::RGBA, Gdk::RGBA)>& CardWidget::signal_color_changed() {
+    return m_color_changed_signal;
+}
+
+sigc::signal<void(CardWidget*, CardlistWidget*)>&
+CardWidget::signal_card_received() {
+    return m_card_received_signal;
 }
 
 void CardWidget::setup_drag_and_drop() {
@@ -669,35 +653,34 @@ void CardWidget::setup_drag_and_drop() {
             value_new_cardptr.set(this);
             auto card_icon = Gtk::WidgetPaintable::create(*this);
             drag_source_c->set_icon(card_icon, x, y);
+
             return Gdk::ContentProvider::create(value_new_cardptr);
         },
         false);
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
-            this->m_cardlist_widget->board.set_scroll();
+            this->m_parent->board.set_scroll();
 
             spdlog::get("ui")->debug("[CardWidget.dnd] (\"{}\"): On drag",
-                                     m_card->get_name());
+                                     get_title());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
-            this->m_cardlist_widget->board.set_scroll(false);
+            this->m_parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardWidget.dnd] (\"{}\"): Canceled drag event",
-                m_card->get_name());
+                "[CardWidget.dnd] (\"{}\"): Canceled drag event", get_title());
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
-            this->m_cardlist_widget->board.set_scroll(false);
+            this->m_parent->board.set_scroll(false);
 
             spdlog::get("ui")->debug(
-                "[CardWidget.dnd] (\"{}\") Stopped being dragged",
-                m_card->get_name());
+                "[CardWidget.dnd] (\"{}\") Stopped being dragged", get_title());
         });
     add_controller(drag_source_c);
 
@@ -706,7 +689,7 @@ void CardWidget::setup_drag_and_drop() {
         Glib::Value<CardWidget*>::value_type(), Gdk::DragAction::MOVE);
     drop_target_c->signal_drop().connect(
         [this](const Glib::ValueBase& value, double x, double y) {
-            this->m_cardlist_widget->board.set_scroll(false);
+            this->m_parent->board.set_scroll(false);
             if (G_VALUE_HOLDS(value.gobj(),
                               Glib::Value<CardWidget*>::value_type())) {
                 Glib::Value<CardWidget*> dropped_value;
@@ -717,34 +700,34 @@ void CardWidget::setup_drag_and_drop() {
                     spdlog::warn(
                         "[CardWidget.dnd] (\"{}\") has been dropped on "
                         "itself",
-                        m_card->get_name());
-
-                    // After dropping, the receiver card still has the style
-                    // set by DropControllerMotion. Reset
-                    this->remove_css_class("card-to-drop");
+                        get_title());
                     return true;
                 }
 
                 spdlog::get("app")->info(
                     "Card (\"{}\") has been dropped on Card (\"{}\")",
-                    dropped_card_widget->get_card()->get_name(),
-                    m_card->get_name());
+                    dropped_card_widget->get_title(), get_title());
 
-                if (dropped_card_widget->get_cardlist_widget() ==
-                    this->m_cardlist_widget) {
-                    this->m_cardlist_widget->reorder(*dropped_card_widget,
-                                                     *this);
+                if (dropped_card_widget->parent() == this->m_parent) {
+                    this->m_parent->reorder(*dropped_card_widget, *this);
                 } else {
-                    auto dropped_card = dropped_card_widget->get_card();
-                    CardWidget* dropped_copy =
-                        this->m_cardlist_widget->append_new_card(*dropped_card);
-                    dropped_card_widget->remove_from_parent();
-                    this->m_cardlist_widget->reorder(*dropped_copy, *this);
-                }
+                    // auto dropped_parent = dropped_card_widget->parent();
+                    // dropped_card_widget->reference();
 
-                // After dropping, the receiver card still has the style set
-                // by DropControllerMotion. Reset
-                this->remove_css_class("card-to-drop");
+                    // dropped_parent->signal_card_removed().block();
+                    // dropped_parent->remove(*dropped_card_widget);
+                    // dropped_parent->signal_card_removed().unblock();
+
+                    // m_parent->signal_card_added().block();
+                    // m_parent->insert_after(*dropped_card_widget, *this);
+                    // m_parent->signal_card_added().unblock();
+                    // m_card_received_signal.emit(dropped_card_widget,
+                    //                             dropped_parent);
+
+                    // dropped_card_widget->set_cardlist(this->m_parent);
+
+                    this->m_parent->receive_after(*dropped_card_widget, *this);
+                }
 
                 return true;
             }
@@ -754,7 +737,7 @@ void CardWidget::setup_drag_and_drop() {
     add_controller(drop_target_c);
 }
 
-void CardWidget::open_card_details_dialog() {
+void CardWidget::open_card_dialog() {
     auto& parent_window = *(static_cast<ProgressWindow*>(get_root()));
 
     // This is a workaround for the issue where the Card widget maintains
@@ -762,7 +745,7 @@ void CardWidget::open_card_details_dialog() {
     // details dialog
     off_rename();
 
-    parent_window.show_card_dialog(this);
+    parent_window.card_dialog().open(parent_window, this);
 }
 
 void CardWidget::on_rename() {
@@ -775,42 +758,31 @@ void CardWidget::on_rename() {
     m_card_label.set_visible(false);
     m_card_entry.grab_focus();
     m_card_entry.add_controller(m_focus_ctrl);
-
-    spdlog::get("ui")->debug(
-        "[CardWidget.on_rename] (\"{}\"): Entered rename mode",
-        m_card->get_name());
 }
 
 void CardWidget::off_rename() {
     m_card_label.set_visible();
     m_card_entry_revealer.set_reveal_child(false);
-
-    spdlog::get("ui")->debug(
-        "[CardWidget.on_rename] (\"{}\"): Exited rename mode",
-        m_card->get_name());
 }
 
 void CardWidget::on_confirm_changes() {
     if (m_card_entry.get_text().compare(m_card_label.get_label()) != 0) {
-        const std::string old = m_card->get_name();
-
-        m_card->set_name(m_card_entry.get_text());
+        const std::string old = get_title();
         m_card_label.set_label(m_card_entry.get_text());
 
-        spdlog::get("app")->info("Card (\"{}\") renamed to (\"{}\")", old,
-                                 m_card->get_name());
+        m_name_changed_signal.emit(old, get_title());
     }
 }
 
-void CardWidget::set_completion_label_color(unsigned long n_complete_tasks) {
+void CardWidget::update_completion_label(int n_tasks, int n_tasks_complete) {
     std::string css_class;
-    const float threshold = m_card->container().get_data().size() / 2.0F;
+    const float threshold = n_tasks / 2.0F;
 
-    if (n_complete_tasks == m_card->container().get_data().size()) {
+    if (n_tasks_complete == n_tasks) {
         css_class = "complete-tasks-indicator-complete";
-    } else if (n_complete_tasks < threshold) {
+    } else if (n_tasks_complete < threshold) {
         css_class = "complete-tasks-indicator-incomplete";
-    } else if (n_complete_tasks >= threshold) {
+    } else if (n_tasks_complete >= threshold) {
         css_class = "complete-tasks-indicator-almost";
     }
 
@@ -830,16 +802,24 @@ void CardWidget::set_completion_label_color(unsigned long n_complete_tasks) {
 void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
     auto color_frame_pixbuf = Gdk::Pixbuf::create(
         Gdk::Colorspace::RGB, false, 8, CardlistWidget::CARDLIST_MAX_WIDTH, 30);
-    color_frame_pixbuf->fill(rgb_to_hex(m_card->get_color()));
+    color_frame_pixbuf->fill(
+        (((unsigned char)(color.get_red() * 255.0)) << 24) |
+        (((unsigned char)(color.get_green() * 255.0)) << 16) |
+        (((unsigned char)(color.get_blue() * 255.0)) << 8) |
+        ((unsigned char)(color.get_alpha())));
 
     m_card_cover_picture.set_paintable(
         Gdk::Texture::create_for_pixbuf(color_frame_pixbuf));
     m_card_cover_revealer.set_reveal_child(true);
+
+    m_color = color;
 }
 
 void CardWidget::__clear_cover_color() {
     m_card_cover_revealer.set_reveal_child(false);
     m_card_cover_picture.set_paintable(nullptr);
+
+    m_color = Gdk::RGBA{};
 }
 
 void CardWidget::cleanup() { m_root.unparent(); }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/task.h>
 #include <dialog/card-dialog.h>
 #include <gtkmm.h>
 
@@ -29,19 +28,22 @@ public:
      *
      * @param card_details_dialog CardDetailsDialog reference to hold this
      * widget
-     * @param task Task data
-     * @param editing_mode bool value indicating whether to start this widget in
-     * editing mode
-     */
-    TaskWidget(CardDetailsDialog& card_details_dialog,
-               const std::shared_ptr<Task>& task);
-
-    /**
-     * @brief Returns the Task instance pointer
      *
-     * @return Task instance pointer.
+     * @param name task's title
+     * 
+     * @param complete task's complete status
      */
-    std::shared_ptr<Task> task() const;
+    TaskWidget(CardDialog& card_details_dialog, const std::string& title,
+               bool complete = false);
+
+    void set_title(const std::string& title);
+    void set_complete(bool complete = true);
+
+    std::string get_title() const;
+    bool get_complete() const;
+
+    sigc::signal<void(std::string, std::string)>& signal_name_changed();
+    sigc::signal<void()>& signal_complete_changed();
 
 protected:
     /**
@@ -53,11 +55,6 @@ protected:
      * @brief Handles the end of the rename action.
      */
     void off_rename();
-
-    /**
-     * @brief Handles the remove action.
-     */
-    void on_remove();
 
     /**
      * @brief Checkbox toggled event handler
@@ -78,20 +75,24 @@ protected:
 
     void cleanup() override;
 
+    // Widgets
     Gtk::Label m_label;
     Gtk::Revealer m_entry_revealer;
     Gtk::Entry m_entry;
     Gtk::CheckButton m_checkbutton;
     Gtk::PopoverMenu m_popover;
-    const Glib::RefPtr<Gtk::EventControllerFocus> m_focus_controller;
 
-    CardDetailsDialog& m_card_dialog;
+    CardDialog& m_card_dialog;
     CardWidget* m_card_widget;
 
+    std::string m_title;
+
+    const Glib::RefPtr<Gtk::EventControllerFocus> m_focus_controller;
     const Glib::RefPtr<Gio::Menu> m_menu_model;
     const Glib::RefPtr<Gio::SimpleActionGroup> m_action_group;
 
-    std::shared_ptr<Task> m_task;
+    sigc::signal<void(std::string, std::string)> m_name_changed_signal;
+    sigc::signal<void()> m_complete_changed_signal;
 };
 
 }  // namespace ui

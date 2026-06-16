@@ -36,7 +36,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
       progress_settings{progress_settings},
-      card_dialog{},
+      m_card_dialog{},
       create_board{CreateBoardDialog::create(m_manager)},
       edit_board{PreferencesBoardDialog::create(board_widget)},
       sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
@@ -320,11 +320,9 @@ void ProgressWindow::show_about_dialog() {
         "https://github.com/smolBlackCat/progress-tracker", NULL);
 }
 
-void ProgressWindow::show_card_dialog(CardWidget* card_widget) {
-    card_dialog.open(*this, card_widget);
-}
-
 void ProgressWindow::show_shortcuts_dialog() { sh_window->set_visible(); }
+
+CardDialog& ProgressWindow::card_dialog() { return m_card_dialog; }
 
 void ProgressWindow::setup_menu_button() {
     auto action_group = Gio::SimpleActionGroup::create();

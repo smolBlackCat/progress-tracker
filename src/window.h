@@ -87,22 +87,10 @@ public:
      */
     void delete_selected_boards();
 
-    /**
-     * @brief Shows the general information about the application.
-     */
     void show_about_dialog();
-
-    /**
-     * @brief Shows the card details dialog.
-     *
-     * @param card_widget Pointer to the CardWidget to show details for.
-     */
-    void show_card_dialog(CardWidget* card_widget);
-
-    /**
-     * @brief Shows the shortcuts dialog.
-     */
     void show_shortcuts_dialog();
+
+    CardDialog& card_dialog();
 
 protected:
     BoardManager& m_manager;
@@ -132,7 +120,7 @@ protected:
 #endif
 
     BoardDialog *create_board, *edit_board;
-    CardDetailsDialog card_dialog;
+    CardDialog m_card_dialog;
 
     /**
      * @brief Sets up the menu button.

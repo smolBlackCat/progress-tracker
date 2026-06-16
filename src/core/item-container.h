@@ -62,7 +62,7 @@ public:
     void modify(bool m = true) override;
 
     ssize_t size() const;
-
+    
     /**
      * @brief Returns a reference to the container's data.
      *
