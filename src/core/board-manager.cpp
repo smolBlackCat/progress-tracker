@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <filesystem>
 #include <memory>
-#include <mutex>
 #include <regex>
 #include <thread>
 
@@ -226,7 +225,7 @@ BoardManager::BoardManager(const std::string& board_dir)
 
     // FIXME: The current state of the core is incomplete.
     std::thread([this]() {
-        std::lock_guard<std::mutex> valid_mutex_guard{this->valid_mutex};
+        std::lock_guard<std::mutex> valid_mutex_guard(this->valid_mutex);
 
         // We only need to perform this check on Linux environments since this
         // version is still loading from %APPDATA%
@@ -346,7 +345,7 @@ void BoardManager::local_close(const std::shared_ptr<Board>& board) {
 }
 
 bool BoardManager::loaded() const {
-    std::lock_guard<std::mutex> lg{valid_mutex};
+    std::lock_guard<std::mutex> lg(valid_mutex);
     return m_loaded;
 }
 

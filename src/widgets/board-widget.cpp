@@ -14,7 +14,6 @@ namespace ui {
 BoardWidget::BoardWidget()
     : Gtk::ScrolledWindow{},
       m_root{Gtk::Orientation::HORIZONTAL},
-      m_manager{manager},
       m_picture{},
       m_scr{},
       m_overlay{},
