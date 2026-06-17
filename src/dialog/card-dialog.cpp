@@ -90,7 +90,10 @@ void CardDialog::set_deadline(const Glib::Date& deadline) {
         Glib::DateTime datetime = Glib::DateTime::create_local(
             deadline.get_year(), deadline.get_month_as_int(),
             deadline.get_day(), 0, 0, 0);
-        m_calendar->set_date(datetime);
+
+        // This method will be deprecated in next releases
+        m_calendar->select_day(datetime);
+
         m_deadline = std::chrono::year_month_day{
             std::chrono::year{int(datetime.get_year())},
             std::chrono::month{unsigned(datetime.get_month())},
