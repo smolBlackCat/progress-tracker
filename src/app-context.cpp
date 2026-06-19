@@ -9,6 +9,7 @@
 
 #include "core/board.h"
 #include "core/colorable.h"
+#include "glibmm/main.h"
 #include "widgets/card-widget.h"
 #include "widgets/cardlist-widget.h"
 #include "widgets/task-widget.h"
@@ -52,11 +53,6 @@ AppContext::AppContext(ui::ProgressWindow& app_window,
         sigc::mem_fun(*this, &AppContext::on_session_loaded));
     m_save_board_dispatcher.connect(
         sigc::mem_fun(*this, &AppContext::on_session_saved));
-
-    // TODO: Update card updating system
-    // m_board_widget.signal_added_cardlist().connect(
-    //     sigc::mem_fun(*this,
-    //     &AppContext::register_cardlist_container_update));
 }
 
 void AppContext::open_session(const std::string& filename) {
@@ -101,9 +97,12 @@ void AppContext::close_session() {
 }
 
 void AppContext::reset_session_state() {
+    // Reset card updating system state
     m_next_card_i = 0;
     m_cardlist_i = 0;
     m_cards.clear();
+
+    // Reset idle, suspend, timeout event handlers
     m_idle_load_session_cnn.disconnect();
     m_timeout_save_cnn.disconnect();
     m_timeout_cards_update_cnn.disconnect();
@@ -114,21 +113,7 @@ void AppContext::reset_session_state() {
                                 m_suspended_tracker_handler_id);
 #endif
 
-    std::for_each(m_board_widget_cnns.begin(), m_board_widget_cnns.end(),
-                  [](auto& connection) { connection.disconnect(); });
-    m_board_widget_cnns.clear();
-    std::for_each(m_cardlists_cnns.begin(), m_cardlists_cnns.end(),
-                  [](auto& connection) { connection.disconnect(); });
-    m_cardlists_cnns.clear();
-    std::for_each(m_cards_cnns.begin(), m_cards_cnns.end(),
-                  [](auto& connection) { connection.disconnect(); });
-    m_cards_cnns.clear();
-    std::for_each(m_card_dialog_cnns.begin(), m_card_dialog_cnns.end(),
-                  [](auto& connection) { connection.disconnect(); });
-    m_card_dialog_cnns.clear();
-
-    m_board_name_change_cnn.disconnect();
-    m_board_bg_changed_cnn.disconnect();
+    clear_binds();
 
     m_current_board = nullptr;
 }
@@ -233,13 +218,8 @@ void AppContext::on_session_loaded() {
 
         m_card_dialog_cnns.push_back(
             card_dialog.signal_closed().connect([this, &card_dialog]() {
-                for (auto it = std::next(m_card_dialog_cnns.begin(), 2);
-                     it != m_card_dialog_cnns.end(); it++) {
-                    it->disconnect();
-                }
-
                 // The last two signals are the open and close connections,
-                // which doesnt have to be deleted across sessions
+                // which doesnt have to be deleted when a session is still on
                 m_card_dialog_cnns.erase(
                     std::next(m_card_dialog_cnns.begin(), 2),
                     m_card_dialog_cnns.end());
@@ -257,14 +237,28 @@ void AppContext::on_session_loaded() {
                 Date date = card_dialog.get_deadline();
 
                 if (date != db_card->get_due_date()) {
+                    Date old_date = db_card->get_due_date();
                     db_card->set_due_date(date);
-                }
 
-                if (date.ok() &&
-                    (card_dialog.get_complete() != db_card->get_complete())) {
-                    card_w->set_complete(card_dialog.get_complete());
-                    card_w->update_deadline_label();
-                    db_card->set_complete(card_dialog.get_complete());
+                    if (date.ok()) {
+                        // It means the cards hasn't a deadline set until now,
+                        // which means it should be added to the card updating
+                        // queue too
+                        if (!old_date.ok()) {
+                            card_update_queue_push(card_w);
+                        }
+
+                        if (card_dialog.get_complete() !=
+                            db_card->get_complete()) {
+                            card_w->set_complete(card_dialog.get_complete());
+                            card_w->update_deadline_label();
+                            db_card->set_complete(card_dialog.get_complete());
+                        }
+                    } else {
+                        // Date has been unset. We don't need to update this
+                        // card's deadline label anymore
+                        std::erase(m_cards, card_w);
+                    }
                 }
 
                 const std::pair<int, int> completion_ratio =
@@ -279,6 +273,7 @@ void AppContext::on_session_loaded() {
 
         m_app_window.on_board_view();
 
+        // TODO: Remove this method. There's no need for it
         setup_board_widget();
 
         m_idle_load_session_cnn = Glib::signal_idle().connect(
@@ -287,9 +282,6 @@ void AppContext::on_session_loaded() {
         m_timeout_save_cnn = Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &AppContext::timeout_save_session),
             AppContext::SAVE_INTERVAL);
-        m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
-            sigc::mem_fun(*this, &AppContext::timeout_update_cards),
-            AppContext::UPDATE_INTERVAL);
 #if GTKMM_CHECK_VERSION(4, 12, 0)
         m_suspended_tracker_cnn =
             m_app_window.property_suspended().signal_changed().connect(
@@ -461,6 +453,9 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
             m_bound_cards.erase(card_w);
         }));
 
+    m_cardlists_cnns.push_back(cardlist_w->signal_card_removed().connect(
+        [this](ui::CardWidget* card_w) { std::erase(m_cards, card_w); }));
+
     m_cardlists_cnns.push_back(cardlist_w->signal_card_reorder().connect(
         [this, db_cardlist](ui::CardWidget* next, ui::CardWidget* sibling,
                             bool up) {
@@ -546,8 +541,20 @@ void AppContext::bind(const std::shared_ptr<Task>& db_task,
 }
 
 void AppContext::clear_binds() {
-    m_bound_cardlists.clear();
-    m_bound_cards.clear();
+    m_board_widget_cnns.clear();
+    m_cardlists_cnns.clear();
+    m_cards_cnns.clear();
+    m_card_dialog_cnns.clear();
+}
+
+void AppContext::card_update_queue_push(ui::CardWidget* card_w) {
+    m_cards.push_back(card_w);
+
+    if (m_timeout_cards_update_cnn.empty()) {
+        m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &AppContext::timeout_update_cards),
+            UPDATE_INTERVAL);
+    }
 }
 
 bool AppContext::on_window_closed() {
@@ -600,6 +607,9 @@ bool AppContext::idle_load_session() {
             m_current_board->get_name());
         bind(m_current_board, &m_board_widget);
 
+        m_timeout_cards_update_cnn = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &AppContext::timeout_update_cards),
+            AppContext::UPDATE_INTERVAL);
         m_idle_load_session_cnn.disconnect();
         return false;
     }
@@ -610,9 +620,13 @@ bool AppContext::idle_load_session() {
 
     for (const auto& card : data[m_cardlist_i]->container()) {
         ui::CardWidget* card_widget = builder_card_widget(card);
+        if (card_widget->is_deadline_set()) {
+            m_cards.push_back(card_widget);
+        }
         cardlist_widget->append(*card_widget);
         bind(card, card_widget);
     }
+
     bind(data[m_cardlist_i], cardlist_widget);
     m_cardlist_i++;
 
@@ -673,22 +687,25 @@ bool AppContext::timeout_update_cards() {
         const size_t size = m_cards.size();
 
         if (m_cards.empty()) {
-            return true;
+            m_timeout_cards_update_cnn.disconnect();
+            spdlog::get("app")->debug(
+                "[AppContext.timeout_update_cards] Stop card update task");
+            return false;
         }
 
         if (m_next_card_i > size - 1) {
             m_next_card_i = 0;
         }
 
-        auto card = m_cards[m_next_card_i];
+        auto card_w = m_cards[m_next_card_i];
 
-        card->update_deadline_label();
-        card->set_tooltip_markup(card->card_widget_tooltip_text());
+        card_w->update_deadline_label();
+        card_w->set_tooltip_markup(card_w->card_widget_tooltip_text());
 
         spdlog::get("app")->debug(
             "[AppContext.timeout_update_cards] CardWidget \"{}\"'s UI has "
             "been updated",
-            card->get_title());
+            card_w->get_title());
 
         m_next_card_i++;
 
@@ -705,17 +722,3 @@ void AppContext::setup_board_widget() {
     m_board_widget.set_name(m_current_board->get_name());
     m_board_widget.set_background(m_current_board->get_background());
 }
-
-// void AppContext::register_cardlist_container_update(
-//     ui::CardlistWidget* cardlist) {
-//     cardlist->signal_card_added().connect(sigc::track_obj(
-//         [this](ui::CardWidget* card) {
-//             this->m_cards.push_back(card);
-//             card->signal_destroy().connect(
-//                 [this, card]() { std::erase(this->m_cards, card); });
-//         },
-//         *cardlist));
-//     cardlist->signal_card_removed().connect(sigc::track_obj(
-//         [this](ui::CardWidget* card) { std::erase(this->m_cards, card); },
-//         *cardlist));
-// }

@@ -100,6 +100,15 @@ protected:
     void clear_binds();
 
     /**
+     * @brief Pushs a card widget object pointer to the updating system queue.
+     * Also, the timeout update procedure is scheduled if it has been
+     * deactivated
+     * 
+     * @param card_w card widget object pointer
+     */
+    void card_update_queue_push(ui::CardWidget* card_w);
+
+    /**
      * @brief Save the current session if there is one
      * */
     bool on_window_closed();
@@ -123,8 +132,7 @@ protected:
     std::thread m_board_save_thread, m_board_load_thread;
     Glib::Dispatcher m_load_board_dispatcher, m_save_board_dispatcher;
     sigc::connection m_timeout_save_cnn, m_timeout_cards_update_cnn,
-        m_idle_load_session_cnn, m_board_bg_changed_cnn,
-        m_board_name_change_cnn;
+        m_idle_load_session_cnn;
 
 #if GTKMM_CHECK_VERSION(4, 12, 0)
     sigc::connection m_suspended_tracker_cnn;
@@ -133,11 +141,8 @@ protected:
 #endif
 
     // BoardWidget Context
-    std::vector<sigc::connection> m_board_widget_cnns;
-    std::vector<sigc::connection> m_cardlists_cnns;
-    std::vector<sigc::connection> m_cards_cnns;
-    std::vector<sigc::connection> m_tasks_cnns;
-    std::vector<sigc::connection> m_card_dialog_cnns;
+    std::vector<sigc::scoped_connection> m_board_widget_cnns, m_cardlists_cnns,
+        m_cards_cnns, m_tasks_cnns, m_card_dialog_cnns;
 
     std::unordered_map<ui::CardlistWidget*, std::shared_ptr<CardList>>
         m_bound_cardlists;
