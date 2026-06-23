@@ -279,6 +279,9 @@ void ProgressWindow::on_main_menu() {
     app_menu_button_p->set_menu_model(board_grid_menu_p);
     home_button_p->set_visible(false);
     add_board_button_p->set_visible();
+
+    add_board_button_p->set_sensitive();
+    app_menu_button_p->set_sensitive();
     set_title("Progress");
 }
 
