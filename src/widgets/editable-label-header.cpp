@@ -161,7 +161,8 @@ void EditableLabelHeader::on_key_released(guint keyval, guint keycode,
                                           Gdk::ModifierType state) {
     if (revealer.get_child_revealed()) {
         switch (keyval) {
-            case (GDK_KEY_Return): {
+            case (GDK_KEY_Return):
+            case (GDK_KEY_KP_Enter): {
                 on_confirm_changes();
                 break;
             }
