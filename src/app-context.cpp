@@ -247,18 +247,18 @@ void AppContext::on_session_loaded() {
                         if (!old_date.ok()) {
                             card_update_queue_push(card_w);
                         }
-
-                        if (card_dialog.get_complete() !=
-                            db_card->get_complete()) {
-                            card_w->set_complete(card_dialog.get_complete());
-                            card_w->update_deadline_label();
-                            db_card->set_complete(card_dialog.get_complete());
-                        }
                     } else {
                         // Date has been unset. We don't need to update this
                         // card's deadline label anymore
                         std::erase(m_cards, card_w);
                     }
+                }
+
+                if (date.ok() &&
+                    (card_dialog.get_complete() != db_card->get_complete())) {
+                    card_w->set_complete(card_dialog.get_complete());
+                    card_w->update_deadline_label();
+                    db_card->set_complete(card_dialog.get_complete());
                 }
 
                 const std::pair<int, int> completion_ratio =
