@@ -392,7 +392,7 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
     }
 
     if (deadline.valid()) {
-        set_deadline_label(deadline);
+        set_deadline_label(deadline, m_complete);
     }
 
     if (n_tasks > 0 && n_tasks_complete <= n_tasks) {
