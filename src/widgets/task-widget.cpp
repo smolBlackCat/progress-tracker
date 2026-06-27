@@ -102,7 +102,8 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (m_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
-                    case (GDK_KEY_Return): {
+                    case (GDK_KEY_Return):
+                    case (GDK_KEY_KP_Enter): {
                         off_rename();
                         break;
                     }
