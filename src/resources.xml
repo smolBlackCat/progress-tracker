@@ -8,4 +8,8 @@
         <file>app-window.ui</file>
         <file>board-dialog.ui</file>
     </gresource>
+
+    <gresource prefix="/org/gtk/libgtk/icons/">
+        <file>document-text-symbolic.svg</file>
+    </gresource>
 </gresources>

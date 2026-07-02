@@ -69,16 +69,6 @@ std::string cover_color_css(CoverColor color) {
     }
 }
 
-std::string format_date_str(Date date) {
-    const std::time_t time =
-        std::chrono::system_clock::to_time_t(std::chrono::sys_days(date));
-
-    char date_str[30];
-    std::strftime(date_str, sizeof(date_str), "%d %b, %Y", std::gmtime(&time));
-
-    return date_str;
-}
-
 // FIXME: This is only a workaround. Find better solution later
 CoverColor rgba_to_cover_color(Gdk::RGBA rgb) {
     const std::array<std::pair<Gdk::RGBA, CoverColor>, 7> COLORS = {
@@ -95,84 +85,6 @@ CoverColor rgba_to_cover_color(Gdk::RGBA rgb) {
         }
     }
     return CoverColor::UNSET;
-}
-
-std::string truncate(const std::string& text) {
-    const int TRUNCATE_SIZE = 40;
-
-    if (text.size() <= TRUNCATE_SIZE) {
-        return text;
-    }
-
-    std::string truncated_text = text.substr(0, TRUNCATE_SIZE - 3);
-    truncated_text += "...";
-
-    return truncated_text;
-}
-
-std::string time_info_text(const Glib::Date& now, const Glib::Date& deadline) {
-    int delta_days = now.days_between(deadline);
-
-    std::string due_date_text;
-
-    if (delta_days > 0 && delta_days < 30) {
-        due_date_text =
-            Glib::ustring::compose(Glib::locale_to_utf8(ngettext(
-                                       "<b>%1 day</b> remaining",
-                                       "<b>%1 days</b> remaining", delta_days)),
-                                   delta_days) +
-            "\n\n";
-    } else if (delta_days > 0 && delta_days >= 30 && delta_days < 365) {
-        long months_from_delta =
-            delta_days / 30;  // Assume every month has 30 days
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(ngettext("<b>%1 month</b> remaining",
-                                              "<b>%1 months</b> remaining",
-                                              months_from_delta)),
-                months_from_delta) +
-            "\n\n";
-    } else if (delta_days > 0 && delta_days >= 365) {
-        long years_from_delta = delta_days / 365;  // Ignore leap years
-        due_date_text = Glib::ustring::compose(
-                            Glib::locale_to_utf8(ngettext(
-                                "<b>%1 year</b> remaining",
-                                "<b>%1 years</b> remaining", years_from_delta)),
-                            years_from_delta) +
-                        "\n\n";
-    } else if (delta_days > -30) {
-        due_date_text = Glib::ustring::compose(
-                            Glib::locale_to_utf8(ngettext(
-                                "This card is past due date <b>%1 day ago</b>",
-                                "This card is past due date <b>%1 days ago</b>",
-                                -delta_days)),
-                            -delta_days) +
-                        "\n\n";
-    } else if (delta_days <= -30 && delta_days > -365) {
-        long months_from_delta =
-            delta_days / 30;  // Assume every month has 30 days
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(
-                    ngettext("This card is past due date <b>%1 month</b> ago",
-                             "This card is past due date <b>%1 months</b> "
-                             "ago",
-                             -months_from_delta)),
-                -months_from_delta) +
-            "\n\n";
-    } else if (delta_days <= -365) {
-        long years_from_delta = delta_days / 365;  // Ignore leap years
-        due_date_text =
-            Glib::ustring::compose(
-                Glib::locale_to_utf8(
-                    ngettext("This card is past due date <b>%1 year</b> ago",
-                             "This card is past due date <b>%1 years</b> ago",
-                             -years_from_delta)),
-                -years_from_delta) +
-            "\n\n";
-    }
-
-    return due_date_text;
 }
 
 const std::unordered_map<CoverColor, Gdk::RGBA> CardWidget::CARD_COLORS = {
@@ -313,53 +225,11 @@ const std::array<std::string, 3> CardWidget::TASKS_LABEL_CSS_CLASSES = {
     "complete-tasks-indicator-incomplete",
 };
 
-std::string CardWidget::card_widget_tooltip_text(int n_task,
-                                                 int n_tasks_complete,
-                                                 Glib::Date deadline,
-                                                 bool complete,
-                                                 const std::string& notes) {
-    std::ostringstream details_text;
-
-    if (n_task > 0) {
-        details_text << Glib::ustring::compose(
-                            _("%1%% complete"),
-                            Glib::ustring::format(
-                                std::fixed, std::setprecision(0),
-                                (n_tasks_complete / n_task) * 100))
-                     << "\n\n";
-    }
-
-    if (deadline.valid()) {
-        Glib::Date cur_date{};
-        cur_date.set_time_current();
-        if (complete) {
-            details_text << _("This card is complete") << "\n\n";
-        } else if (deadline == cur_date) {
-            details_text << _("The card is due today") << "\n\n";
-        } else {
-            details_text << time_info_text(cur_date, deadline);
-        }
-    }
-
-    if (!notes.empty()) {
-        details_text << "<b>" << _("Notes") << "</b>" << ": " << truncate(notes)
-                     << "\n\n";
-    }
-
-    std::string final_text = details_text.str();
-
-    if (!final_text.empty()) {
-        final_text.resize(final_text.size() - 2);
-    }
-
-    return final_text;
-}
-
 // TODO: There is still work to be done
 // * Re-invent popovers implementation
 CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
-                       Glib::Date deadline, bool complete, int n_tasks,
-                       int n_tasks_complete)
+                       Glib::Date deadline, bool complete, bool show_notes_icon,
+                       int n_tasks, int n_tasks_complete)
     : Glib::ObjectBase{"CardWidget"},
       CardInit{},
       BaseItem{Gtk::Orientation::VERTICAL, 0},
@@ -399,7 +269,9 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
         set_completion_label(n_tasks, n_tasks_complete);
     }
 
-    set_tooltip_markup(card_widget_tooltip_text());
+    if (show_notes_icon) {
+        m_notes_icon.set_visible();
+    }
 
     m_focus_ctrl->signal_leave().connect(
         sigc::mem_fun(*this, &CardWidget::off_rename));
@@ -589,6 +461,10 @@ void CardWidget::set_completion_label(int n_tasks, int n_tasks_complete) {
     } else {
         m_completion_label.set_visible(false);
     }
+}
+
+void CardWidget::set_notes_icon_visible(bool visible) {
+    m_notes_icon.set_visible(visible);
 }
 
 void CardWidget::set_complete(bool complete) {
@@ -855,13 +731,18 @@ void CardWidget::setup_widgets() {
     card_data_box.append(card_label_box);
 
     Gtk::Box& card_info_box = *Gtk::make_managed<Gtk::Box>();
-    card_info_box.set_spacing(15);
+    card_info_box.set_spacing(8);
 
     card_info_box.append(m_completion_label);
     m_completion_label.set_visible(false);
 
     card_info_box.append(m_deadline_label);
     m_deadline_label.set_visible(false);
+
+    m_notes_icon.set_from_icon_name("document-text-symbolic");
+    m_notes_icon.add_css_class("notes-icon");
+    card_info_box.append(m_notes_icon);
+    m_notes_icon.set_visible(false);
 
     card_data_box.append(card_info_box);
 

@@ -38,17 +38,6 @@ public:
     const static std::unordered_map<CoverColor, Gdk::RGBA> CARD_COLORS;
 
     /**
-     * @brief Helper method for creating a tooltip text for the card widget.
-     *
-     * @return the tooltip text string.
-     */
-    static std::string card_widget_tooltip_text(int n_task = 0,
-                                                int n_tasks_complete = 0,
-                                                Glib::Date deadline = {},
-                                                bool complete = false,
-                                                const std::string& notes = {});
-
-    /**
      * @brief Constructs a CardWidget object.
      *
      * @param title card's title
@@ -67,7 +56,8 @@ public:
      * the amount of tasks
      */
     CardWidget(const std::string& title, Gdk::RGBA cover_color = {},
-               Glib::Date deadline = {}, bool complete = false, int n_tasks = 0,
+               Glib::Date deadline = {}, bool complete = false,
+               bool show_notes_icon = false, int n_tasks = 0,
                int n_tasks_complete = 0);
 
     /**
@@ -105,6 +95,14 @@ public:
      * complete/tasks as a label
      */
     void set_completion_label(int n_tasks, int n_tasks_complete);
+
+    /**
+     * @brief Sets the notes label icon visible. It indicates that this card
+     * contains extra notes.
+     *
+     * @param visible boolean flag
+     */
+    void set_notes_icon_visible(bool visible = true);
 
     /**
      * @param Marks this card as complete. This method only has effect if there
@@ -202,6 +200,7 @@ protected:
     Gtk::Revealer m_card_cover_revealer, m_card_entry_revealer;
     Gtk::Picture m_card_cover_picture;
     Gtk::Label m_card_label, m_completion_label, m_deadline_label;
+    Gtk::Image m_notes_icon;
     Gtk::Entry m_card_entry;
     Gtk::MenuButton m_card_menu_button;
     CardPopover m_fixed_card_popover, m_mouse_card_popover;

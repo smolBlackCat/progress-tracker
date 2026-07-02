@@ -36,7 +36,7 @@ ui::CardWidget* AppContext::builder_card_widget(
 
     ui::CardWidget* card_widget = Gtk::make_managed<ui::CardWidget>(
         card->get_name(), card_color, card_deadline, card->get_complete(),
-        card->container().size(), n_complete_tasks);
+        !card->get_notes().empty(), card->container().size(), n_complete_tasks);
 
     return card_widget;
 }
@@ -340,6 +340,9 @@ void AppContext::on_session_loaded() {
                     spdlog::get("app")->info(
                         "(\"{}\") → Card \"{}\"'s notes has been updated",
                         m_current_board->get_name(), db_card->get_name());
+
+                    card_w->set_notes_icon_visible(
+                        !db_card->get_notes().empty());
                 }
 
                 spdlog::get("app")->info("(\"{}\") → Card Dialog closed for {}",
@@ -875,7 +878,6 @@ bool AppContext::timeout_update_cards() {
         auto card_w = m_cards[m_next_card_i];
 
         card_w->update_deadline_label();
-        card_w->set_tooltip_markup(card_w->card_widget_tooltip_text());
 
         spdlog::get("app")->debug(
             "[AppContext.timeout_update_cards] CardWidget \"{}\"'s UI has "

@@ -62,7 +62,7 @@ if (BUILD_APP)
     set(GLIB_FLAGS ${GLIB_FLAGS} --generate-source)
     set(GLIB_FLAGS ${GLIB_FLAGS} --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}/resources/ui)
 
-    file(GLOB_RECURSE RESOURCES "resources/ui/*.ui" "resources/ui/*.css")
+    file(GLOB_RECURSE RESOURCES "resources/ui/*.ui" "resources/ui/*.css" "resources/ui/*.svg")
 
     add_custom_command(
     OUTPUT resources.cpp

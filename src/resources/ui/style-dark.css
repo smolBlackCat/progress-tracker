@@ -120,6 +120,16 @@ task:focus {
     box-shadow: 0 0 2px @card_shade_color;
 }
 
+.notes-icon {
+    transition-property: background-color;
+    background-color: @insensitive_bg_color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
 /*
  * Original CSS by Vlad Krupinskii <mrvladus@yandex.ru>
  * Source: https://github.com/mrvladus/Errands
@@ -127,12 +137,12 @@ task:focus {
  */
 
 .accent-color-btn radio {
-  all: unset;
-  border: 2px solid transparent;
-  border-radius: 9999px;
-  min-width: 14px;
-  min-height: 14px;
-  color: @light_1;
+    all: unset;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    min-width: 14px;
+    min-height: 14px;
+    color: @light_1;
 }
 
 .accent-color-btn radio:checked {
@@ -140,7 +150,7 @@ task:focus {
 }
 
 .accent-color-btn radio:hover {
-  filter: brightness(1.2);
+    filter: brightness(1.2);
 }
 
 .red radio {
