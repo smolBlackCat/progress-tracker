@@ -2,7 +2,6 @@
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/checksum.h>
-#include <spdlog/spdlog.h>
 
 #include <filesystem>
 
@@ -42,15 +41,9 @@ std::string compressed_bg_filename(const std::string& filename,
     std::string filename_checksum =
         Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, filename);
 
-    // Cache hit
     const fs::path cached_image = fs::path{bg_cache_dir()} / filename_checksum;
-    if (fs::exists(cached_image)) {
-        spdlog::get("ui")->debug("[BackgroundProvider] Cache hit");
-    } else {
+    if (!fs::exists(cached_image)) {
         // Compresses the given image file and return the compressed's filename
-        spdlog::get("ui")->debug(
-            "[Background] There was no compressed file available. "
-            "Compress it");
         // We ensure a cache directory exists at all times
         fs::create_directories(bg_cache_dir());
 
@@ -87,12 +80,9 @@ std::string compressed_thumb_filename(const std::string& filename) {
 
     fs::create_directories(thumb_cache_dir());
 
-    // Cache hit
     const fs::path cached_image =
         fs::path{thumb_cache_dir()} / filename_checksum;
-    if (fs::exists(cached_image)) {
-        spdlog::get("ui")->debug("[BackgroundProvider] Cache hit");
-    } else {
+    if (!fs::exists(cached_image)) {
         auto bg_pixbuf = Gdk::Pixbuf::create_from_file(filename);
         bg_pixbuf->scale_simple(256, 256, Gdk::InterpType::BILINEAR)
             ->save(cached_image.string(), "png");

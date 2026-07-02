@@ -28,13 +28,6 @@ BoardDialog::BoardDialog()
     background_setter_menubutton->insert_action_group("board-dialog", group);
     footer_button->signal_clicked().connect(
         sigc::mem_fun(*this, &BoardDialog::on_footer_button_click));
-
-    g_signal_connect(
-        board_dialog->gobj(), "closed",
-        G_CALLBACK(+[](AdwDialog*, gpointer user_data) {
-            spdlog::get("ui")->info("[BoardDialog.close] Board dialog closed");
-        }),
-        nullptr);
 }
 
 BoardDialog::~BoardDialog() {}
@@ -43,8 +36,6 @@ void BoardDialog::open(Gtk::Window& parent) {
     adw_dialog_present(ADW_DIALOG(board_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
     this->parent = &parent;
-
-    spdlog::get("app")->info("A Board dialog opened");
 }
 
 void BoardDialog::on_set_image() {
@@ -79,10 +70,9 @@ void BoardDialog::on_color_finish(
     try {
         rgba = color_dialog->choose_rgba_finish(result);
         set_picture(rgba);
-        spdlog::get("app")->info("[BoardDialog.set_picture] Color set to: {}",
-                                 rgba.to_string().c_str());
     } catch (Gtk::DialogError& err) {
-        spdlog::get("app")->warn("[BoardDialog.on_color_finish] {}", err.what());
+        spdlog::get("app")->warn("[BoardDialog.on_color_finish] {}",
+                                 err.what());
     }
 }
 
@@ -92,11 +82,9 @@ void BoardDialog::on_filedialog_finish(
     try {
         image_filename = dialog->open_finish(result)->get_path();
         set_picture(compressed_thumb_filename(image_filename));
-        spdlog::get("app")->info("[BoardDialog.set_picture] Picture set to: {}",
-                                 image_filename);
     } catch (Glib::Error& err) {
         spdlog::get("app")->warn("[BoardDialog.on_filedialog_finish] {}",
-                                err.what());
+                                 err.what());
     }
 }
 

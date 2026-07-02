@@ -254,7 +254,7 @@ void ProgressWindow::on_delete_board_mode() {
     add_board_button_p->set_visible(false);
     app_menu_button_p->set_visible(false);
 
-    spdlog::get("app")->info("Entered delete board mode");
+    spdlog::get("app")->info("User has entered board deletion mode");
 }
 
 void ProgressWindow::off_delete_board_mode() {
@@ -267,7 +267,7 @@ void ProgressWindow::off_delete_board_mode() {
 
     set_title("Progress");
 
-    spdlog::get("app")->info("Left deletion mode");
+    spdlog::get("app")->info("User has left board deletion mode");
 }
 
 void ProgressWindow::on_main_menu() {
@@ -304,8 +304,6 @@ void ProgressWindow::delete_selected_boards() {
             (ui::BoardCardButton*)child->get_child();
         m_manager.local_remove(cur_child->get_board());
     }
-
-    spdlog::get("app")->info("Deleted {} boards", selected_children.size());
 
     off_delete_board_mode();
 }
@@ -359,11 +357,6 @@ bool ProgressWindow::on_close() {
     progress_settings->set_boolean("window-maximized", is_maximized());
     progress_settings->set_int("window-height", height);
     progress_settings->set_int("window-width", width);
-
-    spdlog::get("app")->debug(
-        "On close status:\n\twindow-maximized: {}\n\twindow-height: "
-        "{}\n\twindow-width: {}",
-        is_maximized(), height, width);
     return false;
 }
 }  // namespace ui

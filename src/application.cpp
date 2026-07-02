@@ -38,15 +38,10 @@ void ui::Application::on_startup() {
 
     if (progress_settings->get_boolean("window-maximized")) {
         main_window->maximize();
-        spdlog::get("app")->debug("[Application.on_startup] Window maximized");
     } else {
         int window_height = progress_settings->get_int("window-height");
         int window_width = progress_settings->get_int("window-width");
         main_window->set_default_size(window_width, window_height);
-
-        spdlog::get("app")->debug(
-            "[Application.on_startup] Window size set to {}x{}", window_width,
-            window_height);
     }
 
     add_window(*main_window);

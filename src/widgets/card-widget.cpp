@@ -661,27 +661,18 @@ void CardWidget::setup_drag_and_drop() {
     drag_source_c->signal_drag_begin().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref) {
             this->m_parent->board.set_scroll();
-
-            spdlog::get("ui")->debug("[CardWidget.dnd] (\"{}\"): On drag",
-                                     get_title());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref,
                Gdk::DragCancelReason reason) {
             this->m_parent->board.set_scroll(false);
-
-            spdlog::get("ui")->debug(
-                "[CardWidget.dnd] (\"{}\"): Canceled drag event", get_title());
             return true;
         },
         false);
     drag_source_c->signal_drag_end().connect(
         [this](const Glib::RefPtr<Gdk::Drag>& drag_ref, bool s) {
             this->m_parent->board.set_scroll(false);
-
-            spdlog::get("ui")->debug(
-                "[CardWidget.dnd] (\"{}\") Stopped being dragged", get_title());
         });
     add_controller(drag_source_c);
 
@@ -704,10 +695,6 @@ void CardWidget::setup_drag_and_drop() {
                         get_title());
                     return true;
                 }
-
-                spdlog::get("app")->info(
-                    "Card (\"{}\") has been dropped on Card (\"{}\")",
-                    dropped_card_widget->get_title(), get_title());
 
                 if (dropped_card_widget->parent() == this->m_parent) {
                     this->m_parent->reorder(*dropped_card_widget, *this);

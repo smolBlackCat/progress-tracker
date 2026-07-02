@@ -194,7 +194,7 @@ void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
             sibling.get_prev_sibling() == nullptr
                 ? m_root.reorder_child_at_start(next)
                 : m_root.reorder_child_after(next, *sibling.get_prev_sibling());
-                up = true;
+            up = true;
         } else {  // Move the widget down
             m_root.reorder_child_after(next, sibling);
         }
@@ -204,9 +204,6 @@ void CardlistWidget::reorder(CardWidget& next, CardWidget& sibling) {
 }
 
 void CardlistWidget::remove(CardWidget& card) {
-    spdlog::get("app")->info("Card (\"{}\") removed from CardList (\"{}\")",
-                             card.get_title(), get_name());
-
     // Focus should be passed to the immediate sibling
     Gtk::Widget* next_card = card.get_next_sibling();
     Gtk::Widget* prev_card = card.get_prev_sibling();
@@ -331,9 +328,6 @@ void CardlistWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag) {
             this->set_opacity(0.5);
             this->board.set_scroll();
-
-            spdlog::get("ui")->debug("[CardlistWidget.dnd] (\"{}\"): On drag",
-                                     get_name());
         },
         false);
     drag_source_c->signal_drag_cancel().connect(
@@ -341,10 +335,6 @@ void CardlistWidget::setup_drag_and_drop() {
                Gdk::DragCancelReason reason) {
             this->set_opacity(1);
             this->board.set_scroll(false);
-
-            spdlog::get("ui")->debug(
-                "[CardlistWidget.dnd] (\"{}\"): Canceled drag event",
-                get_name());
             return true;
         },
         false);
@@ -352,10 +342,6 @@ void CardlistWidget::setup_drag_and_drop() {
         [this](const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data) {
             this->set_opacity(1);
             this->board.set_scroll(false);
-
-            spdlog::get("ui")->debug(
-                "[CardlistWidget.dnd] (\"{}\"): Stopped being draggeed",
-                get_name());
         });
     drag_source_c->set_actions(Gdk::DragAction::MOVE);
     m_header.add_controller(drag_source_c);
@@ -387,9 +373,6 @@ void CardlistWidget::setup_drag_and_drop() {
 
                 this->remove_css_class("cardlist-to-drop");
 
-                spdlog::get("app")->info(
-                    "Card list (\"{}\") dropped on Card list (\"{}\")",
-                    dropped_cardlist->get_name(), get_name());
                 return true;
             }
             return false;
@@ -410,9 +393,6 @@ void CardlistWidget::setup_drag_and_drop() {
                 auto dropped_card = dropped_value.get();
                 if (!this->is_child(*dropped_card)) {
                     receive(*dropped_card);
-                    spdlog::get("app")->info(
-                        "[TODO] Card (\"{}\") dropped on card list (\"{}\")",
-                        dropped_card->get_title(), get_name());
                 }
 
                 this->remove_css_class("cardlist-to-drop");

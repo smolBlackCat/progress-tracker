@@ -1,7 +1,6 @@
 #include "task-widget.h"
 
 #include <glibmm/i18n.h>
-#include <spdlog/spdlog.h>
 #include <widgets/card-widget.h>
 #include <widgets/cardlist-widget.h>
 

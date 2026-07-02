@@ -4,7 +4,6 @@
 #include <spdlog/spdlog.h>
 #include <window.h>
 
-#include <algorithm>
 #include <numeric>
 
 #include "core/board.h"
@@ -53,6 +52,16 @@ AppContext::AppContext(ui::ProgressWindow& app_window,
         sigc::mem_fun(*this, &AppContext::on_session_loaded));
     m_save_board_dispatcher.connect(
         sigc::mem_fun(*this, &AppContext::on_session_saved));
+
+    m_manager.signal_add_board().connect([this](const LocalBoard& local_board) {
+        spdlog::get("app")->info("User has created board \"{}\"",
+                                 local_board.board->get_name());
+    });
+    m_manager.signal_remove_board().connect(
+        [this](const LocalBoard& local_board) {
+            spdlog::get("app")->info("User has deleted board \"{}\"",
+                                     local_board.board->get_name());
+        });
 }
 
 void AppContext::open_session(const std::string& filename) {
@@ -73,14 +82,15 @@ void AppContext::close_session() {
     if (m_current_board) {
         if (m_board_save_thread.joinable()) {
             spdlog::get("app")->debug(
-                "[AppContext] Saver worker thread still running. Joining");
+                "[AppContext.close_session] Saver worker thread still running. "
+                "Joining");
             m_board_save_thread.join();
         } else {
             m_manager.local_save(m_current_board);
         }
         m_manager.local_close(m_current_board);
 
-        spdlog::get("app")->info("Closed Kanban board session (\"{}\")",
+        spdlog::get("app")->info("(\"{}\") → Closed",
                                  m_current_board->get_name());
 
         reset_session_state();
@@ -124,16 +134,18 @@ void AppContext::on_session_loaded() {
     }
 
     if (m_current_board) {
-        spdlog::get("app")->info("Kanban Board Session (\"{}\") started",
+        spdlog::get("app")->info("(\"{}\") → Started",
                                  m_current_board->get_name());
         m_session_flags[Status::LOADING] = true;
 
         m_app_window.set_title(m_current_board->get_name());
         ui::CardDialog& card_dialog = m_app_window.card_dialog();
 
+        // TODO: Extract this into a AppContext::bind overload
         m_card_dialog_cnns.push_back(card_dialog.signal_open().connect(
             [this, &card_dialog](ui::CardWidget* card) {
-                spdlog::get("app")->info("Card opened for {}",
+                spdlog::get("app")->info("(\"{}\") → Card Dialog opened for {}",
+                                         m_current_board->get_name(),
                                          card->get_title());
 
                 auto db_card = m_bound_cards[card];
@@ -173,6 +185,13 @@ void AppContext::on_session_loaded() {
                                     Task::create(task_w->get_title());
                                 db_card->container().append(new_db_task);
                                 bind(new_db_task, task_w);
+
+                                spdlog::get("app")->info(
+                                    "(\"{}\") → New task \"{}\" has been "
+                                    "appended to card \"{}\"",
+                                    m_current_board->get_name(),
+                                    new_db_task->get_name(),
+                                    db_card->get_name());
                             } else {
                                 auto& data = db_card->container().get_data();
                                 auto new_db_task =
@@ -182,6 +201,13 @@ void AppContext::on_session_loaded() {
                                 db_card->container().modify(true);
 
                                 bind(new_db_task, task_w);
+
+                                spdlog::get("app")->info(
+                                    "(\"{}\") → New task \"{}\" has been "
+                                    "inserted into card \"{}\"",
+                                    m_current_board->get_name(),
+                                    new_db_task->get_name(),
+                                    db_card->get_name());
                             }
                         }));
 
@@ -195,6 +221,12 @@ void AppContext::on_session_loaded() {
                                 m_bound_tasks[task_w];
                             db_card->container().remove(to_remove);
                             m_bound_tasks.erase(task_w);
+
+                            spdlog::get("app")->info(
+                                "(\"{}\") → Task \"{}\" has been removed from "
+                                "card \"{}\"",
+                                m_current_board->get_name(),
+                                to_remove->get_name(), db_card->get_name());
                         }));
 
                 m_card_dialog_cnns.push_back(
@@ -213,6 +245,16 @@ void AppContext::on_session_loaded() {
                                     m_bound_tasks[next],
                                     m_bound_tasks[sibling]);
                             }
+
+                            spdlog::get("app")->info(
+                                "(\"{}\") → In card \"{}\", Task \"{}\" has "
+                                "been reordered {} "
+                                "Task \"{}\"",
+                                m_current_board->get_name(),
+                                db_card->get_name(),
+                                m_bound_tasks[next]->get_name(),
+                                (up ? "before" : "after"),
+                                m_bound_tasks[sibling]->get_name());
                         }));
             }));
 
@@ -227,11 +269,15 @@ void AppContext::on_session_loaded() {
                 ui::CardWidget* card_w = card_dialog.card_widget();
                 auto db_card = m_bound_cards[card_w];
 
-                spdlog::get("app")->info("Card Dialog closed for {}",
-                                         db_card->get_name());
-
-                if (db_card->get_name() != card_dialog.get_title()) {
+                const std::string old_name = db_card->get_name();
+                if (old_name != card_dialog.get_title()) {
+                    // FIXME: We're not setting the name for db_card !!!
                     card_w->set_title(card_dialog.get_title());
+
+                    spdlog::get("app")->info(
+                        "(\"{}\") → Card \"{}\" has been renamed to \"{}\"",
+                        m_current_board->get_name(), old_name,
+                        db_card->get_name());
                 }
 
                 Date date = card_dialog.get_deadline();
@@ -246,11 +292,28 @@ void AppContext::on_session_loaded() {
                         // queue too
                         if (!old_date.ok()) {
                             card_update_queue_push(card_w);
+
+                            spdlog::get("app")->info(
+                                "(\"{}\") → Card \"{}\"'s deadline has been "
+                                "set",
+                                m_current_board->get_name(),
+                                db_card->get_name());
+                        } else {
+                            spdlog::get("app")->info(
+                                "(\"{}\") → Card \"{}\"'s deadline has been "
+                                "updated",
+                                m_current_board->get_name(),
+                                db_card->get_name());
                         }
                     } else {
                         // Date has been unset. We don't need to update this
                         // card's deadline label anymore
                         std::erase(m_cards, card_w);
+
+                        spdlog::get("app")->info(
+                            "(\"{}\") → Card \"{}\"'s deadline has been "
+                            "unset",
+                            m_current_board->get_name(), db_card->get_name());
                     }
                 }
 
@@ -259,6 +322,12 @@ void AppContext::on_session_loaded() {
                     card_w->set_complete(card_dialog.get_complete());
                     card_w->update_deadline_label();
                     db_card->set_complete(card_dialog.get_complete());
+
+                    spdlog::get("app")->info(
+                        "(\"{}\") → Card \"{}\" has been marked as {}",
+                        m_current_board->get_name(), db_card->get_name(),
+                        (db_card->get_complete() ? "complete"
+                                                 : "not complete"));
                 }
 
                 const std::pair<int, int> completion_ratio =
@@ -268,7 +337,15 @@ void AppContext::on_session_loaded() {
 
                 if (db_card->get_notes() != card_dialog.get_notes()) {
                     db_card->set_notes(card_dialog.get_notes());
+
+                    spdlog::get("app")->info(
+                        "(\"{}\") → Card \"{}\"'s notes has been updated",
+                        m_current_board->get_name(), db_card->get_name());
                 }
+
+                spdlog::get("app")->info("(\"{}\") → Card Dialog closed for {}",
+                                         m_current_board->get_name(),
+                                         db_card->get_name());
             }));
 
         m_app_window.on_board_view();
@@ -350,6 +427,10 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
                          const std::string& new_name) {
             if (old_name != new_name) {
                 db_board->set_name(new_name);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Board \"{}\" has been renamed to \"{}\"",
+                    m_current_board->get_name(), old_name, new_name);
             }
         }));
 
@@ -363,14 +444,27 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
                     case BackgroundType::COLOR: {
                         db_board->set_background(
                             string_to_color(new_background));
+
+                        spdlog::get("app")->info(
+                            "(\"{}\") → Board background has been changed to "
+                            "\"{}\"",
+                            m_current_board->get_name(), new_background);
                         break;
                     }
                     case BackgroundType::IMAGE: {
                         db_board->set_background(new_background);
+
+                        spdlog::get("app")->info(
+                            "(\"{}\") → Board background has been changed to "
+                            "\"{}\"",
+                            m_current_board->get_name(), new_background);
                         break;
                     }
                     case BackgroundType::INVALID: {
-                        // TODO: Log invalid set background
+                        spdlog::get("app")->warn(
+                            "(\"{}\") → It was not possible to set the "
+                            "background {}",
+                            m_current_board->get_name(), new_background);
                         break;
                     }
                 }
@@ -384,6 +478,10 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
                     CardList::create(cardlist_w->get_name());
                 db_board->container().append(new_cardlist);
                 bind(new_cardlist, cardlist_w);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Cardlist \"{}\" has been appended to Board",
+                    m_current_board->get_name(), new_cardlist->get_name());
             } else {
                 auto& inner_data = db_board->container().get_data();
 
@@ -395,6 +493,10 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
                 db_board->container().modify(true);
 
                 bind(new_cardlist, cardlist_w);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Cardlist \"{}\" has been inserted to Board",
+                    m_current_board->get_name(), new_cardlist->get_name());
             }
         }));
 
@@ -404,6 +506,10 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
             db_board->container().remove(to_remove);
 
             m_bound_cardlists.erase(cardlist_w);
+
+            spdlog::get("app")->info(
+                "(\"{}\") → Cardlist \"{}\" has been removed from Board",
+                m_current_board->get_name(), to_remove->get_name());
         }));
 
     m_board_widget_cnns.push_back(board_w->signal_reorder().connect(
@@ -416,6 +522,13 @@ void AppContext::bind(const std::shared_ptr<Board>& db_board,
                 db_board->container().reorder_after(m_bound_cardlists[next],
                                                     m_bound_cardlists[sibling]);
             }
+
+            spdlog::get("app")->info(
+                "(\"{}\") → Cardlist \"{}\" has been reordered {} Cardlist "
+                "\"{}\"",
+                m_current_board->get_name(),
+                m_bound_cardlists[next]->get_name(), (up ? "before" : "after"),
+                m_bound_cardlists[sibling]->get_name());
         }));
 }
 
@@ -427,6 +540,10 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
         [this, db_cardlist](std::string old_name, std::string new_name) {
             if (old_name != new_name) {
                 db_cardlist->set_name(new_name);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Cardlist \"{}\" has been renamed to \"{}\"",
+                    m_current_board->get_name(), old_name, new_name);
             }
         }));
 
@@ -436,6 +553,12 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
                 auto new_db_card = Card::create(card_w->get_title());
                 db_cardlist->container().append(new_db_card);
                 bind(new_db_card, card_w);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → New card \"{}\" has been appended onto "
+                    "cardlist \"{}\"",
+                    m_current_board->get_name(), new_db_card->get_name(),
+                    db_cardlist->get_name());
             } else {
                 auto& data = db_cardlist->container().get_data();
                 auto new_db_card = Card::create(card_w->get_title());
@@ -443,6 +566,12 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
                 db_cardlist->container().modify(true);
 
                 bind(new_db_card, card_w);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → New card \"{}\" has been inserted onto "
+                    "cardlist \"{}\"",
+                    m_current_board->get_name(), new_db_card->get_name(),
+                    db_cardlist->get_name());
             }
         }));
 
@@ -451,6 +580,11 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
             std::shared_ptr<Card> to_remove = m_bound_cards[card_w];
             db_cardlist->container().remove(to_remove);
             m_bound_cards.erase(card_w);
+
+            spdlog::get("app")->info(
+                "(\"{}\") → Card \"{}\" has been removed from cardlist \"{}\"",
+                m_current_board->get_name(), to_remove->get_name(),
+                db_cardlist->get_name());
         }));
 
     m_cardlists_cnns.push_back(cardlist_w->signal_card_removed().connect(
@@ -466,6 +600,11 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
                 db_cardlist->container().reorder_after(m_bound_cards[next],
                                                        m_bound_cards[sibling]);
             }
+
+            spdlog::get("app")->info(
+                "(\"{}\") → Card \"{}\" has been reordered {} Card \"{}\"",
+                m_current_board->get_name(), m_bound_cards[next]->get_name(),
+                (up ? "before" : "after"), m_bound_cards[sibling]->get_name());
         }));
 
     m_cardlists_cnns.push_back(cardlist_w->signal_card_received().connect(
@@ -479,9 +618,22 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
 
             if (!sibling) {
                 db_cardlist->container().append(received_card);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Card \"{}\" from cardlist \"{}\" has been "
+                    "appended to cardlist \"{}\"",
+                    m_current_board->get_name(), received_card->get_name(),
+                    received_from->get_name(), db_cardlist->get_name());
             } else {
                 db_cardlist->container().insert_after(received_card,
                                                       m_bound_cards[sibling]);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Card \"{}\" from cardlist \"{}\" has been "
+                    "inserted after card \"{}\" in cardlist \"{}\"",
+                    m_current_board->get_name(), received_card->get_name(),
+                    m_bound_cards[sibling]->get_name(),
+                    received_from->get_name(), db_cardlist->get_name());
             }
         }));
 }
@@ -495,6 +647,10 @@ void AppContext::bind(const std::shared_ptr<Card>& db_card,
                         const std::string& new_name) {
             if (old_name != new_name) {
                 db_card->set_name(new_name);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Card \"{}\" has been renamed to \"{}\"",
+                    m_current_board->get_name(), old_name, new_name);
             }
         }));
 
@@ -504,9 +660,16 @@ void AppContext::bind(const std::shared_ptr<Card>& db_card,
                 db_card->set_color(
                     Color{new_color.get_red_u(), new_color.get_green_u(),
                           new_color.get_blue_u(), new_color.get_alpha()});
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Card \"{}\"'s color has been set to {}",
+                    m_current_board->get_name(), db_card->get_name(),
+                    new_color.to_string().c_str());
             }
         }));
 
+    // FIXME: This callback will never be called! Remove the signal and this
+    // handler
     m_cards_cnns.push_back(card_w->signal_card_received().connect(
         [this, db_card, card_w](ui::CardWidget* recv_widget,
                                 ui::CardlistWidget* recv_from) {
@@ -530,14 +693,26 @@ void AppContext::bind(const std::shared_ptr<Task>& db_task,
     m_bound_tasks[task_w] = db_task;
 
     m_tasks_cnns.push_back(task_w->signal_name_changed().connect(
-        [db_task](const std::string& old_name, const std::string& new_name) {
+        [this, db_task](const std::string& old_name,
+                        const std::string& new_name) {
             if (old_name != new_name) {
                 db_task->set_name(new_name);
+
+                spdlog::get("app")->info(
+                    "(\"{}\") → Task \"{}\" has been renamed to \"{}\"",
+                    m_current_board->get_name(), old_name, new_name);
             }
         }));
 
-    m_tasks_cnns.push_back(task_w->signal_complete_changed().connect(
-        [db_task, task_w]() { db_task->set_done(task_w->get_complete()); }));
+    m_tasks_cnns.push_back(
+        task_w->signal_complete_changed().connect([this, db_task, task_w]() {
+            db_task->set_done(task_w->get_complete());
+
+            spdlog::get("app")->info(
+                "(\"{}\") → Task \"{}\" has been marked {}",
+                m_current_board->get_name(), db_task->get_name(),
+                task_w->get_complete() ? "complete" : "incomplete");
+        }));
 }
 
 void AppContext::clear_binds() {
@@ -689,7 +864,8 @@ bool AppContext::timeout_update_cards() {
         if (m_cards.empty()) {
             m_timeout_cards_update_cnn.disconnect();
             spdlog::get("app")->debug(
-                "[AppContext.timeout_update_cards] Stop card update task");
+                "[AppContext.timeout_update_cards] Empty card queue. Stopping "
+                "timeout update task.");
             return false;
         }
 
@@ -712,9 +888,9 @@ bool AppContext::timeout_update_cards() {
         return true;
     }
 
-    // We stop running at this point
     spdlog::get("app")->debug(
-        "[AppContext.timeout_update_cards] Stop card update task");
+        "[AppContext.timeout_update_cards] There is no session running. Stop "
+        "timeout update task.");
     return false;
 }
 

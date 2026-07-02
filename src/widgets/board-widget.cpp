@@ -1,7 +1,6 @@
 #include "board-widget.h"
 
 #include <glibmm/i18n.h>
-#include <spdlog/spdlog.h>
 #include <utils.h>
 #include <window.h>
 
@@ -205,8 +204,6 @@ void BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
 }
 
 void BoardWidget::remove(CardlistWidget& cardlist) {
-    spdlog::get("app")->info("Removed CardList (\"{}\")", cardlist.get_name());
-
     Gtk::Widget* prev_clist = cardlist.get_prev_sibling();
     Gtk::Widget* next_clist = cardlist.get_next_sibling();
     if (prev_clist) {

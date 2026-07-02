@@ -1,7 +1,6 @@
 #include "create_board_dialog.h"
 
 #include <glibmm/i18n.h>
-#include <spdlog/spdlog.h>
 
 namespace ui {
 CreateBoardDialog::CreateBoardDialog(BoardManager& board_creator)
@@ -44,9 +43,6 @@ void CreateBoardDialog::create_board() {
             break;
         }
     }
-
-    spdlog::get("app")->info("Board (\"{}\") created",
-                             board_title_entry->get_text().c_str());
     adw_dialog_close(ADW_DIALOG(board_dialog->gobj()));
 }
 }  // namespace ui
