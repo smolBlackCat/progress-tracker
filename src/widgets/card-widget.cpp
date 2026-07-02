@@ -540,8 +540,12 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
 }
 
 void CardWidget::set_title(const std::string& label) {
+    const std::string old_name = m_card_label.get_label();
+
     m_card_label.set_label(label);
     m_card_entry.set_text(label);
+
+    m_name_changed_signal.emit(old_name, label);
 }
 
 void CardWidget::set_cardlist(CardlistWidget* new_parent) {

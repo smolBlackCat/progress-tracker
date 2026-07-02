@@ -271,7 +271,6 @@ void AppContext::on_session_loaded() {
 
                 const std::string old_name = db_card->get_name();
                 if (old_name != card_dialog.get_title()) {
-                    // FIXME: We're not setting the name for db_card !!!
                     card_w->set_title(card_dialog.get_title());
 
                     spdlog::get("app")->info(
