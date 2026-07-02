@@ -133,7 +133,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
          {"<Control>N",
           [&card_details_dialog, this](Gtk::Widget&, const Glib::VariantBase&) {
               auto new_task =
-                  Gtk::make_managed<TaskWidget>(m_card_dialog, _("New Card"));
+                  Gtk::make_managed<TaskWidget>(m_card_dialog, _("New Task"));
               card_details_dialog.insert_after(*new_task, *this);
               new_task->grab_focus();
               return true;
