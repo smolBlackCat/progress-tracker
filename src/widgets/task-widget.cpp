@@ -50,7 +50,13 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
     m_label.set_margin_start(5);
     m_label.set_wrap();
     m_label.set_wrap_mode(Pango::WrapMode::WORD_CHAR);
-    m_label.set_label(name);
+
+    if (complete) {
+        add_css_class("complete-task");
+        m_label.set_markup(std::format("<s>{}</s>", name));
+    } else {
+        m_label.set_label(name);
+    }
 
     inner_box.append(m_entry_revealer);
     m_entry_revealer.set_hexpand();
@@ -62,8 +68,6 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
     m_checkbutton.set_halign(Gtk::Align::END);
     m_checkbutton.set_hexpand();
     m_checkbutton.set_margin_end(5);
-
-    if (complete) add_css_class("complete-task");
 
     m_checkbutton.set_active(complete);
     m_checkbutton.signal_toggled().connect(
@@ -220,7 +224,7 @@ void TaskWidget::on_rename() {
     m_entry_revealer.set_reveal_child();
     m_label.set_visible(false);
 
-    m_entry.set_text(m_label.get_label());
+    m_entry.set_text(m_title);
     m_entry.grab_focus();
 
     m_entry.add_controller(m_focus_controller);
@@ -248,10 +252,10 @@ void TaskWidget::on_checkbox() {
 
     if (m_checkbutton.get_active()) {
         m_label.set_markup(
-            Glib::ustring::compose("<s>%1</s>", m_label.get_label()));
+            Glib::ustring::compose("<s>%1</s>", m_title));
         add_css_class("complete-task");
     } else {
-        m_label.set_markup(m_label.get_label());
+        m_label.set_label(m_title);
         remove_css_class("complete-task");
     }
 }
