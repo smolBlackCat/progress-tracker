@@ -300,7 +300,7 @@ void CardDialog::on_set_due_date() {
     m_deadline = std::chrono::year_month_day{std::chrono::year{y},
                                              std::chrono::month{unsigned(m)},
                                              std::chrono::day{unsigned(d)}};
-    m_card_widget->set_deadline_label(new_date, get_complete());
+    m_card_widget->set_deadline_label(new_date, m_card_widget->get_complete());
     m_checkbutton_revealer->set_reveal_child(true);
     m_date_menubutton->set_label(new_date.format_string("%x"));
 }
