@@ -68,6 +68,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
     m_checkbutton.set_halign(Gtk::Align::END);
     m_checkbutton.set_hexpand();
     m_checkbutton.set_margin_end(5);
+    m_checkbutton.set_can_focus(false);
 
     m_checkbutton.set_active(complete);
     m_checkbutton.signal_toggled().connect(
@@ -101,17 +102,24 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
     this->add_controller(gesture_click);
 
     auto key_controller = Gtk::EventControllerKey::create();
-    key_controller->signal_key_released().connect(
+    key_controller->signal_key_pressed().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (m_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
+                    case (GDK_KEY_Escape): {
+                        // TODO: Extract this behaviour into a toggle method
+                        m_entry_revealer.set_reveal_child(false);
+                        m_label.set_visible();
+                        return true;
+                    }
                     case (GDK_KEY_Return):
                     case (GDK_KEY_KP_Enter): {
                         off_rename();
-                        break;
+                        return true;
                     }
                 }
             }
+            return false;
         },
         false);
     m_focus_controller->signal_leave().connect(
@@ -187,6 +195,22 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
 
     add_controller(shortcut_controller);
 
+    auto key_controller2 = Gtk::EventControllerKey::create();
+    key_controller2->signal_key_released().connect(
+        [this](guint keyval, guint keycode, Gdk::ModifierType modifier) {
+            if (this->has_focus()) {
+                switch (keyval) {
+                    case (GDK_KEY_space):
+                    case (GDK_KEY_Return):
+                    case (GDK_KEY_KP_Enter): {
+                        m_checkbutton.set_active(!m_checkbutton.get_active());
+                        break;
+                    }
+                }
+            }
+        });
+    add_controller(key_controller2);
+
     setup_drag_and_drop();
 }
 
@@ -251,8 +275,7 @@ void TaskWidget::on_checkbox() {
     m_complete_changed_signal.emit();
 
     if (m_checkbutton.get_active()) {
-        m_label.set_markup(
-            Glib::ustring::compose("<s>%1</s>", m_title));
+        m_label.set_markup(Glib::ustring::compose("<s>%1</s>", m_title));
         add_css_class("complete-task");
     } else {
         m_label.set_label(m_title);

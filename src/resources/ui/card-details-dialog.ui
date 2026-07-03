@@ -154,6 +154,10 @@ a Card object details. -->
 																</property>
 																<property name="vexpand">True</property>
 																<property name="wrap-mode">word-char</property>
+																<property name="top-margin">6</property>
+																<property name="bottom-margin">6</property>
+																<property name="left-margin">6</property>
+																<property name="right-margin">6</property>
 															</object>
 														</property>
 														<property name="hscrollbar-policy">never</property>
