@@ -25,16 +25,16 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       add_board_button_p{b->get_widget<Gtk::Button>("add-board-button")},
       board_delete_button{b->get_widget<Gtk::Button>("delete-button")},
       cancel_delete_button{b->get_widget<Gtk::Button>("cancel-delete-button")},
-      app_overlay_p{b->get_widget<Gtk::Overlay>("app-overlay")},
       app_stack_p{b->get_widget<Gtk::Stack>("app-stack")},
       boards_grid_p{b->get_widget<Gtk::FlowBox>("boards-grid")},
       board_grid_menu_p{b->get_object<Gio::MenuModel>("board-grid-menu")},
       board_menu_p{b->get_object<Gio::MenuModel>("board-menu")},
       app_menu_button_p{b->get_widget<Gtk::MenuButton>("app-menu-button")},
-      action_bar_p{b->get_widget<Gtk::ActionBar>("action-bar")},
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
+      delete_button_revealer{b->get_widget<Gtk::Revealer>("delete-button-revealer")},
+      cancel_delete_button_revealer{b->get_widget<Gtk::Revealer>("cancel-delete-button-revealer")},
       progress_settings{progress_settings},
       m_card_dialog{},
       create_board{CreateBoardDialog::create(m_manager)},
@@ -85,7 +85,7 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         std::pair<const char*,
                   std::function<bool(Gtk::Widget&, const Glib::VariantBase&)>>;
 
-    const std::array<WindowShortcut, 5> shortcuts = {
+    const std::array<WindowShortcut, 6> shortcuts = {
         WindowShortcut{"<Control>D",
                        [this](Gtk::Widget&, const Glib::VariantBase&) {
                            if (app_stack_p->get_visible_child_name() ==
@@ -94,6 +94,16 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
                            }
 
                            return true;
+                       }},
+        WindowShortcut{"Escape",
+                       [this](Gtk::Widget&, const Glib::VariantBase&) {
+                           if (app_stack_p->get_visible_child_name() ==
+                               "board-grid-page" && on_delete_mode) {
+                                off_delete_board_mode();
+                                return true;
+                           }
+
+                           return false;
                        }},
         WindowShortcut{"<Control>B",
                        [this](Gtk::Widget&, const Glib::VariantBase&) {
@@ -246,9 +256,11 @@ void ProgressWindow::add_local_board_entry(LocalBoard board_entry) {
 void ProgressWindow::on_delete_board_mode() {
     on_delete_mode = true;
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::MULTIPLE);
-    action_bar_p->set_revealed();
 
     set_title(_("No board has been selected yet"));
+
+    cancel_delete_button_revealer->set_reveal_child();
+    delete_button_revealer->set_reveal_child();
 
     // TAB clicks won't include them, making more manageable to delete boards
     add_board_button_p->set_visible(false);
@@ -259,8 +271,10 @@ void ProgressWindow::on_delete_board_mode() {
 
 void ProgressWindow::off_delete_board_mode() {
     on_delete_mode = false;
-    action_bar_p->set_revealed(false);
     boards_grid_p->set_selection_mode(Gtk::SelectionMode::NONE);
+
+    cancel_delete_button_revealer->set_reveal_child(false);
+    delete_button_revealer->set_reveal_child(false);
 
     add_board_button_p->set_visible();
     app_menu_button_p->set_visible();

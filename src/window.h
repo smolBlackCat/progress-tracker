@@ -108,10 +108,9 @@ protected:
     Gtk::ShortcutsWindow* sh_window;
     Gtk::Button *home_button_p, *add_board_button_p, *board_delete_button,
         *cancel_delete_button;
-    Gtk::Overlay* app_overlay_p;
+    Gtk::Revealer *delete_button_revealer, *cancel_delete_button_revealer;
     Gtk::Stack* app_stack_p;
     Gtk::FlowBox* boards_grid_p;
-    Gtk::ActionBar* action_bar_p;
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;
     Gtk::MenuButton* app_menu_button_p;
 
