@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "dialog/card-dialog.h"
+#include "gdk/gdkkeysyms.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -101,20 +102,32 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
         });
     this->add_controller(gesture_click);
 
-    auto key_controller = Gtk::EventControllerKey::create();
-    key_controller->signal_key_pressed().connect(
+    auto entry_controller = Gtk::EventControllerKey::create();
+    entry_controller->signal_key_released().connect(
+        [this](guint keyval, guint keycode, Gdk::ModifierType modifier) {
+            if (m_entry_revealer.get_child_revealed()) {
+                switch (keyval) {
+                    case GDK_KEY_Return:
+                    case GDK_KEY_KP_Enter: {
+                        off_rename();
+                        break;
+                    }
+                }
+            }
+        });
+
+    entry_controller->signal_key_pressed().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType state) {
             if (m_entry_revealer.get_child_revealed()) {
                 switch (keyval) {
-                    case (GDK_KEY_Escape): {
+                    case GDK_KEY_Escape: {
                         // TODO: Extract this behaviour into a toggle method
                         m_entry_revealer.set_reveal_child(false);
                         m_label.set_visible();
                         return true;
                     }
-                    case (GDK_KEY_Return):
-                    case (GDK_KEY_KP_Enter): {
-                        off_rename();
+                    case GDK_KEY_Return: {
+                        std::cout << "Enter has been clicked" << '\n';
                         return true;
                     }
                 }
@@ -125,7 +138,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
     m_focus_controller->signal_leave().connect(
         sigc::mem_fun(*this, &TaskWidget::off_rename));
 
-    m_entry.add_controller(key_controller);
+    m_entry.add_controller(entry_controller);
     m_entry.add_controller(m_focus_controller);
 
     using TaskShortcut =
@@ -195,8 +208,8 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
 
     add_controller(shortcut_controller);
 
-    auto key_controller2 = Gtk::EventControllerKey::create();
-    key_controller2->signal_key_released().connect(
+    auto root_key_controller = Gtk::EventControllerKey::create();
+    root_key_controller->signal_key_released().connect(
         [this](guint keyval, guint keycode, Gdk::ModifierType modifier) {
             if (this->has_focus()) {
                 switch (keyval) {
@@ -209,7 +222,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
                 }
             }
         });
-    add_controller(key_controller2);
+    add_controller(root_key_controller);
 
     setup_drag_and_drop();
 }
