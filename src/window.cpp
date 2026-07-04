@@ -33,8 +33,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
-      delete_button_revealer{b->get_widget<Gtk::Revealer>("delete-button-revealer")},
-      cancel_delete_button_revealer{b->get_widget<Gtk::Revealer>("cancel-delete-button-revealer")},
+      delete_button_revealer{
+          b->get_widget<Gtk::Revealer>("delete-button-revealer")},
+      cancel_delete_button_revealer{
+          b->get_widget<Gtk::Revealer>("cancel-delete-button-revealer")},
       progress_settings{progress_settings},
       m_card_dialog{},
       create_board{CreateBoardDialog::create(m_manager)},
@@ -98,9 +100,10 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         WindowShortcut{"Escape",
                        [this](Gtk::Widget&, const Glib::VariantBase&) {
                            if (app_stack_p->get_visible_child_name() ==
-                               "board-grid-page" && on_delete_mode) {
-                                off_delete_board_mode();
-                                return true;
+                                   "board-grid-page" &&
+                               on_delete_mode) {
+                               off_delete_board_mode();
+                               return true;
                            }
 
                            return false;
@@ -176,6 +179,48 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
         sigc::mem_fun(*this, &ProgressWindow::save_board_handler));
 
     sh_window->set_application(this->get_application());
+
+    // The default behaviour of Gtk::FlowBox whenever an user tries to navigate
+    // through the container using the arrow keys is to select the next child in
+    // the container. If the user wants to navigate through container using only
+    // the keyboard arrows, they would have to press and hold the Ctrl key,which
+    // is not comfortable. To work around this issue, we override the default
+    // key controller event
+    auto board_grid_controller = Gtk::EventControllerKey::create();
+    board_grid_controller->set_propagation_phase(
+        Gtk::PropagationPhase::CAPTURE);
+    board_grid_controller->signal_key_pressed().connect(
+        [this](guint keyval, guint keycode, Gdk::ModifierType state) {
+            // If the user is holding Ctrl, Shift, or Alt, let GTK handle it
+            // normally
+            if (((state == Gdk::ModifierType::SHIFT_MASK) ||
+                 (state == Gdk::ModifierType::CONTROL_MASK) ||
+                 (state == Gdk::ModifierType::ALT_MASK))) {
+                return false;
+            }
+
+            Gtk::DirectionType dir;
+            switch (keyval) {
+                case GDK_KEY_Left:
+                    dir = Gtk::DirectionType::LEFT;
+                    break;
+                case GDK_KEY_Right:
+                    dir = Gtk::DirectionType::RIGHT;
+                    break;
+                case GDK_KEY_Up:
+                    dir = Gtk::DirectionType::UP;
+                    break;
+                case GDK_KEY_Down:
+                    dir = Gtk::DirectionType::DOWN;
+                    break;
+                default:
+                    return false;
+            }
+            boards_grid_p->child_focus(dir);
+            return true;
+        },
+        false);
+    boards_grid_p->add_controller(board_grid_controller);
 
     app_stack_p->add(board_widget, "board-page");
 }
