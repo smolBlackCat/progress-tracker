@@ -25,6 +25,7 @@
                         <property name="margin-top">10</property>
                         <property name="selection-mode">none</property>
                         <property name="valign">start</property>
+                        <property name="homogeneous">true</property>
                       </object>
                     </property>
                     <property name="height-request">-1</property>
