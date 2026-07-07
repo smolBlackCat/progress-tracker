@@ -83,6 +83,7 @@
                 </property>
                 <property name="reveal-child">false</property>
                 <property name="transition-type">GTK_REVEALER_TRANSITION_TYPE_CROSSFADE</property>
+                <property name="visible">false</property>
               </object>
             </child>
             <child type="end">
@@ -104,6 +105,18 @@
                 </property>
                 <property name="reveal-child">false</property>
                 <property name="transition-type">GTK_REVEALER_TRANSITION_TYPE_CROSSFADE</property>
+                <property name="visible">false</property>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkRevealer" id="spinner-revealer">
+                <property name="reveal-child">false</property>
+                <property name="transition-type">GTK_REVEALER_TRANSITION_TYPE_CROSSFADE</property>
+                <property name="child">
+                  <object class="GtkSpinner" id="spinner">
+                    <property name="spinning">false</property>
+                  </object>
+                </property>
               </object>
             </child>
           </object>

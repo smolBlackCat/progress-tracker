@@ -87,6 +87,12 @@ public:
      */
     void delete_selected_boards();
 
+    /**
+     * @brief Sets the window's spinner visible. It is used to indicate some
+     * internal work happening
+     */
+    void set_spinner_visible(bool visible = true);
+
     void show_about_dialog();
     void show_shortcuts_dialog();
 
@@ -108,7 +114,9 @@ protected:
     Gtk::ShortcutsWindow* sh_window;
     Gtk::Button *home_button_p, *add_board_button_p, *board_delete_button,
         *cancel_delete_button;
-    Gtk::Revealer *delete_button_revealer, *cancel_delete_button_revealer;
+    Gtk::Revealer *delete_button_revealer, *cancel_delete_button_revealer,
+        *m_spinner_revealer;
+    Gtk::Spinner* m_spinner;
     Gtk::Stack* app_stack_p;
     Gtk::FlowBox* boards_grid_p;
     Glib::RefPtr<Gio::MenuModel> board_grid_menu_p, board_menu_p;

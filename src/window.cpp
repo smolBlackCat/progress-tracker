@@ -30,6 +30,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       board_grid_menu_p{b->get_object<Gio::MenuModel>("board-grid-menu")},
       board_menu_p{b->get_object<Gio::MenuModel>("board-menu")},
       app_menu_button_p{b->get_widget<Gtk::MenuButton>("app-menu-button")},
+      m_spinner{b->get_widget<Gtk::Spinner>("spinner")},
+      m_spinner_revealer{b->get_widget<Gtk::Revealer>("spinner-revealer")},
       adw_style_manager{
           adw_style_manager_get_for_display(this->get_display()->gobj())},
       css_provider{Gtk::CssProvider::create()},
@@ -306,10 +308,11 @@ void ProgressWindow::on_delete_board_mode() {
 
     set_title(_("No board has been selected yet"));
 
+    cancel_delete_button_revealer->set_visible();
+    delete_button_revealer->set_visible();
     cancel_delete_button_revealer->set_reveal_child();
     delete_button_revealer->set_reveal_child();
 
-    // TAB clicks won't include them, making more manageable to delete boards
     add_board_button_p->set_visible(false);
     app_menu_button_p->set_visible(false);
 
@@ -322,6 +325,8 @@ void ProgressWindow::off_delete_board_mode() {
 
     cancel_delete_button_revealer->set_reveal_child(false);
     delete_button_revealer->set_reveal_child(false);
+    cancel_delete_button_revealer->set_visible(false);
+    delete_button_revealer->set_visible(false);
 
     add_board_button_p->set_visible();
     app_menu_button_p->set_visible();
@@ -367,6 +372,11 @@ void ProgressWindow::delete_selected_boards() {
     }
 
     off_delete_board_mode();
+}
+
+void ProgressWindow::set_spinner_visible(bool visible) {
+    m_spinner_revealer->set_reveal_child(visible);
+    m_spinner->set_spinning(visible);
 }
 
 void ProgressWindow::show_about_dialog() {

@@ -396,6 +396,7 @@ void AppContext::on_session_saved() {
             "[AppContext.on_session_saved] Joining save worker thread");
     }
 
+    m_app_window.set_spinner_visible(false);
     spdlog::get("app")->info("Changes made to Board (\"{}\") saved",
                              m_current_board->get_name());
 }
@@ -841,6 +842,7 @@ bool AppContext::timeout_save_session() {
                 "thread. Saver thread is still joinable");
             return true;
         } else {
+            m_app_window.set_spinner_visible();
             m_board_save_thread = std::thread{[this]() {
                 m_manager.local_save(m_current_board);
                 m_save_board_dispatcher.emit();
