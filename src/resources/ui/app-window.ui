@@ -12,7 +12,6 @@
         <property name="content">
           <object class="GtkStack" id="app-stack">
             <property name="transition-type">slide-left-right</property>
-            <property name="visible-child-name">board-grid-page</property>
             <child>
               <object class="GtkStackPage">
                 <property name="child">

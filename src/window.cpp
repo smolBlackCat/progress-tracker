@@ -42,6 +42,8 @@ ProgressWindow::ProgressWindow(BaseObjectType* cobject,
       create_board{CreateBoardDialog::create(m_manager)},
       edit_board{PreferencesBoardDialog::create(board_widget)},
       sh_window{b->get_widget<Gtk::ShortcutsWindow>("progress-shortcuts")} {
+    app_stack_p->set_visible_child("board-grid-page");
+
     m_context = new AppContext{*this, board_widget, m_manager};
     Gtk::StyleProvider::add_provider_for_display(
         get_display(), css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
