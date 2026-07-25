@@ -590,9 +590,6 @@ void AppContext::bind(const std::shared_ptr<CardList>& db_cardlist,
                 db_cardlist->get_name());
         }));
 
-    m_cardlists_cnns.push_back(cardlist_w->signal_card_removed().connect(
-        [this](ui::CardWidget* card_w) { std::erase(m_cards, card_w); }));
-
     m_cardlists_cnns.push_back(cardlist_w->signal_card_reorder().connect(
         [this, db_cardlist](ui::CardWidget* next, ui::CardWidget* sibling,
                             bool up) {
@@ -803,6 +800,8 @@ bool AppContext::idle_load_session() {
         }
         cardlist_widget->append(*card_widget);
         bind(card, card_widget);
+        card_widget->signal_destroy().connect(
+            [this, card_widget]() { std::erase(m_cards, card_widget); });
     }
 
     bind(data[m_cardlist_i], cardlist_widget);
@@ -875,6 +874,7 @@ bool AppContext::timeout_update_cards() {
 
         if (m_next_card_i > size - 1) {
             m_next_card_i = 0;
+            return true;
         }
 
         auto card_w = m_cards[m_next_card_i];
