@@ -318,6 +318,7 @@ void CardDialog::clear() {
 
     m_date_menubutton->set_label(_("Set Due Date"));
     m_checkbutton_revealer->set_reveal_child(false);
+    m_deadline = {};
 
     m_card_widget = nullptr;
 }
