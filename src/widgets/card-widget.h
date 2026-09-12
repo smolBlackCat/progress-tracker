@@ -31,10 +31,6 @@ enum class CoverColor { UNSET, BLUE, RED, ORANGE, GREEN, YELLOW, PURPLE };
  */
 class CardWidget : public CardInit, public BaseItem {
 public:
-    const static std::array<std::string, 3> TASKS_LABEL_CSS_CLASSES;
-
-    const static std::array<std::string, 3> DATE_LABEL_CSS_CLASSES;
-
     const static std::unordered_map<CoverColor, Gdk::RGBA> CARD_COLORS;
 
     /**
@@ -219,6 +215,9 @@ protected:
 
     Glib::Date m_date;
     Gdk::RGBA m_color;
+    std::string m_deadline_css = "due-date";
+    std::string m_completion_indicator_css =
+        "complete-tasks-indicator-incomplete";
     bool m_complete;
     ui::CardlistWidget* m_parent;
 

@@ -213,18 +213,6 @@ std::function<void()> CardWidget::CardPopover::color_setting_thunk(
     });
 }
 
-const std::array<std::string, 3> CardWidget::DATE_LABEL_CSS_CLASSES = {
-    "due-date-complete",
-    "past-due-date",
-    "due-date",
-};
-
-const std::array<std::string, 3> CardWidget::TASKS_LABEL_CSS_CLASSES = {
-    "complete-tasks-indicator-complete",
-    "complete-tasks-indicator-almost",
-    "complete-tasks-indicator-incomplete",
-};
-
 // TODO: There is still work to be done
 // * Re-invent popovers implementation
 CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
@@ -441,6 +429,7 @@ void CardWidget::set_cover_color(Gdk::RGBA color) {
 void CardWidget::set_deadline_label(const Glib::Date& new_date, bool complete) {
     if (new_date.valid()) {
         m_deadline_label.set_visible();
+        // FIXME: This code generates a warning
         m_deadline_label.set_label(_("Due: ") +
                                    new_date.format_string("%d %b, %Y"));
         m_date = new_date;
@@ -478,25 +467,19 @@ void CardWidget::remove_from_parent() {
 }
 
 void CardWidget::update_deadline_label() {
-    std::string css_class;
     Glib::Date today;
     today.set_time_current();
 
+    m_deadline_label.remove_css_class(m_deadline_css);
+
     if (m_complete)
-        css_class = "due-date-complete";
+        m_deadline_css = "due-date-complete";
     else if (today > m_date)
-        css_class = "past-due-date";
+        m_deadline_css = "past-due-date";
     else
-        css_class = "due-date";
+        m_deadline_css = "due-date";
 
-    for (const auto& css : DATE_LABEL_CSS_CLASSES) {
-        if (m_deadline_label.has_css_class(css)) {
-            if (css_class == css) return;  // Has already been set
-
-            m_deadline_label.remove_css_class(css);
-        }
-    }
-    m_deadline_label.add_css_class(css_class);
+    m_deadline_label.add_css_class(m_deadline_css);
 }
 
 std::string CardWidget::get_title() const { return m_card_label.get_label(); }
@@ -643,28 +626,19 @@ void CardWidget::on_confirm_changes() {
 }
 
 void CardWidget::update_completion_label(int n_tasks, int n_tasks_complete) {
-    std::string css_class;
     const float threshold = n_tasks / 2.0F;
 
+    m_completion_label.remove_css_class(m_completion_indicator_css);
+
     if (n_tasks_complete == n_tasks) {
-        css_class = "complete-tasks-indicator-complete";
+        m_completion_indicator_css = "complete-tasks-indicator-complete";
     } else if (n_tasks_complete < threshold) {
-        css_class = "complete-tasks-indicator-incomplete";
+        m_completion_indicator_css = "complete-tasks-indicator-incomplete";
     } else if (n_tasks_complete >= threshold) {
-        css_class = "complete-tasks-indicator-almost";
+        m_completion_indicator_css = "complete-tasks-indicator-almost";
     }
 
-    if (m_completion_label.has_css_class(css_class)) {
-        return;
-    }
-
-    for (const auto& css : TASKS_LABEL_CSS_CLASSES) {
-        if (m_completion_label.has_css_class(css)) {
-            m_completion_label.remove_css_class(css);
-        }
-    }
-
-    m_completion_label.add_css_class(css_class);
+    m_completion_label.add_css_class(m_completion_indicator_css);
 }
 
 void CardWidget::__set_cover_color(const Gdk::RGBA& color) {
