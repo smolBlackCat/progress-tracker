@@ -27,7 +27,8 @@ protected:
     void on_activate() override;
 
     BoardManager m_manager;
-    ProgressWindow* main_window = nullptr;
-    Glib::RefPtr<Gio::Settings> progress_settings;
+    ProgressWindow* m_main_window = nullptr;
+    Glib::RefPtr<Gio::Settings> m_settings;
+    bool m_on_session = false;
 };
 }  // namespace ui
