@@ -73,7 +73,7 @@ jobs:
         development-modes: [ON, OFF]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Fetch Dependencies
         run: |
