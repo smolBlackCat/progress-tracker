@@ -248,14 +248,14 @@ void CardlistWidget::receive(CardWidget& card) {
     if (card.parent()) {
         CardlistWidget* old_parent = card.parent();
         card.reference();
-        card.parent()->signal_card_removed().block();
+        old_parent->signal_card_removed().block();
         card.remove_from_parent();
 
         card.set_cardlist(this);
         m_root.append(card);
         m_root.reorder_child_after(m_add_card_button, card);
 
-        card.parent()->signal_card_removed().unblock();
+        old_parent->signal_card_removed().unblock();
         card.unreference();
 
         m_card_received_signal.emit(&card, old_parent, nullptr);
@@ -266,14 +266,14 @@ void CardlistWidget::receive_after(CardWidget& card, CardWidget& sibling) {
     if (card.parent() && sibling.parent() == this) {
         CardlistWidget* old_parent = card.parent();
         card.reference();
-        card.parent()->signal_card_removed().block();
+        old_parent->signal_card_removed().block();
 
         card.remove_from_parent();
         card.set_cardlist(this);
         m_root.append(card);
         m_root.reorder_child_after(card, sibling);
 
-        card.parent()->signal_card_removed().unblock();
+        old_parent->signal_card_removed().unblock();
         card.unreference();
 
         m_card_received_signal.emit(&card, old_parent, &sibling);
