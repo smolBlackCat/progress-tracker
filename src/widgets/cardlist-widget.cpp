@@ -42,6 +42,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board, const std::string& name)
     set_layout_manager(Gtk::BoxLayout::create(Gtk::Orientation::VERTICAL));
     add_css_class("cardlist");
     set_halign(Gtk::Align::START);
+    set_valign(Gtk::Align::START);
     set_size_request(CARDLIST_MAX_WIDTH, -1);
     setup_drag_and_drop();
 
@@ -74,6 +75,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board, const std::string& name)
 
     m_scr_window.set_child(m_root);
     m_scr_window.set_size_request(CARDLIST_MAX_WIDTH, -1);
+    m_scr_window.set_propagate_natural_height();
     m_scr_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
     m_scr_window.insert_at_end(*this);
     using CardListShortcut =
