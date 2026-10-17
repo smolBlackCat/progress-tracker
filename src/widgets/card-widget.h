@@ -1,4 +1,4 @@
-#pragma once
+    #pragma once
 
 #include <core/card.h>
 #include <gtkmm.h>

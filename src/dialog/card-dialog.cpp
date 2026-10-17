@@ -30,7 +30,8 @@ CardDialog::CardDialog()
       m_tasks_box{builder->get_widget<Gtk::Box>("tasks-box")},
       m_notes_textbuffer{
           builder->get_object<Gtk::TextBuffer>("notes-textbuffer")},
-      m_adw_dialog{builder->get_object("card-dialog")} {
+      m_adw_dialog{builder->get_object("card-dialog")},
+      m_container_adapter{*m_tasks_box, &m_checklist_add_button} {
     // Signal connections
     m_checklist_add_button.signal_clicked().connect(
         sigc::mem_fun(*this, &CardDialog::on_add_task));
@@ -57,6 +58,10 @@ CardDialog::CardDialog()
     m_checklist_add_button.set_margin_end(4);
     m_checklist_add_button.set_margin_bottom(3);
     m_tasks_box->append(m_checklist_add_button);
+
+    m_container_adapter.signal_item_added().connect(m_task_add_signal);
+    m_container_adapter.signal_item_removed().connect(m_task_remove_signal);
+    m_container_adapter.signal_item_reordered().connect(m_task_reorder_signal);
 }
 
 CardDialog::~CardDialog() {}
@@ -111,8 +116,7 @@ void CardDialog::set_complete(bool complete) {
 }
 
 void CardDialog::append(TaskWidget& task) {
-    m_tasks_box->append(task);
-    m_tasks_box->reorder_child_after(m_checklist_add_button, task);
+    m_container_adapter.append(task);
 
     task.signal_complete_changed().connect(sigc::track_obj(
         [this, &task]() { m_n_tasks_complete += task.get_complete() ? 1 : -1; },
@@ -120,28 +124,23 @@ void CardDialog::append(TaskWidget& task) {
 
     m_n_tasks++;
     m_n_tasks_complete += task.get_complete() ? 1 : 0;
-
-    m_task_add_signal.emit(&task, -1);
 }
 
 // FIXME: This method (probably the similar ones too) do not have defined
 // measures against non-child siblings
 void CardDialog::insert_after(TaskWidget& next, TaskWidget& sibling) {
-    int index = 0;
-    for (Gtk::Widget* task = m_tasks_box->get_first_child();
-         task && task != &sibling; task = task->get_next_sibling())
-        index++;
+    m_n_tasks++;
+    m_n_tasks_complete += next.get_complete() ? 1 : 0;
 
-    m_tasks_box->insert_child_after(next, sibling);
+    m_container_adapter.insert_after(next, sibling);
 
     next.signal_complete_changed().connect(sigc::track_obj(
         [this, &next]() { m_n_tasks_complete += next.get_complete() ? 1 : -1; },
         next));
+    next.grab_focus();
 
-    m_n_tasks++;
-    m_n_tasks_complete += next.get_complete() ? 1 : 0;
-
-    m_task_add_signal.emit(&next, index);
+    static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
+        ->scroll_to(*next.get_next_sibling());
 }
 
 void CardDialog::remove_task(TaskWidget& task_widget) {
@@ -149,59 +148,36 @@ void CardDialog::remove_task(TaskWidget& task_widget) {
         previous_sibling->grab_focus();
     }
 
-    // Whatever needs to be done with TaskWidget will be done first
-    m_task_remove_signal.emit(&task_widget);
+    m_container_adapter.remove(task_widget);
 
     m_n_tasks--;
     m_n_tasks_complete -= task_widget.get_complete() ? 1 : 0;
-
-    m_tasks_box->remove(task_widget);
 }
 
-void CardDialog::reorder(TaskWidget& next, TaskWidget& sibling) {
-    ssize_t next_i = -1;
-    ssize_t sibling_i = -1;
-
-    ssize_t c_i = 0;
-    for (Gtk::Widget* task = m_tasks_box->get_first_child(); task;
-         task = task->get_next_sibling()) {
-        if ((next_i) != -1 && (sibling_i != -1)) {
-            break;
-        }
-
-        if (&next == task) {
-            next_i = c_i;
-        } else if (&sibling == task) {
-            sibling_i = c_i;
-        }
-        c_i++;
-    }
-
-    if ((next_i) == -1 || (sibling_i == -1)) {
+void CardDialog::reorder_after(TaskWidget& next, TaskWidget& sibling) {
+    if (next.get_parent() != m_tasks_box ||
+        sibling.get_parent() != m_tasks_box) {
         return;
     }
 
-    bool up = false;
-    if (sibling.get_prev_sibling() == &next) {
-        m_tasks_box->reorder_child_after(next, sibling);
-    } else if (sibling.get_next_sibling() == &next) {
-        m_tasks_box->reorder_child_after(sibling, next);
-        up = true;
-    } else {
-        // Widgets are not neighbours. How to reorder them now depends on their
-        // index
-        if (next_i > sibling_i) {  // Move the widget up
-            sibling.get_prev_sibling() == nullptr
-                ? m_tasks_box->reorder_child_at_start(next)
-                : m_tasks_box->reorder_child_after(next,
-                                                   *sibling.get_prev_sibling());
-            up = true;
-        } else {  // Move the widget down
-            m_tasks_box->reorder_child_after(next, sibling);
-        }
+    if (sibling.get_next_sibling() != &next) {
+        static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
+            ->scroll_to(sibling);
+        m_container_adapter.reorder_after(next, sibling);
+    }
+}
+
+void CardDialog::reorder_before(TaskWidget& next, TaskWidget& sibling) {
+    if (next.get_parent() != m_tasks_box ||
+        sibling.get_parent() != m_tasks_box) {
+        return;
     }
 
-    m_task_reorder_signal.emit(&next, &sibling, up);
+    if (sibling.get_prev_sibling() != &next) {
+        static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
+            ->scroll_to(sibling);
+        m_container_adapter.reorder_before(next, sibling);
+    }
 }
 
 void CardDialog::open(Gtk::Window& parent, CardWidget* card_widget) {

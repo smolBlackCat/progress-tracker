@@ -283,7 +283,6 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
           [this](Gtk::Widget&, const Glib::VariantBase&) {
               auto card_widget = Gtk::make_managed<CardWidget>(_("New Card"));
               m_parent->insert_after(*card_widget, *this);
-              card_widget->grab_focus();
               return true;
           }},
          {"<Control>D",
@@ -306,7 +305,7 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
               CardWidget* previous_card =
                   static_cast<CardWidget*>(this->get_prev_sibling());
               if (previous_card) {
-                  this->m_parent->reorder(*previous_card, *this);
+                  this->m_parent->reorder_before(*this, *previous_card);
               } else {
                   this->error_bell();
               }
@@ -317,8 +316,8 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
               Widget* next = this->get_next_sibling();
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
-                  this->m_parent->reorder(*this,
-                                          *static_cast<CardWidget*>(next));
+                  this->m_parent->reorder_after(
+                      *this, *static_cast<CardWidget*>(next));
               } else {
                   this->error_bell();
               }
@@ -337,10 +336,11 @@ CardWidget::CardWidget(const std::string& title, Gdk::RGBA cover_color,
           }},
          {"<Control>Right",
           [this](Gtk::Widget&, const Glib::VariantBase&) {
-              Widget* next_parent = this->m_parent->get_next_sibling();
+              CardlistWidget* next_parent = static_cast<CardlistWidget*>(
+                  this->m_parent->get_next_sibling());
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next_parent->gobj(),
                                               Gtk::Button::get_type())) {
-                  static_cast<CardlistWidget*>(next_parent)->receive(*this);
+                  next_parent->receive(*this);
               } else {
                   this->error_bell();
               }
@@ -560,23 +560,20 @@ void CardWidget::setup_drag_and_drop() {
                 }
 
                 if (dropped_card_widget->parent() == this->m_parent) {
-                    this->m_parent->reorder(*dropped_card_widget, *this);
+                    bool reorder_before = true;
+                    for (Gtk::Widget* prev = this->get_prev_sibling(); prev;
+                         prev = prev->get_prev_sibling()) {
+                        if (prev == dropped_card_widget) {
+                            reorder_before = false;
+                            break;
+                        }
+                    }
+
+                    reorder_before ? this->m_parent->reorder_before(
+                                         *dropped_card_widget, *this)
+                                   : this->m_parent->reorder_after(
+                                         *dropped_card_widget, *this);
                 } else {
-                    // auto dropped_parent = dropped_card_widget->parent();
-                    // dropped_card_widget->reference();
-
-                    // dropped_parent->signal_card_removed().block();
-                    // dropped_parent->remove(*dropped_card_widget);
-                    // dropped_parent->signal_card_removed().unblock();
-
-                    // m_parent->signal_card_added().block();
-                    // m_parent->insert_after(*dropped_card_widget, *this);
-                    // m_parent->signal_card_added().unblock();
-                    // m_card_received_signal.emit(dropped_card_widget,
-                    //                             dropped_parent);
-
-                    // dropped_card_widget->set_cardlist(this->m_parent);
-
                     this->m_parent->receive_after(*dropped_card_widget, *this);
                 }
 

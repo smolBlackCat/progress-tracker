@@ -156,7 +156,6 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
               auto new_task =
                   Gtk::make_managed<TaskWidget>(m_card_dialog, _("New Task"));
               card_details_dialog.insert_after(*new_task, *this);
-              new_task->grab_focus();
               return true;
           }},
          {"<Control>Delete",
@@ -174,7 +173,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
               Gtk::Widget* previous = this->get_prev_sibling();
               if (previous) {
                   TaskWidget& prev_task = *static_cast<TaskWidget*>(previous);
-                  this->m_card_dialog.reorder(prev_task, *this);
+                  this->m_card_dialog.reorder_before(*this, prev_task);
               } else {
                   this->error_bell();
               }
@@ -186,7 +185,7 @@ TaskWidget::TaskWidget(CardDialog& card_details_dialog, const std::string& name,
               if (!G_TYPE_CHECK_INSTANCE_TYPE(next->gobj(),
                                               Gtk::Button::get_type())) {
                   TaskWidget& next_task = *static_cast<TaskWidget*>(next);
-                  this->m_card_dialog.reorder(*this, next_task);
+                  this->m_card_dialog.reorder_after(*this, next_task);
               } else {
                   this->error_bell();
               }
@@ -347,7 +346,23 @@ void TaskWidget::setup_drag_and_drop() {
                     return true;
                 }
 
-                m_card_dialog.reorder(*dropped_taskwidget, *this);
+                // If the dropped task widget does not precede the current
+                // widget, then the dropped task widget must be after the
+                // current widget
+                bool is_before = true;
+                for (Gtk::Widget* prev = this->get_prev_sibling(); prev;
+                     prev = prev->get_prev_sibling()) {
+                    if (prev == dropped_taskwidget) {
+                        is_before = false;
+                        break;
+                    }
+                }
+
+                if (is_before) {
+                    m_card_dialog.reorder_before(*dropped_taskwidget, *this);
+                } else {
+                    m_card_dialog.reorder_after(*dropped_taskwidget, *this);
+                }
 
                 dropped_taskwidget->set_opacity(1);
                 return true;

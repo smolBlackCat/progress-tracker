@@ -80,6 +80,11 @@ BoardWidget::BoardWidget()
     m_add_button.add_css_class("opaque");
 
     m_root.append(m_add_button);
+
+    m_container_adapter.signal_item_added().connect(m_cardlist_added_signal);
+    m_container_adapter.signal_item_removed().connect(m_cardlist_remove_signal);
+    m_container_adapter.signal_item_reordered().connect(
+        m_cardlist_reorder_signal);
 }
 #endif
 
@@ -141,66 +146,20 @@ void BoardWidget::set_background(const std::string& background) {
 #endif
 
 void BoardWidget::append(CardlistWidget& child) {
-    m_root.append(child);
-    m_root.reorder_child_after(m_add_button, child);
-
-    m_cardlist_added_signal.emit(&child, -1);
+    m_container_adapter.append(child);
 }
 
 void BoardWidget::insert_after(CardlistWidget& widget,
                                CardlistWidget& sibling) {
-    ssize_t index = 0;
-    if (!sibling.get_next_sibling()) {
-        index = -1;
-    } else {
-        for (Gtk::Widget* cardlist = m_root.get_first_child();
-             cardlist && cardlist != &sibling;
-             (cardlist = cardlist->get_next_sibling(), index++));
-    }
-
-    m_root.insert_child_after(widget, sibling);
-    m_cardlist_added_signal.emit(&widget, index);
+    m_container_adapter.insert_after(widget, sibling);
 }
 
-void BoardWidget::reorder(CardlistWidget& next, CardlistWidget& sibling) {
-    ssize_t next_i = -1;
-    ssize_t sibling_i = -1;
-
-    ssize_t c_i = 0;
-    for (Gtk::Widget* cardlist = m_root.get_first_child(); cardlist;
-         cardlist = cardlist->get_next_sibling()) {
-        if (&next == cardlist) {
-            next_i = c_i;
-        } else if (&sibling == cardlist) {
-            sibling_i = c_i;
-        }
-        c_i++;
-    }
-
-    if ((next_i) == -1 || (sibling_i == -1)) {
-        return;
-    }
-
-    bool up = false;
-    if (sibling.get_prev_sibling() == &next) {
-        m_root.reorder_child_after(next, sibling);
-    } else if (sibling.get_next_sibling() == &next) {
-        m_root.reorder_child_after(sibling, next);
-        up = true;
-    } else {
-        // Widgets are not neighbours. How to reorder them now depends on their
-        // index
-        if (next_i > sibling_i) {  // Move the widget up
-            sibling.get_prev_sibling() == nullptr
-                ? m_root.reorder_child_at_start(next)
-                : m_root.reorder_child_after(next, *sibling.get_prev_sibling());
-            up = true;
-        } else {  // Move the widget down
-            m_root.reorder_child_after(next, sibling);
-        }
-    }
-
-    m_cardlist_reorder_signal.emit(&next, &sibling, up);
+void BoardWidget::reorder_after(CardlistWidget& next, CardlistWidget& sibling) {
+    m_container_adapter.reorder_after(next, sibling);
+}
+void BoardWidget::reorder_before(CardlistWidget& next,
+                                 CardlistWidget& sibling) {
+    m_container_adapter.reorder_before(next, sibling);
 }
 
 void BoardWidget::remove(CardlistWidget& cardlist) {
@@ -212,9 +171,7 @@ void BoardWidget::remove(CardlistWidget& cardlist) {
                                  next_clist->gobj(), Gtk::Button::get_type())) {
         next_clist->grab_focus();
     }
-
-    m_cardlist_remove_signal.emit(&cardlist);
-    m_root.remove(cardlist);
+    m_container_adapter.remove(cardlist);
 }
 
 void BoardWidget::set_scroll(bool scroll) {
@@ -222,6 +179,7 @@ void BoardWidget::set_scroll(bool scroll) {
     m_scroll_changed_signal.emit();
 }
 
+// FIXME: The application of this method must be reviewed
 void BoardWidget::pop() {
     if (Gtk::Widget* cardlist = m_add_button.get_prev_sibling()) {
         m_cardlist_remove_signal.emit(static_cast<CardlistWidget*>(cardlist));

@@ -5,8 +5,8 @@
 
 #include "base-item.h"
 #include "board-widget.h"
-#include "card-widget.h"
 #include "editable-label-header.h"
+#include "ordered-item-box.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data);
@@ -40,13 +40,8 @@ public:
 
     void set_title(const std::string& title);
 
-    /**
-     * @brief Reorders card widget "next" after card widget "sibling".
-     *
-     * @param next Reference to the CardWidget to be placed after the sibling.
-     * @param sibling Reference to the CardWidget to be placed before the next.
-     */
-    void reorder(ui::CardWidget& next, ui::CardWidget& sibling);
+    void reorder_after(CardWidget& next, CardWidget& sibling);
+    void reorder_before(CardWidget& next, CardWidget& sibling);
 
     void remove(CardWidget& card);
 
@@ -97,6 +92,8 @@ protected:
     Gtk::Button m_add_card_button;
     Gtk::PopoverMenu m_popover;
     Gtk::Box m_root;
+    TransferableItemBox<CardWidget> m_container_adapter{m_root,
+                                                        &m_add_card_button};
 
     // Signals
     sigc::signal<void(std::string, std::string)> m_name_changed_signal;

@@ -5,6 +5,8 @@
 
 #include <utility>
 
+#include "ordered-item-box.h"
+
 namespace ui {
 class CardlistWidget;
 
@@ -62,13 +64,8 @@ public:
      */
     void insert_after(CardlistWidget& widget, CardlistWidget& sibling);
 
-    /**
-     * @brief Reorders two CardlistWidget objects.
-     *
-     * @param next widget to be put after sibling
-     * @param sibling widget to be put before next
-     */
-    void reorder(CardlistWidget& next, CardlistWidget& sibling);
+    void reorder_after(CardlistWidget& next, CardlistWidget& sibling);
+    void reorder_before(CardlistWidget& next, CardlistWidget& sibling);
 
     /**
      * @brief Removes a CardlistWidget widget.
@@ -124,7 +121,8 @@ public:
 
     sigc::signal<void(CardlistWidget*, int)>& signal_added_cardlist();
     sigc::signal<void(CardlistWidget*)>& signal_remove_cardlist();
-    sigc::signal<void(CardlistWidget*, CardlistWidget*, bool)>& signal_reorder();
+    sigc::signal<void(CardlistWidget*, CardlistWidget*, bool)>&
+    signal_reorder();
 
 protected:
     void __setup_auto_scrolling();
@@ -156,7 +154,7 @@ protected:
     Gtk::Picture m_picture;
     Gtk::ScrolledWindow m_scr;
 #endif
-
+    OrderedItemBox<CardlistWidget> m_container_adapter{m_root, &m_add_button};
     Gtk::Box m_root;
     Gtk::Button m_add_button;
     Glib::RefPtr<Gtk::CssProvider> m_css_provider;

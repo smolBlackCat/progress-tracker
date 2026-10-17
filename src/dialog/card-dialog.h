@@ -2,6 +2,7 @@
 #include <adwaita.h>
 #include <core/task.h>
 #include <gtkmm.h>
+#include <widgets/ordered-item-box.h>
 
 #include <chrono>
 #include <utility>
@@ -34,15 +35,8 @@ public:
     void insert_after(TaskWidget& next, TaskWidget& sibling);
     void remove_task(TaskWidget& task_widget);
 
-    /**
-     * @brief Reorders task widgets within the checklist area.
-     *
-     * @param next Reference to the TaskWidget to be placed after the
-     * sibling.
-     * @param sibling Reference to the TaskWidget to be placed before the
-     * next.
-     */
-    void reorder(TaskWidget& next, TaskWidget& sibling);
+    void reorder_after(TaskWidget& next, TaskWidget& sibling);
+    void reorder_before(TaskWidget& next, TaskWidget& sibling);
 
     /**
      * @brief Opens the details of a card widget.
@@ -114,6 +108,7 @@ protected:
     Gtk::Revealer* m_checkbutton_revealer;
     Gtk::CheckButton* m_checkbutton;
     Gtk::Box* m_tasks_box;
+    OrderedItemBox<ui::TaskWidget> m_container_adapter;
     Glib::RefPtr<Gtk::TextBuffer> m_notes_textbuffer;
 
     // Signals
