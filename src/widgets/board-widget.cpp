@@ -167,18 +167,35 @@ void BoardWidget::insert_after(CardlistWidget& widget,
 
     widget.grab_focus();
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())
         ->scroll_to(*widget.get_next_sibling());
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                           widget.get_next_sibling()->gobj(), NULL);
+#endif
 }
 
 void BoardWidget::reorder_after(CardlistWidget& next, CardlistWidget& sibling) {
     m_container_adapter.reorder_after(next, sibling);
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
+    m_container_adapter.reorder_after(next, sibling);
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                           sibling.gobj(), NULL);
+#endif
 }
 void BoardWidget::reorder_before(CardlistWidget& next,
                                  CardlistWidget& sibling) {
     m_container_adapter.reorder_before(next, sibling);
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
+    m_container_adapter.reorder_after(next, sibling);
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                           sibling.gobj(), NULL);
+#endif
 }
 
 void BoardWidget::remove(CardlistWidget& cardlist) {

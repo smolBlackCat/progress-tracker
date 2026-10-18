@@ -153,8 +153,13 @@ void CardDialog::insert_after(TaskWidget& next, TaskWidget& sibling) {
         next));
     next.grab_focus();
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
         ->scroll_to(*next.get_next_sibling());
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_tasks_box->get_parent()->gobj()),
+                           next.get_next_sibling()->gobj(), NULL);
+#endif
 }
 
 void CardDialog::remove_task(TaskWidget& task_widget) {
@@ -177,9 +182,14 @@ void CardDialog::reorder_after(TaskWidget& next, TaskWidget& sibling) {
     }
 
     if (sibling.get_next_sibling() != &next) {
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
             ->scroll_to(sibling);
         m_container_adapter.reorder_after(next, sibling);
+#else
+        gtk_viewport_scroll_to(GTK_VIEWPORT(m_tasks_box->get_parent()->gobj()),
+                               sibling.gobj(), NULL);
+#endif
     }
 }
 
@@ -190,9 +200,14 @@ void CardDialog::reorder_before(TaskWidget& next, TaskWidget& sibling) {
     }
 
     if (sibling.get_prev_sibling() != &next) {
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         static_cast<Gtk::Viewport*>(m_tasks_box->get_parent())
             ->scroll_to(sibling);
         m_container_adapter.reorder_before(next, sibling);
+#else
+        gtk_viewport_scroll_to(GTK_VIEWPORT(m_tasks_box->get_parent()->gobj()),
+                               sibling.gobj(), NULL);
+#endif
     }
 }
 

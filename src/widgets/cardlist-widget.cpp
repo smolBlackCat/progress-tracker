@@ -5,6 +5,7 @@
 
 #include "board-widget.h"
 #include "card-widget.h"
+#include "gtk/gtk.h"
 
 extern "C" {
 static void cardlist_class_init(void* klass, void* user_data) {
@@ -170,12 +171,24 @@ void CardlistWidget::set_title(const std::string& name) {
 
 void CardlistWidget::reorder_after(CardWidget& next, CardWidget& sibling) {
     m_container_adapter.reorder_after(next, sibling);
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
+    m_container_adapter.reorder_after(next, sibling);
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                           sibling.gobj(), NULL);
+#endif
 }
 
 void CardlistWidget::reorder_before(CardWidget& next, CardWidget& sibling) {
     m_container_adapter.reorder_before(next, sibling);
+#if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
+    m_container_adapter.reorder_after(next, sibling);
+#else
+    gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                           sibling.gobj(), NULL);
+#endif
 }
 
 void CardlistWidget::remove(CardWidget& card) {
@@ -203,7 +216,7 @@ void CardlistWidget::append(CardWidget& card, bool interactive) {
                     vajd->set_value(vajd->get_upper() + 1);
                 },
                 Glib::PRIORITY_LOW);
-        }   
+        }
     }
 }
 
@@ -214,8 +227,13 @@ void CardlistWidget::insert_after(CardWidget& card, CardWidget& sibling) {
 
         card.grab_focus();
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         static_cast<Gtk::Viewport*>(m_root.get_parent())
             ->scroll_to(*card.get_next_sibling());
+#else
+        gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                               card.get_next_sibling()->gobj(), NULL);
+#endif
     }
 }
 
@@ -225,11 +243,18 @@ void CardlistWidget::receive(CardWidget& card) {
         m_container_adapter.receive_from(old_parent->m_container_adapter, card);
         card.set_cardlist(this);
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         Gtk::Viewport* parent_vp =
             static_cast<Gtk::Viewport*>(get_parent()->get_parent());
         parent_vp->scroll_to(*this);
         Gtk::Viewport* vp = static_cast<Gtk::Viewport*>(m_root.get_parent());
         vp->scroll_to(*card.get_next_sibling());
+#else
+        gtk_viewport_scroll_to(GTK_VIEWPORT(get_parent()->get_parent()->gobj()),
+                               this->gobj(), NULL);
+        gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                               card.get_next_sibling()->gobj(), NULL);
+#endif
         card.grab_focus();
 
         m_card_received_signal.emit(&card, old_parent, nullptr);
@@ -243,11 +268,18 @@ void CardlistWidget::receive_after(CardWidget& card, CardWidget& sibling) {
                                          &sibling);
         card.set_cardlist(this);
 
+#if GTKMM_CHECK_VERSION(4, 12, 0)
         Gtk::Viewport* parent_vp =
             static_cast<Gtk::Viewport*>(get_parent()->get_parent());
         parent_vp->scroll_to(*this);
         Gtk::Viewport* vp = static_cast<Gtk::Viewport*>(m_root.get_parent());
         vp->scroll_to(*card.get_next_sibling());
+#else
+        gtk_viewport_scroll_to(GTK_VIEWPORT(get_parent()->get_parent()->gobj()),
+                               this->gobj(), NULL);
+        gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
+                               card.get_next_sibling()->gobj(), NULL);
+#endif
         card.grab_focus();
 
         m_card_received_signal.emit(&card, old_parent, &sibling);
