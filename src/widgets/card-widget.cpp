@@ -476,6 +476,8 @@ void CardWidget::update_deadline_label() {
         m_deadline_css = "due-date-complete";
     else if (today > m_date)
         m_deadline_css = "past-due-date";
+    else if (today == m_date)
+        m_deadline_css = "almost-past-due-date";
     else
         m_deadline_css = "due-date";
 

@@ -110,6 +110,16 @@ task:focus {
     box-shadow: 0 0 2px @card_shade_color;
 }
 
+.almost-past-due-date {
+    background-color: @warning_color;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 0 2px @card_shade_color;
+}
+
 .due-date-complete {
     background-color: @success_color;
     transition-property: background-color;
