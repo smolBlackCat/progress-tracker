@@ -64,7 +64,7 @@ CardlistWidget::CardlistWidget(BoardWidget& board, const std::string& name)
     m_add_card_button.set_hexpand(true);
     m_add_card_button.signal_clicked().connect([this]() {
         CardWidget* card = Gtk::make_managed<CardWidget>(_("New Card"));
-        append(*card);
+        append(*card, true);
     });
     m_root.append(m_add_card_button);
 
@@ -170,21 +170,40 @@ void CardlistWidget::set_title(const std::string& name) {
 
 void CardlistWidget::reorder_after(CardWidget& next, CardWidget& sibling) {
     m_container_adapter.reorder_after(next, sibling);
+    static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
 }
 
 void CardlistWidget::reorder_before(CardWidget& next, CardWidget& sibling) {
     m_container_adapter.reorder_before(next, sibling);
+    static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
 }
 
 void CardlistWidget::remove(CardWidget& card) {
+    if (Gtk::Widget* previous_sibling = card.get_prev_sibling()) {
+        previous_sibling->grab_focus();
+    } else {
+        card.get_next_sibling()->grab_focus();
+    }
     m_container_adapter.remove(card);
     card.set_cardlist(nullptr);
 }
 
-void CardlistWidget::append(CardWidget& card) {
+void CardlistWidget::append(CardWidget& card, bool interactive) {
     if (!card.parent()) {
         m_container_adapter.append(card);
         card.set_cardlist(this);
+
+        if (interactive) {
+            Glib::signal_idle().connect_once(
+                [this, &card]() {
+                    Gtk::ScrolledWindow* vp = static_cast<Gtk::ScrolledWindow*>(
+                        m_root.get_parent()->get_parent());
+                    card.grab_focus();
+                    auto vajd = vp->get_vadjustment();
+                    vajd->set_value(vajd->get_upper() + 1);
+                },
+                Glib::PRIORITY_LOW);
+        }   
     }
 }
 
@@ -192,6 +211,11 @@ void CardlistWidget::insert_after(CardWidget& card, CardWidget& sibling) {
     if (!card.parent() && sibling.parent() == this) {
         m_container_adapter.insert_after(card, sibling);
         card.set_cardlist(this);
+
+        card.grab_focus();
+
+        static_cast<Gtk::Viewport*>(m_root.get_parent())
+            ->scroll_to(*card.get_next_sibling());
     }
 }
 
@@ -200,6 +224,13 @@ void CardlistWidget::receive(CardWidget& card) {
         CardlistWidget* old_parent = card.parent();
         m_container_adapter.receive_from(old_parent->m_container_adapter, card);
         card.set_cardlist(this);
+
+        Gtk::Viewport* parent_vp =
+            static_cast<Gtk::Viewport*>(get_parent()->get_parent());
+        parent_vp->scroll_to(*this);
+        Gtk::Viewport* vp = static_cast<Gtk::Viewport*>(m_root.get_parent());
+        vp->scroll_to(*card.get_next_sibling());
+        card.grab_focus();
 
         m_card_received_signal.emit(&card, old_parent, nullptr);
     }
@@ -211,6 +242,13 @@ void CardlistWidget::receive_after(CardWidget& card, CardWidget& sibling) {
         m_container_adapter.receive_from(old_parent->m_container_adapter, card,
                                          &sibling);
         card.set_cardlist(this);
+
+        Gtk::Viewport* parent_vp =
+            static_cast<Gtk::Viewport*>(get_parent()->get_parent());
+        parent_vp->scroll_to(*this);
+        Gtk::Viewport* vp = static_cast<Gtk::Viewport*>(m_root.get_parent());
+        vp->scroll_to(*card.get_next_sibling());
+        card.grab_focus();
 
         m_card_received_signal.emit(&card, old_parent, &sibling);
     }

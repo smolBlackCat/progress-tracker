@@ -31,7 +31,7 @@ public:
     void set_deadline(const Glib::Date& deadline = {});
     void set_complete(bool complete = true);
 
-    void append(TaskWidget& task);
+    void append(TaskWidget& task, bool interactive = false);
     void insert_after(TaskWidget& next, TaskWidget& sibling);
     void remove_task(TaskWidget& task_widget);
 

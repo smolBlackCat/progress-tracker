@@ -57,7 +57,7 @@ public:
      *
      * @param child CardlistWidget object reference
      */
-    void append(CardlistWidget& child);
+    void append(CardlistWidget& child, bool interactive = false);
 
     /**
      * @brief Inserts widget after sibling

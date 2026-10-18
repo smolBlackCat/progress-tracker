@@ -8,6 +8,8 @@
 #include <chrono>
 
 #include "glibmm/datetime.h"
+#include "glibmm/main.h"
+#include "glibmm/priorities.h"
 #include "glibmm/ustring.h"
 
 namespace ui {
@@ -115,8 +117,22 @@ void CardDialog::set_complete(bool complete) {
     m_checkbutton->set_active(complete);
 }
 
-void CardDialog::append(TaskWidget& task) {
+void CardDialog::append(TaskWidget& task, bool interactive) {
     m_container_adapter.append(task);
+
+    if (interactive) {
+        // This assumes that the current structure is
+        // Box → Viewport → ScrolledWindow
+        Glib::signal_idle().connect_once(
+            [this, &task]() {
+                Gtk::ScrolledWindow* vp = static_cast<Gtk::ScrolledWindow*>(
+                    m_tasks_box->get_parent()->get_parent());
+                task.grab_focus();
+                auto vajd = vp->get_vadjustment();
+                vajd->set_value(vajd->get_upper() + 1);
+            },
+            Glib::PRIORITY_LOW);
+    }
 
     task.signal_complete_changed().connect(sigc::track_obj(
         [this, &task]() { m_n_tasks_complete += task.get_complete() ? 1 : -1; },
@@ -126,8 +142,6 @@ void CardDialog::append(TaskWidget& task) {
     m_n_tasks_complete += task.get_complete() ? 1 : 0;
 }
 
-// FIXME: This method (probably the similar ones too) do not have defined
-// measures against non-child siblings
 void CardDialog::insert_after(TaskWidget& next, TaskWidget& sibling) {
     m_n_tasks++;
     m_n_tasks_complete += next.get_complete() ? 1 : 0;
@@ -146,12 +160,14 @@ void CardDialog::insert_after(TaskWidget& next, TaskWidget& sibling) {
 void CardDialog::remove_task(TaskWidget& task_widget) {
     if (Gtk::Widget* previous_sibling = task_widget.get_prev_sibling()) {
         previous_sibling->grab_focus();
+    } else {
+        task_widget.get_next_sibling()->grab_focus();
     }
-
-    m_container_adapter.remove(task_widget);
 
     m_n_tasks--;
     m_n_tasks_complete -= task_widget.get_complete() ? 1 : 0;
+
+    m_container_adapter.remove(task_widget);
 }
 
 void CardDialog::reorder_after(TaskWidget& next, TaskWidget& sibling) {
@@ -235,7 +251,7 @@ sigc::signal<void()>& CardDialog::signal_closed() {
 
 void CardDialog::on_add_task() {
     auto new_task = Gtk::make_managed<TaskWidget>(*this, _("New Task"));
-    append(*new_task);
+    append(*new_task, true);
 }
 
 std::string CardDialog::get_title() const { return m_title_entry->get_text(); }

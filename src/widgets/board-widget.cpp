@@ -72,7 +72,7 @@ BoardWidget::BoardWidget()
     m_add_button.signal_clicked().connect([this]() {
         CardlistWidget* new_cardlist =
             Gtk::make_managed<CardlistWidget>(*this, _("New CardList"));
-        append(*new_cardlist);
+        append(*new_cardlist, true);
     });
 
     m_add_button.set_valign(Gtk::Align::START);
@@ -145,32 +145,49 @@ void BoardWidget::set_background(const std::string& background) {
 }
 #endif
 
-void BoardWidget::append(CardlistWidget& child) {
+void BoardWidget::append(CardlistWidget& child, bool interactive) {
     m_container_adapter.append(child);
+
+    if (interactive) {
+        Glib::signal_idle().connect_once(
+            [this, &child]() {
+                Gtk::ScrolledWindow* vp = static_cast<Gtk::ScrolledWindow*>(
+                    m_root.get_parent()->get_parent());
+                child.grab_focus();
+                auto hadj = vp->get_hadjustment();
+                hadj->set_value(hadj->get_upper() + 1);
+            },
+            Glib::PRIORITY_LOW);
+    }
 }
 
 void BoardWidget::insert_after(CardlistWidget& widget,
                                CardlistWidget& sibling) {
     m_container_adapter.insert_after(widget, sibling);
+
+    widget.grab_focus();
+
+    static_cast<Gtk::Viewport*>(m_root.get_parent())
+        ->scroll_to(*widget.get_next_sibling());
 }
 
 void BoardWidget::reorder_after(CardlistWidget& next, CardlistWidget& sibling) {
     m_container_adapter.reorder_after(next, sibling);
+    static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
 }
 void BoardWidget::reorder_before(CardlistWidget& next,
                                  CardlistWidget& sibling) {
     m_container_adapter.reorder_before(next, sibling);
+    static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
 }
 
 void BoardWidget::remove(CardlistWidget& cardlist) {
-    Gtk::Widget* prev_clist = cardlist.get_prev_sibling();
-    Gtk::Widget* next_clist = cardlist.get_next_sibling();
-    if (prev_clist) {
-        prev_clist->grab_focus();
-    } else if (next_clist && !G_TYPE_CHECK_INSTANCE_TYPE(
-                                 next_clist->gobj(), Gtk::Button::get_type())) {
-        next_clist->grab_focus();
+    if (Gtk::Widget* previous_sibling = cardlist.get_prev_sibling()) {
+        previous_sibling->grab_focus();
+    } else {
+        cardlist.get_next_sibling()->grab_focus();
     }
+
     m_container_adapter.remove(cardlist);
 }
 

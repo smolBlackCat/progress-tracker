@@ -51,7 +51,7 @@ public:
      *
      * @param card card widget
      */
-    void append(CardWidget& card);
+    void append(CardWidget& card, bool interactive = false);
     void insert_after(CardWidget& card, CardWidget& sibling);
 
     /**
