@@ -323,7 +323,7 @@ void CardDialog::clear() {
 
     m_date_menubutton->set_label(_("Set Due Date"));
     m_day_selected_cnn.block();
-    m_calendar->set_date(Glib::DateTime::create_now_local());
+    m_calendar->select_day(Glib::DateTime::create_now_local());
     m_day_selected_cnn.unblock();
     m_checkbutton_revealer->set_reveal_child(false);
     m_checkbutton->set_active(false);
