@@ -44,7 +44,7 @@ CardDialog::CardDialog()
 
     m_checkbutton->signal_toggled().connect(
         sigc::mem_fun(m_complete_changed_signal, &sigc::signal<void()>::emit));
-    m_calendar->signal_day_selected().connect(
+    m_day_selected_cnn = m_calendar->signal_day_selected().connect(
         sigc::mem_fun(*this, &CardDialog::on_set_due_date));
 
     g_signal_connect(
@@ -321,11 +321,15 @@ void CardDialog::clear() {
 
     m_n_tasks = m_n_tasks_complete = 0;
 
-    m_notes_textbuffer->set_text("");
-
     m_date_menubutton->set_label(_("Set Due Date"));
+    m_day_selected_cnn.block();
+    m_calendar->set_date(Glib::DateTime::create_now_local());
+    m_day_selected_cnn.unblock();
     m_checkbutton_revealer->set_reveal_child(false);
+    m_checkbutton->set_active(false);
     m_deadline = {};
+
+    m_notes_textbuffer->set_text("");
 
     m_card_widget = nullptr;
 }

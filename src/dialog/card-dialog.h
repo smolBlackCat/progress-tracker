@@ -111,6 +111,8 @@ protected:
     OrderedItemBox<ui::TaskWidget> m_container_adapter;
     Glib::RefPtr<Gtk::TextBuffer> m_notes_textbuffer;
 
+    sigc::connection m_day_selected_cnn;
+
     // Signals
     sigc::signal<void(std::string, std::string)> m_name_changed_signal;
     sigc::signal<void(std::string, std::string)> m_notes_changed_signal;
