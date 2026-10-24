@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress — Kanban Board Manager</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon"
+        href="https://raw.githubusercontent.com/smolBlackCat/progress-tracker/refs/heads/main/data/io.github.smolblackcat.Progress.ico">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cantarell', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #2b2b2b;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+
+            background-color: #d2d6db;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.45) 0%, rgba(0, 0, 0, 0.15) 100%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02) 1px, transparent 1px, transparent 2px);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 40px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 820px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .skeuo-panel {
+            background: linear-gradient(180deg, #f7f8fa 0%, #e1e5eb 100%);
+            border: 1px solid #a1a7b3;
+            border-top: 1px solid #ffffff;
+            border-bottom: 1px solid #787e8a;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow:
+                0 10px 25px -5px rgba(0, 0, 0, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        /* Inset Well / Plate for nested elements */
+        .skeuo-inset-well {
+            background: #d8dce2;
+            border-radius: 8px;
+            border-top: 1px solid #9aa0aa;
+            border-left: 1px solid #abb1bd;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.25);
+            padding: 16px;
+        }
+
+        .header-block {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 32px 24px 24px;
+        }
+
+        /* 3D App Icon Badge */
+        .app-icon-badge {
+            width: 88px;
+            height: 88px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #3a88ea 0%, #1752b3 50%, #0d3b87 100%);
+            border: 2px solid #ffffff;
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.35),
+                inset 0 2px 3px rgba(255, 255, 255, 0.7),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Gloss Highlight overlay */
+        .app-icon-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: 18px 18px 50% 50%;
+            pointer-events: none;
+        }
+
+        .app-icon-badge img {
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+        }
+
+        .app-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #22252a;
+            letter-spacing: -0.02em;
+            text-shadow: 0 1px 0 #ffffff;
+        }
+
+        .app-tagline {
+            font-size: 1.15rem;
+            color: #525866;
+            max-width: 580px;
+            line-height: 1.4;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .screenshot-card {
+            padding: 12px;
+            background: linear-gradient(180deg, #2c2f36 0%, #1a1c20 100%);
+            border: 1px solid #121316;
+            border-top: 1px solid #5a5f6c;
+            border-radius: 10px;
+            box-shadow:
+                0 12px 30px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        /* Glass Frame Screen Bevel */
+        .screen-frame {
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #000000;
+            position: relative;
+            background-color: #111;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .screen-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Glass Reflection Streak */
+        .screen-frame::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -30%;
+            width: 160%;
+            height: 100%;
+            background: linear-gradient(115deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 30%, rgba(255, 255, 255, 0) 31%);
+            pointer-events: none;
+        }
+
+        .description-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2a2d34;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .description-content {
+            font-size: 1.02rem;
+            line-height: 1.6;
+            color: #383c45;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .skeuo-tab {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #4a505c;
+            background: linear-gradient(180deg, #eceef2 0%, #cbd0d8 100%);
+            border: 1px solid #9fa5b0;
+            border-top: 1px solid #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow:
+                0 2px 3px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            text-shadow: 0 1px 0 #ffffff;
+            transition: all 0.1s ease;
+        }
+
+        .skeuo-tab:hover {
+            background: linear-gradient(180deg, #f5f6f8 0%, #d8dde5 100%);
+        }
+
+        .skeuo-tab.active {
+            background: linear-gradient(180deg, #1d6ed8 0%, #124ba6 100%);
+            color: #ffffff;
+            border-color: #0b3478;
+            border-top-color: #5ca1ff;
+            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+            box-shadow:
+                inset 0 2px 4px rgba(0, 0, 0, 0.4),
+                0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* Terminal Window Inset */
+        .terminal-container {
+            background: #181a1f;
+            border-radius: 8px;
+            border: 1px solid #000000;
+            border-bottom: 1px solid #3d424e;
+            box-shadow:
+                inset 0 3px 8px rgba(0, 0, 0, 0.8),
+                0 1px 0 rgba(255, 255, 255, 0.5);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #4ef081;
+            text-shadow: 0 0 6px rgba(78, 240, 129, 0.4);
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .terminal-text span.prompt {
+            color: #888;
+            user-select: none;
+        }
+
+        .cmd-snippet {
+            display: none;
+        }
+
+        .cmd-snippet.active {
+            display: block;
+        }
+
+        /* Glossy Push Button (Copy Action) */
+        .skeuo-btn {
+            background: linear-gradient(180deg, #3b88f7 0%, #1a5ec7 50%, #12479e 100%);
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #0d3880;
+            border-top: 1px solid #8cbaff;
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+            transition: transform 0.05s ease, filter 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .skeuo-btn:hover {
+            filter: brightness(1.08);
+        }
+
+        /* Realistic Tactile Pressed Down Effect */
+        .skeuo-btn:active {
+            background: linear-gradient(180deg, #104294 0%, #1753b3 100%);
+            box-shadow:
+                inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                0 1px 0 rgba(255, 255, 255, 0.4);
+            transform: translateY(1px);
+        }
+
+        .footer-block {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.88rem;
+            color: #636a78;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            border-top: 1px solid #b6bbc4;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            margin-top: 8px;
+        }
+
+        .footer-link {
+            color: #1a5ec7;
+            text-decoration: none;
+            font-weight: 700;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Tweaks */
+        @media (max-width: 600px) {
+            body {
+                padding: 16px 10px;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .terminal-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .skeuo-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper">
+        <header class="skeuo-panel header-block">
+            <img src="https://raw.githubusercontent.com/smolBlackCat/progress-tracker/ddc8a90fde7121b8f71aeaa5c470849b389dcb9d/data/io.github.smolblackcat.Progress.svg"
+                width="120px" height="120px" />
+            <h1 class="app-title">Progress</h1>
+            <p class="app-tagline">Simple kanban board manager for Linux</p>
+        </header>
+
+        <section class="screenshot-card">
+            <div class="screen-frame">
+                <img src="https://github.com/smolBlackCat/progress-tracker/raw/main/pictures/progress-app-presentation.png"
+                    alt="Progress Application Preview">
+            </div>
+        </section>
+
+        <section class="skeuo-panel description-section">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                About Progress
+            </h2>
+            <div class="skeuo-inset-well description-content">
+                Progress is a Kanban board management app designed to be simple yet flexible for most workflows. Whether
+                you're managing software projects or organising daily tasks, Progress keeps things straightforward.
+                Built with C++ with GTK4 and libadwaita.
+            </div>
+        </section>
+
+        <section class="skeuo-panel">
+            <div class="tab-bar">
+                <button class="skeuo-tab active" onclick="switchTab('flatpak', this)">Flatpak</button>
+                <button class="skeuo-tab" onclick="switchTab('source', this)">Source</button>
+            </div>
+
+            <div class="terminal-container">
+                <div class="terminal-text">
+                    <!-- PLACEHOLDER: INSTALL_COMMAND -->
+                    <div id="cmd-flatpak" class="cmd-snippet active">
+                        <span class="prompt">$ </span>flatpak install flathub io.github.smolblackcat.Progress
+                    </div>
+                    <div id="cmd-source" class="cmd-snippet">
+                        <span class="prompt">$ </span>git clone https://github.com/smolBlackCat/progress-tracker.git
+                    </div>
+                </div>
+
+                <button class="skeuo-btn" onclick="copyCommand()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span id="copyText">Copy</span>
+                </button>
+            </div>
+        </section>
+
+        <footer class="footer-block">
+            <span>© 2026 smolblackcat</span>
+            <span>•</span>
+            <a href="https://github.com/smolBlackCat/progress-tracker" target="_blank" class="footer-link">View on
+                GitHub</a>
+            <span>•</span>
+            <a href="https://github.com/smolBlackCat/progress-tracker/blob/main/LICENSE" class="footer-link">MIT
+                License</a>
+        </footer>
+
+    </div>
+
+    <script>
+        let currentTab = 'flatpak';
+
+        function switchTab(tabId, element) {
+            currentTab = tabId;
+
+            // Toggle active state on tabs
+            document.querySelectorAll('.skeuo-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Toggle active command snippet
+            document.querySelectorAll('.cmd-snippet').forEach(cmd => {
+                cmd.classList.remove('active');
+            });
+            document.getElementById(`cmd-${tabId}`).classList.add('active');
+        }
+
+        function copyCommand() {
+            const activeSnippet = document.getElementById(`cmd-${currentTab}`);
+            const textToCopy = activeSnippet.innerText.replace(/^\$\s*/, '').trim();
+
+            // ExecCommand clipboard fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            // Button feedback
+            const copyText = document.getElementById('copyText');
+            copyText.textContent = 'Copied!';
+            setTimeout(() => {
+                copyText.textContent = 'Copy';
+            }, 1800);
+        }
+    </script>
+</body>
+</html>
