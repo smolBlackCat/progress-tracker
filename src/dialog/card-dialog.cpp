@@ -42,10 +42,11 @@ CardDialog::CardDialog()
     m_unset_due_date_button->signal_clicked().connect(
         sigc::mem_fun(*this, &CardDialog::on_unset_due_date));
 
-    m_checkbutton->signal_toggled().connect(
-        sigc::mem_fun(m_complete_changed_signal, &sigc::signal<void()>::emit));
+    m_checkbutton->signal_toggled().connect(m_complete_changed_signal);
     m_day_selected_cnn = m_calendar->signal_day_selected().connect(
         sigc::mem_fun(*this, &CardDialog::on_set_due_date));
+
+    m_day_selected_cnn.block();
 
     g_signal_connect(
         m_adw_dialog->gobj(), "closed",
@@ -218,6 +219,8 @@ void CardDialog::open(Gtk::Window& parent, CardWidget* card_widget) {
 
     adw_dialog_present(ADW_DIALOG(m_adw_dialog->gobj()),
                        static_cast<Gtk::Widget&>(parent).gobj());
+
+    m_day_selected_cnn.unblock();
 }
 
 void CardDialog::close() { adw_dialog_close(ADW_DIALOG(m_adw_dialog->gobj())); }
@@ -293,10 +296,12 @@ void CardDialog::on_delete_card() {
 
 void CardDialog::on_unset_due_date() {
     m_date_menubutton->set_label(_("Set Due Date"));
+    m_checkbutton->set_active(false);
+    m_checkbutton_revealer->set_reveal_child(false);
+
     m_deadline = std::chrono::year_month_day{};
     m_card_widget->set_deadline_label();
     m_card_widget->set_complete(false);
-    m_checkbutton_revealer->set_reveal_child(false);
 }
 
 void CardDialog::on_set_due_date() {
@@ -307,7 +312,7 @@ void CardDialog::on_set_due_date() {
     m_deadline = std::chrono::year_month_day{std::chrono::year{y},
                                              std::chrono::month{unsigned(m)},
                                              std::chrono::day{unsigned(d)}};
-    m_card_widget->set_deadline_label(new_date, m_card_widget->get_complete());
+    m_card_widget->set_deadline_label(new_date, m_checkbutton->get_active());
     m_checkbutton_revealer->set_reveal_child(true);
     m_date_menubutton->set_label(new_date.format_string("%x"));
 }
