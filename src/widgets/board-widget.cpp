@@ -48,6 +48,11 @@ BoardWidget::BoardWidget()
     m_add_button.add_css_class("opaque");
 
     m_root.append(m_add_button);
+
+    m_container_adapter.signal_item_added().connect(m_cardlist_added_signal);
+    m_container_adapter.signal_item_removed().connect(m_cardlist_remove_signal);
+    m_container_adapter.signal_item_reordered().connect(
+        m_cardlist_reorder_signal);
 }
 #else
 BoardWidget::BoardWidget()
