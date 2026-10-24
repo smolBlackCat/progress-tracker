@@ -180,7 +180,6 @@ void BoardWidget::reorder_after(CardlistWidget& next, CardlistWidget& sibling) {
     m_container_adapter.reorder_after(next, sibling);
 #if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
-    m_container_adapter.reorder_after(next, sibling);
 #else
     gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
                            sibling.gobj(), NULL);
@@ -191,7 +190,6 @@ void BoardWidget::reorder_before(CardlistWidget& next,
     m_container_adapter.reorder_before(next, sibling);
 #if GTKMM_CHECK_VERSION(4, 12, 0)
     static_cast<Gtk::Viewport*>(m_root.get_parent())->scroll_to(sibling);
-    m_container_adapter.reorder_after(next, sibling);
 #else
     gtk_viewport_scroll_to(GTK_VIEWPORT(m_root.get_parent()->gobj()),
                            sibling.gobj(), NULL);
