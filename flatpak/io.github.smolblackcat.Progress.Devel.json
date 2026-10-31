@@ -1,0 +1,73 @@
+{
+    "id": "io.github.smolblackcat.Progress",
+    "runtime": "org.gnome.Platform",
+    "sdk": "org.gnome.Sdk",
+    "runtime-version": "51",
+    "command": "progress-debug",
+    "finish-args": [
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--share=ipc"
+    ],
+    "cleanup": [
+        "/include",
+        "/lib/cmake",
+        "/lib/pkgconfig"
+    ],
+    "modules": [
+        "gtkmm.json",
+        {
+            "name": "tinyxml2",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/leethomason/tinyxml2.git",
+                    "tag": "11.0.0",
+                    "commit": "9148bdf719e997d1f474be6bcc7943881046dba1"
+                }
+            ]
+        },
+        {
+            "name": "spdlog",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DSPDLOG_BUILD_EXAMPLE=OFF",
+                "-DSPDLOG_BUILD_TESTS=OFF",
+                "-DSPDLOG_ENABLE_PCH=ON",
+                "-DSPDLOG_BUILD_SHARED=ON"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/gabime/spdlog.git",
+                    "tag": "v1.17.0",
+                    "commit": "79524ddd08a4ec981b7fea76afd08ee05f83755d"
+                }
+            ]
+        },
+        {
+            "name": "progress-tracker",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "config-opts": [
+                "-DDEVELOPMENT=ON",
+                "-DFLATPAK=ON",
+                "-DCMAKE_INSTALL_PREFIX=/app"
+            ],
+            "build-options": {
+                "cxxflags": "-include mutex"
+            },
+            "post-install": [
+                "glib-compile-schemas /app/share/glib-2.0/schemas/"
+            ],
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "../"
+                }
+            ]
+        }
+    ]
+}
