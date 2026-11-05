@@ -8,6 +8,7 @@
 
 #include "dialog/card-dialog.h"
 #include "gdk/gdkkeysyms.h"
+#include "glibmm/markup.h"
 
 extern "C" {
 static void task_class_init(void* klass, void* user_data) {
@@ -270,13 +271,14 @@ void TaskWidget::off_rename() {
     m_entry_revealer.set_reveal_child(false);
     m_label.set_visible(true);
 
-    const std::string new_label = m_entry.get_text();
+    const Glib::ustring new_label = m_entry.get_text();
     const std::string old_label = m_title;
     if (new_label != old_label) {
         if (m_checkbutton.get_active()) {
-            m_label.set_markup(Glib::ustring::compose("<s>%1</s>", new_label));
+            m_label.set_markup(Glib::ustring::compose(
+                "<s>%1</s>", Glib::Markup::escape_text(new_label)));
         } else {
-            m_label.set_markup(new_label);
+            m_label.set_markup(Glib::Markup::escape_text(new_label));
         }
         m_title = new_label;
         m_name_changed_signal.emit(old_label, new_label);
