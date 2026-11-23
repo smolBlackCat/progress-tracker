@@ -12,7 +12,7 @@ Simple Kanban board manager
 ## About Progress
 
 Progress is a Kanban board management app designed to be simple yet flexible for
-most workflows. Whether you're managing software projects or organsing
+most workflows. Whether you're managing software projects or organising
 daily tasks, Progress keeps things straightforward. Built with C++ with GTK4
 and LibAdwaita.
 
@@ -67,21 +67,37 @@ docker compose up
 
 ### Linux
 
-1. Install the dependencies
-
+<details>
+   <summary>Debian/Ubuntu</summary>
    ```sh
-   # Catch2 is not necessary if you're not going to build tests
    sudo apt install cmake libgtkmm-4.0-dev libadwaita-1-dev libtinyxml2-dev \
     libspdlog-dev gettext catch2
    ```
+</details>
 
-2. Clone the project's repository
+<details>
+   <summary>Fedora</summary>
+   ```sh
+   sudo dnf install gcc-c++ cmake ninja-build gettext gtkmm4.0-devel \
+   libadwaita-devel tinyxml2-devel spdlog-devel Catch2-devel
+   ```
+</details>
+
+<details>
+   <summary>Arch Linux</summary>
+   ```sh
+   sudo pacman -S --needed base-devel cmake ninja gettext gtkmm-4.0 \
+   libadwaita tinyxml2 spdlog catch2
+   ```
+</details>
+
+1. Clone the project's repository
 
    ```sh
    git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
    ```
 
-3. Configure and compile the project.
+2. Configure and compile the project.
 
    ```sh
    cd progress-tracker/
@@ -90,7 +106,7 @@ docker compose up
    cmake --build build/
    ```
 
-4. Install the project
+3. Install the project
 
    ```sh
    # There's no need for sudo if you set to a local install prefix
@@ -99,11 +115,7 @@ docker compose up
    sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
    ```
 
-### Windows
-
-[MSYS2][msys-download] is a build platform utilised by the project for porting
-Progress to Windows operating systems. Ensure that the platform is installed
-before proceeding.
+### Windows (MSYS2)
 
 1. Install the dependencies
 
@@ -142,9 +154,7 @@ before proceeding.
 [progress-logo]: data/io.github.smolblackcat.Progress.svg
 [progress-flathub]: https://flathub.org/apps/io.github.smolblackcat.Progress
 [github-release]: https://github.com/smolBlackCat/progress-tracker/releases
-[flathub-badge]: https://flathub.org/assets/badges/flathub-badge-i-en.png
 [github-release-badge]: https://img.shields.io/github/v/release/smolBlackCat/progress-tracker?logo=github
 [flatpak-release-badge]: https://img.shields.io/flathub/downloads/io.github.smolblackcat.Progress?logo=flathub
 [github-licence]: https://img.shields.io/github/license/smolBlackCat/progress-tracker
 [build-status]: https://img.shields.io/github/actions/workflow/status/smolBlackCat/progress-tracker/progress-ci.yml
-[msys-download]: https://www.msys2.org/
