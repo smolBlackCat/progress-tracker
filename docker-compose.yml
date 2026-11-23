@@ -1,0 +1,14 @@
+name: progress
+
+services:
+  app:
+    build: ./
+    environment:
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+    volumes:
+      - data:/home/progress
+      - $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+
+volumes:
+  data:
