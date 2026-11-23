@@ -1,6 +1,23 @@
 name: Progress CI
 
-on: ["push", "pull_request"]
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'data/**'
+      - 'CMakeLists.txt'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/progress-ci.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'data/**'
+      - 'CMakeLists.txt'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/progress-ci.yml'
 
 jobs:
   windows:
