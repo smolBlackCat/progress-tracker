@@ -9,39 +9,31 @@ Simple Kanban board manager
 
 ![App Windows](pictures/progress-app-presentation.png)
 
+## About Progress
+
 Progress is a Kanban board management app designed to be simple yet flexible for
 most workflows. Whether you're managing software projects or organsing
 daily tasks, Progress keeps things straightforward. Built with C++ with GTK4
 and LibAdwaita.
 
-## Dependencies
-
-* gtkmm-4 (>= 4.10.0)
-* libadwaita1 (>= 1.5)
-* tinyxml2 (>= 10.0.0)
-* spdlog (>= 1.12)
-* crossguid (built-in)
+* Keyboard-centred workflow support
+* Support drag-and-drop gestures
+* Basic card customisation
+* Responsive design
 
 ## Installation
 
 ### Flatpak
 
-[![flathub-badge]][progress-flathub]
-
 ```sh
 flatpak install flathub io.github.smolblackcat.Progress
 ```
 
-### Debian-based
+### Debian Stable
 
-Progress is available for installation on Debian/Ubuntu based systems. Note that
-the package is built on Ubuntu 24.04 and might not work on every Debian-based
-system. For instance, this package may or may not work on Debian Stable.
+[See the releases section](https://github.com/smolBlackCat/progress-tracker/releases)
 
 ### Arch Linux (AUR)
-
-Progress is available on the AUR (Arch User Repository). You can install it
-using the `yay` command-line application:
 
 ```sh
 yay -S progress-tracker
@@ -49,18 +41,31 @@ yay -S progress-tracker
 
 ### Windows
 
-For Windows systems, Progress is available as a standard Windows installer
-executable or as a compressed file containing the application's binary and its
-dependencies. These builds target 64-bit systems, so make sure the host operating
-system is also 64-bit.
+[See the releases section](https://github.com/smolBlackCat/progress-tracker/releases)
 
-### Building From Source
+## Building From Source
 
 Alternative for those who want to contribute to the project somehow or want
 a custom build. Ensure all dependencies are installed beforehand and verify
 whether the system's C++ compiler is C++20 compliant.
 
-#### Linux
+## Dependencies
+
+* gtkmm-4 (>= 4.10.0)
+* libadwaita1 (>= 1.5)
+* tinyxml2 (>= 10.0.0)
+* spdlog (>= 1.12)
+* crossguid (git submodule)
+
+### Docker
+
+```sh
+git clone https://github.com/smolBlackCat/progress-tracker.git --recursive
+cd progress-tracker
+docker compose up
+```
+
+### Linux
 
 1. Install the dependencies
 
@@ -94,7 +99,7 @@ whether the system's C++ compiler is C++20 compliant.
    sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
    ```
 
-#### Windows
+### Windows
 
 [MSYS2][msys-download] is a build platform utilised by the project for porting
 Progress to Windows operating systems. Ensure that the platform is installed
@@ -131,7 +136,6 @@ before proceeding.
    ```
 
 ## Consider Supporting the Project
-
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T71MK1CZ)
 
