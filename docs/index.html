@@ -191,6 +191,10 @@
             color: #383c45;
         }
 
+        .description-content ul {
+            margin-left: 50px;
+        }
+
         .tab-bar {
             display: flex;
             gap: 6px;
@@ -384,9 +388,68 @@
             </div>
         </section>
 
+        <section class="skeuo-panel description-section">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                What's new in Progress 1.8?
+            </h2>
+
+            <div class="skeuo-inset-well description-content">
+                <p>
+                    Progress has gone through a major refactoring phase. It is
+                    not a big release, but some relevant improvements have been
+                    made.
+                </p>
+
+                <p><b>Additions</b></p>
+                <ul>
+                    <li>Card deadline label turns yellow when the task is due today.</li>
+                    <li>Cards show an icon when they have notes. This replaces
+                        the old text tooltips</li>
+                    <li>Spinner in the main window to indicate internal progress</li>
+                    <li>Enhanced keyboard support</li>
+                    <li>Card lists expand on demand</li>
+                </ul>
+
+                <p><b>Changes</b></p>
+                <ul>
+                    <li>Board deletion mode now uses the window header bar instead of a separate
+                        action bar and overlay.</li>
+                    <li>Board grid is now homogeneous</li>
+                </ul>
+
+                <p><b>Fixes</b></p>
+                <ul>
+                    <li>Considerably high CPU usage on idle while the application is idle</li>
+                    <li>Crash and undefined behaviour when removing a card list, caused by dangling
+                        card pointers in the update queue.</li>
+                    <li>Undefined behaviour on Windows caused by missing container signal
+                        connections.</li>
+                    <li>Duplicate board entries after a previous attempt to open another Progress
+                        session.</li>
+                    <li>Add board and menu buttons staying insensitive after loading.</li>
+                    <li>Card dialog keeping state from previous use, and setting a card's deadline
+                        to the previously selected one.</li>
+                    <li>Task labels are now escaped before being updated, so text is no longer
+                        interpreted as markup.</li>
+                </ul>
+
+                <p><b>Translations</b></p>
+                <ul>
+                    <li>Updated Spanish translation (#46, thanks to @haggen88)</li>
+                    <li>Updated and improved Turkish translation (#44, #45, thanks to @yakushabb)</li>
+                </ul>
+            </div>
+        </section>
+
         <section class="skeuo-panel">
             <div class="tab-bar">
                 <button class="skeuo-tab active" onclick="switchTab('flatpak', this)">Flatpak</button>
+                <button class="skeuo-tab" onclick="switchTab('aur', this)">Arch Linux</button>
                 <button class="skeuo-tab" onclick="switchTab('source', this)">Source</button>
             </div>
 
@@ -395,6 +458,9 @@
                     <!-- PLACEHOLDER: INSTALL_COMMAND -->
                     <div id="cmd-flatpak" class="cmd-snippet active">
                         <span class="prompt">$ </span>flatpak install flathub io.github.smolblackcat.Progress
+                    </div>
+                    <div id="cmd-aur" class="cmd-snippet">
+                        <span class="prompt">$</span> yay -S progress-tracker
                     </div>
                     <div id="cmd-source" class="cmd-snippet">
                         <span class="prompt">$ </span>git clone https://github.com/smolBlackCat/progress-tracker.git
@@ -464,4 +530,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -64,6 +64,63 @@
   </description>
 
   <releases>
+    <release date="2026-11-21" version="1.8.0">
+      <description translate="no">
+        <p>What's new in Progress 1.7.3</p>
+        <p>
+          Progress has gone through a major refactoring phase. It is
+          not a big release, but some relevant improvements have been
+          made.
+        </p>
+
+        <p>
+          <b>Additions</b>
+        </p>
+        <ul>
+          <li>Card deadline label turns yellow when the task is due today.</li>
+          <li>Cards show an icon when they have notes. This replaces
+            the old text tooltips</li>
+          <li>Spinner in the main window to indicate internal progress</li>
+          <li>Enhanced keyboard support</li>
+          <li>Card lists expand on demand</li>
+        </ul>
+
+        <p>
+          <b>Changes</b>
+        </p>
+        <ul>
+          <li>Board deletion mode now uses the window header bar instead of a separate
+            action bar and overlay.</li>
+          <li>Board grid is now homogeneous</li>
+        </ul>
+
+        <p>
+          <b>Fixes</b>
+        </p>
+        <ul>
+          <li>Considerably high CPU usage on idle while the application is idle</li>
+          <li>Crash and undefined behaviour when removing a card list, caused by dangling
+            card pointers in the update queue.</li>
+          <li>Undefined behaviour on Windows caused by missing container signal
+            connections.</li>
+          <li>Duplicate board entries after a previous attempt to open another Progress
+            session.</li>
+          <li>Add board and menu buttons staying insensitive after loading.</li>
+          <li>Card dialog keeping state from previous use, and setting a card's deadline
+            to the previously selected one.</li>
+          <li>Task labels are now escaped before being updated, so text is no longer
+            interpreted as markup.</li>
+        </ul>
+
+        <p>
+          <b>Translations</b>
+        </p>
+        <ul>
+          <li>Updated Spanish translation (#46, thanks to @haggen88)</li>
+          <li>Updated and improved Turkish translation (#44, #45, thanks to @yakushabb)</li>
+        </ul>
+      </description>
+    </release>
     <release date="2025-12-03" version="1.7.3">
       <description translate="no">
         <p>What's new in Progress 1.7.3</p>
