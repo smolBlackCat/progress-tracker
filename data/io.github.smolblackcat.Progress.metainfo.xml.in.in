@@ -74,7 +74,7 @@
         </p>
 
         <p>
-          <b>Additions</b>
+          <em>Additions</em>
         </p>
         <ul>
           <li>Card deadline label turns yellow when the task is due today.</li>
@@ -86,7 +86,7 @@
         </ul>
 
         <p>
-          <b>Changes</b>
+          <em>Changes</em>
         </p>
         <ul>
           <li>Board deletion mode now uses the window header bar instead of a separate
@@ -95,7 +95,7 @@
         </ul>
 
         <p>
-          <b>Fixes</b>
+          <em>Fixes</em>
         </p>
         <ul>
           <li>Considerably high CPU usage on idle while the application is idle</li>
@@ -113,7 +113,7 @@
         </ul>
 
         <p>
-          <b>Translations</b>
+          <em>Translations</em>
         </p>
         <ul>
           <li>Updated Spanish translation (#46, thanks to @haggen88)</li>
