@@ -36,6 +36,7 @@
 .cache/
 .idea/
 .zed/
+*.sublime-*
 
 # Ignore build
 build/
